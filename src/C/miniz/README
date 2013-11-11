@@ -1,0 +1,3 @@
+deflate/inflate implementation library from http://code.google.com/p/miniz.
+
+Used by the zlib plugin to validate potential zlib candidates.

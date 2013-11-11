@@ -1,0 +1,4 @@
+#0	beshort		0x7801		Zlib header, no compression
+0	beshort		0x789c		Zlib header, default compression
+0	beshort		0x78da		Zlib header, best compression
+0	beshort		0x785e		Zlib header, compressed

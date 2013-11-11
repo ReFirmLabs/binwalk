@@ -1,0 +1,113 @@
+DESCRIPTION
+
+	The binwalk python module can be used by any python script to programatically perform binwalk scans and 
+	obtain the results of those scans. 
+
+	The classes, methods and objects in the binwalk modules are documented via pydoc, including examples, 
+	so those interested in using the binwalk module are encouraged to look there. However, several common usage 
+	examples are provided here to help jump-start development efforts.
+
+
+BASIC SCAN
+
+	The following is an example of the simplest scan, and is equivalent to running binwalk on the command line 
+	with no additional arguments:
+
+		import pprint
+		from binwalk import Binwalk
+
+		with Binwalk() as bw:
+			pprint.PrettyPrinter().pprint(bw.scan('firmware.bin'))
+
+	The scan() method will return a dictionary of results, and may also be passed a list of files:
+
+		from binwalk import Binwalk
+
+		with Binwalk() as bw:
+			for (filename, file_results) in bw.scan(['firmware1.bin', 'firmware2.bin']).iteritems():
+			print "Results for %s:" % filename
+			for (offset, results) in file_results:
+				for result in results:
+					print offset, result['description']
+
+	Alternatively, a callback function may be specified. The callback function is called as soon as a match is found. 
+	It is passed two arguments: the offset at which the match was found, and a list of results dictionaries (one dictionary 
+	per result found at that offset):
+
+		from binwalk import Binwalk
+
+		def my_callback(offset, results):
+			print "Found %d results at offset %d:" % (len(results), offset)
+			for result in results:
+				print " %s" % result['description']
+
+		with Binwalk() as bw:
+			bw.scan('firmware.bin', callback=my_callback)
+
+
+ADDING FILTERS
+
+	Include and exclude filters may be specified which operate identically to the --include, and --exclude binwalk
+	command line options:
+
+		from binwalk import Binwalk
+		
+		binwalk = Binwalk()
+		
+		# Exclusively filters out all signatures except those containing the string 'filesystem' (same as --include)
+		binwalk.filter.include('filesystem')
+
+		# Excludes all results that contain the string 'jffs2' (same as --exclude)
+		binwalk.filter.exclude('jffs2')
+
+		binwalk.scan('firmware')
+		binwalk.cleanup()
+
+
+EXTRACTING FILES
+
+	Extract rules may be specified which operate identically to the --dd and --extract binwalk command line options.
+	Extraction is automatically enabled when one or more extraction rules are specified.
+	
+	To add a custom extract rule, or a list of extract rules (such as with the --dd option):
+
+		from binwalk import Binwalk
+
+		binwalk = Binwalk()
+
+		# Extract results containing the string 'gzip' with a file extension of 'gz' and run the gunzip command
+		binwalk.extractor.add_rule('gzip:gz:gunzip %e')
+
+		# Extract 'gzip' and 'filesystem' results
+		binwalk.extractor.add_rule(['gzip:gz', 'filesystem:fs'])
+
+		binwalk.scan('firmware')
+		binwalk.cleanup()
+
+	To load the default extraction rules from the extract.conf file (such as with the --extract option):
+	
+		from binwalk import Binwalk
+		
+		binwalk = Binwalk()
+		binwalk.extractor.load_defaults()
+		binwalk.scan('firmware.bin')
+		binwalk.cleanup()
+
+	To enabled delayed file extraction (such as with the --delay option):
+
+		from binwalk import Binwalk
+		
+		binwalk = Binwalk()
+		binwalk.extractor.enable_delayed_extract(True)
+		binwalk.scan('firmware.bin')
+		binwalk.cleanup()
+
+	To enable file cleanup after extraction (such as with the --rm option):
+
+		from binwalk import Binwalk
+		
+		binwalk = Binwalk()
+		binwalk.extractor.cleanup_extracted_files(True)
+		binwalk.scan('firmware.bin')
+		binwalk.cleanup()
+

@@ -1,0 +1,39 @@
+#------------------------------------------------------------------------------
+# $File: pdf,v 1.6 2009/09/19 16:28:11 christos Exp $
+# pdf:  file(1) magic for Portable Document Format
+#
+0       string          %PDF-           PDF document,
+>6	byte		!0x2e		invalid
+>5      string          x               version: "%3s"
+
+#------------------------------------------------------------------------------
+# $File: zyxel,v 1.6 2009/09/19 16:28:13 christos Exp $
+# zyxel:  file(1) magic for ZyXEL modems
+#
+# From <rob@pe1chl.ampr.org>
+# These are the /etc/magic entries to decode datafiles as used for the
+# ZyXEL U-1496E DATA/FAX/VOICE modems.  (This header conforms to a
+# ZyXEL-defined standard)
+
+0       string          ZyXEL\002       ZyXEL voice data
+>10     byte            0               \b, CELP encoding
+>10     byte&0x0B       1               \b, ADPCM2 encoding
+>10     byte&0x0B       2               \b, ADPCM3 encoding
+>10     byte&0x0B       3               \b, ADPCM4 encoding
+>10     byte&0x0B       8               \b, New ADPCM3 encoding
+>10     byte&0x04       4               \b,with resync
+
+0       string          LinuxGuestRecord        Xen saved domain file
+
+0	string		\x3chtml		HTML document header{extract-delay:HTML document footer}
+>5	byte		!0x20
+>>5	byte		!0x3e			\b, invalid
+0	string		\x3cHTML		HTML document header{extract-delay:HTML document footer}
+>5	byte		!0x20
+>>5	byte		!0x3e			\b, invalid
+
+0	string		\x3c/html\x3e		HTML document footer{offset-adjust:7}
+0	string		\x3c/HTML\x3e		HTML document footer{offset-adjust:7}
+
+0	string		\x3c?xml\x20version	XML document,
+>15	string		x			version: "%.3s"

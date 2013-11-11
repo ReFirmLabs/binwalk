@@ -1,0 +1,2500 @@
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x40
+# ------------------------------------------------------------------
+0		string	\x40\x00\x00	LZMA compressed data, properties: 0x40,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x41
+# ------------------------------------------------------------------
+0		string	\x41\x00\x00	LZMA compressed data, properties: 0x41,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x48
+# ------------------------------------------------------------------
+0		string	\x48\x00\x00	LZMA compressed data, properties: 0x48,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x49
+# ------------------------------------------------------------------
+0		string	\x49\x00\x00	LZMA compressed data, properties: 0x49,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x51
+# ------------------------------------------------------------------
+0		string	\x51\x00\x00	LZMA compressed data, properties: 0x51,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x5A
+# ------------------------------------------------------------------
+0		string	\x5A\x00\x00	LZMA compressed data, properties: 0x5A,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x5B
+# ------------------------------------------------------------------
+0		string	\x5B\x00\x00	LZMA compressed data, properties: 0x5B,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x5C
+# ------------------------------------------------------------------
+0		string	\x5C\x00\x00	LZMA compressed data, properties: 0x5C,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x5D
+# ------------------------------------------------------------------
+0		string	\x5D\x00\x00	LZMA compressed data, properties: 0x5D,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x5E
+# ------------------------------------------------------------------
+0		string	\x5E\x00\x00	LZMA compressed data, properties: 0x5E,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x63
+# ------------------------------------------------------------------
+0		string	\x63\x00\x00	LZMA compressed data, properties: 0x63,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x64
+# ------------------------------------------------------------------
+0		string	\x64\x00\x00	LZMA compressed data, properties: 0x64,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x65
+# ------------------------------------------------------------------
+0		string	\x65\x00\x00	LZMA compressed data, properties: 0x65,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x66
+# ------------------------------------------------------------------
+0		string	\x66\x00\x00	LZMA compressed data, properties: 0x66,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x6C
+# ------------------------------------------------------------------
+0		string	\x6C\x00\x00	LZMA compressed data, properties: 0x6C,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x6D
+# ------------------------------------------------------------------
+0		string	\x6D\x00\x00	LZMA compressed data, properties: 0x6D,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x6E
+# ------------------------------------------------------------------
+0		string	\x6E\x00\x00	LZMA compressed data, properties: 0x6E,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x75
+# ------------------------------------------------------------------
+0		string	\x75\x00\x00	LZMA compressed data, properties: 0x75,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x76
+# ------------------------------------------------------------------
+0		string	\x76\x00\x00	LZMA compressed data, properties: 0x76,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x7E
+# ------------------------------------------------------------------
+0		string	\x7E\x00\x00	LZMA compressed data, properties: 0x7E,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x87
+# ------------------------------------------------------------------
+0		string	\x87\x00\x00	LZMA compressed data, properties: 0x87,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x88
+# ------------------------------------------------------------------
+0		string	\x88\x00\x00	LZMA compressed data, properties: 0x88,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x89
+# ------------------------------------------------------------------
+0		string	\x89\x00\x00	LZMA compressed data, properties: 0x89,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x8A
+# ------------------------------------------------------------------
+0		string	\x8A\x00\x00	LZMA compressed data, properties: 0x8A,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x8B
+# ------------------------------------------------------------------
+0		string	\x8B\x00\x00	LZMA compressed data, properties: 0x8B,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x90
+# ------------------------------------------------------------------
+0		string	\x90\x00\x00	LZMA compressed data, properties: 0x90,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x91
+# ------------------------------------------------------------------
+0		string	\x91\x00\x00	LZMA compressed data, properties: 0x91,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x92
+# ------------------------------------------------------------------
+0		string	\x92\x00\x00	LZMA compressed data, properties: 0x92,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x93
+# ------------------------------------------------------------------
+0		string	\x93\x00\x00	LZMA compressed data, properties: 0x93,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x99
+# ------------------------------------------------------------------
+0		string	\x99\x00\x00	LZMA compressed data, properties: 0x99,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x9A
+# ------------------------------------------------------------------
+0		string	\x9A\x00\x00	LZMA compressed data, properties: 0x9A,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x9B
+# ------------------------------------------------------------------
+0		string	\x9B\x00\x00	LZMA compressed data, properties: 0x9B,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xA2
+# ------------------------------------------------------------------
+0		string	\xA2\x00\x00	LZMA compressed data, properties: 0xA2,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xA3
+# ------------------------------------------------------------------
+0		string	\xA3\x00\x00	LZMA compressed data, properties: 0xA3,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xAB
+# ------------------------------------------------------------------
+0		string	\xAB\x00\x00	LZMA compressed data, properties: 0xAB,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xB4
+# ------------------------------------------------------------------
+0		string	\xB4\x00\x00	LZMA compressed data, properties: 0xB4,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xB5
+# ------------------------------------------------------------------
+0		string	\xB5\x00\x00	LZMA compressed data, properties: 0xB5,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xB6
+# ------------------------------------------------------------------
+0		string	\xB6\x00\x00	LZMA compressed data, properties: 0xB6,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xB7
+# ------------------------------------------------------------------
+0		string	\xB7\x00\x00	LZMA compressed data, properties: 0xB7,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xB8
+# ------------------------------------------------------------------
+0		string	\xB8\x00\x00	LZMA compressed data, properties: 0xB8,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xBD
+# ------------------------------------------------------------------
+0		string	\xBD\x00\x00	LZMA compressed data, properties: 0xBD,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xBE
+# ------------------------------------------------------------------
+0		string	\xBE\x00\x00	LZMA compressed data, properties: 0xBE,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xBF
+# ------------------------------------------------------------------
+0		string	\xBF\x00\x00	LZMA compressed data, properties: 0xBF,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xC0
+# ------------------------------------------------------------------
+0		string	\xC0\x00\x00	LZMA compressed data, properties: 0xC0,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xC6
+# ------------------------------------------------------------------
+0		string	\xC6\x00\x00	LZMA compressed data, properties: 0xC6,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xC7
+# ------------------------------------------------------------------
+0		string	\xC7\x00\x00	LZMA compressed data, properties: 0xC7,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xC8
+# ------------------------------------------------------------------
+0		string	\xC8\x00\x00	LZMA compressed data, properties: 0xC8,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xCF
+# ------------------------------------------------------------------
+0		string	\xCF\x00\x00	LZMA compressed data, properties: 0xCF,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xD0
+# ------------------------------------------------------------------
+0		string	\xD0\x00\x00	LZMA compressed data, properties: 0xD0,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xD8
+# ------------------------------------------------------------------
+0		string	\xD8\x00\x00	LZMA compressed data, properties: 0xD8,
+
+# These are all the valid dictionary sizes supported by LZMA utils.
+>1		lelong	!65536	
+>>1		lelong	!131072	
+>>>1		lelong	!262144	
+>>>>1		lelong	!524288	
+>>>>>1		lelong	!1048576	
+>>>>>>1		lelong	!2097152	
+>>>>>>>1	lelong	!4194304	
+>>>>>>>>1	lelong	!8388608	
+>>>>>>>>>1	lelong	!16777216	
+>>>>>>>>>>1	lelong	!33554432	invalid
+>1		lelong	x		dictionary size: %d bytes,
+
+# Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
+# This could technically be valid, but is unlikely.
+>5		lequad	!-1
+>>5		lequad	<32		invalid
+>>5		lequad	>0x40000000	invalid
+
+# These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
+# Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
+# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+>1		lelong	65536
+>>5		lequad	65536		invalid
+>1		lelong	131072
+>>5		lequad	131072		invalid
+>1		lelong	262144
+>>5		lequad	262144		invalid
+>1		lelong	524288
+>>5		lequad	524288		invalid
+>1		lelong	1048576
+>>5		lequad	1048576		invalid
+>1		lelong	2097152
+>>5		lequad	2097152		invalid
+>1		lelong	4194304
+>>5		lequad	4194304		invalid
+>1		lelong	8388608
+>>5		lequad	8388608		invalid
+>1		lelong	16777216
+>>5		lequad	16777216	invalid
+>1		lelong	33554432
+>>5		lequad	33554432	invalid
+>5		lequad	x		uncompressed size: %lld bytes
+

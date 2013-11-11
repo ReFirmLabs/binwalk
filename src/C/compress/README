@@ -1,0 +1,3 @@
+Unix compress implementation of LZW (from debian source repository).
+
+Used by the compressd plugin to validate potential compress'd candidates.

@@ -1,0 +1,11 @@
+
+#---------------------------Bootloaders--------------------------------
+
+# CFE bootloader
+0	string	CFE1CFE1	CFE boot loader
+>40	string	CFE1CFE1	invalid
+
+# U-Boot boot loader
+0	string	U-Boot		U-Boot boot loader reference{one-of-many}
+0	string	U-BOOT		U-Boot boot loader reference{one-of-many}
+0	string	u-boot		U-Boot boot loader reference{one-of-many}

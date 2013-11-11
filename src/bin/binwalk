@@ -1,0 +1,600 @@
+#!/usr/bin/env python
+
+import sys
+import os.path
+import binwalk
+from threading import Thread
+from getopt import GetoptError, gnu_getopt as GetOpt
+
+def display_status():
+	global bwalk
+
+	while bwalk is not None:
+		# Display the current scan progress when the enter key is pressed.
+		try:
+			raw_input()
+			print "Progress: %.2f%% (%d / %d)\n" % (((float(bwalk.total_scanned) / float(bwalk.scan_length)) * 100), bwalk.total_scanned, bwalk.scan_length)
+		except Exception, e:
+			pass
+
+def examples():
+	name = os.path.basename(sys.argv[0])
+
+	print """
+Scanning firmware for file signatures:
+
+\t$ %s firmware.bin
+
+Extracting files from firmware:
+
+\t$ %s -Me firmware.bin
+
+Hueristic compression/encryption analysis:
+
+\t$ %s -H firmware.bin
+
+Scanning firmware for executable code:
+
+\t$ %s -A firmware.bin
+
+Performing a firmware strings analysis:
+
+\t$ %s -S firmware.bin
+
+Performing a firmware entropy analysis:
+
+\t$ %s -E firmware.bin
+
+Display identified file signatures on entropy graph:
+
+\t$ %s -EB firmware.bin
+
+Diffing multiple files:
+
+\t$ %s -W firmware1.bin firmware2.bin firmware3.bin
+
+See http://code.google.com/p/binwalk/wiki/TableOfContents for more.
+""" % (name, name, name, name, name, name, name, name)
+	sys.exit(0)
+
+def usage(fd):
+	fd.write("\n")
+	
+	fd.write("Binwalk v%s\n" % binwalk.Config.VERSION)
+	fd.write("Craig Heffner, http://www.devttys0.com\n")
+	fd.write("\n")
+	
+	fd.write("Usage: %s [OPTIONS] [FILE1] [FILE2] [FILE3] ...\n" % os.path.basename(sys.argv[0]))
+	fd.write("\n")
+	
+	fd.write("Signature Analysis:\n")
+	fd.write("\t-B, --binwalk                 Perform a file signature scan (default)\n")
+	fd.write("\t-R, --raw-bytes=<string>      Search for a custom signature\n")
+	fd.write("\t-A, --opcodes                 Scan for executable code signatures\n")
+	fd.write("\t-C, --cast                    Cast file contents as various data types\n")
+	fd.write("\t-m, --magic=<file>            Specify an alternate magic file to use\n")
+	fd.write("\t-x, --exclude=<filter>        Exclude matches that have <filter> in their description\n")
+	fd.write("\t-y, --include=<filter>        Only search for matches that have <filter> in their description\n")
+	fd.write("\t-I, --show-invalid            Show results marked as invalid\n")
+	fd.write("\t-T, --ignore-time-skew        Do not show results that have timestamps more than 1 year in the future\n")
+	fd.write("\t-k, --keep-going              Show all matching results at a given offset, not just the first one\n")
+	fd.write("\t-b, --dumb                    Disable smart signature keywords\n")
+	fd.write("\n")
+
+	fd.write("Strings Analysis:\n")
+	fd.write("\t-S, --strings                 Scan for ASCII strings (may be combined with -B, -R, -A, or -E)\n")
+	fd.write("\t-s, --strlen=<n>              Set the minimum string length to search for (default: 3)\n")
+	fd.write("\n")
+	
+	fd.write("Entropy Analysis:\n")
+	fd.write("\t-E, --entropy                 Plot file entropy (may be combined with -B, -R, -A, or -S)\n")
+	fd.write("\t-H, --heuristic               Identify unknown compression/encryption based on entropy heuristics (implies -E)\n")
+	fd.write("\t-K, --block=<int>             Set the block size for entropy analysis (default: %d)\n" % binwalk.entropy.FileEntropy.DEFAULT_BLOCK_SIZE)
+	fd.write("\t-a, --gzip                    Use gzip compression ratios to measure entropy\n")
+	fd.write("\t-N, --no-plot                 Do not generate an entropy plot graph\n")
+	fd.write("\t-F, --marker=<offset:name>    Add a marker to the entropy plot graph\n")
+	fd.write("\t-Q, --no-legend               Omit the legend from the entropy plot graph\n")
+	fd.write("\t-J, --save-plot               Save plot as an SVG (implied if multiple files are specified)\n")
+	fd.write("\n")
+
+	fd.write("Binary Diffing:\n")
+	fd.write("\t-W, --diff                    Hexdump / diff the specified files\n")
+	fd.write("\t-K, --block=<int>             Number of bytes to display per line (default: %d)\n" % binwalk.hexdiff.HexDiff.DEFAULT_BLOCK_SIZE)
+	fd.write("\t-G, --green                   Only show hex dump lines that contain bytes which were the same in all files\n")
+	fd.write("\t-i, --red                     Only show hex dump lines that contain bytes which were different in all files\n")
+	fd.write("\t-U, --blue                    Only show hex dump lines that contain bytes which were different in some files\n")
+	fd.write("\t-w, --terse                   Diff all files, but only display a hex dump of the first file\n")
+	fd.write("\n")
+
+	fd.write("Extraction Options:\n")
+	fd.write("\t-D, --dd=<type:ext[:cmd]>     Extract <type> signatures, give the files an extension of <ext>, and execute <cmd>\n")
+	fd.write("\t-e, --extract=[file]          Automatically extract known file types; load rules from file, if specified\n")
+	fd.write("\t-M, --matryoshka=[n]          Recursively scan extracted files, up to n levels deep (8 levels of recursion is the default)\n")
+	fd.write("\t-r, --rm                      Cleanup extracted files and zero-size files\n")
+	fd.write("\t-d, --delay                   Delay file extraction for files with known footers\n")
+	fd.write("\n")
+
+	fd.write("Plugin Options:\n")
+	fd.write("\t-X, --disable-plugin=<name>   Disable a plugin by name\n")
+	fd.write("\t-Y, --enable-plugin=<name>    Enable a plugin by name\n")
+	fd.write("\t-p, --disable-plugins         Do not load any binwalk plugins\n")
+	fd.write("\t-L, --list-plugins            List all user and system plugins by name\n")
+	fd.write("\n")
+
+	fd.write("General Options:\n")	
+	fd.write("\t-o, --offset=<int>            Start scan at this file offset\n")
+	fd.write("\t-l, --length=<int>            Number of bytes to scan\n")
+	fd.write("\t-g, --grep=<text>             Grep results for the specified text\n")
+	fd.write("\t-f, --file=<file>             Log results to file\n")
+	fd.write("\t-c, --csv                     Log results to file in csv format\n")
+	fd.write("\t-O, --skip-unopened           Ignore file open errors and process only the files that can be opened\n")
+	fd.write("\t-t, --term                    Format output to fit the terminal window\n")
+	fd.write("\t-q, --quiet                   Supress output to stdout\n")
+	fd.write("\t-v, --verbose                 Be verbose (specify twice for very verbose)\n")
+	fd.write("\t-u, --update                  Update magic signature files\n")
+	fd.write("\t-?, --examples                Show example usage\n")
+	fd.write("\t-h, --help                    Show help output\n")
+	fd.write("\n")
+
+	if fd == sys.stderr:
+		sys.exit(1)
+	else:
+		sys.exit(0)
+
+def main():
+	# The Binwalk class instance must be global so that the display_status thread can access it.
+	global bwalk
+
+	MIN_ARGC = 2
+
+	requested_scans = []	
+	offset = 0
+	length = 0
+	strlen = 0
+	verbose = 0
+	matryoshka = 1
+	block_size = 0
+	failed_open_count = 0
+	quiet = False
+	do_comp = False
+	do_files = False
+	log_file = None
+	do_csv = False
+	save_plot = False
+	show_plot = True
+	show_legend = True
+	entropy_scan = False
+	enable_plugins = True
+	show_invalid = False
+	entropy_algorithm = None
+	format_to_terminal = False
+	custom_signature = None
+	delay_extraction = False
+	ignore_time_skew = True
+	extract_rules_file = None
+	ignore_failed_open = False
+	extract_from_config = False
+	show_single_hex_dump = False
+	cleanup_after_extract = False
+	explicit_signature_scan = False
+	ignore_signature_keywords = False
+	magic_flags = binwalk.magic.MAGIC_NONE
+	markers = []
+	magic_files = []
+	file_opt_list = []
+	target_files = []
+	greps = []
+	excludes = []
+	searches = []
+	extracts = []
+	options = []
+	arguments = []
+	plugin_whitelist = []
+	plugin_blacklist = []
+
+	config = binwalk.Config()
+
+	short_options = "AaBbCcdEeGHhIiJkLMNnOPpQqrSTtUuvWw?D:F:f:g:K:o:l:m:R:s:X:x:Y:y:"
+	long_options = [
+			"rm",
+			"help",
+			"green",
+			"red",
+			"blue",
+			"examples",
+			"quiet", 
+			"csv",
+			"verbose",
+			"opcodes",
+			"cast",
+			"update",
+			"binwalk", 
+			"keep-going",
+			"show-invalid",
+			"ignore-time-skew",
+			"profile",
+			"delay",
+			"skip-unopened",
+			"term",
+			"tim",
+			"terse",
+			"diff",
+			"dumb",
+			"entropy",
+			"heuristic",
+			"math",
+			"gzip",
+			"save-plot",
+			"no-plot",
+			"no-legend", 
+			"matryoshka=",
+			"strings",
+			"list-plugins",
+			"disable-plugins",
+			"disable-plugin=",
+			"enable-plugin=",
+			"marker=",
+			"strlen=",
+			"file=", 
+			"block=",
+			"offset=", 
+			"length=", 
+			"exclude=",
+			"include=",
+			"search=",
+			"extract=",
+			"dd=",
+			"grep=",
+			"magic=",
+			"raw-bytes=",
+	]
+
+	# Require at least one argument (the target file)
+	if len(sys.argv) < MIN_ARGC:
+		usage(sys.stderr)
+
+	try:
+		opts, args = GetOpt(sys.argv[1:], short_options, long_options)
+	except GetoptError, e:
+		sys.stderr.write("%s\n" % str(e))
+		usage(sys.stderr)
+
+	for opt, arg in opts:
+		if opt in ("-h", "--help"):
+			usage(sys.stdout)
+		elif opt in ("-?", "--examples"):
+			examples()
+		elif opt in ("-d", "--delay"):
+			delay_extraction = True
+		elif opt in ("-f", "--file"):
+			log_file = arg
+		elif opt in ("-c", "--csv"):
+			do_csv = True
+		elif opt in ("-q", "--quiet"):
+			quiet = True
+		elif opt in ("-s", "--strlen"):
+			strlen = binwalk.common.str2int(arg)
+		elif opt in ("-Q", "--no-legend"):
+			show_legend = False
+		elif opt in ("-J", "--save-plot"):
+			save_plot = True
+		elif opt in ("-N", "--no-plot"):
+			show_plot = False
+		elif opt in ("-E", "--entropy"):
+			requested_scans.append(binwalk.Binwalk.ENTROPY)
+		elif opt in ("-W", "--diff"):
+			requested_scans.append(binwalk.Binwalk.HEXDIFF)
+		elif opt in ("-w", "--terse"):
+			show_single_hex_dump = True
+		elif opt in ("-a", "--gzip"):
+			entropy_algorithm = 'gzip'
+		elif opt in("-t", "--term", "--tim"):
+			format_to_terminal = True
+		elif opt in("-p", "--disable-plugins"):
+			enable_plugins = False
+		elif opt in ("-b", "--dumb"):
+			ignore_signature_keywords = True
+		elif opt in ("-v", "--verbose"):
+			verbose += 1
+		elif opt in ("-S", "--strings"):
+			requested_scans.append(binwalk.Binwalk.STRINGS)
+		elif opt in ("-O", "--skip-unopened"):
+			ignore_failed_open = True
+		elif opt in ("-o", "--offset"):
+			offset = binwalk.common.str2int(arg)
+		elif opt in ("-l", "--length"):
+			length = binwalk.common.str2int(arg)
+		elif opt in ("-y", "--search", "--include"):
+			searches.append(arg)
+		elif opt in ("-x", "--exclude"):
+			excludes.append(arg)
+		elif opt in ("-D", "--dd"):
+			extracts.append(arg)
+		elif opt in ("-g", "--grep"):
+			greps.append(arg)
+		elif opt in ("-G", "--green"):
+			greps.append("32;")
+		elif opt in ("-i", "--red"):
+			greps.append("31;")
+		elif opt in ("-U", "--blue"):
+			greps.append("34;")
+		elif opt in ("-r", "--rm"):
+			cleanup_after_extract = True
+		elif opt in ("-m", "--magic"):
+			magic_files.append(arg)
+		elif opt in ("-k", "--keep-going"):
+			magic_flags |= binwalk.magic.MAGIC_CONTINUE
+		elif opt in ("-I", "--show-invalid"):
+			show_invalid = True
+		elif opt in ("-B", "--binwalk"):
+			requested_scans.append(binwalk.Binwalk.BINWALK)
+		elif opt in ("-K", "--block"):
+			block_size = binwalk.common.str2int(arg)
+		elif opt in ("-X", "--disable-plugin"):
+			plugin_blacklist.append(arg)
+		elif opt in ("-Y", "--enable-plugin"):
+			plugin_whitelist.append(arg)
+		elif opt in ("-T", "--ignore-time-skew"):
+			ignore_time_skew = False
+
+		elif opt in ("-H", "--heuristic", "--math"):
+			do_comp = True
+			if binwalk.Binwalk.ENTROPY not in requested_scans:
+				requested_scans.append(binwalk.Binwalk.ENTROPY)
+		elif opt in ("-F", "--marker"):
+			if ':' in arg:
+				(location, description) = arg.split(':', 1)
+				location = int(location)
+				markers.append((location, [{'description' : description, 'offset' : location}]))
+		elif opt in("-L", "--list-plugins"):
+			# List all user and system plugins, then exit
+			print ''
+			print 'NAME             TYPE       ENABLED    DESCRIPTION'
+			print '-' * 115
+			with binwalk.Binwalk() as bw:
+				for (key, info) in binwalk.plugins.Plugins(bw).list_plugins().iteritems():
+					for module_name in info['modules']:
+						print '%-16s %-10s %-10s %s' % (module_name, key, info['enabled'][module_name], info['descriptions'][module_name])
+			print ''
+                	sys.exit(1)
+		elif opt in ("-M", "--matryoshka"):
+			if arg:
+				matryoshka = binwalk.common.str2int(arg)
+			else:
+				# Original Zvyozdochkin matrhoska set had 8 dolls. This is a good number.
+				matryoshka = 8
+		elif opt in ("-e", "--extract"):
+			# If a file path was specified, use that as the extraction rules file
+			if arg:
+				extract_from_config = False
+				extract_rules_file = arg
+			# Else, use the default rules file
+			else:
+				extract_from_config = True
+		elif opt in ("-A", "--opcodes"):
+			requested_scans.append(binwalk.Binwalk.BINARCH)
+			# Load user file first so its signatures take precedence
+			magic_files.append(config.paths['user'][config.BINARCH_MAGIC_FILE])
+			magic_files.append(config.paths['system'][config.BINARCH_MAGIC_FILE])
+		elif opt in ("-C", "--cast"):
+			requested_scans.append(binwalk.Binwalk.BINCAST)
+			# Don't stop at the first match (everything matches everything in this scan)
+			magic_flags |= binwalk.magic.MAGIC_CONTINUE
+			# Load user file first so its signatures take precedence
+			magic_files.append(config.paths['user'][config.BINCAST_MAGIC_FILE])
+			magic_files.append(config.paths['system'][config.BINCAST_MAGIC_FILE])
+		elif opt in ("-R", "--raw-bytes"):
+			custom_signature = arg
+			requested_scans.append(binwalk.Binwalk.CUSTOM)
+			explicit_signature_scan = True
+		elif opt in ("-u", "--update"):
+			try:
+				sys.stdout.write("Updating signatures...")
+				sys.stdout.flush()
+
+				binwalk.Update().update()
+
+				sys.stdout.write("done.\n")
+				sys.exit(0)
+			except Exception, e:
+				if 'Permission denied' in str(e):
+					sys.stderr.write("failed (permission denied). Check your user permissions, or run the update as root.\n")
+				else:
+					sys.stderr.write('\n' + str(e) + '\n')
+				sys.exit(1)
+		
+		# The --profile option is handled prior to calling main()
+		elif opt not in ('-P', '--profile'):
+			usage(sys.stderr)
+
+		# Keep track of the options and arguments.
+		# This is used later to determine which argv entries are file names.
+		options.append(opt)
+		options.append("%s%s" % (opt, arg))
+		options.append("%s=%s" % (opt, arg))
+		arguments.append(arg)
+		
+	# Treat any command line options not processed by getopt as target file paths.
+	for opt in sys.argv[1:]:
+		if opt not in arguments and opt not in options and not opt.startswith('-'):
+			file_opt_list.append(opt)
+
+	# Validate the target files listed in target_files
+	for tfile in file_opt_list:
+		# Ignore directories.
+		if not os.path.isdir(tfile):
+			# Make sure we can open the target files
+			try:
+				fd = open(tfile, "rb")
+				fd.close()
+				target_files.append(tfile)
+			except Exception, e:
+				sys.stdout.write("Cannot open file : %s\n" % str(e))
+				failed_open_count += 1
+
+	# Unless -O was specified, don't run the scan unless we are able to scan all specified files
+	if failed_open_count > 0 and not ignore_failed_open:
+		if failed_open_count > 1:
+			plural = 's'
+		else:
+			plural = ''
+		sys.stdout.write("Failed to open %d file%s for scanning, quitting...\n" % (failed_open_count, plural))
+		sys.exit(1)
+
+	# If more than one target file was specified, enable verbose mode; else, there is
+	# nothing in the output to indicate which scan corresponds to which file.
+	if (matryoshka > 1 or len(target_files) > 1):
+		save_plot = True
+		if not verbose:
+			verbose = 1
+	elif len(target_files) == 0:
+		usage(sys.stderr)
+
+	# Instantiate the Binwalk class
+	bwalk = binwalk.Binwalk(magic_files=magic_files, flags=magic_flags, verbose=verbose, log=log_file, quiet=quiet, ignore_smart_keywords=ignore_signature_keywords, load_plugins=enable_plugins, ignore_time_skews=ignore_time_skew)
+
+	# If a custom signature was specified, create a temporary magic file containing the custom signature
+	# and ensure that it is the only magic file that will be loaded when Binwalk.scan() is called.
+	if custom_signature is not None:
+		bwalk.magic_files = [bwalk.parser.file_from_string(custom_signature)]
+
+	# Set any specified filters
+	bwalk.filter.exclude(excludes)
+	bwalk.filter.include(searches)
+	bwalk.filter.grep(filters=greps)
+
+	# Add any specified extract rules
+	bwalk.extractor.add_rule(extracts)
+
+	# If -e was specified, load the default extract rules
+	if extract_from_config:
+		bwalk.extractor.load_defaults()
+
+	# If --extract was specified, load the specified extraction rules file
+	if extract_rules_file is not None:
+		bwalk.extractor.load_from_file(extract_rules_file)
+
+	# Set the extractor cleanup value (True to clean up files, False to leave them on disk)
+	bwalk.extractor.cleanup_extracted_files(cleanup_after_extract)
+
+	# Enable delayed extraction, which will prevent supported file types from having trailing data when extracted
+	bwalk.extractor.enable_delayed_extract(delay_extraction)
+
+	# Load the magic file(s)
+	#bwalk.load_signatures(magic_files=magic_files)
+
+	# If --term was specified, enable output formatting to terminal
+	if format_to_terminal:
+		bwalk.display.enable_formatting(True)
+
+	# Enable log file CSV formatting, if specified
+	if do_csv:
+		bwalk.display.enable_csv()
+
+	# If no scan was explicitly rquested, do a binwalk scan
+	if not requested_scans:
+		requested_scans.append(binwalk.Binwalk.BINWALK)
+
+	# Sort the scan types to ensure the entropy scan is performed last
+	requested_scans.sort()
+
+	# Everything is set up, let's do a scan
+	try:
+		results = {}
+
+		# Start the display_status function as a daemon thread.
+		t = Thread(target=display_status)
+		t.setDaemon(True)
+		t.start()
+		
+		for scan_type in requested_scans:
+
+			if scan_type in [binwalk.Binwalk.BINWALK, binwalk.Binwalk.BINARCH, binwalk.Binwalk.BINCAST, binwalk.Binwalk.CUSTOM]:
+
+				# There's no generic way for the binwalk class to know what
+				# scan type is being run, since these are all signature scans,
+				# just with different magic files. Manually set the scan sub-type
+				# here to ensure that plugins can differentiate between the
+				# scans being performed.
+				bwalk.scan_type = scan_type
+
+				r = bwalk.scan(target_files,
+						offset=offset, 
+						length=length, 
+						show_invalid_results=show_invalid, 
+						callback=bwalk.display.results, 
+						start_callback=bwalk.display.header,
+						end_callback=bwalk.display.footer,
+						matryoshka=matryoshka,
+						plugins_whitelist=plugin_whitelist,
+						plugins_blacklist=plugin_blacklist)
+
+				bwalk.concatenate_results(results, r)
+
+			elif scan_type == binwalk.Binwalk.STRINGS:
+
+				r = bwalk.analyze_strings(target_files, 
+							length=length, 
+							offset=offset, 
+							n=strlen, 
+							block=block_size, 
+							load_plugins=enable_plugins, 
+							whitelist=plugin_whitelist, 
+							blacklist=plugin_blacklist)
+					
+				bwalk.concatenate_results(results, r)
+
+			elif scan_type == binwalk.Binwalk.COMPRESSION:
+
+				r = bwalk.analyze_compression(target_files, offset=offset, length=length)
+				bwalk.concatenate_results(results, r)
+
+			elif scan_type == binwalk.Binwalk.ENTROPY:
+
+				if not results:
+					for target_file in target_files:
+						results[target_file] = []
+				else:
+					bwalk.display.quiet = True
+					bwalk.display.cleanup()
+
+				for target_file in results.keys():
+					bwalk.concatenate_results(results, {target_file : markers})
+
+				bwalk.analyze_entropy(results,
+							offset, 
+							length, 
+							block_size, 
+							show_plot, 
+							show_legend, 
+							save_plot,
+							algorithm=entropy_algorithm,
+							load_plugins=enable_plugins,
+							whitelist=plugin_whitelist,
+							blacklist=plugin_blacklist,
+							compcheck=do_comp)
+
+			elif scan_type == binwalk.Binwalk.HEXDIFF:
+				
+				bwalk.hexdiff(target_files, offset=offset, length=length, block=block_size, first=show_single_hex_dump)
+
+	except KeyboardInterrupt:
+		pass
+	except IOError:
+		pass
+#	except Exception, e:
+#		print "Unexpected error:", str(e)
+		
+	bwalk.cleanup()
+
+try:
+	# Special options for profiling the code. For debug use only.
+	if '--profile' in sys.argv or '-P' in sys.argv:
+		import cProfile
+		cProfile.run('main()')
+	else:
+		main()
+except KeyboardInterrupt:
+	pass
+
+
