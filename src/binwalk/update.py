@@ -1,5 +1,4 @@
 import os
-import urllib2
 from binwalk.config import *
 from binwalk.compat import *
 

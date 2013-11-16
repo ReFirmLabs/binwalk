@@ -133,6 +133,7 @@ setup(	name = "binwalk",
 	scripts = ["bin/binwalk"],
 )
 
+# THIS BREAKS WHEN INSTALLING WITH PYTHON3; PROPER PYTHON3 SUPPORT IS IN PROGRESS.
 # If python2 exists, replace the shebang to invoke python2.
 # This prevents python3 from being used when running binwalk.
 # This shouldn't be done on the ./bin/binwalk file, as that would
