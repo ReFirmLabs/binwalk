@@ -20,34 +20,18 @@ class Plugin:
 		# The tinfl library is built and installed with binwalk
 		self.tinfl = ctypes.cdll.LoadLibrary(ctypes.util.find_library("tinfl"))
 
+		# Add an extraction rule
 		if self.binwalk.extractor.enabled:
-			# TODO: Add python extractor rule
-			pass
+			self.binwalk.extractor.add_rule(regex=self.DESCRIPTION.lower(), extension="deflate", cmd=self._extractor)
 
 	def pre_scan(self, fp):
 		self._deflate_scan(fp)
 		return PLUGIN_TERMINATE
 
 	def _extractor(self, file_name):
-		processed = 0
-		inflated_data = ''
-		fd = BlockFile(file_name, 'rb')
-		fd.READ_BLOCK_SIZE = self.SIZE
-
-		while processed < fd.length:
-			(data, dlen) = fd.read_block()
-
-			inflated_block = self.tinfl.inflate_block(data, dlen)
-			if inflated_block:
-				inflated_data += inflated_block
-			else:
-				break
-
-			processed += dlen
-
-		fd.close()
-		
-		print "%s inflated to %d bytes" % (file_name, len(inflated_data))
+		if self.tinfl:
+			out_file = os.path.splitext(file_name)[0]
+			self.tinfl.inflate_raw_file(file_name, out_file)
 
 	def _deflate_scan(self, fp):
 		fp.MAX_TRAILING_SIZE = self.SIZE
@@ -69,6 +53,10 @@ class Plugin:
 					# Update total_scanned here for immediate progress feedback
 					self.binwalk.total_scanned = current_total + i
 					self.binwalk.display.easy_results(loc, self.DESCRIPTION)
+
+					# Extract the file
+					if self.binwalk.extractor.enabled:
+						self.binwalk.extractor.extract(loc, self.DESCRIPTION, fp.name, (fp.length - loc))
 
 				if (current_total + i) > self.binwalk.scan_length:
 					break

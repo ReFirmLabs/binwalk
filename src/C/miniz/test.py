@@ -14,7 +14,8 @@ except:
 
 tinfl = ctypes.cdll.LoadLibrary(ctypes.util.find_library("tinfl"))
 
-if tinfl.is_deflated(data, len(data), 1):
-	print "%s is zlib compressed." % (sys.argv[1])
+if tinfl.is_deflated(data, len(data), 0):
+	print "%s is deflated." % (sys.argv[1])
+	print "Inflated to %d bytes!" % tinfl.inflate_raw_file(sys.argv[1], sys.argv[1] + '.inflated')
 else:
-	print "%s is not zlib compressed." % sys.argv[1]
+	print "%s is not deflated." % sys.argv[1]

@@ -603,6 +603,50 @@ int is_deflated(char *buf, size_t buf_size, int includes_zlib_header)
   return 0;
 }
 
+int inflate_raw_file(char *in_file, char *out_file)
+{
+	int retval = 0;
+	size_t out_size = 0, in_size = 0;
+	FILE *fp_in = NULL, *fp_out = NULL;
+	char *compressed_data = NULL, *decompressed_data = NULL;
+
+	fp_in = fopen(in_file, "rb");
+	if(fp_in)
+	{
+		fp_out = fopen(out_file, "wb");
+		if(fp_out)
+		{
+	
+			fseek(fp_in, 0L, SEEK_END);
+			in_size = ftell(fp_in);
+			fseek(fp_in, 0L, SEEK_SET);
+
+			compressed_data = malloc(in_size);
+			if(compressed_data)
+			{
+				memset(compressed_data, 0, in_size);
+				fread(compressed_data, 1, in_size, fp_in);
+
+				decompressed_data = (char *) tinfl_decompress_mem_to_heap(compressed_data, in_size, &out_size, 0);
+	
+				if(decompressed_data)
+				{
+					fwrite(decompressed_data, 1, out_size, fp_out);
+					free(decompressed_data);
+					retval = out_size;
+				}
+				
+				free(compressed_data);
+			}
+		}
+	}
+
+	if(fp_in) fclose(fp_in);
+	if(fp_out) fclose(fp_out);
+
+	return retval;
+}
+
 #endif // #ifndef TINFL_HEADER_FILE_ONLY
 
 /*
@@ -631,3 +675,11 @@ int is_deflated(char *buf, size_t buf_size, int includes_zlib_header)
 
   For more information, please refer to <http://unlicense.org/>
 */
+
+#ifdef MAIN
+int main(int argc, char *argv[])
+{
+	printf("Inflated to %d bytes.\n", inflate_raw_file(argv[1], argv[2]));
+	return 0;
+}
+#endif
