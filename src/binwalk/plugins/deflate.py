@@ -7,7 +7,7 @@ from binwalk.common import BlockFile
 
 class Plugin:
 	'''
-	Searches for raw deflate compression streams.
+	Finds and extracts raw deflate compression streams.
 	'''
 
 	ENABLED = False
