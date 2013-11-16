@@ -12,14 +12,19 @@ class Update:
 
 		Update().update()
 	'''
-	BASE_URL = "http://binwalk.googlecode.com/svn/trunk/src/binwalk/"
+	BASE_URL = "https://raw.github.com/devttys0/binwalk/master/src/binwalk/"
 	MAGIC_PREFIX = "magic/"
 	CONFIG_PREFIX = "config/"
 
-	def __init__(self):
+	def __init__(self, verbose=False):
 		'''
 		Class constructor.
+
+		@verbose - Verbose flag.
+
+		Returns None.
 		'''
+		self.verbose = verbose
 		self.config = Config()
 
 	def update(self):
@@ -33,6 +38,7 @@ class Update:
 		self.update_binarch()
 		self.update_extract()
 		self.update_zlib()
+		self.update_compressd()
 
 	def _do_update_from_svn(self, prefix, fname):
 		'''
@@ -54,6 +60,9 @@ class Update:
 		url = self.BASE_URL + prefix + fname
 		
 		try:
+			if self.verbose:
+				print "Fetching %s..." % url
+			
 			data = urllib2.urlopen(url).read()
 			open(self.config.paths['system'][fname], "wb").write(data)
 		except Exception, e:
@@ -90,6 +99,14 @@ class Update:
 		Returns None.
 		'''
 		self._do_update_from_svn(self.MAGIC_PREFIX, self.config.ZLIB_MAGIC_FILE)
+
+	def update_compressd(self):
+		'''
+		Updates the compress'd signature file.
+		
+		Returns None.
+		'''
+		self._do_update_from_svn(self.MAGIC_PREFIX, self.config.COMPRESSD_MAGIC_FILE)
 
 	def update_extract(self):
 		'''

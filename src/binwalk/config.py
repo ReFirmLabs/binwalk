@@ -48,7 +48,9 @@ class Config:
 	BINWALK_MAGIC_FILE = "binwalk"
 	BINCAST_MAGIC_FILE = "bincast"
 	BINARCH_MAGIC_FILE = "binarch"
-	
+	ZLIB_MAGIC_FILE = "zlib"
+	COMPRESSD_MAGIC_FILE = "compressd"
+
 	def __init__(self):
 		'''
 		Class constructor. Enumerates file paths and populates self.paths.
@@ -75,6 +77,8 @@ class Config:
 		self.paths['system'][self.BINWALK_MAGIC_FILE] = self._system_path(self.BINWALK_MAGIC_DIR, self.BINWALK_MAGIC_FILE)
 		self.paths['system'][self.BINCAST_MAGIC_FILE] = self._system_path(self.BINWALK_MAGIC_DIR, self.BINCAST_MAGIC_FILE)
 		self.paths['system'][self.BINARCH_MAGIC_FILE] = self._system_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
+		self.paths['system'][self.ZLIB_MAGIC_FILE] = self._system_path(self.BINWALK_MAGIC_DIR, self.ZLIB_MAGIC_FILE)
+		self.paths['system'][self.COMPRESSD_MAGIC_FILE] = self._system_path(self.BINWALK_MAGIC_DIR, self.COMPRESSD_MAGIC_FILE)
 		self.paths['system'][self.EXTRACT_FILE] = self._system_path(self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE)
 		self.paths['system'][self.PLUGINS] = self._system_path(self.BINWALK_PLUGINS_DIR)
 

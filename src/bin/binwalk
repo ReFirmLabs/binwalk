@@ -390,9 +390,11 @@ def main():
 		elif opt in ("-u", "--update"):
 			try:
 				sys.stdout.write("Updating signatures...")
+				if verbose:
+					sys.stdout.write("\n")
 				sys.stdout.flush()
 
-				binwalk.Update().update()
+				binwalk.Update(verbose).update()
 
 				sys.stdout.write("done.\n")
 				sys.exit(0)
