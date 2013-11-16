@@ -625,15 +625,17 @@ int inflate_raw_file(char *in_file, char *out_file)
 			if(compressed_data)
 			{
 				memset(compressed_data, 0, in_size);
-				fread(compressed_data, 1, in_size, fp_in);
-
-				decompressed_data = (char *) tinfl_decompress_mem_to_heap(compressed_data, in_size, &out_size, 0);
-	
-				if(decompressed_data)
+				
+				if(fread(compressed_data, 1, in_size, fp_in) == in_size)
 				{
-					fwrite(decompressed_data, 1, out_size, fp_out);
-					free(decompressed_data);
-					retval = out_size;
+					decompressed_data = (char *) tinfl_decompress_mem_to_heap(compressed_data, in_size, &out_size, 0);
+	
+					if(decompressed_data)
+					{
+						fwrite(decompressed_data, 1, out_size, fp_out);
+						free(decompressed_data);
+						retval = out_size;
+					}
 				}
 				
 				free(compressed_data);
