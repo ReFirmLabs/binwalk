@@ -5,50 +5,66 @@ import subprocess
 from os import listdir, path
 from distutils.core import setup
 
-WIDTH = 115
+# This is super hacky.
+if "--yes" in sys.argv:
+	sys.argv.pop(sys.argv.index("--yes"))
+	IGNORE_WARNINGS = True
+else:
+	IGNORE_WARNINGS = False
 
 def which(fname):
 	cmd = ["which", fname]
 	return subprocess.Popen(cmd, stdout=subprocess.PIPE).stdout.readline().strip()
 
-# Check for pre-requisite modules only if --no-prereq-checks was not specified
-if "--no-prereq-checks" not in sys.argv:
-	print "checking pre-requisites"
-	try:
-		import magic
-		try:
-			magic.MAGIC_NO_CHECK_TEXT
-		except Exception, e:
-			print "\n", "*" * WIDTH
-			print "Pre-requisite failure:", str(e)
-			print "It looks like you have an old or incompatible magic module installed."
-			print "Please install the official python-magic module, or download and install it from source: ftp://ftp.astron.com/pub/file/"
-			print "*" * WIDTH, "\n"
-			sys.exit(1)
-	except Exception, e:
-		print "\n", "*" * WIDTH
-		print "Pre-requisite failure:", str(e)
-		print "Please install the python-magic module, or download and install it from source: ftp://ftp.astron.com/pub/file/"
-		print "*" * WIDTH, "\n"
-		sys.exit(1)
+def warning(lines, terminate=True, prompt=False):
+	WIDTH = 115
 
-	try:
-		import matplotlib
-		matplotlib.use('Agg')
-		import matplotlib.pyplot
-		import numpy
-	except Exception, e:
+	if not IGNORE_WARNINGS:
 		print "\n", "*" * WIDTH
-		print "Pre-requisite check warning:", str(e)
-		print "To take advantage of this tool's entropy plotting capabilities, please install the python-matplotlib module."
+		for line in lines:
+			print line
 		print "*" * WIDTH, "\n"
-	
-		if raw_input('Continue installation without this module (Y/n)? ').lower().startswith('n'):
-			print 'Quitting...\n'
+
+		if prompt:
+			if raw_input('Continue installation anyway (Y/n)? ').lower().startswith('n'):
+				terminate = True
+			else:
+				terminate = False
+
+		if terminate:
 			sys.exit(1)
-else:
-	# This is super hacky.
-	sys.argv.pop(sys.argv.index("--no-prereq-checks"))
+		
+# Check for pre-requisite modules only if --no-prereq-checks was not specified
+print "checking pre-requisites"
+try:
+	import magic
+	try:
+		magic.MAGIC_NO_CHECK_TEXT
+	except Exception, e:
+		msg = ["Pre-requisite failure:", str(e),
+			"It looks like you have an old or incompatible magic module installed.",
+			"Please install the official python-magic module, or download and install it from source: ftp://ftp.astron.com/pub/file/"
+		]
+		
+		warning(msg)
+except Exception, e:
+	msg = ["Pre-requisite failure:", str(e),
+		"Please install the python-magic module, or download and install it from source: ftp://ftp.astron.com/pub/file/",
+	]
+	
+	warning(msg)
+
+try:
+	import matplotlib
+	matplotlib.use('Agg')
+	import matplotlib.pyplot
+	import numpy
+except Exception, e:
+	msg = ["Pre-requisite check warning:", str(e),
+		"To take advantage of this tool's entropy plotting capabilities, please install the python-matplotlib module.",
+	]
+	
+	warning(msg, prompt=True)
 
 # Build / install C compression libraries
 c_lib_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "C")
@@ -64,12 +80,20 @@ if not os.path.exists(c_lib_makefile):
 status |= os.system("make")
 
 if status != 0:
-	print "ERROR: Failed to build libtinfl.so! Do you have gcc installed?"
-	sys.exit(1)
+	msg = ["Failed to build compression libraries.",
+		"Some plugins will not work without these libraries."
+	]
+	
+	warning(msg, prompt=True)
+else:
+	if "install" in sys.argv:
+		if os.system("make install") != 0:
+			msg = ["Failed to install compression libraries.",
+				"Some plugins will not work without these libraries."
+			]
 
-if "install" in sys.argv:
-	os.system("make install")
-
+			warning(msg, prompt=True)
+		
 os.chdir(working_directory)
 
 # Generate a new magic file from the files in the magic directory
