@@ -4,6 +4,7 @@
 # Inspired by people who actually know what they're doing: http://www.fourmilab.ch/random/
 
 import math
+from binwalk.compat import *
 
 class MonteCarloPi(object):
 	'''
@@ -215,19 +216,4 @@ if __name__ == "__main__":
 
 	sys.stderr.write("Number of deviations: %d\n" % num_error)
 	sys.stderr.write("Largest deviation: %d at offset 0x%X\n" % (largest[1], largest[0]))
-
-	print "Data:",
-	if num_error != 0:
-		print "Compressed"
-	else:
-		print "Encrypted"
-
-	print "Confidence:",
-	if num_error >= 5 or num_error == 0:
-		print "High"
-	elif num_error in [3,4]:
-		print "Medium"
-	else:
-		print "Low"
-
 

@@ -1,5 +1,6 @@
 import re
-from common import str2int, get_quoted_strings
+from binwalk.compat import *
+from binwalk.common import str2int, get_quoted_strings
 
 class SmartSignature:
 	'''

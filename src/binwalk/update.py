@@ -1,6 +1,7 @@
 import os
 import urllib2
-from config import *
+from binwalk.config import *
+from binwalk.compat import *
 
 class Update:
 	'''
@@ -61,11 +62,11 @@ class Update:
 		
 		try:
 			if self.verbose:
-				print "Fetching %s..." % url
+				print("Fetching %s..." % url)
 			
 			data = urllib2.urlopen(url).read()
 			open(self.config.paths['system'][fname], "wb").write(data)
-		except Exception, e:
+		except Exception as e:
 			raise Exception("Update._do_update_from_svn failed to update file '%s': %s" % (url, str(e)))
 
 	def update_binwalk(self):

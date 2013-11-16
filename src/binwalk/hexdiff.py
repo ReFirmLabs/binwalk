@@ -5,7 +5,8 @@ import sys
 import string
 import curses
 import platform
-import common
+import binwalk.common as common
+from binwalk.compat import *
 
 class HexDiff(object):
 
@@ -83,7 +84,7 @@ class HexDiff(object):
 			self.block_hex += c
 
 	def _simple_footer(self):
-		print ""
+		print("")
 
 	def _header(self, files, block):
 		header = "OFFSET    "
@@ -144,7 +145,7 @@ class HexDiff(object):
 					for f in files:
 						try:
 							c = data[f][j+i]
-						except Exception, e:
+						except Exception as e:
 							c = None
 
 						if c not in byte_list:
@@ -168,10 +169,8 @@ class HexDiff(object):
 
 					for j in range(0, block):
 						try:
-							#print "%s[%d]" % (f, j+i)
 							self._build_block("%.2X " % ord(data[f][j+i]), highlight=diff_same[j])
-						except Exception, e:
-							#print str(e)
+						except Exception as e:
 							self._build_block("   ")
 
 						if (j+1) == block:

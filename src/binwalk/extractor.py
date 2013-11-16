@@ -4,8 +4,9 @@ import sys
 import shlex
 import tempfile
 import subprocess
-from config import *
-from common import file_size, unique_file_name, BlockFile
+from binwalk.compat import *
+from binwalk.config import *
+from binwalk.common import file_size, unique_file_name, BlockFile
 
 class Extractor:
 	'''
@@ -177,7 +178,7 @@ class Extractor:
 			# Process each line from the extract file, ignoring comments
 			for rule in open(fname).readlines():
 				self.add_rule(rule.split(self.COMMENT_DELIM, 1)[0])
-		except Exception, e:
+		except Exception as e:
 			raise Exception("Extractor.load_from_file failed to load file '%s': %s" % (fname, str(e)))
 
 	def load_defaults(self):
@@ -195,7 +196,7 @@ class Extractor:
 		for extract_file in extract_files:
 			try:
 				self.load_from_file(extract_file)
-			except Exception, e:
+			except Exception as e:
 				if self.verbose:
 					raise Exception("Extractor.load_defaults failed to load file '%s': %s" % (extract_file, str(e)))
 
@@ -433,7 +434,7 @@ class Extractor:
 			# Open the output file
 			try:
 				fdout = BlockFile(fname, "wb")
-			except Exception, e:
+			except Exception as e:
 				# Fall back to the default name if the requested name fails
 				fname = unique_file_name(default_bname, extension)
 				fdout = BlockFile(fname, "wb")
@@ -446,7 +447,7 @@ class Extractor:
 			# Cleanup
 			fdout.close()
 			fdin.close()
-		except Exception, e:
+		except Exception as e:
 			raise Exception("Extractor.dd failed to extract data from '%s' to '%s': %s" % (file_name, fname, str(e)))
 		
 		return fname
@@ -467,7 +468,7 @@ class Extractor:
 			if callable(cmd):
 				try:
 					cmd(fname)
-				except Exception, e:
+				except Exception as e:
 					sys.stderr.write("WARNING: Extractor.execute failed to run '%s': %s\n" % (str(cmd), str(e)))
 			else:
 				# If not in verbose mode, create a temporary file to redirect stdout and stderr to
@@ -480,7 +481,7 @@ class Extractor:
 				# Execute.
 				if subprocess.call(shlex.split(cmd), stdout=tmp, stderr=tmp) != 0:
 					retval = False
-		except Exception, e:
+		except Exception as e:
 			# Silently ignore no such file or directory errors. Why? Because these will inevitably be raised when
 			# making the switch to the new firmware mod kit directory structure. We handle this elsewhere, but it's
 			# annoying to see this spammed out to the console every time.

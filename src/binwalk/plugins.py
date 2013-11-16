@@ -1,6 +1,7 @@
 import os
 import sys
 import imp
+from binwalk.compat import *
 
 # Valid return values for plugins
 PLUGIN_CONTINUE     = 0x00
@@ -124,7 +125,7 @@ class Plugins:
 				val = callback(arg)
 				if val is not None:
 					retval |= val
-			except Exception, e:
+			except Exception as e:
 				sys.stderr.write("WARNING: %s.%s failed: %s\n" % (str(callback.im_class), callback.__name__, str(e)))
 
 		return retval
@@ -235,7 +236,7 @@ class Plugins:
 				except:
 					pass
 							
-			except Exception, e:
+			except Exception as e:
 				sys.stderr.write("WARNING: Failed to load plugin module '%s': %s\n" % (module, str(e)))
 
 	def _pre_scan_callbacks(self, fd):

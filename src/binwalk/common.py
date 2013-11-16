@@ -1,6 +1,8 @@
 # Common functions.
+import io
 import os
 import re
+from binwalk.compat import *
 
 def file_size(filename):
 	'''
@@ -14,7 +16,7 @@ def file_size(filename):
 	fd = os.open(filename, os.O_RDONLY)
 	try:
 		return os.lseek(fd, 0, os.SEEK_END)
-	except Exception, e:
+	except Exception as e:
 		raise Exception("file_size failed to obtain the size of '%s': %s" % (filename, str(e)))
 	finally:
 		os.close(fd)
@@ -89,7 +91,7 @@ def unique_file_name(base_name, extension=''):
 
 	return fname
 
-class BlockFile(file):
+class BlockFile(io.BufferedReader):
 	'''
 	Abstraction class to handle reading data from files in blocks.
 	Necessary for large files.
@@ -107,12 +109,11 @@ class BlockFile(file):
 	# limit disk I/O, but small enough to limit the size of processed data blocks.
 	READ_BLOCK_SIZE = 1 * 1024 * 1024
 
-	def __init__(self, fname, mode='rb', length=0, offset=0):
+	def __init__(self, fname, length=0, offset=0):
 		'''
 		Class constructor.
 
 		@fname  - Path to the file to be opened.
-		@mode   - Mode to open the file in.
 		@length - Maximum number of bytes to read from the file via self.block_read().
 		@offset - Offset at which to start reading from the file.
 
@@ -135,7 +136,7 @@ class BlockFile(file):
 		else:
 			self.length = self.size
 
-		file.__init__(self, fname, mode)
+		io.BufferedReader.__init__(self, fname, "rb")
 
 		self.seek(self.offset)
 			

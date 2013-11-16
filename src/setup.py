@@ -137,24 +137,24 @@ setup(	name = "binwalk",
 # This prevents python3 from being used when running binwalk.
 # This shouldn't be done on the ./bin/binwalk file, as that would
 # cause a conflict between the master branch and the local clone.
-python2_path = which("python2")
-binwalk_path = which("binwalk")
+#python2_path = which("python2")
+#binwalk_path = which("binwalk")
 
-if python2_path and binwalk_path:
-	i = 0
-	data = ''
+#if python2_path and binwalk_path:
+#	i = 0
+#	data = ''
 
-	for line in open(binwalk_path, 'rb').readlines():
-		if i == 0:
-			line = "#!/usr/bin/env python2\n"
-		data += str(line)
-		i += 1
+#	for line in open(binwalk_path, 'rb').readlines():
+#		if i == 0:
+#			line = "#!/usr/bin/env python2\n"
+#		data += str(line)
+#		i += 1
 
-	fd = open(binwalk_path, 'wb')
-	try:
-		fd.write(data)
-	except TypeError:
-		fd.write(bytes(data, 'UTF-8'))
-	fd.close()
+#	fd = open(binwalk_path, 'wb')
+#	try:
+#		fd.write(data)
+#	except TypeError:
+#		fd.write(bytes(data, 'UTF-8'))
+#	fd.close()
 
 

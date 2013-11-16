@@ -2,10 +2,11 @@ import sys
 import hashlib
 import csv as pycsv
 from datetime import datetime
+from binwalk.compat import *
 
 class PrettyPrint:
-        '''
-        Class for printing binwalk results to screen/log files.
+	'''
+	Class for printing binwalk results to screen/log files.
 	
 	An instance of PrettyPrint is available via the Binwalk.display object.
 	The PrettyPrint.results() method is of particular interest, as it is suitable for use as a Binwalk.scan() callback function,
@@ -28,7 +29,7 @@ class PrettyPrint:
 		bw.display.header()
 		bw.single_scan('firmware.bin', callback=bw.display.results)
 		bw.display.footer()
-        '''
+	'''
 
 	HEADER_WIDTH = 115
 	BUFFER_WIDTH = 32
@@ -200,7 +201,7 @@ class PrettyPrint:
 				# Get the terminal window width
 				hw = struct.unpack('hh', fcntl.ioctl(1, termios.TIOCGWINSZ, '1234'))
 				self.HEADER_WIDTH = hw[1]
-			except Exception, e:
+			except Exception as e:
 				pass
 
 			self.MAX_LINE_LEN = self.HEADER_WIDTH - self.BUFFER_WIDTH

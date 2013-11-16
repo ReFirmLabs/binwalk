@@ -1,7 +1,8 @@
 import string
-import entropy
-import plugins
-import common
+import binwalk.entropy as entropy
+import binwalk.plugins as plugins
+import binwalk.common as common
+from binwalk.compat import *
 
 class FileStrings(object):
 	'''

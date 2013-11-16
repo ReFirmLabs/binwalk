@@ -4,7 +4,8 @@
 # Inspired by people who actually know what they're doing: http://www.fourmilab.ch/random/
 
 import math
-import common
+import binwalk.common as common
+from binwalk.compat import *
 
 class MonteCarloPi(object):
 	'''

@@ -4,18 +4,19 @@ import os
 import re
 import time
 import magic
-from config import *
-from update import *
-from filter import *
-from parser import *
-from plugins import *
-from hexdiff import *
-from entropy import *
-from extractor import *
-from prettyprint import *
-from smartstrings import *
-from smartsignature import *
-from common import file_size, unique_file_name, BlockFile
+from binwalk.compat import *
+from binwalk.config import *
+from binwalk.update import *
+from binwalk.filter import *
+from binwalk.parser import *
+from binwalk.plugins import *
+from binwalk.hexdiff import *
+from binwalk.entropy import *
+from binwalk.extractor import *
+from binwalk.prettyprint import *
+from binwalk.smartstrings import *
+from binwalk.smartsignature import *
+from binwalk.common import file_size, unique_file_name, BlockFile
 
 class Binwalk(object):
 	'''
@@ -238,7 +239,7 @@ class Binwalk(object):
 		return data
 
 	def analyze_entropy(self, files, offset=0, length=0, block=0, plot=True, legend=True, save=False, algorithm=None, load_plugins=True, whitelist=[], blacklist=[], compcheck=False):
-                '''
+		'''
 		Performs an entropy analysis on the specified file(s).
 
 		@files        - A dictionary containing file names and results data, as returned by Binwalk.scan.

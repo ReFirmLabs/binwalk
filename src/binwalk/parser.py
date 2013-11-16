@@ -1,7 +1,8 @@
 import re
 import os.path
 import tempfile
-from common import str2int
+from binwalk.compat import *
+from binwalk.common import str2int
 
 class MagicParser:
 	'''
@@ -165,7 +166,7 @@ class MagicParser:
 					self.fd.write(line)
 
 			self.build_signature_set()			
-		except Exception, e:
+		except Exception as e:
 			raise Exception("Error parsing magic file '%s' on line %d: %s" % (file_name, line_count, str(e)))
 
 	def _parse_line(self, line):
@@ -202,14 +203,14 @@ class MagicParser:
 			# The condition line may contain escaped sequences, so be sure to decode it properly.
 			entry['condition'] = line_parts[2].decode('string_escape')
 			entry['description'] = ' '.join(line_parts[3:])
-		except Exception, e:
+		except Exception as e:
 			raise Exception("%s :: %s", (str(e), line))
 
 		# We've already verified that the first character in this line is a number, so this *shouldn't*
 		# throw an exception, but let's catch it just in case...
 		try:
 			entry['offset'] = str2int(entry['offset'])
-		except Exception, e:
+		except Exception as e:
 			raise Exception("%s :: %s", (str(e), line))
 
 		# If this is a string, get the length of the string
@@ -229,7 +230,7 @@ class MagicParser:
 			# but needing that is rare.
 			try:
 				intval = str2int(entry['condition'].strip('L'))
-			except Exception, e:
+			except Exception as e:
 				raise Exception("Failed to evaluate condition for '%s' type: '%s', condition: '%s', error: %s" % (entry['description'], entry['type'], entry['condition'], str(e)))
 
 			# How long is the field type?

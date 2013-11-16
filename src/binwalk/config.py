@@ -1,5 +1,6 @@
 import os
-import common
+import binwalk.common as common
+from binwalk.compat import *
 
 class Config:
 	'''

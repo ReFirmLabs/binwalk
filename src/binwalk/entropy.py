@@ -1,9 +1,10 @@
 import zlib
 import math
 import os.path
-import plugins
-import common
-import compression
+import binwalk.plugins as plugins
+import binwalk.common as common
+import binwalk.compression as compression
+from binwalk.compat import *
 
 class PlotEntropy(object):
 	'''

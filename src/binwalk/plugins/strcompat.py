@@ -1,3 +1,4 @@
+from binwalk.compat import *
 
 class Plugin:
 	'''
@@ -16,6 +17,6 @@ class Plugin:
 	def callback(self, results):
 		if self.modify_output:
 			try:
-				print results['description']
-			except Exception, e:
+				print(results['description'])
+			except Exception as e:
 				pass
