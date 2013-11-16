@@ -86,13 +86,13 @@ class PrettyPrint:
 
 		self.fp = None
 
-	def _log(self, data):
+	def _log(self, data, raw=False):
 		'''
 		Log data to the log file.
 		'''
 		if self.fp is not None:
 			
-			if self.log_csv and self.csv:
+			if self.log_csv and self.csv and not raw:
 
 				data = data.replace('\n', ' ')
 				while '  ' in data:
@@ -219,9 +219,10 @@ class PrettyPrint:
 		md5sum = self._file_md5(file_name)
 		timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-		if self.log_csv:
+		if self.csv:
 			nolog = True
-			self._pprint("%s %s %s" % (file_name, md5sum, timestamp), noprint=True)
+			self.csv.writerow(["FILE", "MD5SUM", "TIMESTAMP"])
+			self.csv.writerow([file_name, md5sum, timestamp])
 
 		self._pprint("\n")
 		self._pprint("Scan Time:     %s\n" % timestamp, nolog=nolog)
@@ -239,17 +240,22 @@ class PrettyPrint:
 
 		Returns None.
 		'''
+		nolog = False
+
 		if self.verbose and file_name is not None:
 			self.file_info(file_name)
+
+		if self.log_csv:
+			nolog = True
 
 		self._pprint("\n")
 
 		if not header:
-			self._pprint("DECIMAL   \tHEX       \t%s\n" % description)
+			self._pprint("DECIMAL   \tHEX       \t%s\n" % description, nolog=nolog)
 		else:
-			self._pprint(header + "\n")
+			self._pprint(header + "\n", nolog=nolog)
 		
-		self._pprint("-" * self.HEADER_WIDTH + "\n")
+		self._pprint("-" * self.HEADER_WIDTH + "\n", nolog=nolog)
 
 	def footer(self, bwalk=None, file_name=None):
 		'''

@@ -489,8 +489,8 @@ def main():
 	if format_to_terminal:
 		bwalk.display.enable_formatting(True)
 
-	# Enable log file CSV formatting, if specified
-	if do_csv:
+	# Enable log file CSV formatting, if specified and supported for all the requested scan types
+	if do_csv and binwalk.Binwalk.BINCAST not in requested_scans and binwalk.Binwalk.HEXDIFF not in requested_scans:
 		bwalk.display.enable_csv()
 
 	# If no scan was explicitly rquested, do a binwalk scan
