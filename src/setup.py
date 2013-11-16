@@ -1,10 +1,15 @@
 #!/usr/bin/env python
 import os
 import sys
+import subprocess
 from os import listdir, path
 from distutils.core import setup
 
 WIDTH = 115
+
+def which(fname):
+	cmd = ["which", fname]
+	return subprocess.Popen(cmd, stdout=subprocess.PIPE).stdout.readline().strip()
 
 # Check for pre-requisite modules only if --no-prereq-checks was not specified
 if "--no-prereq-checks" not in sys.argv:
@@ -93,3 +98,23 @@ setup(	name = "binwalk",
 	package_data = {"binwalk" : install_data_files},
 	scripts = ["bin/binwalk"],
 )
+
+# If python2 exists, replace the shebang to invoke python2.
+# This prevents python3 from being used when running binwalk.
+# This shouldn't be done on the ./bin/binwalk file, as that would
+# cause a conflict between the master branch and the local clone.
+python2_path = which("python2")
+binwalk_path = which("binwalk")
+
+if python2_path and binwalk_path:
+	i = 0
+	data = ''
+
+	for line in open(binwalk_path, 'rb').readlines():
+		if i == 0:
+			line = line.replace("python", "python2")
+		data += line
+		i += 1
+
+	open(binwalk_path, 'wb').write(data)
+
