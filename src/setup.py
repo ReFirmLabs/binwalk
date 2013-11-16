@@ -112,7 +112,7 @@ if python2_path and binwalk_path:
 
 	for line in open(binwalk_path, 'rb').readlines():
 		if i == 0:
-			line = line.replace("python", "python2")
+			line = "#!/usr/bin/env python2\n"
 		data += line
 		i += 1
 

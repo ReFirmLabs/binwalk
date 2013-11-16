@@ -108,13 +108,14 @@ class PrettyPrint:
 			else:
 				self.fp.write(data)
 
-	def _pprint(self, data):
+	def _pprint(self, data, nolog=False, noprint=False):
 		'''
 		Print data to stdout and the log file.
 		'''
-		if not self.quiet:
+		if not self.quiet and not noprint:
 			sys.stdout.write(data)
-		self._log(data)
+		if not nolog:
+			self._log(data)
 
 	def _file_md5(self, file_name):
 		'''
@@ -214,11 +215,19 @@ class PrettyPrint:
 
 		Returns None.
 		'''
+		nolog = False
+		md5sum = self._file_md5(file_name)
+		timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+		if self.log_csv:
+			nolog = True
+			self._pprint("%s %s %s" % (file_name, md5sum, timestamp), noprint=True)
+
 		self._pprint("\n")
-		self._pprint("Scan Time:     %s\n" % datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-		self._pprint("Signatures:    %d\n" % self.binwalk.parser.signature_count)
-		self._pprint("Target File:   %s\n" % file_name)
-		self._pprint("MD5 Checksum:  %s\n" % self._file_md5(file_name))
+		self._pprint("Scan Time:     %s\n" % timestamp, nolog=nolog)
+		self._pprint("Signatures:    %d\n" % self.binwalk.parser.signature_count, nolog=nolog)
+		self._pprint("Target File:   %s\n" % file_name, nolog=nolog)
+		self._pprint("MD5 Checksum:  %s\n" % md5sum, nolog=nolog)
 
 	def header(self, file_name=None, header=None, description=DEFAULT_DESCRIPTION_HEADER):
 		'''
