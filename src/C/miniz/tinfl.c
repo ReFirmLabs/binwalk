@@ -581,7 +581,7 @@ int is_deflated(char *buf, size_t buf_size, int includes_zlib_header)
   char out_buf[DATA_SIZE] = { 0 };
   size_t out_buf_size = DATA_SIZE;
   size_t in_buf_size = buf_size;
-  int flags = TINFL_FLAG_HAS_MORE_INPUT;
+  int flags = TINFL_FLAG_HAS_MORE_INPUT | TINFL_FLAG_COMPUTE_ADLER32;
 
   if(includes_zlib_header)
   {
