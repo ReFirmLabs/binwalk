@@ -91,7 +91,7 @@ def unique_file_name(base_name, extension=''):
 
 	return fname
 
-class BlockFile(io.BufferedReader):
+class BlockFile(io.FileIO):
 	'''
 	Abstraction class to handle reading data from files in blocks.
 	Necessary for large files.
@@ -109,11 +109,12 @@ class BlockFile(io.BufferedReader):
 	# limit disk I/O, but small enough to limit the size of processed data blocks.
 	READ_BLOCK_SIZE = 1 * 1024 * 1024
 
-	def __init__(self, fname, length=0, offset=0):
+	def __init__(self, fname, mode='r', length=0, offset=0):
 		'''
 		Class constructor.
 
 		@fname  - Path to the file to be opened.
+		@mode   - Mode to open the file in (default: 'r').
 		@length - Maximum number of bytes to read from the file via self.block_read().
 		@offset - Offset at which to start reading from the file.
 
@@ -136,7 +137,7 @@ class BlockFile(io.BufferedReader):
 		else:
 			self.length = self.size
 
-		io.BufferedReader.__init__(self, fname, "rb")
+		io.FileIO.__init__(self, fname, mode)
 
 		self.seek(self.offset)
 			
