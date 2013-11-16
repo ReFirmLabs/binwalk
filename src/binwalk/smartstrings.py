@@ -79,6 +79,7 @@ class FileStrings(object):
 		# TODO: This is not optimal. We should read in larger chunks and process it into self.block chunks.
 		self.fd.READ_BLOCK_SIZE = self.block
 		self.fd.MAX_TRAILING_SIZE = 0
+		self.start = self.fd.offset
 
 		# Set the total_scanned and scan_length values for plugins and status display messages
 		self.binwalk.total_scanned = 0

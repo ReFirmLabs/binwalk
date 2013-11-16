@@ -114,16 +114,21 @@ class BlockFile(file):
 		@fname  - Path to the file to be opened.
 		@mode   - Mode to open the file in.
 		@length - Maximum number of bytes to read from the file via self.block_read().
+		@offset - Offset at which to start reading from the file.
 
 		Returns None.
 		'''
 		self.total_read = 0
-		self.offset = offset
 		
 		try:
 			self.size = file_size(fname)
 		except:
 			self.size = 0
+
+		if offset < 0:
+			self.offset = self.size + offset
+		else:
+			self.offset = offset
 
 		if length:
 			self.length = length

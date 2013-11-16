@@ -135,6 +135,7 @@ class FileEntropy(object):
 			self.block = self.DEFAULT_BLOCK_SIZE
 			
 		self.fd = common.BlockFile(file_name, 'rb', offset=self.start, length=self.length)
+		self.start = self.fd.offset
 		self.fd.MAX_TRAILING_SIZE = 0
 		if self.fd.READ_BLOCK_SIZE < self.block:
 			self.fd.READ_BLOCK_SIZE = self.block

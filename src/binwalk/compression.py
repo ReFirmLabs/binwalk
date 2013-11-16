@@ -153,7 +153,7 @@ class CompressionEntropyAnalyzer(object):
 		if self.fp.READ_BLOCK_SIZE < self.BLOCK_SIZE:
 			self.fp.READ_BLOCK_SIZE = self.BLOCK_SIZE
 
-		self.start = start
+		self.start = self.fp.offset
 		self.length = length
 		self.binwalk = binwalk
 

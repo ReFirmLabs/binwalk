@@ -454,7 +454,9 @@ class Binwalk(object):
 		if fd is None:
 			fd = BlockFile(target_file, length=self.scan_length, offset=offset)
 			i_opened_fd = True
-	
+			# If offset is negative (bytes from EOF), BlockFile class will autmoatically calculate the right offset
+			offset = fd.offset
+
 		# Seek to the starting offset.
 		#fd.seek(offset)
 		

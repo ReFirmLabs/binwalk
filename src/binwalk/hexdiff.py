@@ -117,6 +117,9 @@ class HexDiff(object):
 			fp.MAX_TRAILING_SIZE = 0
 			fps.append(fp)
 
+		# BlockFile handles calculation of negative offsets, if one was specified
+		offset = fps[0].offset
+
 		while total < size:
 			i = 0
 			for fp in fps:
