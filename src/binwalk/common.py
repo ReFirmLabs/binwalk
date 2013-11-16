@@ -120,13 +120,15 @@ class BlockFile(file):
 		self.total_read = 0
 		self.offset = offset
 		
+		try:
+			self.size = file_size(fname)
+		except:
+			self.size = 0
+
 		if length:
 			self.length = length
 		else:
-			try:
-				self.length = file_size(fname)
-			except:
-				self.length = 0
+			self.length = self.size
 
 		file.__init__(self, fname, mode)
 

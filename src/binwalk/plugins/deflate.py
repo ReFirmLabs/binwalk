@@ -56,7 +56,7 @@ class Plugin:
 
 					# Extract the file
 					if self.binwalk.extractor.enabled:
-						self.binwalk.extractor.extract(loc, self.DESCRIPTION, fp.name, (fp.length - loc))
+						self.binwalk.extractor.extract(loc, self.DESCRIPTION, fp.name, (fp.size - loc))
 
 				if (current_total + i) > self.binwalk.scan_length:
 					break
