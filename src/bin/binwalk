@@ -584,8 +584,8 @@ def main():
 		pass
 	except IOError:
 		pass
-#	except Exception, e:
-#		print "Unexpected error:", str(e)
+	except Exception as e:
+		print("Unexpected error: %s" % str(e))
 		
 	bwalk.cleanup()
 
