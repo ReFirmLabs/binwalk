@@ -1,5 +1,6 @@
 import os
 import shutil
+from binwalk.compat import *
 from binwalk.common import BlockFile
 
 class Plugin:
@@ -39,9 +40,11 @@ class Plugin:
 				(data, dlen) = fp_in.read_block()
 				
 				if i == 0:
-					fp_out.write(data[0:5] + self.FAKE_LZMA_SIZE + data[5:])
+					out_data = data[0:5] + self.FAKE_LZMA_SIZE + data[5:]
 				else:
-					fp_out.write(data)
+					out_data = data
+				
+				fp_out.write(str2bytes(out_data))
 	
 				i += dlen
 

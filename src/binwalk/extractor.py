@@ -441,7 +441,7 @@ class Extractor:
 
 			while total_size < size:
 				(data, dlen) = fdin.read_block()
-				fdout.write(data[:dlen])
+				fdout.write(str2bytes(data[:dlen]))
 				total_size += dlen
 
 			# Cleanup
