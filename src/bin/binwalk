@@ -13,14 +13,14 @@ def display_status():
 		# Display the current scan progress when the enter key is pressed.
 		try:
 			raw_input()
-			print "Progress: %.2f%% (%d / %d)\n" % (((float(bwalk.total_scanned) / float(bwalk.scan_length)) * 100), bwalk.total_scanned, bwalk.scan_length)
-		except Exception, e:
+			print("Progress: %.2f%% (%d / %d)\n" % (((float(bwalk.total_scanned) / float(bwalk.scan_length)) * 100), bwalk.total_scanned, bwalk.scan_length))
+		except Exception:
 			pass
 
 def examples():
 	name = os.path.basename(sys.argv[0])
 
-	print """
+	print("""
 Scanning firmware for file signatures:
 
 \t$ %s firmware.bin
@@ -54,7 +54,7 @@ Diffing multiple files:
 \t$ %s -W firmware1.bin firmware2.bin firmware3.bin
 
 See http://code.google.com/p/binwalk/wiki/TableOfContents for more.
-""" % (name, name, name, name, name, name, name, name)
+""" % (name, name, name, name, name, name, name, name))
 	sys.exit(0)
 
 def usage(fd):
@@ -255,7 +255,7 @@ def main():
 
 	try:
 		opts, args = GetOpt(sys.argv[1:], short_options, long_options)
-	except GetoptError, e:
+	except GetoptError as e:
 		sys.stderr.write("%s\n" % str(e))
 		usage(sys.stderr)
 
@@ -348,15 +348,15 @@ def main():
 				markers.append((location, [{'description' : description, 'offset' : location}]))
 		elif opt in("-L", "--list-plugins"):
 			# List all user and system plugins, then exit
-			print ''
-			print 'NAME             TYPE       ENABLED    DESCRIPTION'
-			print '-' * 115
+			print('')
+			print('NAME             TYPE       ENABLED    DESCRIPTION')
+			print('-' * 115)
 			with binwalk.Binwalk() as bw:
 				for (key, info) in binwalk.plugins.Plugins(bw).list_plugins().iteritems():
 					for module_name in info['modules']:
-						print '%-16s %-10s %-10s %s' % (module_name, key, info['enabled'][module_name], info['descriptions'][module_name])
-			print ''
-                	sys.exit(1)
+						print('%-16s %-10s %-10s %s' % (module_name, key, info['enabled'][module_name], info['descriptions'][module_name]))
+			print ('')
+			sys.exit(1)
 		elif opt in ("-M", "--matryoshka"):
 			if arg:
 				matryoshka = binwalk.common.str2int(arg)
@@ -398,7 +398,7 @@ def main():
 
 				sys.stdout.write("done.\n")
 				sys.exit(0)
-			except Exception, e:
+			except Exception as e:
 				if 'Permission denied' in str(e):
 					sys.stderr.write("failed (permission denied). Check your user permissions, or run the update as root.\n")
 				else:
@@ -430,7 +430,7 @@ def main():
 				fd = open(tfile, "rb")
 				fd.close()
 				target_files.append(tfile)
-			except Exception, e:
+			except Exception as e:
 				sys.stdout.write("Cannot open file : %s\n" % str(e))
 				failed_open_count += 1
 
