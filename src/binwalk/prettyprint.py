@@ -63,7 +63,7 @@ class PrettyPrint:
 			self.enable_formatting(True)
 
 		if self.log is not None:
-			self.fp = io.FileIO(log, "w")
+			self.fp = open(log, "w")
 			
 			if self.log_csv:
 				self.enable_csv()
@@ -82,11 +82,19 @@ class PrettyPrint:
 		Clean up any open file descriptors.
 		'''
 		try:
+			print("Closing fp.")
 			self.fp.close()
 		except:
 			pass
 
 		self.fp = None
+
+	def _csv_writerow(self, rows):
+		'''
+		Write data to csv file and flush.
+		'''
+		self.csv.writerow(rows)
+		self.fp.flush()
 
 	def _log(self, data, raw=False):
 		'''
@@ -106,9 +114,9 @@ class PrettyPrint:
 					for i in range(0, len(data_parts)):
 						data_parts[i] = data_parts[i].strip()
 
-					self.csv.writerow(data_parts)
+					self._csv_writerow(data_parts)
 			else:
-				self.fp.write(str2bytes(data))
+				self.fp.write(data)
 
 	def _pprint(self, data, nolog=False, noprint=False):
 		'''
@@ -223,8 +231,8 @@ class PrettyPrint:
 
 		if self.csv:
 			nolog = True
-			self.csv.writerow([b"FILE", b"MD5SUM", b"TIMESTAMP"])
-			self.csv.writerow([file_name, md5sum, timestamp])
+			self._csv_writerow(["FILE", "MD5SUM", "TIMESTAMP"])
+			self._csv_writerow([file_name, md5sum, timestamp])
 
 		self._pprint("\n")
 		self._pprint("Scan Time:     %s\n" % timestamp, nolog=nolog)
