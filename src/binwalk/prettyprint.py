@@ -1,3 +1,4 @@
+import io
 import sys
 import hashlib
 import csv as pycsv
@@ -62,7 +63,7 @@ class PrettyPrint:
 			self.enable_formatting(True)
 
 		if self.log is not None:
-			self.fp = open(log, "w")
+			self.fp = io.FileIO(log, "w")
 			
 			if self.log_csv:
 				self.enable_csv()
@@ -107,7 +108,7 @@ class PrettyPrint:
 
 					self.csv.writerow(data_parts)
 			else:
-				self.fp.write(data)
+				self.fp.write(str2bytes(data))
 
 	def _pprint(self, data, nolog=False, noprint=False):
 		'''
@@ -222,7 +223,7 @@ class PrettyPrint:
 
 		if self.csv:
 			nolog = True
-			self.csv.writerow(["FILE", "MD5SUM", "TIMESTAMP"])
+			self.csv.writerow([b"FILE", b"MD5SUM", b"TIMESTAMP"])
 			self.csv.writerow([file_name, md5sum, timestamp])
 
 		self._pprint("\n")
