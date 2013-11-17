@@ -169,7 +169,7 @@ class MagicParser:
 			self.build_signature_set()			
 		except Exception as e:
 			raise Exception("Error parsing magic file '%s' on line %d: %s" % (file_name, line_count, str(e)))
-
+		
 	def _parse_line(self, line):
 		'''
 		Parses a signature line into its four parts (offset, type, condition and description),
@@ -191,14 +191,14 @@ class MagicParser:
 		# Quick and dirty pre-filter. We are only concerned with the first line of a
 		# signature, which will always start with a number. Make sure the first byte of
 		# the line is a number; if not, don't process.
-		if str(line[:1]) < '0' or str(line[:1]) > '9':
+		if bytes2str(line[:1]) < '0' or bytes2str(line[:1]) > '9':
 			return None
 
 		try:
 			# Split the line into white-space separated parts.
 			# For this to work properly, replace escaped spaces ('\ ') with '\x20'.
 			# This means the same thing, but doesn't confuse split().
-			line_parts = line.replace('\\ ', '\\x20').split()
+			line_parts = bytes2str(line).replace('\\ ', '\\x20').split()
 			entry['offset'] = line_parts[0]
 			entry['type'] = line_parts[1]
 			# The condition line may contain escaped sequences, so be sure to decode it properly.
@@ -281,6 +281,7 @@ class MagicParser:
 		Returns an ordered list of offsets inside of data at which candidate offsets were found.
 		'''
 		candidate_offsets = []
+		data = bytes2str(data)
 
 		for regex in self.signature_set:
 			candidate_offsets += [match.start() for match in regex.finditer(data) if match.start() < end]
