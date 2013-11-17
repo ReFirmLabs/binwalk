@@ -183,7 +183,7 @@ class Binwalk(object):
 		# Parse the magic file(s) and initialize libmagic
 		self.mfile = self.parser.parse(self.magic_files)
 		self.magic = magic.open(self.flags)
-		self.magic.load(self.mfile)
+		self.magic.load(str2bytes(self.mfile))
 		# Once the temporary magic file is loaded into libmagic, we don't need it anymore; delete the temp file
 		self.parser.rm_magic_file()
 
@@ -610,7 +610,7 @@ class Binwalk(object):
 							callback(results_offset, results)
 			
 						# If a relative jump offset was specified, update the absolute jump_offset variable
-						if smart.has_key('jump') and smart['jump'] > 0:
+						if has_key(smart, 'jump') and smart['jump'] > 0:
 							jump_offset = results_offset + smart['jump']
 
 			# Track the total number of bytes scanned
@@ -621,7 +621,7 @@ class Binwalk(object):
 			offset = 0
 
 		# Sort the results before returning them
-		scan_items = scan_results.items()
+		scan_items = list(scan_results.items())
 		scan_items.sort()
 
 		# Do delayed extraction, if specified.
@@ -654,7 +654,7 @@ class Binwalk(object):
 		Returns None.
 		'''
 		for (new_file_name, new_data) in iterator(new):
-			if not results.has_key(new_file_name):
+			if not has_key(results, new_file_name):
 				results[new_file_name] = new_data
 			else:
 				for i in range(0, len(new_data)):

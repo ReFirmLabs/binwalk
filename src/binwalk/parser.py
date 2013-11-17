@@ -1,3 +1,4 @@
+import io
 import re
 import os.path
 import tempfile
@@ -139,7 +140,7 @@ class MagicParser:
 		line_count = 0
 
 		try:
-			for line in open(file_name).readlines():
+			for line in io.FileIO(file_name).readlines():
 				line_count += 1
 
 				# Check if this is the first line of a signature entry
@@ -152,7 +153,7 @@ class MagicParser:
 						include = True	
 						self.signature_count += 1
 
-						if not self.signatures.has_key(entry['offset']):
+						if not has_key(self.signatures, entry['offset']):
 							self.signatures[entry['offset']] = []
 						
 						if entry['condition'] not in self.signatures[entry['offset']]:
@@ -190,7 +191,7 @@ class MagicParser:
 		# Quick and dirty pre-filter. We are only concerned with the first line of a
 		# signature, which will always start with a number. Make sure the first byte of
 		# the line is a number; if not, don't process.
-		if line[:1] < '0' or line[:1] > '9':
+		if str(line[:1]) < '0' or str(line[:1]) > '9':
 			return None
 
 		try:
@@ -201,7 +202,7 @@ class MagicParser:
 			entry['offset'] = line_parts[0]
 			entry['type'] = line_parts[1]
 			# The condition line may contain escaped sequences, so be sure to decode it properly.
-			entry['condition'] = line_parts[2].decode('string_escape')
+			entry['condition'] = string_decode(line_parts[2])
 			entry['description'] = ' '.join(line_parts[3:])
 		except Exception as e:
 			raise Exception("%s :: %s", (str(e), line))

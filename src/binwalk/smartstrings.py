@@ -109,7 +109,7 @@ class FileStrings(object):
 		offset = self.total_read + self.start
 
 		# Ignore blocks which have a higher than average or higher than MAX_ENTROPY entropy
-		while self.entropy.has_key(offset):
+		while has_key(self.entropy, offset):
 			# Don't ignore blocks that border on an entropy rising/falling edge
 			try:
 				if self.entropy[offset-self.block] <= self.MAX_ENTROPY:
@@ -179,7 +179,7 @@ class FileStrings(object):
 
 		Returns True if bracketed, False if not.
 		'''
-		return self.BRACKETED.has_key(data[0]) and data.endswith(self.BRACKETED[data[0]])
+		return has_key(self.BRACKETED, data[0]) and data.endswith(self.BRACKETED[data[0]])
 
 	def _non_alpha_count(self, data):
 		'''

@@ -170,7 +170,7 @@ class SmartSignature:
 		'''
 		arg = ''
 
-		if self.KEYWORDS.has_key(keyword) and self.KEYWORDS[keyword] in data:
+		if has_key(self.KEYWORDS, keyword) and self.KEYWORDS[keyword] in data:
 			arg = data.split(self.KEYWORDS[keyword])[1].split(self.KEYWORD_DELIM_END)[0]
 
 		return arg

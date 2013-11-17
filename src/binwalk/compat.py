@@ -10,11 +10,39 @@ if sys.version_info.major > 2:
 else:
 	import urllib2
 
-def iterator(obj):
+def iterator(dictionary):
 	'''
 	For cross compatibility between Python 2 and Python 3 dictionaries.
 	'''
 	if sys.version_info.major > 2:
-		return obj.items()
+		return dictionary.items()
 	else:
-		return obj.iteritems()
+		return dictionary.iteritems()
+
+def has_key(dictionary, key):
+	'''
+	For cross compatibility between Python 2 and Python 3 dictionaries.
+	'''
+	if sys.version_info.major > 2:
+		return key in dictionary
+	else:
+		return dictionary.has_key(key)
+
+def str2bytes(string):
+	'''
+	For cross compatibility between Python 2 and Python 3 strings.
+	'''
+	if sys.version_info.major > 2:
+		return bytes(string, 'utf-8')
+	else:
+		return string
+	
+def string_decode(string):
+	'''
+	For cross compatibility between Python 2 and Python 3 strings.
+	'''
+	if sys.version_info.major > 2:
+		return bytes(string, 'utf-8').decode('unicode_escape')
+	else:
+		return string.decode('string_escape')
+

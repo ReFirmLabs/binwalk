@@ -52,7 +52,7 @@ class PlotEntropy(object):
 				label = None
 				description = results[0]['description'].split(',')[0]
 
-				if not color_mappings.has_key(description):
+				if not has_key(color_mappings, description):
 					if show_legend:
 						label = description
 
