@@ -158,6 +158,8 @@ class BlockFile(io.FileIO):
 			data = self.read(self.READ_BLOCK_SIZE + self.MAX_TRAILING_SIZE)
 
 			if data and data is not None:
+				data = bytes2str(data)
+
 				# Get the actual length of the read in data
 				dlen = len(data)
 				seek_offset = dlen - self.READ_BLOCK_SIZE

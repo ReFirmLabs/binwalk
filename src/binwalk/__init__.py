@@ -539,8 +539,11 @@ class Binwalk(object):
 					results = []
 					results_offset = -1
 
+					# In python3 we need a bytes object to pass to magic.buffer
+					candidate_data = str2bytes(data[i+candidate:i+candidate+fd.MAX_TRAILING_SIZE])
+
 					# Pass the data to libmagic, and split out multiple results into a list
-					for magic_result in self.parser.split(self.magic.buffer(data[i+candidate:i+candidate+fd.MAX_TRAILING_SIZE])):
+					for magic_result in self.parser.split(self.magic.buffer(candidate_data)):
 
 						i_set_results_offset = False
 

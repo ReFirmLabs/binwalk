@@ -33,7 +33,7 @@ def str2bytes(string):
 	For cross compatibility between Python 2 and Python 3 strings.
 	'''
 	if isinstance(string, type('')) and sys.version_info.major > 2:
-		return bytes(string, 'ascii')
+		return bytes(string, 'latin1')
 	else:
 		return string
 
@@ -42,7 +42,7 @@ def bytes2str(bs):
 	For cross compatibility between Python 2 and Python 3 strings.
 	'''
 	if isinstance(bs, type(b'')) and sys.version_info.major > 2:
-		return bs.decode('ascii')
+		return bs.decode('latin1')
 	else:
 		return bs
 
