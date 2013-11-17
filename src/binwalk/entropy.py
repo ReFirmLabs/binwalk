@@ -272,6 +272,9 @@ class FileEntropy(object):
 
 		if self.plugins:
 			self.plugins._post_scan_callbacks(self.fd)
+		
+		if self.do_chisq:
+			self._look_for_compression(offsets, entropy)
 	
 		return (offsets, entropy, average)
 
@@ -365,9 +368,6 @@ class FileEntropy(object):
 
 		Returns None.
 		'''
-		if self.do_chisq:
-			self._look_for_compression(x, y)
-
 		PlotEntropy(x, y, self.fd.name, average, self.file_results, show_legend, save)
 
 class Entropy(object):
