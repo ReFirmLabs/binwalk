@@ -132,7 +132,7 @@ class SmartSignature:
 		if quoted_data and self.KEYWORD_DELIM_START in quoted_data:
 			# If so, check to see if the quoted data contains any of our keywords.
 			# If any keywords are found inside of quoted data, consider the keywords invalid.
-			for (name, keyword) in self.KEYWORDS.iteritems():
+			for (name, keyword) in iterator(self.KEYWORDS):
 				if keyword in quoted_data:
 					return False
 		return True
@@ -251,7 +251,7 @@ class SmartSignature:
 		Returns a sanitized string.
 		'''
 		if not self.ignore_smart_signatures:
-			for (name, keyword) in self.KEYWORDS.iteritems():
+			for (name, keyword) in iterator(self.KEYWORDS):
 				start = data.find(keyword)
 				if start != -1:
 					end = data[start:].find(self.KEYWORD_DELIM_END)

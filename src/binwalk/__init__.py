@@ -653,7 +653,7 @@ class Binwalk(object):
 
 		Returns None.
 		'''
-		for (new_file_name, new_data) in new.iteritems():
+		for (new_file_name, new_data) in iterator(new):
 			if not results.has_key(new_file_name):
 				results[new_file_name] = new_data
 			else:

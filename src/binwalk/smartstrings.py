@@ -1,4 +1,3 @@
-import string
 import binwalk.entropy as entropy
 import binwalk.plugins as plugins
 import binwalk.common as common
@@ -205,7 +204,7 @@ class FileStrings(object):
 		Returns True if the ratio of special characters in data is too high, otherwise returns False.
 		'''
 		# If an open bracket exists, we expect a close bracket as well
-		for (key, value) in self.BRACKETED.iteritems():
+		for (key, value) in iterator(self.BRACKETED):
 			if key in data and not value in data:
 				return True
 

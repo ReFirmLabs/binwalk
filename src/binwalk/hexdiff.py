@@ -2,7 +2,6 @@
 
 import os
 import sys
-import string
 import curses
 import platform
 import binwalk.common as common

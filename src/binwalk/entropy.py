@@ -470,7 +470,7 @@ class Entropy(object):
 		if self.binwalk and self.load_plugins:
 			self.plugins = plugins.Plugins(self.binwalk, whitelist=self.whitelist, blacklist=self.blacklist)
 
-		for (file_name, overlay) in self.files.iteritems():
+		for (file_name, overlay) in iterator(self.files):
 
 			if self.plugins:
 				self.plugins._load_plugins()

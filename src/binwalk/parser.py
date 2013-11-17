@@ -256,7 +256,7 @@ class MagicParser:
 		'''
 		signature_set = []
 
-		for (offset, sigs) in self.signatures.iteritems():
+		for (offset, sigs) in iterator(self.signatures):
 			for sig in sigs:
 				if sig == self.WILDCARD:
 					sig = re.compile('.')

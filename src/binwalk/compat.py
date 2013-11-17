@@ -9,3 +9,12 @@ if sys.version_info.major > 2:
 	string.letters = string.ascii_letters
 else:
 	import urllib2
+
+def iterator(obj):
+	'''
+	For cross compatibility between Python 2 and Python 3 dictionaries.
+	'''
+	if sys.version_info.major > 2:
+		return obj.items()
+	else:
+		return obj.iteritems()
