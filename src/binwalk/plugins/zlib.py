@@ -7,6 +7,7 @@ class Plugin:
 	Searches for and validates zlib compressed data.
 	'''
 
+	MIN_DECOMP_SIZE = 1
 	MAX_DATA_SIZE = 33 * 1024
 
 	def __init__(self, binwalk):
@@ -32,7 +33,10 @@ class Plugin:
 			data = self.fd.read(self.MAX_DATA_SIZE)
 			
 			# Check if this is valid zlib data
-			if not self.tinfl.is_deflated(data, len(data), 1):
+			decomp_size = self.tinfl.is_deflated(data, len(data), 1)
+			if decomp_size > 0:
+				result['description'] += ", uncompressed size >= %d" % decomp_size
+			else:
 				return (PLUGIN_NO_DISPLAY | PLUGIN_NO_EXTRACT)
 		
 		return PLUGIN_CONTINUE

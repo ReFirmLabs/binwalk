@@ -600,7 +600,7 @@ int is_deflated(char *buf, size_t buf_size, int includes_zlib_header)
                       flags) >= 0 && out_buf_size > 0)
   {
       //printf("%d => %d    DATA: '%s'\n", in_buf_size, out_buf_size, out_buf);
-      return 1;
+      return (int) out_buf_size;
   }
 
   return 0;

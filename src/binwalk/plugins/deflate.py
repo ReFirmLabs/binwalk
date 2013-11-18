@@ -12,6 +12,7 @@ class Plugin:
 
 	ENABLED = False
 	SIZE = 64*1024
+	MIN_DECOMP_SIZE = 1
 	DESCRIPTION = "Deflate compressed data stream"
 
 	def __init__(self, binwalk):
@@ -22,7 +23,7 @@ class Plugin:
 
 		# Add an extraction rule
 		if self.binwalk.extractor.enabled:
-			self.binwalk.extractor.add_rule(regex=self.DESCRIPTION.lower(), extension="deflate", cmd=self._extractor)
+			self.binwalk.extractor.add_rule(regex='^%s' % self.DESCRIPTION.lower(), extension="deflate", cmd=self._extractor)
 
 	def pre_scan(self, fp):
 		self._deflate_scan(fp)
@@ -48,15 +49,17 @@ class Plugin:
 				break
 
 			for i in range(0, dlen):
-				if self.tinfl.is_deflated(data[i:], dlen-i, 0):
+				decomp_size = self.tinfl.is_deflated(data[i:], dlen-i, 0)
+				if decomp_size >= self.MIN_DECOMP_SIZE:
 					loc = fp.offset + current_total + i
 					# Update total_scanned here for immediate progress feedback
 					self.binwalk.total_scanned = current_total + i
-					self.binwalk.display.easy_results(loc, self.DESCRIPTION)
+					description = self.DESCRIPTION + ', uncompressed size >= %d' % decomp_size
+					self.binwalk.display.easy_results(loc, description)
 
 					# Extract the file
 					if self.binwalk.extractor.enabled:
-						self.binwalk.extractor.extract(loc, self.DESCRIPTION, fp.name, (fp.size - loc))
+						self.binwalk.extractor.extract(loc, description, fp.name, (fp.size - loc))
 
 				if (current_total + i) > self.binwalk.scan_length:
 					break
