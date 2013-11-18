@@ -457,6 +457,9 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
           }
         }
 #endif
+	/* CJH: Check for NULL pointers */
+	if (!pOut_buf_cur || ! pSrc) goto common_exit;
+
         do
         {
           pOut_buf_cur[0] = pSrc[0];
@@ -630,7 +633,7 @@ int inflate_raw_file(char *in_file, char *out_file)
 				{
 					decompressed_data = (char *) tinfl_decompress_mem_to_heap(compressed_data, in_size, &out_size, 0);
 	
-					if(decompressed_data)
+					if(decompressed_data && out_size > 0)
 					{
 						fwrite(decompressed_data, 1, out_size, fp_out);
 						free(decompressed_data);
@@ -681,7 +684,13 @@ int inflate_raw_file(char *in_file, char *out_file)
 #ifdef MAIN
 int main(int argc, char *argv[])
 {
+	if(argc != 3)
+	{
+		fprintf(stderr, "Usage: %s <input file> <output file>\n", argv[0]);
+		return EXIT_FAILURE;
+	}
+
 	printf("Inflated to %d bytes.\n", inflate_raw_file(argv[1], argv[2]));
-	return 0;
+	return EXIT_SUCCESS;
 }
 #endif
