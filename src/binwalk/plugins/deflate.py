@@ -60,11 +60,14 @@ class Plugin:
 				if decomp_size >= self.MIN_DECOMP_SIZE:
 					loc = fp.offset + current_total + i
 					description = self.DESCRIPTION + ', uncompressed size >= %d' % decomp_size
-					self.binwalk.display.easy_results(loc, description)
 
 					# Extract the file
 					if self.binwalk.extractor.enabled:
 						self.binwalk.extractor.extract(loc, description, fp.name, (fp.size - loc))
+					
+					# Display results after extraction to be consistent with normal binwalk scans
+					self.binwalk.display.easy_results(loc, description)
+				
 				# Update total_scanned here for immediate progress feedback
 				self.binwalk.total_scanned = current_total + i
 
