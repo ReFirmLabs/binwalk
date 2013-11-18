@@ -11,8 +11,9 @@ class Plugin:
 	'''
 
 	ENABLED = False
-	SIZE = 64*1024
-	MIN_DECOMP_SIZE = 1
+	SIZE = 33*1024
+	# To prevent many false positives, only show data that decompressed to a reasonable window size
+	MIN_DECOMP_SIZE = 16*1024
 	DESCRIPTION = "Deflate compressed data stream"
 
 	def __init__(self, binwalk):
@@ -26,7 +27,12 @@ class Plugin:
 			self.binwalk.extractor.add_rule(regex='^%s' % self.DESCRIPTION.lower(), extension="deflate", cmd=self._extractor)
 
 	def pre_scan(self, fp):
+		# Make sure we'll be getting enough data for a good decompression test
+		if fp.MAX_TRAILING_SIZE < self.SIZE:
+			fp.MAX_TRAILING_SIZE = self.SIZE
+
 		self._deflate_scan(fp)
+
 		return PLUGIN_TERMINATE
 
 	def _extractor(self, file_name):
@@ -35,8 +41,6 @@ class Plugin:
 			self.tinfl.inflate_raw_file(file_name, out_file)
 
 	def _deflate_scan(self, fp):
-		fp.MAX_TRAILING_SIZE = self.SIZE
-
 		# Set these so that the progress report reflects the current scan status
 		self.binwalk.scan_length = fp.length
 		self.binwalk.total_scanned = 0
@@ -48,18 +52,21 @@ class Plugin:
 			if not data or dlen == 0:
 				break
 
+			# dlen == block size, but data includes MAX_TRAILING_SIZE data as well
+			actual_dlen = len(data)
+
 			for i in range(0, dlen):
-				decomp_size = self.tinfl.is_deflated(data[i:], dlen-i, 0)
+				decomp_size = self.tinfl.is_deflated(data[i:], actual_dlen-i, 0)
 				if decomp_size >= self.MIN_DECOMP_SIZE:
 					loc = fp.offset + current_total + i
-					# Update total_scanned here for immediate progress feedback
-					self.binwalk.total_scanned = current_total + i
 					description = self.DESCRIPTION + ', uncompressed size >= %d' % decomp_size
 					self.binwalk.display.easy_results(loc, description)
 
 					# Extract the file
 					if self.binwalk.extractor.enabled:
 						self.binwalk.extractor.extract(loc, description, fp.name, (fp.size - loc))
+				# Update total_scanned here for immediate progress feedback
+				self.binwalk.total_scanned = current_total + i
 
 				if (current_total + i) > self.binwalk.scan_length:
 					break

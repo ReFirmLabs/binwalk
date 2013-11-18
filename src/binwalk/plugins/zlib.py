@@ -7,7 +7,7 @@ class Plugin:
 	Searches for and validates zlib compressed data.
 	'''
 
-	MIN_DECOMP_SIZE = 1
+	MIN_DECOMP_SIZE = 1024
 	MAX_DATA_SIZE = 33 * 1024
 
 	def __init__(self, binwalk):
