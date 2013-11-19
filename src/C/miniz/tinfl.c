@@ -517,6 +517,7 @@ void *tinfl_decompress_mem_to_heap(const void *pSrc_buf, size_t src_buf_len, siz
     size_t src_buf_size = src_buf_len - src_buf_ofs, dst_buf_size = out_buf_capacity - *pOut_len, new_out_buf_capacity;
     tinfl_status status = tinfl_decompress(&decomp, (const mz_uint8*)pSrc_buf + src_buf_ofs, &src_buf_size, (mz_uint8*)pBuf, pBuf ? (mz_uint8*)pBuf + *pOut_len : NULL, &dst_buf_size,
       (flags & ~TINFL_FLAG_HAS_MORE_INPUT) | TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF);
+printf("STATUS: %d\n", status);
     if ((status < 0) || (status == TINFL_STATUS_NEEDS_MORE_INPUT))
     {
       MZ_FREE(pBuf); *pOut_len = 0; return NULL;
@@ -606,10 +607,11 @@ int is_deflated(char *buf, size_t buf_size, int includes_zlib_header)
   return 0;
 }
 
+#define MAX_READ_SIZE 1*1024*1024
 int inflate_raw_file(char *in_file, char *out_file)
 {
-	int retval = 0;
-	size_t out_size = 0, in_size = 0;
+	int retval = 0, i = 0;
+	size_t out_size = 0, in_size = 0, nbytes = 0;
 	FILE *fp_in = NULL, *fp_out = NULL;
 	char *compressed_data = NULL, *decompressed_data = NULL;
 
@@ -624,20 +626,25 @@ int inflate_raw_file(char *in_file, char *out_file)
 			in_size = ftell(fp_in);
 			fseek(fp_in, 0L, SEEK_SET);
 
-			compressed_data = malloc(in_size);
+			compressed_data = malloc(MAX_READ_SIZE);
 			if(compressed_data)
 			{
-				memset(compressed_data, 0, in_size);
 				
-				if(fread(compressed_data, 1, in_size, fp_in) == in_size)
+				for(i=0; i<in_size; i+=MAX_READ_SIZE)
 				{
-					decompressed_data = (char *) tinfl_decompress_mem_to_heap(compressed_data, in_size, &out_size, 0);
-	
-					if(decompressed_data && out_size > 0)
+					memset(compressed_data, 0, MAX_READ_SIZE);
+
+					nbytes = fread(compressed_data, 1, MAX_READ_SIZE, fp_in);
+					if(nbytes > 0)
 					{
-						fwrite(decompressed_data, 1, out_size, fp_out);
-						free(decompressed_data);
-						retval = out_size;
+						decompressed_data = (char *) tinfl_decompress_mem_to_heap(compressed_data, nbytes, &out_size, 0);
+	
+						if(decompressed_data && out_size > 0)
+						{
+							fwrite(decompressed_data, 1, out_size, fp_out);
+							free(decompressed_data);
+							retval += out_size;
+						}
 					}
 				}
 				
