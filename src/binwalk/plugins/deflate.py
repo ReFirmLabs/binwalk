@@ -12,7 +12,7 @@ class Plugin:
 
 	ENABLED = False
 	SIZE = 33*1024
-	# To prevent many false positives, only show data that decompressed to a reasonable window size
+	# To prevent many false positives, only show data that decompressed to a reasonable size
 	MIN_DECOMP_SIZE = 16*1024
 	DESCRIPTION = "Deflate compressed data stream"
 
