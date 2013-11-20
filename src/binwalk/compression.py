@@ -148,7 +148,7 @@ class CompressionEntropyAnalyzer(object):
 
 		Returns None.
 		'''
-		self.fp = common.BlockFile(fname, 'rb', offset=start, length=length)
+		self.fp = common.BlockFile(fname, 'r', offset=start, length=length)
 		
 		# Read block size must be at least as large as our analysis block size
 		if self.fp.READ_BLOCK_SIZE < self.BLOCK_SIZE:

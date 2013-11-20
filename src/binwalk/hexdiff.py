@@ -112,7 +112,7 @@ class HexDiff(object):
 			read_block_size = common.BlockFile.READ_BLOCK_SIZE
 
 		for f in files:
-			fp = common.BlockFile(f, 'rb', length=size, offset=offset)
+			fp = common.BlockFile(f, 'r', length=size, offset=offset)
 			fp.READ_BLOCK_SIZE = read_block_size
 			fp.MAX_TRAILING_SIZE = 0
 			fps.append(fp)

@@ -75,7 +75,7 @@ class FileStrings(object):
 		# the entropy analysis, block offsets won't line up.
 		self.start -= (self.start % self.block)
 
-		self.fd = common.BlockFile(file_name, 'rb', length=length, offset=self.start)
+		self.fd = common.BlockFile(file_name, 'r', length=length, offset=self.start)
 		# TODO: This is not optimal. We should read in larger chunks and process it into self.block chunks.
 		self.fd.READ_BLOCK_SIZE = self.block
 		self.fd.MAX_TRAILING_SIZE = 0

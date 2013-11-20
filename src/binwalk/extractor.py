@@ -428,16 +428,16 @@ class Extractor:
 		
 		try:
 			# Open the target file and seek to the offset
-			fdin = BlockFile(file_name, "rb", length=size)
+			fdin = BlockFile(file_name, 'r', length=size)
 			fdin.seek(offset)
 			
 			# Open the output file
 			try:
-				fdout = BlockFile(fname, "wb")
+				fdout = BlockFile(fname, 'w')
 			except Exception as e:
 				# Fall back to the default name if the requested name fails
 				fname = unique_file_name(default_bname, extension)
-				fdout = BlockFile(fname, "wb")
+				fdout = BlockFile(fname, 'w')
 
 			while total_size < size:
 				(data, dlen) = fdin.read_block()
