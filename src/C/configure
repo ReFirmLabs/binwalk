@@ -599,6 +599,7 @@ ac_includes_default="\
 #endif"
 
 ac_subst_vars='LTLIBOBJS
+INSTALL_OPTIONS
 SONAME
 LIBOBJS
 EGREP
@@ -3277,11 +3278,15 @@ CFLAGS="-Wall -fPIC $CFLAGS"
 if test "$(uname)" == "Darwin"
 then
 	SONAME="-install_name"
+	INSTALL_OPTIONS="-m644"
 else
 	SONAME="-soname"
+	INSTALL_OPTIONS="-D -m644"
 fi
 
 SONAME=$SONAME
+
+INSTALL_OPTIONS=$INSTALL_OPTIONS
 
 ac_config_files="$ac_config_files Makefile"
 

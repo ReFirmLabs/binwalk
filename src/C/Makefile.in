@@ -2,6 +2,7 @@ export CC=@CC@
 export CFLAGS=@CFLAGS@
 export SONAME=@SONAME@
 export LIBDIR=@libdir@
+export INSTALL_OPTIONS=@INSTALL_OPTIONS@
 
 all: clean
 	make -C miniz

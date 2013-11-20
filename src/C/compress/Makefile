@@ -9,7 +9,7 @@ compress42.o:
 	$(CC) $(CFLAGS) compress42.c -c
 
 install:
-	install -D -m644 $(LIBNAME) $(DESTDIR)$(LIBDIR)/$(LIBNAME)
+	install $(INSTALL_OPTIONS) $(LIBNAME) $(DESTDIR)$(LIBDIR)/$(LIBNAME)
 
 .PHONY: clean distclean
 

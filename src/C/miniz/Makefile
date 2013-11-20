@@ -9,7 +9,7 @@ tinfl.o:
 	$(CC) $(CFLAGS) -c tinfl.c
 
 install:
-	install -D -m644 $(LIBNAME) $(DESTDIR)$(LIBDIR)/$(LIBNAME)
+	install $(INSTALL_OPTIONS) $(LIBNAME) $(DESTDIR)$(LIBDIR)/$(LIBNAME)
 
 .PHONY: clean distclean
 

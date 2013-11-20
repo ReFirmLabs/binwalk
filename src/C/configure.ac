@@ -12,10 +12,13 @@ CFLAGS="-Wall -fPIC $CFLAGS"
 if test "$(uname)" == "Darwin"
 then
 	SONAME="-install_name"
+	INSTALL_OPTIONS="-m644"
 else
 	SONAME="-soname"
+	INSTALL_OPTIONS="-D -m644"
 fi
 
 AC_SUBST(SONAME, $SONAME)
+AC_SUBST(INSTALL_OPTIONS, $INSTALL_OPTIONS)
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
