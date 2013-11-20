@@ -139,6 +139,12 @@ class BlockFile(io.FileIO):
 
 		io.FileIO.__init__(self, fname, mode)
 
+		# Work around for python 2.6 where FileIO.name raises an exception
+		try:
+			self.name
+		except AttributeError:
+			self.name = fname
+
 		self.seek(self.offset)
 			
 

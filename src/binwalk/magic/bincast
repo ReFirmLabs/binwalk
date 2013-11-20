@@ -1,7 +1,7 @@
 0	belong x	Hex:                 0x%.8X
 #0	string x	String:              %s
-0	lequad x	Little Endian Quad:  %lld
-0	bequad x	Big Endian Quad:     %lld
+#0	lequad x	Little Endian Quad:  %lld
+#0	bequad x	Big Endian Quad:     %lld
 0	lelong x	Little Endian Long:  %d
 0	belong x	Big Endian Long:     %d
 0	leshort x	Little Endian Short: %d

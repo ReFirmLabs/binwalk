@@ -262,6 +262,8 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
 
   do
   {
+//printf("DECOMPRESS: %d\n", r->m_final);
+//fflush(stdout);
     TINFL_GET_BITS(3, r->m_final, 3); r->m_type = r->m_final >> 1;
     if (r->m_type == 0)
     {
@@ -503,6 +505,8 @@ common_exit:
     }
     r->m_check_adler32 = (s2 << 16) + s1; if ((status == TINFL_STATUS_DONE) && (decomp_flags & TINFL_FLAG_PARSE_ZLIB_HEADER) && (r->m_check_adler32 != r->m_z_adler32)) status = TINFL_STATUS_ADLER32_MISMATCH;
   }
+//printf("DECOMPRESS RETURN\n");
+//fflush(stdout);
   return status;
 }
 
@@ -515,9 +519,12 @@ void *tinfl_decompress_mem_to_heap(const void *pSrc_buf, size_t src_buf_len, siz
   for ( ; ; )
   {
     size_t src_buf_size = src_buf_len - src_buf_ofs, dst_buf_size = out_buf_capacity - *pOut_len, new_out_buf_capacity;
+//printf("DOING DECOMPRESSION\n");
+//fflush(stdout);
     tinfl_status status = tinfl_decompress(&decomp, (const mz_uint8*)pSrc_buf + src_buf_ofs, &src_buf_size, (mz_uint8*)pBuf, pBuf ? (mz_uint8*)pBuf + *pOut_len : NULL, &dst_buf_size,
       (flags & ~TINFL_FLAG_HAS_MORE_INPUT) | TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF);
-printf("STATUS: %d\n", status);
+//printf("STATUS: %d\n", status);
+//fflush(stdout);
     if ((status < 0) || (status == TINFL_STATUS_NEEDS_MORE_INPUT))
     {
       MZ_FREE(pBuf); *pOut_len = 0; return NULL;
