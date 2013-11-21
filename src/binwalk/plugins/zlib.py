@@ -1,6 +1,7 @@
 import ctypes
 import ctypes.util
 from binwalk.plugins import *
+from binwalk.common import BlockFile
 
 class Plugin:
 	'''
@@ -15,14 +16,14 @@ class Plugin:
 		self.tinfl = None
 
 		if binwalk.scan_type == binwalk.BINWALK:
-			# Add the zlib file to the list of magic files
-			binwalk.magic_files.append(binwalk.config.find_magic_file('zlib'))
 			# Load libtinfl.so
 			self.tinfl = ctypes.cdll.LoadLibrary(ctypes.util.find_library('tinfl'))
-	
+			# Add the zlib file to the list of magic files
+			binwalk.magic_files.append(binwalk.config.find_magic_file('zlib'))
+
 	def pre_scan(self, fd):
 		if self.tinfl:
-			self.fd = open(fd.name, 'rb')
+			self.fd = BlockFile(fd.name, 'r')
 
 	def callback(self, result):
 

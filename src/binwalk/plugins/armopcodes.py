@@ -1,3 +1,4 @@
+from binwalk.common import *
 from binwalk.plugins import *
 
 class Plugin:
@@ -18,7 +19,7 @@ class Plugin:
 
 	def pre_scan(self, fd):
 		if self.enabled:
-			self.fd = open(fd.name, 'rb')
+			self.fd = BlockFile(fd.name, 'r')
 
 	def callback(self, results):
 		if self.fd:

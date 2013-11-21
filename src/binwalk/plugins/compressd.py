@@ -1,5 +1,6 @@
 import ctypes
 import ctypes.util
+from binwalk.common import *
 from binwalk.plugins import *
 
 class Plugin:
@@ -28,7 +29,7 @@ class Plugin:
 	def pre_scan(self, fd):
 		try:
 			if self.comp:
-				self.fd = open(fd.name, 'rb')
+				self.fd = BlockFile(fd.name, 'r')
 		except:
 			pass
 

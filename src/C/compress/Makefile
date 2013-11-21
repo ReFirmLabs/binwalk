@@ -1,4 +1,4 @@
-LIBNAME=libcompress42.so
+LIBNAME=libcompress42.$(SOEXT)
 
 all: clean $(LIBNAME)
 

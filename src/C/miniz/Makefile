@@ -1,4 +1,4 @@
-LIBNAME=libtinfl.so
+LIBNAME=libtinfl.$(SOEXT)
 
 all: clean $(LIBNAME)
 

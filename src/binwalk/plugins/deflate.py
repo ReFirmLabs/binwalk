@@ -13,7 +13,7 @@ class Plugin:
 	ENABLED = False
 	SIZE = 33*1024
 	# To prevent many false positives, only show data that decompressed to a reasonable size
-	MIN_DECOMP_SIZE = 16*1024
+	MIN_DECOMP_SIZE = 32*1024
 	DESCRIPTION = "Deflate compressed data stream"
 
 	def __init__(self, binwalk):
