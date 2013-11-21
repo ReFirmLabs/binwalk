@@ -123,7 +123,7 @@ class BlockFile(io.FileIO):
 		self.total_read = 0
 
 		# Python 2.6 doesn't like modes like 'rb' or 'wb'
-		self.mode = mode.replace('b', '')
+		mode = mode.replace('b', '')
 		
 		try:
 			self.size = file_size(fname)
@@ -140,7 +140,7 @@ class BlockFile(io.FileIO):
 		else:
 			self.length = self.size
 
-		io.FileIO.__init__(self, fname, self.mode)
+		io.FileIO.__init__(self, fname, mode)
 
 		# Work around for python 2.6 where FileIO._name is not defined
 		try:
