@@ -4,7 +4,6 @@ import hashlib
 import csv as pycsv
 from datetime import datetime
 from binwalk.compat import *
-from binwalk.common import BlockFile
 
 class PrettyPrint:
 	'''
@@ -134,7 +133,7 @@ class PrettyPrint:
 		'''
 		md5 = hashlib.md5()
                 
-		with BlockFile(file_name, 'r') as f:
+		with open(file_name, 'rb') as f:
 			for chunk in iter(lambda: f.read(128*md5.block_size), b''):
 				md5.update(chunk)
 

@@ -31,7 +31,7 @@ class Plugin:
 		# Try extracting the LZMA file without modification first
 		if not self.binwalk.extractor.execute(self.original_cmd, fname):
 			out_name = os.path.splitext(fname)[0] + '-patched' + os.path.splitext(fname)[1]
-			fp_out = open(out_name, 'wb')
+			fp_out = BlockFile(out_name, 'w')
 			fp_in = BlockFile(fname)
 			fp_in.MAX_TRAILING_SIZE = 0
 			i = 0
@@ -44,7 +44,7 @@ class Plugin:
 				else:
 					out_data = data
 				
-				fp_out.write(str2bytes(out_data))
+				fp_out.write(out_data)
 	
 				i += dlen
 

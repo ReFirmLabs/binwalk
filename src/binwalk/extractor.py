@@ -176,8 +176,9 @@ class Extractor:
 		'''
 		try:
 			# Process each line from the extract file, ignoring comments
-			for rule in open(fname).readlines():
-				self.add_rule(rule.split(self.COMMENT_DELIM, 1)[0])
+			with open(fname, 'r') as f:
+				for rule in f.readlines():
+					self.add_rule(rule.split(self.COMMENT_DELIM, 1)[0])
 		except Exception as e:
 			raise Exception("Extractor.load_from_file failed to load file '%s': %s" % (fname, str(e)))
 

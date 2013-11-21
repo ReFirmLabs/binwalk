@@ -140,8 +140,7 @@ class MagicParser:
 		line_count = 0
 
 		try:
-			for line in io.FileIO(file_name).readlines():
-				line = bytes2str(line)
+			for line in open(file_name, 'r').readlines():
 				line_count += 1
 
 				# Check if this is the first line of a signature entry

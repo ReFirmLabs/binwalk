@@ -93,8 +93,26 @@ def unique_file_name(base_name, extension=''):
 
 class BlockFile(io.FileIO):
 	'''
-	Abstraction class to handle reading data from files in blocks.
-	Necessary for large files.
+	Abstraction class for accessing binary files.
+
+	This class overrides io.FilIO's read and write methods. This guaruntees two things:
+
+		1. All requested data will be read/written via the read and write methods.
+		2. All reads return a str object and all writes can accept either a str or a
+		   bytes object, regardless of the Python interpreter version.
+
+	However, the downside is that other io.FileIO methods won't work properly in Python 3,
+	namely things that are wrappers around self.read (e.g., readline, readlines, etc).
+
+	This class also provides a read_block method, which is used by binwalk to read in a
+	block of data, plus some additional data (MAX_TRAILING_SIZE), but on the next block read
+	pick up at the end of the previous data block (not the end of the additional data). This
+	is necessary for scans where a signature may span a block boundary.
+
+	The descision to force read to return a str object instead of a bytes object is questionable
+	for Python 3, it seemed the best way to abstract differences in Python 2/3 from the rest
+	of the code (especially for people writing plugins) and to add Python 3 support with 
+	minimal code change.
 	'''
 
 	# The MAX_TRAILING_SIZE limits the amount of data available to a signature.
@@ -150,12 +168,51 @@ class BlockFile(io.FileIO):
 
 		self.seek(self.offset)
 			
+	def write(self, data):
+		'''
+		Writes data to the opened file.
+		
+		io.FileIO.write does not guaruntee that all data will be written;
+		this method overrides io.FileIO.write and does guaruntee that all data will be written.
+
+		Returns the number of bytes written.
+		'''
+		n = 0
+		l = len(data)
+		data = str2bytes(data)
+
+		while n < l:
+			n += io.FileIO.write(self, data[n:])
+
+		return n
+
+	def read(self, n=-1):
+		''''
+		Reads up to n bytes of data (or to EOF if n is not specified).
+		
+		io.FileIO.read does not guaruntee that all requested data will be read;
+		this method overrides io.FileIO.read and does guaruntee that all data will be read.
+
+		Returns a str object containing the read data.
+		'''
+		l = 0
+		data = b''
+
+		while n < 0 or l < n:
+			tmp = io.FileIO.read(self, n-l)
+			if tmp:
+				data += tmp
+				l += len(tmp)
+			else:
+				break
+
+		return bytes2str(data)
 
 	def read_block(self):
 		'''
 		Reads in a block of data from the target file.
 
-                Returns a tuple of (file block data, block data length).
+                Returns a tuple of (str(file block data), block data length).
                 '''
 		dlen = 0
 		data = None
@@ -167,7 +224,6 @@ class BlockFile(io.FileIO):
 			data = self.read(self.READ_BLOCK_SIZE + self.MAX_TRAILING_SIZE)
 
 			if data and data is not None:
-				data = bytes2str(data)
 
 				# Get the actual length of the read in data
 				dlen = len(data)

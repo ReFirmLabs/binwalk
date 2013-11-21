@@ -126,7 +126,7 @@ class Plugins:
 				if val is not None:
 					retval |= val
 			except Exception as e:
-				sys.stderr.write("WARNING: %s.%s failed: %s\n" % (str(callback.im_class), callback.__name__, str(e)))
+				sys.stderr.write("WARNING: %s.%s failed: %s\n" % (callback.__module__, callback.__name__, e))
 
 		return retval
 
