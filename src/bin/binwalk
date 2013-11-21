@@ -53,7 +53,7 @@ Diffing multiple files:
 
 \t$ %s -W firmware1.bin firmware2.bin firmware3.bin
 
-See http://code.google.com/p/binwalk/wiki/TableOfContents for more.
+See http://binwalk.org/wiki/usage for more.
 """ % (name, name, name, name, name, name, name, name))
 	sys.exit(0)
 
