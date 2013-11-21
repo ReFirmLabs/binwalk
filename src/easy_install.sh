@@ -43,23 +43,30 @@ echo "Detected $DISTRO $PLATFORM"
 
 case $DISTRO in
 	debian)
-		;&
+		debian
+		;;
 	ubuntu) 
-		;&
+		debian
+		;;
 	linuxmint)
-		;&
+		debian
+		;;
 	knoppix)
-		;&
+		debian
+		;;
 	aptosid)
 		debian
 		;;
 
 	redhat)
-		;&
+		redhat
+		;;
 	rhel)
-		;&
+		redhat
+		;;
 	fedora)
-		;&
+		redhat
+		;;
 	centos)
 		redhat
 		;;
@@ -69,7 +76,7 @@ case $DISTRO in
 		;;
 	*)
 		echo ""
-		echo "This system is not supported by easy install! You may need to install dependent packages manually."
+		echo "This system is not recognized by easy install! You may need to install dependent packages manually."
 		echo ""
 		echo "If your system is a derivative of Debian, RedHat or OSX, you can try manually specifying your system type on the command line:"
 		echo ""
