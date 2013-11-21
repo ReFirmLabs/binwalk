@@ -114,7 +114,7 @@ case $DISTRO in
 		exit 1
 esac
 
-if [ "$(python -c 'import magic; magic.MAGIC_NO_CHECK_TEXT2' 2>/dev/null)" != 0 ]
+if [ "$(python -c 'import magic; magic.MAGIC_NO_CHECK_TEXT' 2>/dev/null)" != 0 ]
 then
 	echo "python-magic not installed or wrong version."
 	libmagic
