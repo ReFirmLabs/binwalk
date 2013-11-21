@@ -23,6 +23,7 @@ function redhat
 
 function darwin
 {
+	# TODO: py-magic is OLD. Download and build from source?
 	sudo port install git-core arj p7zip py-magic py-matplotlib
 }
 
