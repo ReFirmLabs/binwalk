@@ -1,6 +1,35 @@
 #!/bin/bash
 # Easy installer script for Debian/RedHat/OSX systems.
 
+function libmagic
+{
+	SITE="ftp://ftp.astron.com/pub/file/"
+	VERSION="5.14"
+	OUTFILE="file-$VERSION.tar.gz"
+	URL="$SITE$OUTFILE"
+
+	echo "Downloading '$URL'..."
+
+	if [ "$(which wget)" != "" ]
+	then
+		wget "$URL"
+	elif [ "$(which curl)" != "" ]
+	then
+		curl "$URL" > "$OUTFILE"
+	fi
+
+	if [ -e "$OUTFILE" ]
+	then
+		echo "Installing libmagic / python-magic..."
+		tar -zxvf "$OUTFILE"
+		cd "file-$VERSION" && ./configure && make && sudo make install && cd python && sudo python ./setup.py install && cd ../..
+		sudo rm -rf "file-$VERSION" "$OUTFILE"
+	else
+		echo "ERROR: Failed to download '$URL'!"
+		echo "libmagic not installed."
+	fi
+}
+
 function debian
 {
 	# The appropriate unrar package goes under different names in Debian vs Ubuntu
@@ -12,19 +41,18 @@ function debian
 	fi
 
 	# Install binwalk/fmk pre-requisites and extraction tools
-	sudo apt-get -y install git build-essential mtd-utils zlib1g-dev liblzma-dev ncompress gzip bzip2 tar arj p7zip p7zip-full openjdk-6-jdk python-magic python-matplotlib
+	sudo apt-get -y install git build-essential mtd-utils zlib1g-dev liblzma-dev ncompress gzip bzip2 tar arj p7zip p7zip-full openjdk-6-jdk python-matplotlib
 }
 
 function redhat
 {
 	sudo yum groupinstall -y "Development Tools"
-	sudo yum install -y git mtd-utils unrar zlib1g-dev liblzma-dev xz-devel compress gzip bzip2 tar arj p7zip p7zip-full openjdk-6-jdk python-magic python-matplotlib
+	sudo yum install -y git mtd-utils unrar zlib1g-dev liblzma-dev xz-devel compress gzip bzip2 tar arj p7zip p7zip-full openjdk-6-jdk python-matplotlib
 }
 
 function darwin
 {
-	# TODO: py-magic is OLD. Download and build from source?
-	sudo port install git-core arj p7zip py-magic py-matplotlib
+	sudo port install git-core arj p7zip py-matplotlib
 }
 
 if [ "$1" == "" ] || [ "$1" == "--sumount" ]
@@ -85,6 +113,12 @@ case $DISTRO in
 		echo ""
 		exit 1
 esac
+
+if [ "$(python -c 'import magic; magic.MAGIC_NO_CHECK_TEXT2' 2>/dev/null)" != 0 ]
+then
+	echo "python-magic not installed or wrong version."
+	libmagic
+fi
 
 if [ "$DISTRO" != "darwin" ]
 then
