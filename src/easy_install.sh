@@ -105,6 +105,12 @@ function debian
 	if [ "$(which python3)" != "" ]
 	then
 		$SUDO apt-get -y install python3-pyqt4 python3-numpy python3-scipy
+		$SUDO apt-get -y install python3-pip
+		PIP="$(which pip-3* | head -1)"
+		if [ "$PIP" != "" ]
+		then
+			$SUDO $PIP install PyOpenGl
+		fi
 	fi
 }
 
@@ -116,6 +122,12 @@ function redhat
 	if [ "$(which python3)" != "" ]
 	then
 		$SUDO yum -y install python3-pyqt4 python3-numpy python3-scipy
+		$SUDO yum -y install python3-pip
+		PIP="$(which pip-3* | head -1)"
+		if [ "$PIP" != "" ]
+		then
+			$SUDO $PIP install PyOpenGl
+		fi
 	fi
 }
 
