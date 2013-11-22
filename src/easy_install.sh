@@ -4,6 +4,7 @@
 function libmagic
 {
 	SITE="ftp://ftp.astron.com/pub/file/"
+	# 5.11 is the most recent version that builds out of the box on OSX.
 	VERSION="5.11"
 	OUTFILE="file-$VERSION.tar.gz"
 	URL="$SITE$OUTFILE"
@@ -54,7 +55,7 @@ function darwin
 {
 	if [ "$(which easy_install)" == "" ]
 	then
-		curl https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py | python
+		curl https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py | sudo python
 	fi
 
 	if [ "$(which easy_install)" != "" ]
@@ -129,6 +130,7 @@ then
 	libmagic
 fi
 
+# FMK doesn't support OSX.
 if [ "$DISTRO" != "darwin" ]
 then
 	# Get and build the firmware mod kit
