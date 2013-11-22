@@ -16,14 +16,14 @@ class FileStrings(object):
 	MAX_SPECIAL_CHARS_RATIO = .4
 	MAX_ENTROPY = 0.9
 
-	LETTERS = [x for x in string.letters]
-	NUMBERS = [x for x in string.digits]
-	PRINTABLE = [x for x in string.printable]
-	WHITESPACE = [x for x in string.whitespace]
-	PUNCTUATION = [x for x in string.punctuation]
-	NEWLINES = ['\r', '\n', '\x0b', '\x0c']
-	VOWELS = ['A', 'E', 'I', 'O', 'U', 'a', 'e', 'i', 'o', 'u']
-	NON_ALPHA_EXCEPTIONS = ['%', '.', '/', '-', '_']
+	LETTERS = set(string.letters)
+	NUMBERS = set(string.digits)
+	PRINTABLE = set(string.printable)
+	WHITESPACE = set(string.whitespace)
+	PUNCTUATION = set(string.punctuation)
+	NEWLINES = set(['\r', '\n', '\x0b', '\x0c'])
+	VOWELS = set(['A', 'E', 'I', 'O', 'U', 'a', 'e', 'i', 'o', 'u'])
+	NON_ALPHA_EXCEPTIONS = set(['%', '.', '/', '-', '_'])
 	BRACKETED = {
 			'[' : ']',
 			'<' : '>',
@@ -156,8 +156,8 @@ class FileStrings(object):
 		'''
 		Returns True if data has a vowel in it, otherwise returns False.
 		'''
-		for i in self.VOWELS:
-			if i in data:
+		for vowel in self.VOWELS:
+			if vowel in data:
 				return True
 		return False
 
@@ -166,8 +166,8 @@ class FileStrings(object):
 		Returns the number of english letters in data.
 		'''
 		c = 0
-		for i in range(0, len(data)):
-			if data[i] in self.LETTERS:
+		for char in data:
+			if char in self.LETTERS:
 				c += 1
 		return c
 
@@ -185,19 +185,20 @@ class FileStrings(object):
 		'''
 		Returns the number of non-english letters in data.
 		'''
-		c = 0
+		count = 0
 		dlen = len(data)
 
 		# No exceptions for very short strings
 		if dlen <= self.SUSPECT_STRING_LENGTH:
 			exceptions = []
 		else:
-			exceptions = self.NON_ALPHA_EXCEPTIONS
-
-		for i in range(0, len(data)):
-			if data[i] not in self.LETTERS and data[i] not in self.NUMBERS and data[i] not in exceptions:
-					c += 1
-		return c
+			exceptions = set(self.NON_ALPHA_EXCEPTIONS)
+		
+		non_alphanumeric = self.LETTERS | self.NUMBERS
+		for char in data:
+			if char not in non_alphanumeric and char not in exceptions:
+				count += 1
+		return count
 
 	def _too_many_special_chars(self, data):
 		'''
@@ -445,4 +446,3 @@ class Strings(object):
 			del self.plugins
 
 		return results
-
