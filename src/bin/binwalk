@@ -111,8 +111,8 @@ def usage(fd):
 	fd.write("\t-e, --extract=[file]          Automatically extract known file types; load rules from file, if specified\n")
 	fd.write("\t-M, --matryoshka=[n]          Recursively scan extracted files, up to n levels deep (8 levels of recursion is the default)\n")
 	fd.write("\t-r, --rm                      Cleanup extracted files and zero-size files\n")
-	fd.write("\t-j, --ignore-footers          Ignore file footers and extract up to EOF\n")
-	fd.write("\t-z, --carve                   Carve data from files, but don't execute extraction utilities\n")
+	fd.write("\t-d, --honor-footers           Only extract files up to their corresponding footer signatures\n")
+	fd.write("\t-z, --carve                   Carve data from files, but don't execute extraction utilities (iplies -d)\n")
 	fd.write("\n")
 
 	fd.write("Plugin Options:\n")
@@ -171,7 +171,7 @@ def main():
 	entropy_algorithm = None
 	format_to_terminal = False
 	custom_signature = None
-	delay_extraction = True
+	delay_extraction = False
 	ignore_time_skew = True
 	extract_rules_file = None
 	ignore_failed_open = False
@@ -196,7 +196,7 @@ def main():
 
 	config = binwalk.Config()
 
-	short_options = "AaBbCcdEeGHhIiJjkLMNnOPpQqrSTtUuvWwz?D:F:f:g:K:o:l:m:R:s:X:x:Y:y:"
+	short_options = "AaBbCcdEeGHhIiJkLMNnOPpQqrSTtUuvWwz?D:F:f:g:K:o:l:m:R:s:X:x:Y:y:"
 	long_options = [
 			"rm",
 			"help",
@@ -214,7 +214,7 @@ def main():
 			"keep-going",
 			"show-invalid",
 			"ignore-time-skew",
-			"ignore-footers",
+			"honor-footers",
 			"carve",
 			"profile",
 			"delay", # delay is depreciated, but kept for backwards compatability
@@ -268,10 +268,8 @@ def main():
 			usage(sys.stdout)
 		elif opt in ("-?", "--examples"):
 			examples()
-		elif opt in ("-d", "--delay"):
+		elif opt in ("-d", "--delay", "--honor-footers"):
 			delay_extraction = True
-		elif opt in ("-j", "--ignore-footers"):
-			delay_extraction = False
 		elif opt in ("-f", "--file"):
 			log_file = arg
 		elif opt in ("-c", "--csv"):
