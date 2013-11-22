@@ -45,12 +45,13 @@ class Extractor:
 	# Max size of data to read/write at one time when extracting data
 	MAX_READ_SIZE = 10 * 1024 * 1024
 
-	def __init__(self, verbose=False, exec_commands=True):
+	def __init__(self, verbose=False, exec_commands=True, max_size=None):
 		'''
 		Class constructor.
 	
 		@verbose       - Set to True to display the output from any executed external applications.
 		@exec_commands - Set to False to disable the execution of external utilities when extracting data from files.
+		@max_size      - Limit the size of extracted files to max_size.
 
 		Returns None.
 		'''
@@ -58,6 +59,7 @@ class Extractor:
 		self.enabled = False
 		self.delayed = True
 		self.verbose = verbose
+		self.max_size = max_size
 		self.exec_commands = exec_commands
 		self.extract_rules = []
 		self.remove_after_execute = False
@@ -420,6 +422,9 @@ class Extractor:
 		total_size = 0
 		# Default extracted file name is <hex offset>.<extension>
 		default_bname = "%X" % offset
+
+		if self.max_size and size > self.max_size:
+			size = self.max_size
 
 		if not output_file_name or output_file_name is None:
 			bname = default_bname

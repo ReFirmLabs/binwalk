@@ -68,7 +68,7 @@ class Binwalk(object):
 	CUSTOM = 0x40
 	ENTROPY = 0x80
 
-	def __init__(self, magic_files=[], flags=magic.MAGIC_NONE, log=None, quiet=False, verbose=0, ignore_smart_keywords=False, ignore_time_skews=False, load_extractor=False, load_plugins=True, exec_commands=True):
+	def __init__(self, magic_files=[], flags=magic.MAGIC_NONE, log=None, quiet=False, verbose=0, ignore_smart_keywords=False, ignore_time_skews=False, load_extractor=False, load_plugins=True, exec_commands=True, max_extract_size=None):
 		'''
 		Class constructor.
 
@@ -82,6 +82,7 @@ class Binwalk(object):
 		@load_extractor         - Set to True to load the default extraction rules automatically.
 		@load_plugins           - Set to False to disable plugin support.
 		@exec_commands          - Set to False to disable the execution of external utilities when extracting data from files.
+		@max_extract_size       - Limit the size of extracted files.
 
 		Returns None.
 		'''
@@ -135,7 +136,7 @@ class Binwalk(object):
 		#	o Specify file extraction rules to be applied during a scan
 		#
 		self.filter = MagicFilter()
-		self.extractor = Extractor(verbose=extractor_verbose, exec_commands=exec_commands)
+		self.extractor = Extractor(verbose=extractor_verbose, exec_commands=exec_commands, max_size=max_extract_size)
 		if load_extractor:
 			self.extractor.load_defaults()
 

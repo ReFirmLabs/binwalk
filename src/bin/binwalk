@@ -110,9 +110,10 @@ def usage(fd):
 	fd.write("\t-D, --dd=<type:ext[:cmd]>     Extract <type> signatures, give the files an extension of <ext>, and execute <cmd>\n")
 	fd.write("\t-e, --extract=[file]          Automatically extract known file types; load rules from file, if specified\n")
 	fd.write("\t-M, --matryoshka=[n]          Recursively scan extracted files, up to n levels deep (8 levels of recursion is the default)\n")
+	fd.write("\t-j, --max-size=<int>          Limit extracted file sizes (default: infinite)\n")      
 	fd.write("\t-r, --rm                      Cleanup extracted files and zero-size files\n")
 	fd.write("\t-d, --honor-footers           Only extract files up to their corresponding footer signatures\n")
-	fd.write("\t-z, --carve                   Carve data from files, but don't execute extraction utilities (iplies -d)\n")
+	fd.write("\t-z, --carve                   Carve data from files, but don't execute extraction utilities (implies -d)\n")
 	fd.write("\n")
 
 	fd.write("Plugin Options:\n")
@@ -156,6 +157,7 @@ def main():
 	matryoshka = 1
 	block_size = 0
 	failed_open_count = 0
+	max_extract_size = None
 	quiet = False
 	do_comp = False
 	do_files = False
@@ -196,7 +198,7 @@ def main():
 
 	config = binwalk.Config()
 
-	short_options = "AaBbCcdEeGHhIiJkLMNnOPpQqrSTtUuvWwz?D:F:f:g:K:o:l:m:R:s:X:x:Y:y:"
+	short_options = "AaBbCcdEeGHhIiJkLMNnOPpQqrSTtUuvWwz?D:F:f:g:j:K:o:l:m:R:s:X:x:Y:y:"
 	long_options = [
 			"rm",
 			"help",
@@ -215,7 +217,6 @@ def main():
 			"show-invalid",
 			"ignore-time-skew",
 			"honor-footers",
-			"carve",
 			"profile",
 			"delay", # delay is depreciated, but kept for backwards compatability
 			"skip-unopened",
@@ -231,12 +232,14 @@ def main():
 			"save-plot",
 			"no-plot",
 			"no-legend", 
-			"matryoshka=",
 			"strings",
+			"carve",
+			"matryoshka=",
 			"list-plugins",
 			"disable-plugins",
 			"disable-plugin=",
 			"enable-plugin=",
+			"max-size=",
 			"marker=",
 			"strlen=",
 			"file=", 
@@ -342,6 +345,8 @@ def main():
 			ignore_time_skew = False
 		elif opt in ("-z", "--carve"):
 			exec_commands = False
+		elif opt in ("-j", "--max-size"):
+			max_extract_size = binwalk.common.str2int(arg)
 
 		elif opt in ("-H", "--heuristic", "--math"):
 			do_comp = True
@@ -467,7 +472,8 @@ def main():
 				ignore_smart_keywords=ignore_signature_keywords, 
 				load_plugins=enable_plugins, 
 				ignore_time_skews=ignore_time_skew, 
-				exec_commands=exec_commands)
+				exec_commands=exec_commands,
+				max_extract_size=max_extract_size)
 
 	# If a custom signature was specified, create a temporary magic file containing the custom signature
 	# and ensure that it is the only magic file that will be loaded when Binwalk.scan() is called.
