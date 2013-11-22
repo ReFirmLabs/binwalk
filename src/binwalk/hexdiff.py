@@ -101,6 +101,10 @@ class HexDiff(object):
 		data = {}
 		delim = '/'
 
+		# If negative offset, then we're going that far back from the end of the file
+		if offset < 0:
+			size = offset * -1
+
 		if show_first_only:
 			self._header([files[0]], block)
 		else:
@@ -122,9 +126,16 @@ class HexDiff(object):
 
 		while total < size:
 			i = 0
+			files_finished = 0
+
 			for fp in fps:
 				(ddata, dlen) = fp.read_block()
 				data[fp.name] = ddata
+				if not ddata or dlen == 0:
+					files_finished += 1
+			
+			if files_finished == len(fps):
+				break
 			
 			while i < read_block_size and (total+i) < size:
 				diff_same = {}

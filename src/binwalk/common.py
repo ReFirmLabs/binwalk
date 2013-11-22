@@ -153,9 +153,21 @@ class BlockFile(io.FileIO):
 		else:
 			self.offset = offset
 
-		if length:
+		if self.offset < 0:
+			self.offset = 0
+		elif self.offset > self.size:
+			self.offset = self.size
+
+		if offset < 0:
+			self.length = offset * -1
+		elif length:
 			self.length = length
 		else:
+			self.length = self.size - offset
+
+		if self.length < 0:
+			self.length = 0
+		elif self.length > self.size:
 			self.length = self.size
 
 		io.FileIO.__init__(self, fname, mode)
@@ -167,7 +179,7 @@ class BlockFile(io.FileIO):
 			self._name = fname
 
 		self.seek(self.offset)
-			
+
 	def write(self, data):
 		'''
 		Writes data to the opened file.
