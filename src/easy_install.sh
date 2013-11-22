@@ -57,6 +57,16 @@ function libmagic
 	fi
 }
 
+function libfuzzy
+{
+	VERSION="ssdeep-2.10"
+	cd ./C
+	tar -zxvf $VERSION.tar.gz && cd $VERSION && ./configure && make && $SUDO make install
+	cd ..
+	rm -rf $VERSION
+	cd ..
+}
+
 function pyqtgraph
 {
 	SITE="http://www.pyqtgraph.org/downloads/"
@@ -90,7 +100,6 @@ function debian
 	fi
 
 	# Install binwalk/fmk pre-requisites and extraction tools
-	$SUDO apt-get -y install libfuzzy2
 	$SUDO apt-get -y install git build-essential mtd-utils zlib1g-dev liblzma-dev ncompress gzip bzip2 tar arj p7zip p7zip-full openjdk-6-jdk
 	$SUDO apt-get -y install python-opengl python-qt4 python-qt4-gl python-numpy python-scipy
 }
@@ -98,7 +107,6 @@ function debian
 function redhat
 {
 	$SUDO yum groupinstall -y "Development Tools"
-	$SUDO yum install -y libfuzzy2 # TODO: Is there a libfuzzy2 package for RHEL?
 	$SUDO yum install -y git mtd-utils unrar zlib1g-dev liblzma-dev xz-devel compress gzip bzip2 tar arj p7zip p7zip-full openjdk-6-jdk
 	$SUDO yum install -y python-opengl python-qt4 python-qt4-gl python-numpy python-scipy
 }
@@ -160,18 +168,24 @@ esac
 
 if [ "$(python -c 'import magic; print (magic.MAGIC_NO_CHECK_TEXT)' 2>/dev/null)" == "" ]
 then
-	echo "python-magic not installed, or wrong version."
+	echo "python-magic not installed, or wrong version; building from source..."
 	libmagic
 fi
 
 if [ "$(python -c 'import pyqtgraph; print (pyqtgraph.__file__)' 2>/dev/null)" == "" ]
 then
-	echo "pyqtgraph not installed."
+	echo "pyqtgraph not installed; building from source..."
 	pyqtgraph
 fi
 
+if [ "$(python -c 'import ctypes.util; print (ctypes.util.find_library("fuzzy"))')" == "None" ]
+then
+	echo "libfuzzy not installed; building from source..."
+	libfuzzy
+fi
+
 # Get and build the firmware mod kit
-fmk
+#fmk
 
 # Install binwalk
 $SUDO python setup.py install
