@@ -78,8 +78,9 @@ def main():
 	matryoshka = 1
 	block_size = 0
 	failed_open_count = 0
-	weight = None
+	max_points = None
 	max_extract_size = None
+	do_2d = False
 	quiet = False
 	do_comp = False
 	do_files = False
@@ -157,6 +158,10 @@ def main():
 			show_grids = True
 		elif opt in ("-3", "--3D", "--3d"):
 			requested_scans.append(binwalk.Binwalk.BINVIS)
+			do_2d = False
+		elif opt in ("-2", "--2D", "--2d"):
+			requested_scans.append(binwalk.Binwalk.BINVIS)
+			do_2d = True
 		elif opt in ("-E", "--entropy"):
 			requested_scans.append(binwalk.Binwalk.ENTROPY)
 		elif opt in ("-W", "--diff"):
@@ -179,8 +184,8 @@ def main():
 			requested_scans.append(binwalk.Binwalk.STRINGS)
 		elif opt in ("-O", "--skip-unopened"):
 			ignore_failed_open = True
-		elif opt in ("-Z", "--weight"):
-			weight = binwalk.common.str2int(arg)
+		elif opt in ("-Z", "--max-points"):
+			max_points = binwalk.common.str2int(arg)
 		elif opt in ("-o", "--offset"):
 			offset = binwalk.common.str2int(arg)
 		elif opt in ("-l", "--length"):
@@ -468,8 +473,11 @@ def main():
 			elif scan_type == binwalk.Binwalk.BINVIS:
 			
 				# Always enable verbose mode; generating the plot can take some time for large files,
-				# and without verbose mode enabled it looks like binwalk is just sitting there doing nothing.	
-				bwalk.plot3d(target_files, offset=offset, length=length, weight=weight, show_grids=show_grids, verbose=True)
+				# and without verbose mode enabled it looks like binwalk is just sitting there doing nothing.
+				if do_2d:
+					bwalk.plot2d(target_files, offset=offset, length=length, max_points=max_points, show_grids=show_grids, verbose=True)
+				else:
+					bwalk.plot3d(target_files, offset=offset, length=length, max_points=max_points, show_grids=show_grids, verbose=True)
 
 			elif scan_type == binwalk.Binwalk.ENTROPY:
 

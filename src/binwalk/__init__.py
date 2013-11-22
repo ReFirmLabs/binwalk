@@ -290,14 +290,14 @@ class Binwalk(object):
 
 		return data
 
-	def plot3d(self, target_files, offset=0, length=0, weight=None, show_grids=False, verbose=False):
+	def plot3d(self, target_files, offset=0, length=0, max_points=None, show_grids=False, verbose=False):
 		'''
 		Generates a 3D data plot of the specified target files.
 
 		@target_files   - File or list of files to scan.
 		@offset         - Starting offset at which to start the scan.
                 @length         - Number of bytes to scan. Specify 0 to scan the entire file(s).
-		@weight         - A data point must occur at least this many times before being plotted (default: auto-detect).
+		@max_points     - Set the maximum number of data points to plot.
 		@show_grids     - Set to True to show axis grids in the 3D plot.
 		@verbose        - Set to True to enable verbose output.
 
@@ -306,7 +306,25 @@ class Binwalk(object):
 		if not isinstance(target_files, type([])):
 			target_files = [target_files]
 
-		Plotter3D(target_files, offset=offset, length=length, weight=weight, show_grids=show_grids, verbose=verbose).plot()
+		Plotter3D(target_files, offset=offset, length=length, max_points=max_points, show_grids=show_grids, verbose=verbose).plot()
+
+	def plot2d(self, target_files, offset=0, length=0, max_points=None, show_grids=False, verbose=False):
+		'''
+		Generates a 2D data plot of the specified target files.
+
+		@target_files   - File or list of files to scan.
+		@offset         - Starting offset at which to start the scan.
+                @length         - Number of bytes to scan. Specify 0 to scan the entire file(s).
+		@max_points     - Set the maximum number of data points to plot.
+		@show_grids     - Set to True to show axis grids in the 3D plot.
+		@verbose        - Set to True to enable verbose output.
+
+		Returns None.
+		'''
+		if not isinstance(target_files, type([])):
+			target_files = [target_files]
+
+		Plotter2D(target_files, offset=offset, length=length, max_points=max_points, show_grids=show_grids, verbose=verbose).plot()
 
 	def scan(self, target_files, offset=0, length=0, show_invalid_results=False, callback=None, start_callback=None, end_callback=None, base_dir=None, matryoshka=1, plugins_whitelist=[], plugins_blacklist=[]):
 		'''

@@ -102,6 +102,10 @@ function debian
 	# Install binwalk/fmk pre-requisites and extraction tools
 	$SUDO apt-get -y install git build-essential mtd-utils zlib1g-dev liblzma-dev ncompress gzip bzip2 tar arj p7zip p7zip-full openjdk-6-jdk
 	$SUDO apt-get -y install python-opengl python-qt4 python-qt4-gl python-numpy python-scipy
+	if [ "$(which python3)" != "" ]
+	then
+		$SUDO apt-get -y install python3-pyqt4 python3-numpy python3-scipy
+	fi
 }
 
 function redhat
@@ -109,12 +113,16 @@ function redhat
 	$SUDO yum groupinstall -y "Development Tools"
 	$SUDO yum install -y git mtd-utils unrar zlib1g-dev liblzma-dev xz-devel compress gzip bzip2 tar arj p7zip p7zip-full openjdk-6-jdk
 	$SUDO yum install -y python-opengl python-qt4 python-qt4-gl python-numpy python-scipy
+	if [ "$(which python3)" != "" ]
+	then
+		$SUDO yum -y install python3-pyqt4 python3-numpy python3-scipy
+	fi
 }
 
 if [ "$1" == "" ] || [ "$1" == "--sumount" ]
 then
-	PLATFORM=$(python -c 'import platform; print platform.system().lower()')
-	DISTRO=$(python -c 'import platform; print platform.linux_distribution()[0].lower()')
+	PLATFORM=$(python -c 'import platform; print (platform.system().lower())')
+	DISTRO=$(python -c 'import platform; print (platform.linux_distribution()[0].lower())')
 else
 	DISTRO="$1"
 fi
@@ -185,7 +193,7 @@ then
 fi
 
 # Get and build the firmware mod kit
-#fmk
+fmk
 
 # Install binwalk
 $SUDO python setup.py install

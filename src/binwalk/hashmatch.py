@@ -183,7 +183,7 @@ class HashMatch(object):
 						else:
 							return self.lib.fuzzy_compare(hash1, hash2)
 				except Exception as e:
-					print "WARNING: Exception while doing fuzzy hash:", e
+					print ("WARNING: Exception while doing fuzzy hash: %s" % e)
 
 		return None
 
@@ -348,7 +348,7 @@ if __name__ == '__main__':
 	import sys
 	
 	hmatch = HashMatch(strings=True, name=False, types={True:"^elf"})
-	print hmatch.file(sys.argv[1], sys.argv[2:])
+	print (hmatch.file(sys.argv[1], sys.argv[2:]))
 	#for (match, fname) in hmatch.directories(sys.argv[1], sys.argv[2]):
 	#for (match, fname) in hmatch.find_file(sys.argv[1], sys.argv[2:]):
 	#	print match, fname

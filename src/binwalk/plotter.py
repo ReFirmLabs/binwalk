@@ -3,20 +3,41 @@ from binwalk.compat import *
 from binwalk.common import BlockFile
 
 class Plotter(object):
+	'''
+	Base class for plotting binaries in Qt.
+	Other plotter classes are derived from this.
+	'''
 
 	DIMENSIONS = 3
 	VIEW_DISTANCE = 1024
+	MAX_PLOT_POINTS = 25000
 
-	def __init__(self, files, offset=0, length=0, weight=None, show_grids=False, verbose=False):
+	def __init__(self, files, offset=0, length=0, max_points=MAX_PLOT_POINTS, show_grids=False, verbose=False):
+		'''
+		Class constructor.
+
+		@files      - A list of files to plot in the graph.
+		@offset     - The starting offset for each file.
+		@length     - The number of bytes to analyze from each file.
+		@max_points - The maximum number of data points to display.
+		@show_grids - Set to True to display x-y-z grids.
+		@verbse     - Set to False to disable verbose print statements.
+
+		Returns None.
+		'''
 		import pyqtgraph.opengl as gl
 		from pyqtgraph.Qt import QtGui
 
 		self.verbose = verbose
 		self.show_grids = show_grids
 		self.files = files
-		self.weight = weight
 		self.offset = offset
 		self.length = length
+	
+		if not max_points:
+			self.max_points = self.MAX_PLOT_POINTS
+		else:
+			self.max_points = max_points
 
 		self.app = QtGui.QApplication([])
 		self.window = gl.GLViewWidget()
@@ -26,55 +47,92 @@ class Plotter(object):
 			self.window.setWindowTitle(self.files[0])
 
 	def _print(self, message):
+		'''
+		Print console messages. For internal use only.
+		'''
 		if self.verbose:
 			print (message)
 
-	def _generate_plot_points(self, data_points, data_weights):
-		plot_points = set()
-		max_plot_points = (24 * 1024)
+	def _generate_plot_points(self, data_points):
+		'''
+		Generates plot points from a list of data points.
+		
+		@data_points - A dictionary containing each unique point and its frequency of occurance.
 
-		if self.weight:
-			weight = self.weight
-		else:
-			self._print("Calculating weight...")
+		Returns a set of plot points.
+		'''
+		total = 0
+		min_weight = 0
+		weightings = {}
+		plot_points = {}
 
-			weight = 1
+		# If the number of data points exceeds the maximum number of allowed data points, use a
+		# weighting system to eliminate data points that occur less freqently.
+		if sum(data_points.itervalues()) > self.max_points:
 
-			if len(data_points) > max_plot_points:
-				weightings = {}
+			# First, generate a set of weight values 1 - 10
+			for i in range(1, 11):
+				weightings[i] = 0
 
-				for i in range(1, 11):
-					weightings[i] = 0
+			# Go through every data point and how many times that point occurs
+			for (point, count) in iterator(data_points):
+				# For each data point, compare it to each remaining weight value
+				for w in get_keys(weightings):
 
-				for point in data_points:
-					for w in get_keys(weightings):
-						if data_weights[point] >= w:
-							weightings[w] += 1
-					
-						if weightings[w] > max_plot_points:
-							del weightings[w]
-
-					if len(weightings) <= 1:
+					# If the number of times this data point occurred is >= the weight value,
+					# then increment the weight value. Since weight values are ordered lowest
+					# to highest, this means that more frequent data points also increment lower
+					# weight values. Thus, the more high-frequency data points there are, the
+					# more lower-frequency data points are eliminated.
+					if count >= w:
+						weightings[w] += 1
+					else:
 						break
 
-				if weightings:
-					weight = min(weightings)
+					# Throw out weight values that exceed the maximum number of data points
+					if weightings[w] > self.max_points:
+						del weightings[w]
 
-		self._print("Weight: %d" % weight)
+				# If there's only one weight value left, no sense in continuing the loop...
+				if len(weightings) == 1:
+					break
 
-		for point in data_points:
-			if data_weights[point] >= weight:
-				plot_points.add(point)
-			
+			# The least weighted value is our minimum weight
+			min_weight = min(weightings)
+
+			# Get rid of all data points that occur less frequently than our minimum weight
+			for point in get_keys(data_points):
+				if data_points[point] < min_weight:
+					del data_points[point]
+
+		for point in sorted(data_points, key=data_points.get, reverse=True):
+			plot_points[point] = data_points[point]
+			total += 1
+			if total >= self.max_points:
+				break
+					
 		return plot_points
 
 	def _generate_data_point(self, data):
+		'''
+		Subclasses must override this to return the appropriate data point.
+
+		@data - A string of data self.DIMENSIONS in length.
+
+		Returns a data point tuple.
+		'''
 		return (0,0,0)
 
 	def _generate_data_points(self, file_name):
+		'''
+		Generates a dictionary of data points and their frequency of occurrance.
+
+		@file_name - The file to generate data points from.
+
+		Returns a dictionary.
+		'''
 		i = 0
-		data_weights = {}
-		data_points = set()
+		data_points = {}
 
 		self._print("Generating data points for %s" % file_name)
 
@@ -89,40 +147,44 @@ class Plotter(object):
 				i = 0
 				while (i+(self.DIMENSIONS-1)) < dlen:
 					point = self._generate_data_point(data[i:i+self.DIMENSIONS])
-					if point in data_points:	
-						data_weights[point] += 1
+					if has_key(data_points, point):	
+						data_points[point] += 1
 					else:
-						data_points.add(point)
-						data_weights[point] = 1
+						data_points[point] = 1
 					i += 3
 
-		return (data_points, data_weights)
+		return data_points
 
-	def _generate_plot(self, plot_points, point_weights):
+	def _generate_plot(self, plot_points):
 		import numpy as np
 		import pyqtgraph.opengl as gl
 		
-		nitems = len(plot_points)
+		nitems = float(len(plot_points))
 
 		pos = np.empty((nitems, 3))
 		size = np.empty((nitems))
 		color = np.empty((nitems, 4))
 
 		i = 0
-		for point in plot_points:
+		for (point, weight) in iterator(plot_points):
 			r = 0.0
 			g = 0.0
 			b = 0.0
 
 			pos[i] = point
-			size[i] = .05
+			frequency_percentage = (weight / nitems)
 
-			if point_weights[point] > 15:
+			# Give points that occur more frequently a brighter color and larger point size.
+			# Frequency is determined as a percentage of total unique data points.
+			if frequency_percentage > .005:
+				size[i] = .20
 				r = 1.0
-			elif point_weights[point] > 5:
+			elif frequency_percentage > .002:
+				size[i] = .10
 				g = 1.0
 				r = 1.0
 			else:
+				size[i] = .05
 				g = 1.0
 
 			color[i] = (r, g, b, 1.0)
@@ -158,15 +220,16 @@ class Plotter(object):
 			zgrid.scale(12.8, 12.8, 12.8)
 
 		for file_name in self.files:
-			(data_points, data_weights) = self._generate_data_points(file_name)
+			data_points = self._generate_data_points(file_name)
 
 			self._print("Generating plot points from %d data points" % len(data_points))
 
-			plot_points = self._generate_plot_points(data_points, data_weights)
+			plot_points = self._generate_plot_points(data_points)
+			del data_points
 
 			self._print("Generating graph from %d plot points" % len(plot_points))
 
-			self.window.addItem(self._generate_plot(plot_points, data_weights))
+			self.window.addItem(self._generate_plot(plot_points))
 
 		if wait:
 			self.wait()
@@ -180,7 +243,9 @@ class Plotter(object):
 
 
 class Plotter3D(Plotter):
-
+	'''
+	Plot data points within a 3D cube.
+	'''
 	DIMENSIONS = 3
 
 	def _generate_data_point(self, data):
@@ -188,15 +253,16 @@ class Plotter3D(Plotter):
 	
 class Plotter2D(Plotter):
 	'''
-	This is of questionable use.
+	Plot data points projected on each cube face.
 	'''
 
 	DIMENSIONS = 2
+	MAX_PLOT_POINTS = 12500
 	plane_count = -1
 
 	def _generate_data_point(self, data):
 		self.plane_count += 1
-		if self.plane_count > 2:
+		if self.plane_count > 5:
 			self.plane_count = 0
 
 		if self.plane_count == 0:
@@ -205,6 +271,12 @@ class Plotter2D(Plotter):
 			return (ord(data[0]), 0, ord(data[1]))
 		elif self.plane_count == 2:
 			return (ord(data[0]), ord(data[1]), 0)
+		elif self.plane_count == 3:
+			return (255, ord(data[0]), ord(data[1]))
+		elif self.plane_count == 4:
+			return (ord(data[0]), 255, ord(data[1]))
+		elif self.plane_count == 5:
+			return (ord(data[0]), ord(data[1]), 255)
 		
 if __name__ == '__main__':
 	import sys
@@ -214,5 +286,5 @@ if __name__ == '__main__':
 	except:
 		weight = None
 
-	Plotter3D(sys.argv[1:], weight=weight, verbose=True).plot()
+	Plotter2D(sys.argv[1:], weight=weight, verbose=True).plot()
 
