@@ -111,7 +111,8 @@ def usage(fd):
 	fd.write("\t-e, --extract=[file]          Automatically extract known file types; load rules from file, if specified\n")
 	fd.write("\t-M, --matryoshka=[n]          Recursively scan extracted files, up to n levels deep (8 levels of recursion is the default)\n")
 	fd.write("\t-r, --rm                      Cleanup extracted files and zero-size files\n")
-	fd.write("\t-d, --delay                   Delay file extraction for files with known footers\n")
+	fd.write("\t-j, --ignore-footers          Ignore file footers and extract up to EOF\n")
+	fd.write("\t-z, --carve                   Carve data from files, but don't execute extraction utilities\n")
 	fd.write("\n")
 
 	fd.write("Plugin Options:\n")
@@ -165,11 +166,12 @@ def main():
 	show_legend = True
 	entropy_scan = False
 	enable_plugins = True
+	exec_commands = True
 	show_invalid = False
 	entropy_algorithm = None
 	format_to_terminal = False
 	custom_signature = None
-	delay_extraction = False
+	delay_extraction = True
 	ignore_time_skew = True
 	extract_rules_file = None
 	ignore_failed_open = False
@@ -194,7 +196,7 @@ def main():
 
 	config = binwalk.Config()
 
-	short_options = "AaBbCcdEeGHhIiJkLMNnOPpQqrSTtUuvWw?D:F:f:g:K:o:l:m:R:s:X:x:Y:y:"
+	short_options = "AaBbCcdEeGHhIiJjkLMNnOPpQqrSTtUuvWwz?D:F:f:g:K:o:l:m:R:s:X:x:Y:y:"
 	long_options = [
 			"rm",
 			"help",
@@ -212,8 +214,10 @@ def main():
 			"keep-going",
 			"show-invalid",
 			"ignore-time-skew",
+			"ignore-footers",
+			"carve",
 			"profile",
-			"delay",
+			"delay", # delay is depreciated, but kept for backwards compatability
 			"skip-unopened",
 			"term",
 			"tim",
@@ -266,6 +270,8 @@ def main():
 			examples()
 		elif opt in ("-d", "--delay"):
 			delay_extraction = True
+		elif opt in ("-j", "--ignore-footers"):
+			delay_extraction = False
 		elif opt in ("-f", "--file"):
 			log_file = arg
 		elif opt in ("-c", "--csv"):
@@ -336,6 +342,8 @@ def main():
 			plugin_whitelist.append(arg)
 		elif opt in ("-T", "--ignore-time-skew"):
 			ignore_time_skew = False
+		elif opt in ("-z", "--carve"):
+			exec_commands = False
 
 		elif opt in ("-H", "--heuristic", "--math"):
 			do_comp = True
@@ -453,7 +461,15 @@ def main():
 		usage(sys.stderr)
 
 	# Instantiate the Binwalk class
-	bwalk = binwalk.Binwalk(magic_files=magic_files, flags=magic_flags, verbose=verbose, log=log_file, quiet=quiet, ignore_smart_keywords=ignore_signature_keywords, load_plugins=enable_plugins, ignore_time_skews=ignore_time_skew)
+	bwalk = binwalk.Binwalk(magic_files=magic_files, 
+				flags=magic_flags, 
+				verbose=verbose, 
+				log=log_file, 
+				quiet=quiet, 
+				ignore_smart_keywords=ignore_signature_keywords, 
+				load_plugins=enable_plugins, 
+				ignore_time_skews=ignore_time_skew, 
+				exec_commands=exec_commands)
 
 	# If a custom signature was specified, create a temporary magic file containing the custom signature
 	# and ensure that it is the only magic file that will be loaded when Binwalk.scan() is called.
@@ -481,9 +497,6 @@ def main():
 
 	# Enable delayed extraction, which will prevent supported file types from having trailing data when extracted
 	bwalk.extractor.enable_delayed_extract(delay_extraction)
-
-	# Load the magic file(s)
-	#bwalk.load_signatures(magic_files=magic_files)
 
 	# If --term was specified, enable output formatting to terminal
 	if format_to_terminal:

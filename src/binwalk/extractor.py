@@ -45,18 +45,20 @@ class Extractor:
 	# Max size of data to read/write at one time when extracting data
 	MAX_READ_SIZE = 10 * 1024 * 1024
 
-	def __init__(self, verbose=False):
+	def __init__(self, verbose=False, exec_commands=True):
 		'''
 		Class constructor.
 	
-		@verbose - Set to True to display the output from any executed external applications.
+		@verbose       - Set to True to display the output from any executed external applications.
+		@exec_commands - Set to False to disable the execution of external utilities when extracting data from files.
 
 		Returns None.
 		'''
 		self.config = Config()
 		self.enabled = False
-		self.delayed = False
+		self.delayed = True
 		self.verbose = verbose
+		self.exec_commands = exec_commands
 		self.extract_rules = []
 		self.remove_after_execute = False
 		self.extract_path = os.getcwd()
@@ -464,6 +466,9 @@ class Extractor:
 		'''
 		tmp = None
 		retval = True
+
+		if not self.exec_commands:
+			return retval
 
 		try:
 			if callable(cmd):
