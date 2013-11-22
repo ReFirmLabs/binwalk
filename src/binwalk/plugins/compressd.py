@@ -18,7 +18,8 @@ class Plugin:
 		
 		if binwalk.scan_type == binwalk.BINWALK:
 			self.comp = ctypes.cdll.LoadLibrary(ctypes.util.find_library("compress42"))
-			binwalk.magic_files.append(binwalk.config.find_magic_file('compressd'))
+			if self.comp:
+				binwalk.magic_files.append(binwalk.config.find_magic_file('compressd'))
 
 	def __del__(self):
 		try:

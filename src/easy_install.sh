@@ -4,7 +4,7 @@
 function libmagic
 {
 	SITE="ftp://ftp.astron.com/pub/file/"
-	VERSION="5.14"
+	VERSION="5.11"
 	OUTFILE="file-$VERSION.tar.gz"
 	URL="$SITE$OUTFILE"
 
@@ -52,7 +52,16 @@ function redhat
 
 function darwin
 {
-	sudo port install git-core arj p7zip py-matplotlib
+	if [ "$(which easy_install)" == "" ]
+	then
+		curl https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py | python
+	fi
+
+	if [ "$(which easy_install)" != "" ]
+	then
+		easy_install -m numpy
+		easy_install -m matplotlib
+	fi
 }
 
 if [ "$1" == "" ] || [ "$1" == "--sumount" ]
@@ -107,16 +116,16 @@ case $DISTRO in
 		echo ""
 		echo "This system is not recognized by easy install! You may need to install dependent packages manually."
 		echo ""
-		echo "If your system is a derivative of Debian, RedHat or OSX, you can try manually specifying your system type on the command line:"
+		echo "If your system is a derivative of Debian, RedHat, or OSX, you can try manually specifying your system type on the command line:"
 		echo ""
 		echo -e "\t$0 [debian | redhat | darwin] [--sumount]"
 		echo ""
 		exit 1
 esac
 
-if [ "$(python -c 'import magic; magic.MAGIC_NO_CHECK_TEXT' 2>/dev/null)" != 0 ]
+if [ "$(python -c 'import magic; print (magic.MAGIC_NO_CHECK_TEXT)' 2>/dev/null)" == "" ]
 then
-	echo "python-magic not installed or wrong version."
+	echo "python-magic not installed, or wrong version."
 	libmagic
 fi
 

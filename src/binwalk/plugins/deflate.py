@@ -22,18 +22,20 @@ class Plugin:
 		# The tinfl library is built and installed with binwalk
 		self.tinfl = ctypes.cdll.LoadLibrary(ctypes.util.find_library("tinfl"))
 
-		# Add an extraction rule
-		if self.binwalk.extractor.enabled:
-			self.binwalk.extractor.add_rule(regex='^%s' % self.DESCRIPTION.lower(), extension="deflate", cmd=self._extractor)
+		if self.tinfl:
+			# Add an extraction rule
+			if self.binwalk.extractor.enabled:
+				self.binwalk.extractor.add_rule(regex='^%s' % self.DESCRIPTION.lower(), extension="deflate", cmd=self._extractor)
 
 	def pre_scan(self, fp):
-		# Make sure we'll be getting enough data for a good decompression test
-		if fp.MAX_TRAILING_SIZE < self.SIZE:
-			fp.MAX_TRAILING_SIZE = self.SIZE
+		if self.tinfl:
+			# Make sure we'll be getting enough data for a good decompression test
+			if fp.MAX_TRAILING_SIZE < self.SIZE:
+				fp.MAX_TRAILING_SIZE = self.SIZE
 
-		self._deflate_scan(fp)
+			self._deflate_scan(fp)
 
-		return PLUGIN_TERMINATE
+			return PLUGIN_TERMINATE
 
 	def _extractor(self, file_name):
 		if self.tinfl:

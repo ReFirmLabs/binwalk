@@ -18,8 +18,9 @@ class Plugin:
 		if binwalk.scan_type == binwalk.BINWALK:
 			# Load libtinfl.so
 			self.tinfl = ctypes.cdll.LoadLibrary(ctypes.util.find_library('tinfl'))
-			# Add the zlib file to the list of magic files
-			binwalk.magic_files.append(binwalk.config.find_magic_file('zlib'))
+			if self.tinfl:
+				# Add the zlib file to the list of magic files
+				binwalk.magic_files.append(binwalk.config.find_magic_file('zlib'))
 
 	def pre_scan(self, fd):
 		if self.tinfl:
