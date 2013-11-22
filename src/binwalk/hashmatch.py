@@ -10,14 +10,20 @@ from binwalk.common import strings
 from binwalk.prettyprint import PrettyPrint
 
 class HashResult(object):
-	
+	'''
+	Class for storing libfuzzy hash results.
+	For internal use only.
+	'''
+
 	def __init__(self, name, hash=None, strings=None):
 		self.name = name
 		self.hash = hash
 		self.strings = strings
 
 class HashMatch(object):
-
+	'''
+	Class for fuzzy hash matching of files and directories.
+	'''
 	# Requires libfuzzy.so
 	LIBRARY_NAME = "fuzzy"
 

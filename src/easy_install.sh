@@ -72,7 +72,7 @@ function pyqtgraph
 		echo "Installing pyqtgraph..."
 		tar -zxvf "$OUTFILE"
 		cd "pyqtgraph-$VERSION" && $SUDO python ./setup.py install && cd ..
-		$SUDO rm -rf "pyqtgraph-$VERSION"
+		$SUDO rm -rf "pyqtgraph-$VERSION" "$OUTFILE"
 	else
 		echo "ERROR: Failed to download '$URL'!"
 		echo "pyqtgraph not installed."
