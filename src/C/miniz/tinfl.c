@@ -262,8 +262,6 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
 
   do
   {
-//printf("DECOMPRESS: %d\n", r->m_final);
-//fflush(stdout);
     TINFL_GET_BITS(3, r->m_final, 3); r->m_type = r->m_final >> 1;
     if (r->m_type == 0)
     {
@@ -459,7 +457,7 @@ tinfl_status tinfl_decompress(tinfl_decompressor *r, const mz_uint8 *pIn_buf_nex
           }
         }
 #endif
-	/* CJH: Check for NULL pointers */
+	// CJH: Check for NULL pointers
 	if (!pOut_buf_cur || ! pSrc) goto common_exit;
 
         do
@@ -505,8 +503,6 @@ common_exit:
     }
     r->m_check_adler32 = (s2 << 16) + s1; if ((status == TINFL_STATUS_DONE) && (decomp_flags & TINFL_FLAG_PARSE_ZLIB_HEADER) && (r->m_check_adler32 != r->m_z_adler32)) status = TINFL_STATUS_ADLER32_MISMATCH;
   }
-//printf("DECOMPRESS RETURN\n");
-//fflush(stdout);
   return status;
 }
 
@@ -519,12 +515,8 @@ void *tinfl_decompress_mem_to_heap(const void *pSrc_buf, size_t src_buf_len, siz
   for ( ; ; )
   {
     size_t src_buf_size = src_buf_len - src_buf_ofs, dst_buf_size = out_buf_capacity - *pOut_len, new_out_buf_capacity;
-//printf("DOING DECOMPRESSION\n");
-//fflush(stdout);
     tinfl_status status = tinfl_decompress(&decomp, (const mz_uint8*)pSrc_buf + src_buf_ofs, &src_buf_size, (mz_uint8*)pBuf, pBuf ? (mz_uint8*)pBuf + *pOut_len : NULL, &dst_buf_size,
       (flags & ~TINFL_FLAG_HAS_MORE_INPUT) | TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF);
-//printf("STATUS: %d\n", status);
-//fflush(stdout);
     if ((status < 0) || (status == TINFL_STATUS_NEEDS_MORE_INPUT))
     {
       MZ_FREE(pBuf); *pOut_len = 0; return NULL;
@@ -588,33 +580,49 @@ char *inflate_block(char *buf, size_t buf_size)
 	return (char *) tinfl_decompress_mem_to_heap((const void *) buf, buf_size, (size_t *) &out_size, 0);
 }
 
-#define DATA_SIZE (32*1024)
+/* CJH */
+
+int is_deflated_callback(const void *pBuf, int len, void *pUser)
+{
+	int *decomp_size = pUser;
+
+	*decomp_size += len;
+
+	if(len > 0)
+	{
+		return 1;
+	}
+
+        return 0;
+}
+
+/*
+ * Tries to determine if a given buffer contains valid deflated data.
+ *
+ * @buf                  - The buffer of data to check for deflated data.
+ * @buf_size             - The size of @buf.
+ * @includes_zlib_header - Set to 1 if the buffer should start with a valid zlib header.
+ * 
+ * Returns the size of the inflated data if @buf inflated to a value larger than 32KB, 
+ * or if it contained a valid zlib header/footer; else, returns 0.
+ *
+ * Thus, it is recommended to provide more than 32KB of data in @buf for the most accurate results.
+ */
 int is_deflated(char *buf, size_t buf_size, int includes_zlib_header)
 {
-  tinfl_decompressor decomp_struct = { 0 };
-  char out_buf[DATA_SIZE] = { 0 };
-  char dummy_buf[DATA_SIZE] = { 0 };
-  size_t out_buf_size = DATA_SIZE;
-  size_t in_buf_size = buf_size;
-  int flags = TINFL_FLAG_HAS_MORE_INPUT | TINFL_FLAG_COMPUTE_ADLER32;
+  int flags = TINFL_FLAG_HAS_MORE_INPUT;
+  int retval = 0, decomp_size = 0;
 
   if(includes_zlib_header)
   {
-    flags |= TINFL_FLAG_PARSE_ZLIB_HEADER;
+    flags |= TINFL_FLAG_PARSE_ZLIB_HEADER | TINFL_FLAG_COMPUTE_ADLER32;
   }
 
-  if(tinfl_decompress(&decomp_struct,
-                      (const mz_uint8 *) buf,
-                      &in_buf_size,
-                      (mz_uint8 *) &out_buf,
-                      (mz_uint8 *) &out_buf,
-                      &out_buf_size,
-                      flags) >= 0 && out_buf_size > 0)
+  retval = tinfl_decompress_mem_to_callback(buf, &buf_size, is_deflated_callback, (void *) &decomp_size, flags);
+
+  if(retval == 1 || decomp_size > BLOCK_SIZE)
   {
-      // CJH: To prevent false positives, check to see if this data filled the output buffer with NULL bytes.
-      //      If so, it's probably a false positive.
-      if(!(out_buf_size == DATA_SIZE && memcmp(out_buf, dummy_buf, out_buf_size) == 0))
-      	return (int) out_buf_size;
+    return decomp_size;
   }
 
   return 0;
@@ -628,12 +636,17 @@ int inflate_raw_file_callback(const void *pBuf, int len, void *pUser)
 	}
 	
 	return 0;
-	
 }
 
-int inflate_raw_file(char *in_file, char *out_file)
+/* Inflates a file containing raw deflated data.
+ *
+ * @in_file  - Input file containing raw deflated data.
+ * @out_file - Output file where inflated data will be saved.
+ *
+ * Returns void.
+ */
+void inflate_raw_file(char *in_file, char *out_file)
 {
-	int retval = 0;
 	char *compressed_data = NULL;
 	size_t in_size = 0, nbytes = 0;
 	FILE *fp_in = NULL, *fp_out = NULL;
@@ -657,7 +670,7 @@ int inflate_raw_file(char *in_file, char *out_file)
 				nbytes = fread(compressed_data, 1, in_size, fp_in);
 				if(nbytes > 0)
 				{
-					retval = tinfl_decompress_mem_to_callback(compressed_data, &nbytes, inflate_raw_file_callback, (void *) fp_out, 0);
+					tinfl_decompress_mem_to_callback(compressed_data, &nbytes, inflate_raw_file_callback, (void *) fp_out, 0);
 				}
 				
 				free(compressed_data);
@@ -668,7 +681,7 @@ int inflate_raw_file(char *in_file, char *out_file)
 	if(fp_in) fclose(fp_in);
 	if(fp_out) fclose(fp_out);
 
-	return retval;
+	return;
 }
 
 #endif // #ifndef TINFL_HEADER_FILE_ONLY
@@ -709,11 +722,8 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	if(inflate_raw_file(argv[1], argv[2]))
-	{
-		return EXIT_SUCCESS;
-	}
-
-	return EXIT_FAILURE;
+	inflate_raw_file(argv[1], argv[2]);
+	
+	return EXIT_SUCCESS;
 }
 #endif
