@@ -92,6 +92,7 @@ def main():
 	show_grids = False
 	show_legend = True
 	entropy_scan = False
+	sig_scan_done = False
 	enable_plugins = True
 	exec_commands = True
 	show_invalid = False
@@ -212,8 +213,6 @@ def main():
 			magic_flags |= binwalk.magic.MAGIC_CONTINUE
 		elif opt in ("-I", "--show-invalid"):
 			show_invalid = True
-		elif opt in ("-B", "--binwalk"):
-			requested_scans.append(binwalk.Binwalk.BINWALK)
 		elif opt in ("-K", "--block"):
 			block_size = binwalk.common.str2int(arg)
 		elif opt in ("-X", "--disable-plugin"):
@@ -261,6 +260,11 @@ def main():
 			# Else, use the default rules file
 			else:
 				extract_from_config = True
+		elif opt in ("-B", "--binwalk"):
+			requested_scans.append(binwalk.Binwalk.BINWALK)
+			# Load user file first so its signatures take precedence
+			magic_files.append(config.paths['user'][config.BINWALK_MAGIC_FILE])
+			magic_files.append(config.paths['system'][config.BINWALK_MAGIC_FILE])
 		elif opt in ("-A", "--opcodes"):
 			requested_scans.append(binwalk.Binwalk.BINARCH)
 			# Load user file first so its signatures take precedence
@@ -413,10 +417,10 @@ def main():
 
 		for scan_type in requested_scans:
 
-			if scan_type in [binwalk.Binwalk.BINWALK, binwalk.Binwalk.BINARCH, binwalk.Binwalk.BINCAST, binwalk.Binwalk.CUSTOM]:
+			if scan_type in [binwalk.Binwalk.BINWALK, binwalk.Binwalk.BINARCH, binwalk.Binwalk.BINCAST, binwalk.Binwalk.CUSTOM] and not sig_scan_done:
 
 				# There's no generic way for the binwalk class to know what
-				# scan type is being run, since these are all signature scans,
+				# scan type is being run, since all of these are signature scans,
 				# just with different magic files. Manually set the scan sub-type
 				# here to ensure that plugins can differentiate between the
 				# scans being performed.
@@ -434,6 +438,7 @@ def main():
 						plugins_blacklist=plugin_blacklist)
 
 				bwalk.concatenate_results(results, r)
+				sig_scan_done = True
 
 			elif scan_type == binwalk.Binwalk.STRINGS:
 

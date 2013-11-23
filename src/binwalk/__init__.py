@@ -371,9 +371,9 @@ class Binwalk(object):
 		if self.load_plugins:
 			self.plugins._load_plugins()
 
-		# Load the default signatures if self.load_signatures has not already been invoked
-		if self.magic is None:
-			self.load_signatures()
+		# Load the magic signatures. This must be done for every scan, as some signature scans
+		# may use a different list of magic signatures.
+		self.load_signatures()
 
 		while i < self.matryoshka:
 			new_target_files = []
@@ -514,8 +514,8 @@ class Binwalk(object):
 		# Invoke any pre-scan plugins
 		plugret_start = self.plugins._pre_scan_callbacks(fd)
 		
-		# Load the default signatures if self.load_signatures has not already been invoked
-		if self.magic is None:
+		# Load the magic signatures if they weren't already loaded. 
+		if not self.magic:
 			self.load_signatures()
 
 		# Main loop, scan through all the data

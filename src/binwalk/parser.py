@@ -43,7 +43,6 @@ class MagicParser:
 
 		@filter - Instance of the MagicFilter class. May be None if the parse/parse_file methods are not used.
 		@smart  - Instance of the SmartSignature class. May be None if the parse/parse_file methods are not used.
-
 		Returns None.
 		'''
 		self.matches = set([])
@@ -52,7 +51,6 @@ class MagicParser:
 		self.smart = smart
 		self.raw_fd = None
 		self.signature_count = 0
-		self.fd = tempfile.NamedTemporaryFile()
 
 	def __del__(self):
 		try:
@@ -111,6 +109,11 @@ class MagicParser:
 		Returns the name of the generated temporary magic file, which will be automatically
 		deleted when the class deconstructor is called.
 		'''
+		self.matches = set([])
+		self.signatures = {}
+		self.signature_count = 0
+		self.fd = tempfile.NamedTemporaryFile()
+
 		if isinstance(file_name, type([])):
 			files = file_name
 		else:
