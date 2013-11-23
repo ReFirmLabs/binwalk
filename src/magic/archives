@@ -13,6 +13,11 @@
 >40	byte		!0
 >>40	string		x			\b, owner group name: "%.32s"
 
+# Incremental snapshot gnu-tar format from:
+# http://www.gnu.org/software/tar/manual/html_node/Snapshot-Files.html
+0       string          GNU\x20tar-     GNU tar incremental snapshot data,
+>0	string		x		version: "%s"
+
 # JAR archiver (.j), this is the successor to ARJ, not Java's JAR (which is essentially ZIP)
 0       string  \x1aJar\x1b JAR (ARJ Software, Inc.) archive data{offset-adjust:-14}
 0       string  JARCS JAR (ARJ Software, Inc.) archive data
