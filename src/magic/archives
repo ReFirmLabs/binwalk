@@ -2,7 +2,16 @@
 
 # POSIX tar archives
 0	string		ustar\000		POSIX tar archive{offset-adjust:-257}
+>8	byte		!0
+>>8	string		x			\b, owner user name: "%.32s"
+>40	byte		!0
+>>40	string		x			\b, owner group name: "%.32s"
+
 0	string          ustar\040\040\000	POSIX tar archive (GNU){offset-adjust:-257}
+>8	byte		!0
+>>8	string		x			\b, owner user name: "%.32s"
+>40	byte		!0
+>>40	string		x			\b, owner group name: "%.32s"
 
 # JAR archiver (.j), this is the successor to ARJ, not Java's JAR (which is essentially ZIP)
 0       string  \x1aJar\x1b JAR (ARJ Software, Inc.) archive data{offset-adjust:-14}
