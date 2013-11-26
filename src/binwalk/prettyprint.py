@@ -82,7 +82,6 @@ class PrettyPrint:
 		Clean up any open file descriptors.
 		'''
 		try:
-			print("Closing fp.")
 			self.fp.close()
 		except:
 			pass
