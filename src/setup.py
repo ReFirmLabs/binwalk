@@ -133,3 +133,47 @@ setup(	name = "binwalk",
 	scripts = ["bin/binwalk"],
 )
 
+# If the bash auto-completion directory exists, generate an auto-completion file
+bash_completion_dir = os.path.join('/', 'etc', 'bash_completion.d')
+
+if os.path.exists(bash_completion_dir):
+	import binwalk.cmdopts
+
+	print("Installing bash auto-completion file")
+
+	long_opts_key = '%%LONG_OPTS%%'
+	short_opts_key = '%%SHORT_OPTS%%'
+	file_opts_key = '%%FILE_OPTS%%'
+	file_name_in = 'binwalk.completion'
+	file_name_out = os.path.join(bash_completion_dir, 'binwalk')
+
+	long_opts = []
+	short_opts = []
+	file_opts = ['--file=', '--extract=', '--magic=']
+
+	for opt in binwalk.cmdopts.short_options:
+		if opt != ':':
+			short_opts.append('-' + opt)
+
+	for opt in binwalk.cmdopts.long_options:
+		long_opts.append('--' + opt)
+
+	try:
+		with open(file_name_in) as fd_in:
+			with open(file_name_out, 'w') as fd_out:
+				for line in fd_in.readlines():
+					if long_opts_key in line:
+						line = line.replace(long_opts_key, ' '.join(long_opts))
+					elif short_opts_key in line:
+						line = line.replace(short_opts_key, ' '.join(short_opts))
+					elif file_opts_key in line:
+						line = line.replace(file_opts_key, ' '.join(file_opts))
+	
+					fd_out.write(line)
+	except Exception as e:
+		print("WARNING: Failed to install auto-completion file: %s" % e)
+		try:
+			os.unlink(file_name_out)
+		except:
+			pass
+
