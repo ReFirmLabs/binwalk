@@ -781,139 +781,16 @@
 >>7	byte		97		(ARM)
 >>7	byte		255		(embedded)
 
-# XXX - according to Microsoft's spec, at an offset of 0x3c in a
-# PE-format executable is the offset in the file of the PE header;
-# unfortunately, that's a little-endian offset, and there's no way
-# to specify an indirect offset with a specified byte order.
-# So, for now, we assume the standard MS-DOS stub, which puts the
-# PE header at 0x80 = 128.
-#
-# Required OS version and subsystem version were 4.0 on some NT 3.51
-# executables built with Visual C++ 4.0, so it's not clear that
-# they're interesting.  The user version was 0.0, but there's
-# probably some linker directive to set it.  The linker version was
-# 3.0, except for one ".exe" which had it as 4.20 (same damn linker!).
-#
-# many of the compressed formats were extraced from IDARC 1.23 source code
-#
+# Some simple Microsoft executable signatures
+0 		string 		MZ\0\0\0\0\0\0		Microsoft
+>0x3c		lelong		<4			invalid
+>(0x3c.l)       string          !PE\0\0     		MS-DOS executable
+>(0x3c.l)       string          PE\0\0      		portable executable
 
-# Not a very useful signature...
-#0       string  MZ	Microsoft
-#>0x18  leshort <0x40 MS-DOS executable
-
-0 	string 		MZ\0\0\0\0\0\0\0\0\0\0
->12	string		PE\0\0	Microsoft PE
->0x18   leshort 	<0x40 	MS-DOS executable
->>&18   leshort&0x2000  >0      (DLL)
->>&88   leshort         0       (unknown subsystem)
->>&88   leshort         1       (native)
->>&88   leshort         2       (GUI)
->>&88   leshort         3       (console)
->>&88   leshort         7       (POSIX)
->>&0    leshort         0x0     unknown processor
->>&0    leshort         0x14c   Intel 80386
->>&0    leshort         0x166   MIPS R4000
->>&0    leshort         0x184   Alpha
->>&0    leshort         0x268   Motorola 68000
->>&0    leshort         0x1f0   PowerPC
->>&0    leshort         0x290   PA-RISC
->>&18   leshort&0x0100  >0      32-bit
->>&18   leshort&0x1000  >0      system file
->>&228  lelong          >0      \b, Mono/.Net assembly
->>&0xf4 search/0x140 \x0\x40\x1\x0
->>>(&0.l+(4)) string MSCF \b, WinHKI CAB self-extracting archive
->30             string  Copyright\x201989-1990\x20PKWARE\x20Inc.      Self-extracting PKZIP archive
-# Is next line correct? One might expect "Corp." not "Copr." If it is right, add a note to that effect.
->30             string  PKLITE\x20Copr.   Self-extracting PKZIP archive
-
->0x18  leshort >0x3f
->>(0x3c.l) string PE\0\0 PE
->>>(0x3c.l+25) byte             1 \b32 executable
->>>(0x3c.l+25) byte             2 \b32+ executable
-# hooray, there's a DOS extender using the PE format, with a valid PE
-# executable inside (which just prints a message and exits if run in win)
->>>(0x3c.l+92)  leshort         <10
->>>>(8.s*16) string 32STUB for MS-DOS, 32rtm DOS extender
->>>>(8.s*16) string !32STUB for MS Windows
->>>>>(0x3c.l+22)        leshort&0x2000  >0      (DLL)
->>>>>(0x3c.l+92)        leshort         0       (unknown subsystem)
->>>>>(0x3c.l+92)        leshort         1       (native)
->>>>>(0x3c.l+92)        leshort         2       (GUI)
->>>>>(0x3c.l+92)        leshort         3       (console)
->>>>>(0x3c.l+92)        leshort         7       (POSIX)
->>>(0x3c.l+92)  leshort         10      (EFI application)
->>>(0x3c.l+92)  leshort         11      (EFI boot service driver)
->>>(0x3c.l+92)  leshort         12      (EFI runtime driver)
->>>(0x3c.l+92)  leshort         13      (XBOX)
->>>(0x3c.l+4)   leshort         0x0     unknown processor
->>>(0x3c.l+4)   leshort         0x14c   Intel 80386
->>>(0x3c.l+4)   leshort         0x166   MIPS R4000
->>>(0x3c.l+4)   leshort         0x184   Alpha
->>>(0x3c.l+4)   leshort         0x268   Motorola 68000
->>>(0x3c.l+4)   leshort         0x1f0   PowerPC
->>>(0x3c.l+4)   leshort         0x290   PA-RISC
->>>(0x3c.l+4)   leshort         0x200   Intel Itanium
->>>(0x3c.l+22)  leshort&0x0100  >0      32-bit
->>>(0x3c.l+22)  leshort&0x1000  >0      system file
->>>(0x3c.l+232) lelong  >0      Mono/.Net assembly
->>>>(0x3c.l+0xf8)       string          UPX0 \b, UPX compressed
->>>>(0x3c.l+0xf8)       search/0x140    PEC2 \b, PECompact2 compressed
->>>>(0x3c.l+0xf8)       search/0x140    UPX2
->>>>>(&0x10.l+(-4))     string          PK\3\4 \b, ZIP self-extracting archive (Info-Zip)
->>>>(0x3c.l+0xf8)       search/0x140    .idata
->>>>>(&0xe.l+(-4))      string          PK\3\4 \b, ZIP self-extracting archive (Info-Zip)
->>>>>(&0xe.l+(-4))      string          ZZ0 \b, ZZip self-extracting archive
->>>>>(&0xe.l+(-4))      string          ZZ1 \b, ZZip self-extracting archive
->>>>(0x3c.l+0xf8)       search/0x140    .rsrc
->>>>>(&0x0f.l+(-4))     string          a\\\4\5 \b, WinHKI self-extracting archive
->>>>>(&0x0f.l+(-4))     string          Rar! \b, RAR self-extracting archive
->>>>>(&0x0f.l+(-4))     search/0x3000   MSCF \b, InstallShield self-extracting archive
->>>>>(&0x0f.l+(-4))     search/32       Nullsoft \b, Nullsoft Installer self-extracting archive
->>>>(0x3c.l+0xf8)       search/0x140    .data
->>>>>(&0x0f.l)          string          WEXTRACT \b, MS CAB-Installer self-extracting archive
->>>>(0x3c.l+0xf8)       search/0x140    .petite\0 \b, Petite compressed
->>>>>(0x3c.l+0xf7)      byte            x
->>>>>>(&0x104.l+(-4))   string          =!sfx! \b, ACE self-extracting archive
->>>>(0x3c.l+0xf8)       search/0x140    .WISE \b, WISE installer self-extracting archive
->>>>(0x3c.l+0xf8)       search/0x140    .dz\0\0\0 \b, Dzip self-extracting archive
->>>>(0x3c.l+0xf8)       search/0x140    .reloc
->>>>>(&0xe.l+(-4))      search/0x180    PK\3\4 \b, ZIP self-extracting archive (WinZip)
-
->>>>&(0x3c.l+0xf8)      search/0x100    _winzip_ \b, ZIP self-extracting archive (WinZip)
->>>>&(0x3c.l+0xf8)      search/0x100    SharedD \b, Microsoft Installer self-extracting archive
->>>>0x30                string          Inno \b, InnoSetup self-extracting archive
-
->>(0x3c.l) string !PE\0\0 MS-DOS executable
-
->>(0x3c.l)              string          NE \b, NE
->>>(0x3c.l+0x36)        byte            0 (unknown OS)
->>>(0x3c.l+0x36)        byte            1 for OS/2 1.x
->>>(0x3c.l+0x36)        byte            2 for MS Windows 3.x
->>>(0x3c.l+0x36)        byte            3 for MS-DOS
->>>(0x3c.l+0x36)        byte            >3 (unknown OS)
->>>(0x3c.l+0x36)        byte            0x81 for MS-DOS, Phar Lap DOS extender
->>>(0x3c.l+0x0c)        leshort&0x8003  0x8002 (DLL)
->>>(0x3c.l+0x0c)        leshort&0x8003  0x8001 (driver)
->>>&(&0x24.s-1)         string          ARJSFX \b, ARJ self-extracting archive
->>>(0x3c.l+0x70)        search/0x80     WinZip(R)\x20Self-Extractor \b, ZIP self-extracting archive (WinZip)
-
->>(0x3c.l)              string          LX\0\0 \b, LX
->>>(0x3c.l+0x0a)        leshort         <1 (unknown OS)
->>>(0x3c.l+0x0a)        leshort         1 for OS/2
->>>(0x3c.l+0x0a)        leshort         2 for MS Windows
->>>(0x3c.l+0x0a)        leshort         3 for DOS
->>>(0x3c.l+0x0a)        leshort         >3 (unknown OS)
->>>(0x3c.l+0x10)        lelong&0x28000  =0x8000 (DLL)
->>>(0x3c.l+0x10)        lelong&0x20000  >0 (device driver)
->>>(0x3c.l+0x10)        lelong&0x300    0x300 (GUI)
->>>(0x3c.l+0x10)        lelong&0x28300  <0x300 (console)
->>>(0x3c.l+0x08)        leshort         1 i80286
->>>(0x3c.l+0x08)        leshort         2 i80386
->>>(0x3c.l+0x08)        leshort         3 i80486
->>>(8.s*16)             string          emx \b, emx
->>>>&1                  string          x "%s"
->>>&(&0x54.l-3)         string          arjsfx \b, ARJ self-extracting archive
-
+0               string          MZ      		Microsoft
+>0x3c		lelong		<4			invalid
+>(0x3c.l)       string          !PE\0\0     		invalid
+>(0x3c.l)       string          PE\0\0      		portable executable
 
 
 #------------------------------------------------------------------------------
