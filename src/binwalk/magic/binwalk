@@ -356,7 +356,8 @@
 #
 0       string          7z\274\257\047\034      7-zip archive data,
 >6	byte		<0			invalid
->6	byte		0			invalid
+>6	byte		0			
+>>7	byte		0			invalid
 >6	byte		>20			invalid
 >6      byte            x                       version %d
 >7      byte            x                       \b.%d
