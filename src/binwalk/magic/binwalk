@@ -1860,8 +1860,19 @@
 0       string          XIP0            XIP, Microsoft Xbox data
 0       string          XTF0            XTF, Microsoft Xbox data
 
-#Windows CE
-0	string		CECE		Windows CE RTOS{offset-adjust:-64}
+#Windows CE Binary Image Data Format aka B000FF
+#More information on the format:
+#http://msdn.microsoft.com/en-us/library/ms924510.aspx
+#http://forum.xda-developers.com/showthread.php?t=801167
+0	string	B000FF	B000FF Windows CE image header,
+>7	lelong	x	Image start: 0x%X,
+>11	lelong	x	Image length: %d
+
+
+#Windows CE RomImage
+0    string    \x00ECEC     Windows CE memory segment header, {offset-adjust:-63}
+>4	lelong	x	TOC address: 0x%X
+
 
 # --------------------------------
 # ZynOS ROM header format
