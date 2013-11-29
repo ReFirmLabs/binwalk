@@ -11,15 +11,10 @@ class PlotEntropy(object):
 	Class to plot entropy data on a graph.
 	'''
 
-	YLIM_MIN = 0
-	YLIM_MAX = 1.5
-
 	XLABEL = 'Offset'
 	YLABEL = 'Entropy'
 
-	LINE_WIDTH = 1.5
-
-	COLORS = ['darkgreen', 'blueviolet', 'saddlebrown', 'deeppink', 'goldenrod', 'olive', 'black']
+	COLORS = ['r', 'g', 'b', 'c', 'm', 'w']
 
 	FILE_FORMAT = 'svg'
 	
@@ -37,53 +32,50 @@ class PlotEntropy(object):
 
 		Returns None.
 		'''
-		import matplotlib.pyplot as plt
 		import numpy as np
+		import pyqtgraph as pg
+		from pyqtgraph.Qt import QtCore, QtGui
 
 		i = 0
-		trigger = 0
-		new_ticks = []
-		color_mappings = {}
+		descriptions = {}
+		max_description_length = None
 
-		plt.clf()
+		for (offset, results) in file_results:
+			description = results[0]['description'].split(',')[0]
+			desc_len = len(description)
+
+			if not max_description_length or desc_len > max_description_length:
+				max_description_length = desc_len
+
+			if has_key(descriptions, offset):
+				descriptions[offset].append(description)
+			else:
+				descriptions[offset] = [description]
+			
+
+		plt = pg.plot(title=title, clear=True)
+		plt.plot(x, y, pen='y')
+		if file_results and show_legend:
+			plt.addLegend(size=(max_description_length*10, 0)) 
+
+		#if average:
+		#	plt.addLine(y=average, pen='r')
 
 		if file_results:
-			for (offset, results) in file_results:
-				label = None
-				description = results[0]['description'].split(',')[0]
-
-				if not has_key(color_mappings, description):
-					if show_legend:
-						label = description
-
-					color_mappings[description] = self.COLORS[i]
+			for (offset, descs) in iterator(descriptions):
+				for description in descs:
+					plt.plot(x=[offset,offset], y=[0,1.1], name=description, pen=pg.mkPen(self.COLORS[i], width=2.5))
 					i += 1
 					if i >= len(self.COLORS):
 						i = 0
-			
-				plt.axvline(x=offset, label=label, color=color_mappings[description], linewidth=self.LINE_WIDTH)
-				new_ticks.append(offset)
-
-			if show_legend:
-				plt.legend()
-
-				if new_ticks:
-					new_ticks.sort()
-					plt.xticks(np.array(new_ticks), new_ticks)
-
-		plt.plot(x, y, linewidth=self.LINE_WIDTH)
-
-		if average:
-			plt.plot(x, [average] * len(x), linestyle='--', color='r')
-
-		plt.xlabel(self.XLABEL)
-		plt.ylabel(self.YLABEL)
-		plt.title(title)
-		plt.ylim(self.YLIM_MIN, self.YLIM_MAX)
+				
 		if save:
-			plt.savefig(common.unique_file_name(title, self.FILE_FORMAT))
+			# TODO
+			pass
+			#plt.savefig(common.unique_file_name(title, self.FILE_FORMAT))
 		else:
-			plt.show()
+			plt.setWindowTitle(title)
+			QtGui.QApplication.instance().exec_()
 
 
 class FileEntropy(object):
