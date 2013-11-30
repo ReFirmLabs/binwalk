@@ -12,14 +12,7 @@ function libmagic
 	URL="$SITE$OUTFILE"
 
 	echo "Downloading '$URL'..."
-
-	if [ "$(which wget)" != "" ]
-	then
-		wget "$URL"
-	elif [ "$(which curl)" != "" ]
-	then
-		curl "$URL" > "$OUTFILE"
-	fi
+	wget "$URL"
 
 	if [ -e "$OUTFILE" ]
 	then
@@ -30,6 +23,28 @@ function libmagic
 	else
 		echo "ERROR: Failed to download '$URL'!"
 		echo "libmagic not installed."
+	fi
+}
+
+function pyqtgraph
+{
+	SITE="http://www.pyqtgraph.org/downloads/"
+	VERSION="0.9.8"
+	OUTFILE="pyqtgraph-$VERSION.tar.gz"
+	URL="$SITE$OUTFILE"
+
+	echo "Downloading '$URL'..."
+	wget "$URL"
+
+	if [ -e "$OUTFILE" ]
+	then
+		echo "Installing pyqtgraph..."
+		tar -zxvf "$OUTFILE"
+		cd "pyqtgraph-$VERSION" && $SUDO python ./setup.py install && cd ..
+		$SUDO rm -rf "pyqtgraph-$VERSION"
+	else
+		echo "ERROR: Failed to download '$URL'!"
+		echo "pyqtgraph not installed."
 	fi
 }
 
@@ -44,27 +59,15 @@ function debian
 	fi
 
 	# Install binwalk/fmk pre-requisites and extraction tools
-	$SUDO apt-get -y install git build-essential mtd-utils zlib1g-dev liblzma-dev ncompress gzip bzip2 tar arj p7zip p7zip-full openjdk-6-jdk python-matplotlib
+	$SUDO apt-get -y install git build-essential mtd-utils zlib1g-dev liblzma-dev ncompress gzip bzip2 tar arj p7zip p7zip-full openjdk-6-jdk
+	$SUDO apt-get -y install python-qt4 python-qt4-gl python-numpy python-scipy
 }
 
 function redhat
 {
 	$SUDO yum groupinstall -y "Development Tools"
-	$SUDO yum install -y git mtd-utils unrar zlib1g-dev liblzma-dev xz-devel compress gzip bzip2 tar arj p7zip p7zip-full openjdk-6-jdk python-matplotlib
-}
-
-function darwin
-{
-	if [ "$(which easy_install)" == "" ]
-	then
-		curl https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py | $SUDO python
-	fi
-
-	if [ "$(which easy_install)" != "" ]
-	then
-		easy_install -m numpy
-		easy_install -m matplotlib
-	fi
+	$SUDO yum install -y git mtd-utils unrar zlib1g-dev liblzma-dev xz-devel compress gzip bzip2 tar arj p7zip p7zip-full openjdk-6-jdk
+	$SUDO yum install -y python-qt4 python-qt4-gl python-numpy python-scipy
 }
 
 if [ "$1" == "" ] || [ "$1" == "--sumount" ]
@@ -111,17 +114,13 @@ case $DISTRO in
 	centos)
 		redhat
 		;;
-	
-	darwin)
-		darwin
-		;;
 	*)
 		echo ""
 		echo "This system is not recognized by easy install! You may need to install dependent packages manually."
 		echo ""
-		echo "If your system is a derivative of Debian, RedHat, or OSX, you can try manually specifying your system type on the command line:"
+		echo "If your system is a derivative of Debian or RedHat, you can try manually specifying your system type on the command line:"
 		echo ""
-		echo -e "\t$0 [debian | redhat | darwin] [--sumount]"
+		echo -e "\t$0 [debian | redhat] [--sumount]"
 		echo ""
 		exit 1
 esac
@@ -132,35 +131,37 @@ then
 	libmagic
 fi
 
-# FMK doesn't support OSX.
-if [ "$DISTRO" != "darwin" ]
+if [ "$(python -c 'import pyqtgraph; print (pyqtgraph.__file__)' 2>/dev/null)" == "" ]
 then
-	# Get and build the firmware mod kit
-	$SUDO rm -rf /opt/firmware-mod-kit/
-	$SUDO mkdir -p /opt/firmware-mod-kit
-	$SUDO chmod a+rwx /opt/firmware-mod-kit
-	git clone https://code.google.com/p/firmware-mod-kit /opt/firmware-mod-kit/
-
-	cd /opt/firmware-mod-kit/src
-	./configure && $SUDO make
-	if [ "$1" == "--sumount" ] || [ "$2" == "--sumount" ]
-	then
-		# The following will allow you - and others - to mount/unmount file systems without root permissions.
-		# This may be problematic, especially on a multi-user system, so think about it first.
-		$SUDO chown root ./mountcp/mountsu
-		$SUDO chmod u+s ./mountcp/mountsu
-		$SUDO chmod o-w ./mountcp/mountsu
-
-		$SUDO chown root ./mountcp/umountsu
-		$SUDO chmod u+s ./mountcp/umountsu
-		$SUDO chmod o-w ./mountcp/umountsu
-
-		$SUDO chown root ./jffs2/sunjffs2
-	        $SUDO chmod u+s ./jffs2/sunjffs2
-	        $SUDO chmod o-w ./jffs2/sunjffs2
-	fi
-	cd -
+	echo "pyqtgraph not installed."
+	pyqtgraph
 fi
+
+# Get and build the firmware mod kit
+$SUDO rm -rf /opt/firmware-mod-kit/
+$SUDO mkdir -p /opt/firmware-mod-kit
+$SUDO chmod a+rwx /opt/firmware-mod-kit
+git clone https://code.google.com/p/firmware-mod-kit /opt/firmware-mod-kit/
+
+cd /opt/firmware-mod-kit/src
+./configure && $SUDO make
+if [ "$1" == "--sumount" ] || [ "$2" == "--sumount" ]
+then
+	# The following will allow you - and others - to mount/unmount file systems without root permissions.
+	# This may be problematic, especially on a multi-user system, so think about it first.
+	$SUDO chown root ./mountcp/mountsu
+	$SUDO chmod u+s ./mountcp/mountsu
+	$SUDO chmod o-w ./mountcp/mountsu
+
+	$SUDO chown root ./mountcp/umountsu
+	$SUDO chmod u+s ./mountcp/umountsu
+	$SUDO chmod o-w ./mountcp/umountsu
+
+	$SUDO chown root ./jffs2/sunjffs2
+        $SUDO chmod u+s ./jffs2/sunjffs2
+        $SUDO chmod o-w ./jffs2/sunjffs2
+fi
+cd -
 
 # Install binwalk
 $SUDO python setup.py install

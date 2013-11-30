@@ -61,13 +61,10 @@ except Exception as e:
 	warning(msg)
 
 try:
-	import matplotlib
-	matplotlib.use('Agg')
-	import matplotlib.pyplot
-	import numpy
+	import pyqtgraph
 except Exception as e:
 	msg = ["Pre-requisite check warning: " + str(e),
-		"To take advantage of this tool's entropy plotting capabilities, please install the python-matplotlib module.",
+		"To take advantage of this tool's graphing capabilities, please install the pyqtgraph module.",
 	]
 	
 	warning(msg, prompt=True)
