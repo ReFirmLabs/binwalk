@@ -14,10 +14,14 @@ class PlotEntropy(object):
 	XLABEL = 'Offset'
 	YLABEL = 'Entropy'
 
-	COLORS = ['r', 'g', 'b', 'c', 'm', 'w']
+	XUNITS = 'B'
+	YUNITS = 'E'
 
-	FILE_FORMAT = 'svg'
-	
+	COLORS = ['r', 'g', 'c', 'b', 'm']
+
+	FILE_WIDTH = 1024
+	FILE_FORMAT = 'png'
+
 	def __init__(self, x, y, title='Entropy', average=0, file_results={}, show_legend=True, save=False):
 		'''
 		Plots entropy data.
@@ -53,11 +57,16 @@ class PlotEntropy(object):
 				descriptions[offset] = [description]
 			
 
+		#pg.setConfigOption('background', 'w')
+		#pg.setConfigOption('foreground', 'k')
+		
 		plt = pg.plot(title=title, clear=True)
-		plt.plot(x, y, pen='y')
+
+		plt.plot(x, y, pen='y') #pen='b'
 		if file_results and show_legend:
 			plt.addLegend(size=(max_description_length*10, 0)) 
 
+		# Don't really like the way pyqtgraph draws these infinite horizontal lines
 		#if average:
 		#	plt.addLine(y=average, pen='r')
 
@@ -70,11 +79,13 @@ class PlotEntropy(object):
 						i = 0
 				
 		if save:
-			# TODO
-			pass
-			#plt.savefig(common.unique_file_name(title, self.FILE_FORMAT))
+			exporter = pg.exporters.ImageExporter.ImageExporter(plt.plotItem)
+			exporter.parameters()['width'] = self.FILE_WIDTH
+			exporter.export(common.unique_file_name(title, self.FILE_FORMAT))
 		else:
-			plt.setWindowTitle(title)
+			# Only set the axis labels if we're displaying a live window (axis labels aren't well-placed when saving directly to file)
+			plt.setLabel('left', self.YLABEL, units=self.YUNITS)
+			plt.setLabel('bottom', self.XLABEL, units=self.XUNITS)
 			QtGui.QApplication.instance().exec_()
 
 
