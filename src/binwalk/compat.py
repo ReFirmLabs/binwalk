@@ -30,6 +30,15 @@ def has_key(dictionary, key):
 	else:
 		return dictionary.has_key(key)
 
+def get_keys(dictionary):
+	'''
+	For cross compatibility between Python 2 and Python 3 dictionaries.
+	'''
+	if PY_MAJOR_VERSION > 2:
+		return list(dictionary.keys())
+	else:
+		return dictionary.keys()
+
 def str2bytes(string):
 	'''
 	For cross compatibility between Python 2 and Python 3 strings.

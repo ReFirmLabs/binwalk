@@ -2,7 +2,9 @@
 import sys
 import os.path
 import binwalk
+import binwalk.plotter
 import binwalk.cmdopts
+import binwalk.plotter
 from binwalk.compat import *
 from threading import Thread
 from getopt import GetoptError, gnu_getopt as GetOpt
@@ -72,6 +74,7 @@ def main():
 	matryoshka = 1
 	block_size = 0
 	failed_open_count = 0
+	weight = None
 	max_extract_size = None
 	quiet = False
 	do_comp = False
@@ -144,6 +147,8 @@ def main():
 			save_plot = True
 		elif opt in ("-N", "--no-plot"):
 			show_plot = False
+		elif opt in ("-3", "--3D"):
+			requested_scans.append(binwalk.Binwalk.BINVIS)
 		elif opt in ("-E", "--entropy"):
 			requested_scans.append(binwalk.Binwalk.ENTROPY)
 		elif opt in ("-W", "--diff"):
@@ -164,6 +169,8 @@ def main():
 			requested_scans.append(binwalk.Binwalk.STRINGS)
 		elif opt in ("-O", "--skip-unopened"):
 			ignore_failed_open = True
+		elif opt in ("-Z", "--weight"):
+			weight = binwalk.common.str2int(arg)
 		elif opt in ("-o", "--offset"):
 			offset = binwalk.common.str2int(arg)
 		elif opt in ("-l", "--length"):
@@ -425,6 +432,10 @@ def main():
 				r = bwalk.analyze_compression(target_files, offset=offset, length=length)
 				bwalk.concatenate_results(results, r)
 
+			elif scan_type == binwalk.Binwalk.BINVIS:
+				
+				binwalk.plotter.Plotter3D(target_files, offset=offset, length=length, weight=weight, verbose=verbose).plot()
+
 			elif scan_type == binwalk.Binwalk.ENTROPY:
 
 				if not results:
@@ -458,8 +469,8 @@ def main():
 		pass
 	except IOError:
 		pass
-#	except Exception as e:
-#		print("Unexpected error: %s" % str(e))
+	except Exception as e:
+		print("Unexpected error: %s" % str(e))
 		
 	bwalk.cleanup()
 

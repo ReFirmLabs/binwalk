@@ -5,8 +5,9 @@ import os
 import sys
 import binwalk.config
 
-short_options = "AaBbCcdEeGHhIiJkLMNnOPpQqrSTtUuvWwz?D:F:f:g:j:K:o:l:m:R:s:X:x:Y:y:"
+short_options = "3AaBbCcdEeGHhIiJkLMNnOPpQqrSTtUuvWwz?D:F:f:g:j:K:o:l:m:R:s:X:x:Y:y:Z:"
 long_options = [
+		"3D",
 		"rm",
 		"help",
 		"green",
@@ -41,6 +42,7 @@ long_options = [
 		"no-legend", 
 		"strings",
 		"carve",
+		"weight=",
 		"matryoshka=",
 		"list-plugins",
 		"disable-plugins",
@@ -101,6 +103,11 @@ def usage(fd):
 	fd.write("\t-F, --marker=<offset:name>    Add a marker to the entropy plot graph\n")
 	fd.write("\t-Q, --no-legend               Omit the legend from the entropy plot graph\n")
 	fd.write("\t-J, --save-plot               Save plot as an SVG (implied if multiple files are specified)\n")
+	fd.write("\n")
+
+	fd.write("Binary Visualization:\n")
+	fd.write("\t-3, --3D                      Generate a 3D visualization\n")
+	fd.write("\t-Z, --weight                  Manually set the cutoff weight (lower weight, more data points)\n")
 	fd.write("\n")
 
 	fd.write("Binary Diffing:\n")
