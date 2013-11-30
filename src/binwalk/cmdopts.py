@@ -106,7 +106,7 @@ def usage(fd):
 	fd.write("\n")
 
 	fd.write("Binary Visualization:\n")
-	fd.write("\t-3, --3D                      Generate a 3D visualization\n")
+	fd.write("\t-3, --3D                      Generate a 3D binary visualization\n")
 	fd.write("\t-Z, --weight                  Manually set the cutoff weight (lower weight, more data points)\n")
 	fd.write("\n")
 

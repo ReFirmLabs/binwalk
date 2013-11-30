@@ -434,7 +434,7 @@ def main():
 
 			elif scan_type == binwalk.Binwalk.BINVIS:
 				
-				binwalk.plotter.Plotter3D(target_files, offset=offset, length=length, weight=weight, verbose=verbose).plot()
+				binwalk.plotter.Plotter3D(target_files, offset=offset, length=length, weight=weight, verbose=True).plot()
 
 			elif scan_type == binwalk.Binwalk.ENTROPY:
 
