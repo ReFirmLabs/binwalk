@@ -102,7 +102,7 @@ def usage(fd):
 	fd.write("\t-N, --no-plot                 Do not generate an entropy plot graph\n")
 	fd.write("\t-F, --marker=<offset:name>    Add a marker to the entropy plot graph\n")
 	fd.write("\t-Q, --no-legend               Omit the legend from the entropy plot graph\n")
-	fd.write("\t-J, --save-plot               Save plot as an PNG (implied if multiple files are specified)\n")
+	fd.write("\t-J, --save-plot               Save plot as a PNG (implied if multiple files are specified)\n")
 	fd.write("\n")
 
 	fd.write("Binary Visualization:\n")
