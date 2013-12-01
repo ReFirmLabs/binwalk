@@ -1,6 +1,6 @@
 import re
 from binwalk.compat import *
-from binwalk.common import str2int, get_quoted_strings
+from binwalk.common import str2int, get_quoted_strings, MathExpression
 
 class SmartSignature:
 	'''
@@ -22,12 +22,12 @@ class SmartSignature:
 		'filename'		: '%sfile-name:' % KEYWORD_DELIM_START,
 		'filesize'		: '%sfile-size:' % KEYWORD_DELIM_START,
 		'raw-string'		: '%sraw-string:' % KEYWORD_DELIM_START,	# This one is special and must come last in a signature block
-		'string-len'		: '%sstring-len:' % KEYWORD_DELIM_START,
+		'string-len'		: '%sstring-len:' % KEYWORD_DELIM_START,	# This one is special and must come last in a signature block
 		'raw-size'		: '%sraw-string-length:' % KEYWORD_DELIM_START,
 		'adjust'		: '%soffset-adjust:' % KEYWORD_DELIM_START,
 		'delay'			: '%sextract-delay:' % KEYWORD_DELIM_START,
-		'year'			: '%syear:' % KEYWORD_DELIM_START,
-		'epoch'			: '%sepoch:' % KEYWORD_DELIM_START,
+		'year'			: '%sfile-year:' % KEYWORD_DELIM_START,
+		'epoch'			: '%sfile-epoch:' % KEYWORD_DELIM_START,
 
 		'raw-replace'		: '%sraw-replace%s' % (KEYWORD_DELIM_START, KEYWORD_DELIM_END),
 		'one-of-many'		: '%sone-of-many%s' % (KEYWORD_DELIM_START, KEYWORD_DELIM_END),
@@ -189,10 +189,10 @@ class SmartSignature:
 
 		arg = self._get_keyword_arg(data, keyword)
 		if arg:
-			if re.match("[0-9\+\-\*]*",arg):
-			    value = eval(arg)
-			else:
-			    self.invalid = True
+			value = MathExpression(arg).value
+			if value is None:
+				value = 0
+				self.invalid = True
 
 		return value
 
@@ -248,19 +248,32 @@ class SmartSignature:
 
 		@data - String to parse.
 
-		Returns strings length.
+		Returns parsed data string.
 		'''
 		if not self.ignore_smart_signatures and self._is_valid(data):
+
 			# Get the raw string  keyword arg
 			raw_string = self._get_keyword_arg(data, 'string-len')
 
 			# Was a string-len  keyword specified?
-			if raw_string:				
-				# Is the raw string  length arg is a numeric value?
-				
-				# Replace all instances of string-len in data with supplied string lenth
-				# Also strip out everything after the string-len keyword, including the keyword itself.
-				data = re.sub(self.KEYWORDS['string-len']+".+?%s" % self.KEYWORD_DELIM_END, str(len(raw_string)),data)
+			if raw_string:
+				# Convert the string to an integer as a sanity check
+				try:
+					string_length = "%d" % str2int(raw_string)
+				except:
+					string_length = '0'
+
+				# If the keyword is nested (e.g., {file-offset:{string-len:%s}}), then the returned
+				# data string needs to end with KEYWORD_DELIM_END. Note that this only allows for
+				# one-level nesting.
+				if data.endswith(self.KEYWORD_DELIM_END*2):
+					end_char = self.KEYWORD_DELIM_END
+				else:
+					end_char = ''
+
+				# Strip out *everything* after the string-len keyword, including the keyword itself.
+				# Failure to do so can potentially allow keyword injection from a maliciously created file.
+				data = data.split(self.KEYWORDS['string-len'])[0] + string_length + end_char
 		return data
 
 	def _strip_tags(self, data):

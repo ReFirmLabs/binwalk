@@ -131,7 +131,7 @@
 >>4	lelong		=694224000	\b, invalid date:
 >>4	lelong		>694224000	\b, last modified:
 >4      ledate          x               %s
->4	lelong		x		\b{epoch:%d}
+>4	lelong		x		\b{file-epoch:%d}
 
 # Zlib signatures
 # Too short to be useful on their own; see:

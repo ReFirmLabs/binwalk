@@ -123,6 +123,14 @@
 # character-header formats and thus are strings, not numbers.
 #0       string          070707          ASCII cpio archive (pre-SVR4 or odc)
 
+# WARNING: The jump-to-offset value in the ASCII spio signatures below is a terrible hack.
+#          This keyword is not intended to be passed a string (%s), and doing so can open
+#          up the possibility of keyword injection by a malicious file. This works here though, because:
+#
+#          	1) It would result in an invalid CPIO file (invalid size)
+#               2) All valid keywords are longer than 8 bytes, so a valid one can't be
+#                  injected in the %.8s field.
+
 0       string          070701          ASCII cpio archive (SVR4 with no CRC),
 >110	byte		0		invalid
 #>110	byte		!0x2F

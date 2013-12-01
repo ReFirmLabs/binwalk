@@ -118,8 +118,8 @@ class Extractor:
 			except:
 				pass
 
-			# Verify that the match string and file extension were retrieved.
-			if match and r['extension']:
+			# Verify that the match string was retrieved.
+			if match: 
 				self.append_rule(r)
 
 	def remove_rule(self, text):

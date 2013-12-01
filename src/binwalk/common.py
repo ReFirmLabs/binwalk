@@ -2,6 +2,8 @@
 import io
 import os
 import re
+import ast
+import operator as op
 from binwalk.compat import *
 
 def file_size(filename):
@@ -90,6 +92,44 @@ def unique_file_name(base_name, extension=''):
 		idcount += 1
 
 	return fname
+
+
+class MathExpression(object):
+	'''
+	Class for safely evaluating mathematical expressions from a string.
+	Stolen from: http://stackoverflow.com/questions/2371436/evaluating-a-mathematical-expression-in-a-string
+	'''
+
+	OPERATORS = {
+		ast.Add: op.add,
+		ast.Sub: op.sub,
+		ast.Mult: op.mul,
+		ast.Div: op.truediv, 
+		ast.Pow: op.pow, 
+		ast.BitXor: op.xor
+	}
+
+	def __init__(self, expression):
+		self.expression = expression
+
+		try:
+			self.value = self.evaluate(self.expression)
+		except TypeError:
+			self.value = None
+
+	def evaluate(self, expr):
+		return self._eval(ast.parse(expr).body[0].value)
+
+	def _eval(self, node):
+		if isinstance(node, ast.Num): # <number>
+			return node.n
+		elif isinstance(node, ast.operator): # <operator>
+			return self.OPERATORS[type(node)]
+		elif isinstance(node, ast.BinOp): # <left> <operator> <right>
+			return self._eval(node.op)(self._eval(node.left), self._eval(node.right))
+		else:
+			raise TypeError(node)
+
 
 class BlockFile(io.FileIO):
 	'''

@@ -550,6 +550,9 @@ class Binwalk(object):
 
 						i_set_results_offset = False
 
+						# Some signatures need to take into account the length of a given string
+						# when specifying additional offsets. Parse the string-len keyword to adjust
+						# for this prior to calling self.smart.parse.
 						magic_result = self.smart._parse_string_len(magic_result)
 
 						# Some file names are not NULL byte terminated, but rather their length is
