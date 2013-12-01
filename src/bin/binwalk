@@ -147,7 +147,7 @@ def main():
 			save_plot = True
 		elif opt in ("-N", "--no-plot"):
 			show_plot = False
-		elif opt in ("-3", "--3D"):
+		elif opt in ("-3", "--3D", "--3d"):
 			requested_scans.append(binwalk.Binwalk.BINVIS)
 		elif opt in ("-E", "--entropy"):
 			requested_scans.append(binwalk.Binwalk.ENTROPY)
@@ -469,8 +469,8 @@ def main():
 		pass
 	except IOError:
 		pass
-	except Exception as e:
-		print("Unexpected error: %s" % str(e))
+#	except Exception as e:
+#		print("Unexpected error: %s" % str(e))
 		
 	bwalk.cleanup()
 

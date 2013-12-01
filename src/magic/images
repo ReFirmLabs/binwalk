@@ -11,6 +11,8 @@
 # 137 P N G \r \n ^Z \n [4-byte length] H E A D [HEAD data] [HEAD crc] ...
 #
 0       string          \x89PNG\x0d\x0a\x1a\x0a         PNG image
+>16	belong		0		invalid
+>20	belong		0		invalid
 >16     belong          x               \b, %ld x
 >20     belong          x               %ld,
 >24     byte            x               %d-bit

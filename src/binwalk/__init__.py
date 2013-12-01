@@ -533,7 +533,7 @@ class Binwalk(object):
 				# start after the end of dlen.
 				for candidate in self.parser.find_signature_candidates(data[i:dlen+self.MAX_SIGNATURE_SIZE], (dlen-i)):
 
-					# If a signature specified a jump offset beyond this candidate signature offset, ignore it
+					# If a previous signature specified a jump offset beyond this candidate signature offset, ignore it
 					if (i + candidate + self.total_scanned) < jump_offset:
 						continue
 
@@ -570,7 +570,7 @@ class Binwalk(object):
 							smart = self.smart.parse(magic_result)
 
 							# Validate the jump value and check if the response description should be displayed
-							if smart['jump'] > -1 and self._should_display(smart):
+							if self._is_valid(smart, candidate+i, fsize):
 								# If multiple results are returned and one of them has smart['jump'] set to a non-zero value,
 								# the calculated results offset will be wrong since i will have been incremented. Only set the
 								# results_offset value when the first match is encountered.
@@ -678,18 +678,25 @@ class Binwalk(object):
 					if not found_offset:
 						results[new_file_name] += new_data
 
-	def _should_display(self, result):
+	def _is_valid(self, result, location, file_size):
 		'''
-		Determines if a result string should be displayed to the user or not.
+		Determines if a result string is valid and should be displayed to the user or not.
 		
-		@result - Result dictionary, as returned by self.smart.parse.
+		@result    - Result dictionary, as returned by self.smart.parse.
+		@location  - The file offset of the result.
+		@file_size - The total size of the file.
 
 		Returns True if the string should be displayed.
 		Returns False if the string should not be displayed.
 		'''
-		if result['invalid'] == True or (self.year and result['year'] > self.year) or (self.epoch and result['epoch'] > self.epoch):
+		if self.filter.show_invalid_results:
+			return True
+
+		if result['jump'] < 0 or result['invalid']:
 			return False
-		
+		if ((location + result['size']) > file_size) or (self.year and result['year'] > self.year) or (self.epoch and result['epoch'] > self.epoch):
+			return False
+
 		desc = result['description']
 		return (desc and desc is not None and not self.filter.invalid(desc) and self.filter.filter(desc) != self.filter.FILTER_EXCLUDE)
 

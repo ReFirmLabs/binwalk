@@ -2072,6 +2072,9 @@
 >19     string  none\n                  \b, unencrypted
 >19     string  AES-256\n               \b, encrypted AES-256
 
+# http://forum.xda-developers.com/showthread.php?p=47818657
+0	string	imgARMcC 		Roku aimage SB{offset-adjust:-8}
+
 # Tag Image File Format, from Daniel Quinlan (quinlan@yggdrasil.com)
 # The second word of TIFF files is the TIFF version number, 42, which has
 # never changed.  The TIFF specification recommends testing for it.
@@ -2085,6 +2088,8 @@
 # 137 P N G \r \n ^Z \n [4-byte length] H E A D [HEAD data] [HEAD crc] ...
 #
 0       string          \x89PNG\x0d\x0a\x1a\x0a         PNG image
+>16	belong		0		invalid
+>20	belong		0		invalid
 >16     belong          x               \b, %ld x
 >20     belong          x               %ld,
 >24     byte            x               %d-bit

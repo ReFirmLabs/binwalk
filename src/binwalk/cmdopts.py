@@ -8,6 +8,7 @@ import binwalk.config
 short_options = "3AaBbCcdEeGHhIiJkLMNnOPpQqrSTtUuvWwz?D:F:f:g:j:K:o:l:m:R:s:X:x:Y:y:Z:"
 long_options = [
 		"3D",
+		"3d",
 		"rm",
 		"help",
 		"green",

@@ -445,3 +445,6 @@
 >19     string  none\n                  \b, unencrypted
 >19     string  AES-256\n               \b, encrypted AES-256
 
+# http://forum.xda-developers.com/showthread.php?p=47818657
+0	string	imgARMcC 		Roku aimage SB{offset-adjust:-8}
+

@@ -166,7 +166,7 @@ class MagicParser:
 				if include:
 					self.fd.write(str2bytes(line))
 
-			self.build_signature_set()			
+			self.build_signature_set()
 		except Exception as e:
 			raise Exception("Error parsing magic file '%s' on line %d: %s" % (file_name, line_count, str(e)))
 		
@@ -255,18 +255,17 @@ class MagicParser:
 
 		Returns a list of tuples in the format: [(<signature offset>, [signature regex])].
 		'''
-		signature_set = []
+		self.signature_set = set()
 
 		for (offset, sigs) in iterator(self.signatures):
+			
 			for sig in sigs:
 				if sig == self.WILDCARD:
 					sig = re.compile('.')
 				else:
 					sig = re.compile(re.escape(sig))
 
-				signature_set.append(sig)
-
-		self.signature_set = set(signature_set)
+				self.signature_set.add((offset, sig))
 
 		return self.signature_set
 
@@ -282,8 +281,8 @@ class MagicParser:
 		'''
 		candidate_offsets = []
 
-		for regex in self.signature_set:
-			candidate_offsets += [match.start() for match in regex.finditer(data) if match.start() < end]
+		for (offset, regex) in self.signature_set:
+			candidate_offsets += [(match.start() - offset) for match in regex.finditer(data) if match.start() < end  and (match.start() - offset) >= 0]
 
 		candidate_offsets = list(set(candidate_offsets))
 		candidate_offsets.sort()
