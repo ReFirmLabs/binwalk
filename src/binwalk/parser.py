@@ -282,7 +282,7 @@ class MagicParser:
 		candidate_offsets = []
 
 		for (offset, regex) in self.signature_set:
-			candidate_offsets += [(match.start() - offset) for match in regex.finditer(data) if match.start() < end  and (match.start() - offset) >= 0]
+			candidate_offsets += [(match.start() - offset) for match in regex.finditer(data) if (match.start() - offset) < end  and (match.start() - offset) >= 0]
 
 		candidate_offsets = list(set(candidate_offsets))
 		candidate_offsets.sort()
