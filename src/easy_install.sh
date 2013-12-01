@@ -1,12 +1,43 @@
 #!/bin/bash
-# Easy installer script for Debian/RedHat/OSX systems.
+# Easy installer script for Debian/RedHat systems.
 
 SUDO=$(which sudo)
+SUMOUNT="$1 $2"
+
+function fmk
+{
+	# Get and build the firmware mod kit
+	$SUDO rm -rf /opt/firmware-mod-kit/
+	$SUDO mkdir -p /opt/firmware-mod-kit
+	$SUDO chmod a+rwx /opt/firmware-mod-kit
+	git clone https://code.google.com/p/firmware-mod-kit /opt/firmware-mod-kit/
+
+	cd /opt/firmware-mod-kit/src
+	./configure && $SUDO make
+
+	if [ "$(echo "$SUMOUNT" | grep -e '--sumount')" != "" ]
+	then
+	        # The following will allow you - and others - to mount/unmount file systems without root permissions.
+	        # This may be problematic, especially on a multi-user system, so think about it first.
+	        $SUDO chown root ./mountcp/mountsu
+	        $SUDO chmod u+s ./mountcp/mountsu
+	        $SUDO chmod o-w ./mountcp/mountsu
+
+	        $SUDO chown root ./mountcp/umountsu
+	        $SUDO chmod u+s ./mountcp/umountsu
+	        $SUDO chmod o-w ./mountcp/umountsu
+
+	        $SUDO chown root ./jffs2/sunjffs2
+	        $SUDO chmod u+s ./jffs2/sunjffs2
+	        $SUDO chmod o-w ./jffs2/sunjffs2
+	fi
+
+	cd -
+}
 
 function libmagic
 {
 	SITE="ftp://ftp.astron.com/pub/file/"
-	# 5.11 is the most recent version that builds out of the box on OSX.
 	VERSION="5.11"
 	OUTFILE="file-$VERSION.tar.gz"
 	URL="$SITE$OUTFILE"
@@ -138,30 +169,7 @@ then
 fi
 
 # Get and build the firmware mod kit
-$SUDO rm -rf /opt/firmware-mod-kit/
-$SUDO mkdir -p /opt/firmware-mod-kit
-$SUDO chmod a+rwx /opt/firmware-mod-kit
-git clone https://code.google.com/p/firmware-mod-kit /opt/firmware-mod-kit/
-
-cd /opt/firmware-mod-kit/src
-./configure && $SUDO make
-if [ "$1" == "--sumount" ] || [ "$2" == "--sumount" ]
-then
-	# The following will allow you - and others - to mount/unmount file systems without root permissions.
-	# This may be problematic, especially on a multi-user system, so think about it first.
-	$SUDO chown root ./mountcp/mountsu
-	$SUDO chmod u+s ./mountcp/mountsu
-	$SUDO chmod o-w ./mountcp/mountsu
-
-	$SUDO chown root ./mountcp/umountsu
-	$SUDO chmod u+s ./mountcp/umountsu
-	$SUDO chmod o-w ./mountcp/umountsu
-
-	$SUDO chown root ./jffs2/sunjffs2
-        $SUDO chmod u+s ./jffs2/sunjffs2
-        $SUDO chmod o-w ./jffs2/sunjffs2
-fi
-cd -
+fmk
 
 # Install binwalk
 $SUDO python setup.py install
