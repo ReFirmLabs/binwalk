@@ -264,6 +264,8 @@ class SmartSignature:
 				# Replace all instances of string-len in data with supplied string lenth
 				# Also strip out everything after the string-len keyword, including the keyword itself.
 				data = re.sub(self.KEYWORDS['string-len']+".+?%s" % self.KEYWORD_DELIM_END, str(len(raw_string)),data)
+			else:
+				data = re.sub(self.KEYWORDS['string-len']+".+?%s" % self.KEYWORD_DELIM_END, str(0),data)
 		return data
 
 	def _strip_tags(self, data):
