@@ -23,7 +23,7 @@ def which(fname):
 	cmd = ["which", fname]
 	return subprocess.Popen(cmd, stdout=subprocess.PIPE).stdout.readline().strip()
 
-def warning(lines, terminate=True, prompt=False):
+def warning(lines, terminate=True, prompt=True):
 	WIDTH = 115
 
 	if not IGNORE_WARNINGS:
