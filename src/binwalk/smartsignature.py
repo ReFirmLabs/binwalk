@@ -188,13 +188,12 @@ class SmartSignature:
 
 		arg = self._get_keyword_arg(data, keyword)
 		if arg:
-			for string_int in arg.split('+'):
-				try:
-					value += str2int(string_int)
-				except:
-					self.invalid = True
+			if re.match("[0-9\+\-\*]*",arg):
+			    value = eval(arg)
+			else:
+			    self.invalid = True
 
-		return value			
+		return value
 
 	def _jump(self, data):
 		'''
