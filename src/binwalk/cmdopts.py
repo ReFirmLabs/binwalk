@@ -121,7 +121,7 @@ def usage(fd):
 	fd.write("\n")
 
 	fd.write("Extraction Options:\n")
-	fd.write("\t-D, --dd=<type:ext[:cmd]>     Extract <type> signatures, give the files an extension of <ext>, and execute <cmd>\n")
+	fd.write("\t-D, --dd=<type:ext:cmd>       Extract <type> signatures, give the files an extension of <ext>, and execute <cmd>\n")
 	fd.write("\t-e, --extract=[file]          Automatically extract known file types; load rules from file, if specified\n")
 	fd.write("\t-M, --matryoshka=[n]          Recursively scan extracted files, up to n levels deep (8 levels of recursion is the default)\n")
 	fd.write("\t-j, --max-size=<int>          Limit extracted file sizes (default: no limit)\n")      
