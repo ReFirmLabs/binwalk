@@ -85,7 +85,7 @@ class SmartSignature:
 			# when extraction is enabled. If not specified, everything to the end of the file will be
 			# extracted (see Binwalk.scan).
 			try:
-				results['size'] = str2int(self._get_keyword_arg(data, 'filesize'))
+				results['size'] = str2int(self._get_math_arg(data, 'filesize'))
 			except:
 				pass
 
