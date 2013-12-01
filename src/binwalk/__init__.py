@@ -550,6 +550,8 @@ class Binwalk(object):
 
 						i_set_results_offset = False
 
+						magic_result = self.smart._parse_string_len(magic_result)
+
 						# Some file names are not NULL byte terminated, but rather their length is
 						# specified in a size field. To ensure these are not marked as invalid due to
 						# non-printable characters existing in the file name, parse the filename(s) and
