@@ -22,6 +22,7 @@ class SmartSignature:
 		'filename'		: '%sfile-name:' % KEYWORD_DELIM_START,
 		'filesize'		: '%sfile-size:' % KEYWORD_DELIM_START,
 		'raw-string'		: '%sraw-string:' % KEYWORD_DELIM_START,	# This one is special and must come last in a signature block
+		'string-len'		: '%sstring-len:' % KEYWORD_DELIM_START,
 		'raw-size'		: '%sraw-string-length:' % KEYWORD_DELIM_START,
 		'adjust'		: '%soffset-adjust:' % KEYWORD_DELIM_START,
 		'delay'			: '%sextract-delay:' % KEYWORD_DELIM_START,
@@ -74,7 +75,9 @@ class SmartSignature:
 		# don't parse anything, just return the raw data as the description.
 		if self.ignore_smart_signatures or not self._is_valid(data):
 			results['description'] = data
-		else:
+		else:			
+			data = self._parse_string_len(data)
+			
 			# Parse the offset-adjust value. This is used to adjust the reported offset at which 
 			# a signature was located due to the fact that MagicParser.match expects all signatures
 			# to be located at offset 0, which some wil not be.
@@ -84,7 +87,7 @@ class SmartSignature:
 			# when extraction is enabled. If not specified, everything to the end of the file will be
 			# extracted (see Binwalk.scan).
 			try:
-				results['size'] = str2int(self._get_keyword_arg(data, 'filesize'))
+				results['size'] = str2int(self._get_math_arg(data, 'filesize'))
 			except:
 				pass
 
@@ -188,13 +191,12 @@ class SmartSignature:
 
 		arg = self._get_keyword_arg(data, keyword)
 		if arg:
-			for string_int in arg.split('+'):
-				try:
-					value += str2int(string_int)
-				except:
-					self.invalid = True
+			if re.match("[0-9\+\-\*]*",arg):
+			    value = eval(arg)
+			else:
+			    self.invalid = True
 
-		return value			
+		return value
 
 	def _jump(self, data):
 		'''
@@ -240,6 +242,29 @@ class SmartSignature:
 					# Failure to do so may (will) result in non-printable characters and this string will be 
 					# marked as invalid when it shouldn't be.
 					data = data[:data.find(self.KEYWORDS['raw-string'])].replace(self.KEYWORDS['raw-replace'], '"' + raw_string[:str2int(raw_size)] + '"')
+		return data
+		
+	def _parse_string_len(self, data):
+		'''
+		Process {string-len} macros. 
+
+		@data - String to parse.
+
+		Returns parsed string.
+		'''
+		if not self.ignore_smart_signatures and self._is_valid(data):
+			# Get the raw string  keyword arg
+			raw_string = self._get_keyword_arg(data, 'string-len')
+
+			# Was a string-len  keyword specified?
+			if raw_string:				
+				# Is the raw string  length arg is a numeric value?
+				
+				# Replace all instances of string-len in data with supplied string lenth
+				# Also strip out everything after the string-len keyword, including the keyword itself.
+				data = re.sub(self.KEYWORDS['string-len']+".+?%s" % self.KEYWORD_DELIM_END, str(len(raw_string)),data)
+			else:
+				data = re.sub(self.KEYWORDS['string-len']+"?%s" % self.KEYWORD_DELIM_END, str(0),data)
 		return data
 
 	def _strip_tags(self, data):
