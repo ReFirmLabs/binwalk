@@ -83,11 +83,20 @@ def unique_file_name(base_name, extension=''):
 	if extension and not extension.startswith('.'):
 		extension = '.%s' % extension
 
-	fname = base_name + extension
+	#if ".None" extension set return filename without extension
+	if extension == ".None":
+	    fname = base_name
 
-	while os.path.exists(fname):
-		fname = "%s-%d%s" % (base_name, idcount, extension)
-		idcount += 1
+	    while os.path.exists(fname):
+		    fname = "%s-%d" % (base_name, idcount)
+		    idcount += 1
+	else:
+	    fname = base_name + extension
+
+	    while os.path.exists(fname):
+		    fname = "%s-%d%s" % (base_name, idcount, extension)
+		    idcount += 1
+
 
 	return fname
 
