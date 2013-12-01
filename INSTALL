@@ -1,0 +1,76 @@
+BEFORE YOU START
+----------------------------------
+
+Although binwalk supports Python 3, Python 2.7 is recommended.
+The following installation procedures assume that you are installing binwalk to be run using Python 2.7.
+If you want to use binwalk in Python 3, some package names and installation procedures may differ slightly.
+
+
+
+EASY INSTALL
+----------------------------------
+
+Dependency hell sucks, so binwalk ships with an easy_install.sh script that installs *everything*
+and should work for most Debian or RedHat based distros:
+
+	$ sudo ./easy_install.sh --sumount
+
+If easy_install.sh didn't work, or if you want to only install the core dependencies, read on.
+
+
+
+INSTALLING CORE DEPENDENCIES
+----------------------------------
+
+Binwalk has two core dependencies:
+
+	o python-magic
+	o pyqtgraph
+
+You can install python-magic from your distro's repositories, or from source (ftp://ftp.astron.com/pub/file/):
+
+	$ sudo apt-get install python-magic
+
+Next, you'll need to install the dependencies for pyqtgraph:
+	
+	$ sudo apt-get install python-qt4 python-qt4-gl python-numpy python-scipy
+
+Most distros don't have pyqtgraph in their repositories, so you'll need to build it from source:
+
+	$ wget http://www.pyqtgraph.org/downloads/pyqtgraph-0.9.8.tar.gz
+	$ tar -zxvf pyqtgraph-0.9.8.tar.gz
+	$ cd pyqtgraph-0.9.8 && sudo ./setup.py install
+
+
+
+INSTALLING BINWALK
+----------------------------------
+
+Binwalk can be installed using the included setup.py installer in the src/ directory:
+
+	$ sudo python ./setup.py install
+
+The installer will check for core dependencies and warn you if any are missing or not compatible.
+
+
+
+INSTALLING EXTRACTION UTILITIES
+----------------------------------
+
+Binwalk can automatically invoke external extraction utilities to extract various types of files that it
+may find during a scan. These utilities are optional, but recommended if you plan on using binwalk's
+extraction features.
+
+Most utilities can be installed from your distro's repositories (package names may vary slightly based
+on your particular distro):
+
+	$ sudo apt-get install git mtd-utils zlib1g-dev liblzma-dev ncompress gzip bzip2 tar arj p7zip p7zip-full openjdk-6-jdk
+
+However, the Firmware-Mod-Kit, which contains many file system extractors, needs to be built from source
+and placed in the /opt/firmware-mod-kit directory:
+
+	$ sudo mkdir -p /opt/firmware-mod-kit
+	$ sudo chmod -R a+rwx /opt/firmware-mod-kit
+	$ git clone https://code.google.com/p/firmware-mod-kit /opt/firmware-mod-kit/
+	$ cd /opt/firmware-mod-kit/src && ./configure && make
+
