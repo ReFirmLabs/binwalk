@@ -250,7 +250,7 @@ class SmartSignature:
 
 		@data - String to parse.
 
-		Returns strings length.
+		Returns parsed string.
 		'''
 		if not self.ignore_smart_signatures and self._is_valid(data):
 			# Get the raw string  keyword arg
