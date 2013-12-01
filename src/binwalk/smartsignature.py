@@ -75,7 +75,10 @@ class SmartSignature:
 		# don't parse anything, just return the raw data as the description.
 		if self.ignore_smart_signatures or not self._is_valid(data):
 			results['description'] = data
-		else:
+		else:			
+			print data
+			data = self._parse_string_len(data)
+			
 			# Parse the offset-adjust value. This is used to adjust the reported offset at which 
 			# a signature was located due to the fact that MagicParser.match expects all signatures
 			# to be located at offset 0, which some wil not be.
