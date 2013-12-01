@@ -76,7 +76,6 @@ class SmartSignature:
 		if self.ignore_smart_signatures or not self._is_valid(data):
 			results['description'] = data
 		else:			
-			print data
 			data = self._parse_string_len(data)
 			
 			# Parse the offset-adjust value. This is used to adjust the reported offset at which 
