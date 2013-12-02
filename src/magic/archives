@@ -128,24 +128,28 @@
 #          up the possibility of keyword injection by a malicious file. This works here though, because:
 #
 #          	1) It would result in an invalid CPIO file (invalid size)
-#               2) All valid keywords are longer than 8 bytes, so a valid one can't be
-#                  injected in the %.8s field.
+#               2) All valid keywords require more than 8 bytes, so a valid one can't be
+#                  injected in the %.11s field.
 
 0       string          070701          ASCII cpio archive (SVR4 with no CRC),
 >110	byte		0		invalid
 #>110	byte		!0x2F
 #>>110	string		!TRAILER!!!	invalid
->110	string		x		file name: "%s"
->54	string		x		file size: "0x%.8s"
->54	string		x		{jump-to-offset:0x%.8s+112}
+>110	string		x		file name: "%s",
+>94	string		x		file name length: "0x%.8s",
+>54	string		x		file size: "0x%.8s",
+>54	string		x		{jump-to-offset:0x%.8s+110+
+>94	string		x		\b0x%.8s}
 
 0       string          070702          ASCII cpio archive (SVR4 with CRC)
 >110	byte		0		invalid
 #>110	byte		!0x2F
 #>>110	string		!TRAILER!!!	invalid
->110	string		x		file name: "%s"
+>110	string		x		file name: "%s",
+>94	string		x		file name length: "0x%.8s",
 >54	string		x		file size: "0x%.8s"
->54	string		x		{jump-to-offset:0x%.8s+112}
+>54	string		x		{jump-to-offset:0x%.8s+110+
+>94	string		x		\b0x%.8s}
 
 
 # HP Printer Job Language
