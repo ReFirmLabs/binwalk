@@ -6,6 +6,8 @@ Although binwalk supports Python 3, Python 2.7 is recommended.
 The following installation procedures assume that you are installing binwalk to be run using Python 2.7.
 If you want to use binwalk in Python 3, some package names and installation procedures may differ slightly.
 
+You will also need to have a C compiler installed to build some of the supporting libraries.
+
 
 
 EASY INSTALL
