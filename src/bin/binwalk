@@ -56,8 +56,12 @@ Diffing multiple files:
 
 \t$ %s -W firmware1.bin firmware2.bin firmware3.bin
 
+Generating a 3D plot:
+
+\t$ %s --3D firmware.bin
+
 See http://binwalk.org/wiki/usage for more.
-""" % (name, name, name, name, name, name, name, name))
+""" % (name, name, name, name, name, name, name, name, name))
 	sys.exit(0)
 
 def main():
@@ -433,8 +437,10 @@ def main():
 				bwalk.concatenate_results(results, r)
 
 			elif scan_type == binwalk.Binwalk.BINVIS:
-				
-				binwalk.plotter.Plotter3D(target_files, offset=offset, length=length, weight=weight, verbose=True).plot()
+			
+				# Always enable verbose mode; generating the plot can take some time for large files,
+				# and without verbose mode enabled it looks like binwalk is just sitting there doing nothing.	
+				bwalk.plot3d(target_files, offset=offset, length=length, weight=weight, verbose=True)
 
 			elif scan_type == binwalk.Binwalk.ENTROPY:
 
