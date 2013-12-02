@@ -264,18 +264,9 @@ class SmartSignature:
 				except:
 					string_length = '0'
 
-				# If the keyword is nested (e.g., {file-offset:{string-len:%s}}), then the returned
-				# data string needs to end with KEYWORD_DELIM_END. Note that this only allows for
-				# one-level nesting.
-				if data.endswith(self.KEYWORD_DELIM_END*2):
-					end_char = self.KEYWORD_DELIM_END
-				else:
-					end_char = ''
-
 				# Strip out *everything* after the string-len keyword, including the keyword itself.
 				# Failure to do so can potentially allow keyword injection from a maliciously created file.
-				data = data.split(self.KEYWORDS['string-len'])[0] + string_length + end_char
-				data = data.replace(self.KEYWORDS['string-len-replace'], string_length)
+				data = data.split(self.KEYWORDS['string-len'])[0].replace(self.KEYWORDS['string-len-replace'], string_length)
 		return data
 
 	def _strip_tags(self, data):
