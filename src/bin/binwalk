@@ -2,7 +2,6 @@
 import sys
 import os.path
 import binwalk
-import binwalk.plotter
 import binwalk.cmdopts
 import binwalk.plotter
 from binwalk.compat import *
@@ -87,6 +86,7 @@ def main():
 	do_csv = False
 	save_plot = False
 	show_plot = True
+	show_grids = False
 	show_legend = True
 	entropy_scan = False
 	enable_plugins = True
@@ -151,6 +151,8 @@ def main():
 			save_plot = True
 		elif opt in ("-N", "--no-plot"):
 			show_plot = False
+		elif opt in ("-V", "--show-grids"):
+			show_grids = True
 		elif opt in ("-3", "--3D", "--3d"):
 			requested_scans.append(binwalk.Binwalk.BINVIS)
 		elif opt in ("-E", "--entropy"):
@@ -440,7 +442,7 @@ def main():
 			
 				# Always enable verbose mode; generating the plot can take some time for large files,
 				# and without verbose mode enabled it looks like binwalk is just sitting there doing nothing.	
-				bwalk.plot3d(target_files, offset=offset, length=length, weight=weight, verbose=True)
+				bwalk.plot3d(target_files, offset=offset, length=length, weight=weight, show_grids=show_grids, verbose=True)
 
 			elif scan_type == binwalk.Binwalk.ENTROPY:
 
@@ -475,8 +477,8 @@ def main():
 		pass
 	except IOError:
 		pass
-#	except Exception as e:
-#		print("Unexpected error: %s" % str(e))
+	except Exception as e:
+		print("Unexpected error: %s" % str(e))
 		
 	bwalk.cleanup()
 

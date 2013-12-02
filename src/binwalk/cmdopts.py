@@ -5,7 +5,7 @@ import os
 import sys
 import binwalk.config
 
-short_options = "3AaBbCcdEeGHhIiJkLMNnOPpQqrSTtUuvWwz?D:F:f:g:j:K:o:l:m:R:s:X:x:Y:y:Z:"
+short_options = "3AaBbCcdEeGHhIiJkLMNnOPpQqrSTtUuVvWwz?D:F:f:g:j:K:o:l:m:R:s:X:x:Y:y:Z:"
 long_options = [
 		"3D",
 		"3d",
@@ -24,6 +24,7 @@ long_options = [
 		"binwalk", 
 		"keep-going",
 		"show-invalid",
+		"show-grids",
 		"ignore-time-skew",
 		"honor-footers",
 		"profile",
@@ -109,6 +110,7 @@ def usage(fd):
 	fd.write("Binary Visualization:\n")
 	fd.write("\t-3, --3D                      Generate a 3D binary visualization\n")
 	fd.write("\t-Z, --weight                  Manually set the cutoff weight (lower weight, more data points)\n")
+	fd.write("\t-V, --show-grids              Display the x-y-z grids in the resulting plot\n")
 	fd.write("\n")
 
 	fd.write("Binary Diffing:\n")
