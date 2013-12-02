@@ -111,11 +111,13 @@ class MathExpression(object):
 
 	def __init__(self, expression):
 		self.expression = expression
+		self.value = None
 
-		try:
-			self.value = self.evaluate(self.expression)
-		except TypeError:
-			self.value = None
+		if expression:
+			try:
+				self.value = self.evaluate(self.expression)
+			except:
+				pass
 
 	def evaluate(self, expr):
 		return self._eval(ast.parse(expr).body[0].value)

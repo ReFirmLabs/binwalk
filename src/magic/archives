@@ -137,7 +137,7 @@
 #>>110	string		!TRAILER!!!	invalid
 >110	string		x		file name: "%s",
 >94	string		x		file name length: "0x%.8s",
->54	string		x		file size: "0x%.8s",
+>54	string		x		file size: "0x%.8s"
 >54	string		x		{jump-to-offset:0x%.8s+110+
 >94	string		x		\b0x%.8s}
 
