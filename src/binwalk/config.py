@@ -35,7 +35,7 @@ class Config:
 		o PLUGINS             - Path to the plugins directory.
 	'''
 	# Release version
-	VERSION = "1.2.3"
+	VERSION = "1.3.0 beta"
 
 	# Sub directories
 	BINWALK_USER_DIR = ".binwalk"

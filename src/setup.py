@@ -83,8 +83,7 @@ if status != 0:
 	]
 	
 	warning(msg, prompt=True)
-else:
-	if "install" in sys.argv:
+elif "install" in sys.argv:
 		if os.system("make install") != 0:
 			msg = ["Install warning: failed to install compression libraries.",
 				"Some plugins will not work without these libraries."
@@ -110,12 +109,12 @@ install_data_files = ["magic/*", "config/*", "plugins/*"]
 
 # Install the binwalk module, script and support files
 setup(	name = "binwalk",
-	version = "1.2.3",
+	version = "1.3.0 beta",
 	description = "Firmware analysis tool",
 	author = "Craig Heffner",
 	url = "https://github.com/devttys0/binwalk",
 
-	requires = ["magic", "matplotlib.pyplot"],	
+	requires = ["magic", "pyqtgraph"],
 	packages = ["binwalk"],
 	package_data = {"binwalk" : install_data_files},
 	scripts = ["bin/binwalk"],
