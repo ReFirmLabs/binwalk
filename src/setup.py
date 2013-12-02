@@ -2,7 +2,6 @@
 from __future__ import print_function
 import os
 import sys
-import subprocess
 from os import listdir, path
 from distutils.core import setup
 
@@ -18,10 +17,6 @@ if "--yes" in sys.argv:
 	IGNORE_WARNINGS = True
 else:
 	IGNORE_WARNINGS = False
-
-def which(fname):
-	cmd = ["which", fname]
-	return subprocess.Popen(cmd, stdout=subprocess.PIPE).stdout.readline().strip()
 
 def warning(lines, terminate=True, prompt=True):
 	WIDTH = 115
@@ -107,11 +102,7 @@ fd = open("binwalk/magic/binwalk", "wb")
 for magic in magic_files:
 	fpath = path.join("magic", magic)
 	if path.isfile(fpath):
-		data = open(fpath).read()
-		try:
-			fd.write(data)
-		except TypeError:
-			fd.write(bytes(data, 'UTF-8'))
+		fd.write(open(fpath, "rb").read())
 fd.close()
 
 # The data files to install along with the binwalk module
