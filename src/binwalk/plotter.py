@@ -131,9 +131,7 @@ class Plotter(object):
 
 		return scatter_plot
 
-	def plot(self):
-		from pyqtgraph.Qt import QtCore, QtGui
-
+	def plot(self, wait=True):
 		self.window.show()
 
 		for file_name in self.files:
@@ -146,6 +144,12 @@ class Plotter(object):
 			self._print("Generating graph from %d plot points" % len(plot_points))
 
 			self.window.addItem(self._generate_plot(plot_points, data_weights))
+
+		if wait:
+			self.wait()
+
+	def wait(self):
+		from pyqtgraph.Qt import QtCore, QtGui
 
 		t = QtCore.QTimer()
 		t.start(50)
@@ -179,6 +183,23 @@ class Plotter2D(Plotter):
 		elif self.plane_count == 2:
 			return (ord(data[0]), ord(data[1]), 0)
 		
+class PlotFiles(object):
+
+	def __init__(self, files, offset=0, length=0, weight=None, verbose=False, overlay=False):
+		
+		if overlay:
+			Plotter3D(files, offset=offset, length=length, weight=weight, verbose=verbose).plot(wait=True)
+		else:
+			objs = []
+
+			for f in files:
+				p = Plotter3D(files, offset=offset, length=length, weight=weight, verbose=verbose)
+				p.plot(wait=False)
+				objs.append(p)
+
+			for obj in objs:
+				obj.wait()
+
 
 
 if __name__ == '__main__':

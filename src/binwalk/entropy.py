@@ -42,6 +42,7 @@ class PlotEntropy(object):
 
 		i = 0
 		descriptions = {}
+		plotted_colors = {}
 		max_description_length = None
 
 		for (offset, results) in file_results:
@@ -70,13 +71,30 @@ class PlotEntropy(object):
 		#if average:
 		#	plt.addLine(y=average, pen='r')
 
-		if file_results:
-			for (offset, descs) in iterator(descriptions):
-				for description in descs:
-					plt.plot(x=[offset,offset], y=[0,1.1], name=description, pen=pg.mkPen(self.COLORS[i], width=2.5))
-					i += 1
-					if i >= len(self.COLORS):
-						i = 0
+		if descriptions:
+			ordered_offsets = get_keys(descriptions)
+			ordered_offsets.sort()
+
+			for offset in ordered_offsets:
+				for description in descriptions[offset]:
+
+					# If this description has already been plotted at a different offset, we need to 
+					# use the same color for the marker, but set the description to None to prevent
+					# duplicate entries in the graph legend.
+					#
+					# Else, get the next color and use it to mark descriptions of this type.
+					if has_key(plotted_colors, description):
+						color = plotted_colors[description]
+						description = None
+					else:
+						color = self.COLORS[i]
+						plotted_colors[description] = color
+						
+						i += 1
+						if i >= len(self.COLORS):
+							i = 0
+
+					plt.plot(x=[offset,offset], y=[0,1.1], name=description, pen=pg.mkPen(color, width=2.5))
 				
 		if save:
 			exporter = pg.exporters.ImageExporter.ImageExporter(plt.plotItem)

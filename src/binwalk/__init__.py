@@ -304,6 +304,7 @@ class Binwalk(object):
 			target_files = [target_files]
 
 		Plotter3D(target_files, offset=offset, length=length, weight=weight, verbose=verbose).plot()
+		#PlotFiles(target_files, offset=offset, length=length, weight=weight, verbose=verbose)
 
 	def scan(self, target_files, offset=0, length=0, show_invalid_results=False, callback=None, start_callback=None, end_callback=None, base_dir=None, matryoshka=1, plugins_whitelist=[], plugins_blacklist=[]):
 		'''
