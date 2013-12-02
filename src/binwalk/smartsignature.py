@@ -31,6 +31,7 @@ class SmartSignature:
 
 		'raw-replace'		: '%sraw-replace%s' % (KEYWORD_DELIM_START, KEYWORD_DELIM_END),
 		'one-of-many'		: '%sone-of-many%s' % (KEYWORD_DELIM_START, KEYWORD_DELIM_END),
+		'string-len-no-arg'	: '%sstring-len%s' % (KEYWORD_DELIM_START, KEYWORD_DELIM_END),
 	}
 
 	def __init__(self, filter, ignore_smart_signatures=False):
@@ -173,7 +174,7 @@ class SmartSignature:
 
 		if has_key(self.KEYWORDS, keyword) and self.KEYWORDS[keyword] in data:
 			arg = data.split(self.KEYWORDS[keyword])[1].split(self.KEYWORD_DELIM_END)[0]
-
+			
 		return arg
 
 	def _get_math_arg(self, data, keyword):
@@ -259,7 +260,7 @@ class SmartSignature:
 			if raw_string:
 				# Convert the string to an integer as a sanity check
 				try:
-					string_length = "%d" % str2int(raw_string)
+					string_length = '%d' % len(raw_string)
 				except:
 					string_length = '0'
 
@@ -274,6 +275,7 @@ class SmartSignature:
 				# Strip out *everything* after the string-len keyword, including the keyword itself.
 				# Failure to do so can potentially allow keyword injection from a maliciously created file.
 				data = data.split(self.KEYWORDS['string-len'])[0] + string_length + end_char
+				data = data.replace(self.KEYWORDS['string-len-no-arg'], string_length)
 		return data
 
 	def _strip_tags(self, data):
