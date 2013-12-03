@@ -716,7 +716,7 @@ class Binwalk(object):
 		if self.filter.show_invalid_results:
 			return True
 
-		if result['jump'] < 0 or result['invalid']:
+		if result['invalid'] or result['jump'] < 0 or result['size'] < 0:
 			return False
 		if ((location + result['size']) > file_size) or (self.year and result['year'] > self.year) or (self.epoch and result['epoch'] > self.epoch):
 			return False

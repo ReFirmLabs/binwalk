@@ -79,6 +79,8 @@ class Plotter(object):
 		self._print("Generating data points for %s" % file_name)
 
 		with BlockFile(file_name, 'r', offset=self.offset, length=self.length) as fp:
+			fp.MAX_TRAILING_SIZE = 0
+
 			while True:
 				(data, dlen) = fp.read_block()
 				if not data or not dlen:
