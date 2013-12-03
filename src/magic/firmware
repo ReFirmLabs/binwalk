@@ -448,3 +448,7 @@
 # http://forum.xda-developers.com/showthread.php?p=47818657
 0	string	imgARMcC 		Roku aimage SB{offset-adjust:-8}
 
+# Boot ROM images for Sun/Cobalt Linux server appliances
+0       string	Cobalt\ Networks\ Inc.\nFirmware\ v	Paged Sun/COBALT boot rom,
+>38     string	x        				version: "%.4s"
+
