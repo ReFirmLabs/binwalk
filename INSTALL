@@ -34,9 +34,9 @@ You can install python-magic from your distro's repositories, or from source (ft
 
 	$ sudo apt-get install python-magic
 
-Next, you'll need to install the dependencies for pyqtgraph:
+Next, you'll need to install the dependencies for pyqtgraph (you may also need to install OpenGL drivers for your video card):
 	
-	$ sudo apt-get install python-qt4 python-qt4-gl python-numpy python-scipy
+	$ sudo apt-get install python-opengl python-qt4 python-qt4-gl python-numpy python-scipy
 
 Most distros don't have pyqtgraph in their repositories, so you'll need to build it from source:
 
