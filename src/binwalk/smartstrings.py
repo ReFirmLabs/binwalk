@@ -15,6 +15,7 @@ class FileStrings(object):
 	MAX_STRING_LENGTH = 20
 	MAX_SPECIAL_CHARS_RATIO = .4
 	MAX_ENTROPY = 0.9
+	DEFAULT_ENTROPY_BLOCK = 1024
 
 	LETTERS = set(string.letters)
 	NUMBERS = set(string.digits)
@@ -31,7 +32,7 @@ class FileStrings(object):
 			'(' : ')',
 	}
 	
-	def __init__(self, file_name, binwalk, length=0, offset=0, n=MIN_STRING_LENGTH, block=0, algorithm=None, plugins=None):
+	def __init__(self, file_name, binwalk=None, length=0, offset=0, n=MIN_STRING_LENGTH, block=DEFAULT_ENTROPY_BLOCK, algorithm='gzip', plugins=None):
 		'''
 		Class constructor. Preferred to be invoked from the Strings class instead of directly.
 
@@ -65,7 +66,7 @@ class FileStrings(object):
 		# Perform an entropy analysis over the entire file (anything less may generate poor entropy data).
 		# Give fake file results list to prevent FileEntropy from doing too much analysis.
 		with entropy.FileEntropy(file_name, block=block, file_results=['foo']) as e:
-			(self.x, self.y, self.average_entropy) = e.analyze()
+			(self.x, self.y, self.average_entropy) = e.analyze(algorithm=algorithm)
 			for i in range(0, len(self.x)):
 				self.entropy[self.x[i]] = self.y[i]
 			# Make sure our block size matches the entropy analysis's block size
@@ -82,8 +83,9 @@ class FileStrings(object):
 		self.start = self.fd.offset
 
 		# Set the total_scanned and scan_length values for plugins and status display messages
-		self.binwalk.total_scanned = 0
-		self.binwalk.scan_length = self.fd.length
+		if self.binwalk:
+			self.binwalk.total_scanned = 0
+			self.binwalk.scan_length = self.fd.length
 
 	def __enter__(self):
 		return self
@@ -128,8 +130,9 @@ class FileStrings(object):
 
 		(data, dlen) = self.fd.read_block()
 
-		self.binwalk.total_scanned = self.total_read
-		self.total_read += dlen
+		if self.binwalk:
+			self.binwalk.total_scanned = self.total_read
+			self.total_read += dlen
 
 		return (self.start+self.total_read-dlen, dlen, data)
 
@@ -309,7 +312,8 @@ class FileStrings(object):
 				string = results['description']
 
 			if not ((plug_ret | plug_pre ) & plugins.PLUGIN_NO_DISPLAY):
-				self.binwalk.display.results(offset, [results])
+				if self.binwalk:
+					self.binwalk.display.results(offset, [results])
 				self.valid_strings.append((offset, string))
 		return plug_ret
 
@@ -354,7 +358,7 @@ class Strings(object):
 	Class for performing a strings analysis against a list of files.
 	'''
 
-	def __init__(self, file_names, binwalk, length=0, offset=0, n=0, block=0, algorithm=None, load_plugins=True, whitelist=[], blacklist=[]):
+	def __init__(self, file_names, binwalk=None, length=0, offset=0, n=0, block=0, algorithm=None, load_plugins=True, whitelist=[], blacklist=[]):
 		'''
 		Class constructor.
 
@@ -378,13 +382,14 @@ class Strings(object):
 		self.n = n
 		self.block = block
 		self.algorithm = algorithm
-		self.binwalk.scan_type = self.binwalk.STRINGS
 		self.file_strings = None
+		self.plugins = None
+		
+		if self.binwalk:
+			self.binwalk.scan_type = self.binwalk.STRINGS
 
-		if load_plugins:
-			self.plugins = plugins.Plugins(self.binwalk, whitelist=whitelist, blacklist=blacklist)
-		else:
-			self.plugins = None
+			if load_plugins:
+				self.plugins = plugins.Plugins(self.binwalk, whitelist=whitelist, blacklist=blacklist)
 
 	def __enter__(self):
 		return self
@@ -429,7 +434,9 @@ class Strings(object):
 			self.plugins._load_plugins()
 
 		for file_name in self.file_names:
-			self.binwalk.display.header(file_name=file_name, description='Strings')
+			if self.binwalk:
+				self.binwalk.display.header(file_name=file_name, description='Strings')
+
 			results[file_name] = []
 
 			self.file_strings = FileStrings(file_name, self.binwalk, self.length, self.offset, self.n, block=self.block, algorithm=self.algorithm, plugins=self.plugins)

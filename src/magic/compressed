@@ -165,3 +165,7 @@
 >6	byte&0x10	0x10		multi-block stream
 
 # See lzma file for LZMA signatures
+
+
+0	string	\xff\x06\x00\x00\x73\x4e\x61\x50\x70\x59	Snappy compression, stream identifier
+

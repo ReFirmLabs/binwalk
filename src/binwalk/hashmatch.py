@@ -1,10 +1,10 @@
 import os
 import re
+import magic
 import fnmatch
 import ctypes
 import ctypes.util
-
-import magic
+import binwalk.smartstrings
 from binwalk.compat import *
 from binwalk.common import file_md5
 
@@ -20,7 +20,7 @@ class HashMatch(object):
 
 	FUZZY_DEFAULT_CUTOFF = 50
 
-	def __init__(self, cutoff=None, fuzzy=True, strings=False, same=False, missing=False, symlinks=False, matches={}, types={}):
+	def __init__(self, cutoff=None, fuzzy=True, strings=False, same=False, missing=False, symlinks=False, name=False, matches={}, types={}):
 		'''
 		Class constructor.
 
@@ -30,6 +30,7 @@ class HashMatch(object):
 		@same            - Set to True to show files that are the same, False to show files that are different.
 		@missing         - Set to True to show missing files.
 		@symlinks        - Set to True to include symbolic link files.
+		@name            - Set to True to only compare files whose base names match.
 		@matches         - A dictionary of file names to diff.
 		@types           - A dictionary of file types to diff.
 
@@ -42,6 +43,7 @@ class HashMatch(object):
 		self.show_missing = missing
 		self.symlinks = symlinks
 		self.matches = matches
+		self.name = name
 		self.types = types
 
 		self.magic = magic.open(0)
@@ -55,6 +57,9 @@ class HashMatch(object):
 		for k in get_keys(self.types):
 			self.types[k] = re.compile(self.types[k])
 
+	def _get_strings(self, fname):
+		return ''.join([string for (offset, string) in binwalk.smartstrings.FileStrings(fname, n=10).strings()])
+
 	def files(self, file1, file2):
 		'''
 		Fuzzy diff two files.
@@ -65,23 +70,39 @@ class HashMatch(object):
 		Returns the match percentage.	
 		Returns None on error.
 		'''
+		status = 0
 
-		if self.fuzzy:
-			hash1 = ctypes.create_string_buffer(self.FUZZY_MAX_RESULT)
-			hash2 = ctypes.create_string_buffer(self.FUZZY_MAX_RESULT)
+		if not self.name or os.path.basename(file1) == os.path.basename(file2):
+			if self.fuzzy:
+				hash1 = ctypes.create_string_buffer(self.FUZZY_MAX_RESULT)
+				hash2 = ctypes.create_string_buffer(self.FUZZY_MAX_RESULT)
 
-			# TODO: Implement strings hashing
-			try:
-				if self.lib.fuzzy_hash_filename(str2bytes(file1), hash1) == 0 and self.lib.fuzzy_hash_filename(str2bytes(file2), hash2) == 0:
-					if hash1.raw == hash2.raw:
-						return 100
+				try:
+					if self.strings:
+						file1_strings = self._get_strings(file1)
+						file2_strings = self._get_strings(file2)
+
+						if file1_strings == file2_strings:
+							return 100
+						else:
+							status |= self.lib.fuzzy_hash_buf(str2bytes(file1_strings), len(file1_strings), hash1)
+							status |= self.lib.fuzzy_hash_buf(str2bytes(file2_strings), len(file2_strings), hash2)
+						
 					else:
-						return self.lib.fuzzy_compare(hash1, hash2)
-			except Exception as e:
-				print "WARNING: Exception while performing fuzzy comparison:", e
-		else:
-			if file_md5(file1) == file_md5(file2):
-				return 100
+						status |= self.lib.fuzzy_hash_filename(str2bytes(file1), hash1)
+						status |= self.lib.fuzzy_hash_filename(str2bytes(file2), hash2)
+				
+					if status == 0:
+						if hash1.raw == hash2.raw:
+							return 100
+						else:
+							return self.lib.fuzzy_compare(hash1, hash2)
+				except Exception as e:
+					print "WARNING: Exception while performing fuzzy comparison:", e
+
+			elif not self.strings:
+				if file_md5(file1) == file_md5(file2):
+					return 100
 
 		return None
 
@@ -160,7 +181,7 @@ class HashMatch(object):
 					matching_files.append((m, f))
 					
 		return matching_files
-
+	
 	def directories(self, dir1, dir2):
 		'''
 		Search two directories for matching files.
@@ -181,10 +202,11 @@ class HashMatch(object):
 				file2 = os.path.join(dir2, f)
 
 				m = self.files(file1, file2)
-				matches = self.is_match(m)
+				if m is not None:
+					matches = self.is_match(m)
 
-				if (matches and self.show_same) or (not matches and not self.show_same):
-					results.append(("%3d" % m, f))
+					if (matches and self.show_same) or (not matches and not self.show_same):
+						results.append(("%3d" % m, f))
 	
 		if self.show_missing:
 			results += [('---', f) for f in (dir1_files-dir2_files)]
@@ -196,8 +218,9 @@ class HashMatch(object):
 if __name__ == '__main__':
 	import sys
 	
-	hmatch = HashMatch(missing=True)
+	hmatch = HashMatch(strings=True, name=True)
+	print hmatch.file(sys.argv[1], sys.argv[2:])
 	#for (match, fname) in hmatch.directories(sys.argv[1], sys.argv[2]):
-	for (match, fname) in hmatch.find_file(sys.argv[1], sys.argv[2:]):
-		print match, fname
+	#for (match, fname) in hmatch.find_file(sys.argv[1], sys.argv[2:]):
+	#	print match, fname
 
