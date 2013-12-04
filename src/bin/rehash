@@ -1,0 +1,121 @@
+#!/usr/bin/env python
+
+import os
+import re
+import sys
+import magic
+import binwalk.hashmatch as hashmatch
+from binwalk.compat import *
+from getopt import GetoptError, gnu_getopt as GetOpt
+
+def usage(fd):
+	fd.write("Usage: %s [OPTIONS] [FILE | DIR] [FILE | DIR] ...\n" % sys.argv[0])
+
+def main():
+
+	results = []
+	options = []
+	arguments = []
+	file_list = []
+
+	types = {}
+	strings = False
+	symlinks = False
+	all_types = False
+	name = False
+	same = False
+	missing = False
+	cutoff = None
+	max_results = None
+	verbose = False
+
+	short_options = "c:hlmnSsvx:"
+	long_options = [
+			"help",
+			"cutoff=",
+			"strings",
+			"show-same",
+			"show-missing",
+			"max=",
+			"symlinks",
+			"name",
+			"file-type",
+			"file-name",
+			"verbose",
+	]
+
+	try:
+		opts, args = GetOpt(sys.argv[1:], short_options, long_options)
+	except GetoptError as e:
+		sys.stderr.write("%s\n" % str(e))
+		usage(sys.stderr)
+
+	for opt, arg in opts:
+		if opt in ("-h", "--help"):
+			usage(sys.stdout)
+		elif opt in ("-S", "--strings"):
+			strings = True
+		elif opt in ("-l", "--symlinks"):
+			symlinks = True
+		elif opt in ("-n", "--name"):
+			name = True
+		elif opt in ("-s", "--show-same"):
+			same = True
+		elif opt in ("-m", "--show-missing"):
+			missing = True
+		elif opt in ("-x", "--max"):
+			max_results = int(arg, 0)
+		elif opt in ("-c", "--cutoff"):
+			cutoff = int(arg, 0)
+		elif opt in ("-v", "--verbose"):
+			verbose = True
+
+		# Keep track of the options and arguments.
+		# This is used later to determine which argv entries are file names.
+		options.append(opt)
+		options.append("%s%s" % (opt, arg))
+		options.append("%s=%s" % (opt, arg))
+		arguments.append(arg)
+
+	# Treat any command line options not processed by getopt as target file paths.
+	for opt in sys.argv[1:]:
+		if opt not in arguments and opt not in options and not opt.startswith('-'):
+			file_list.append(opt)
+
+	if len(file_list) >= 2:
+		rehash = hashmatch.HashMatch(cutoff=cutoff,
+						strings=strings,
+						symlinks=symlinks, 
+						name=name, 
+						same=same,
+						missing=missing,
+						max_results=max_results,
+						verbose=verbose)
+
+		if os.path.isfile(file_list[0]):
+
+			if not all_types and len(types) == 0:
+				m = magic.open(0)
+				m.load()
+				file_type = m.file(file_list[0])
+				if file_type:
+					types[True] = re.escape(file_type.lower())
+
+			if os.path.isfile(file_list[1]):
+				results = rehash.files(file_list[0], file_list[1])
+			else:
+				results = rehash.file(file_list[0], file_list[1:])
+		else:
+			for f in file_list:
+				if not os.path.isdir(f):
+					print("Invalid usage")
+					usage(sys.stderr)
+			results = rehash.directories(file_list[0], file_list[1])
+
+	for (match, fname) in results:
+		print("%s  %s" % (match, fname))
+
+if __name__ == "__main__":
+	main()
+
+

@@ -41,7 +41,7 @@ class FileStrings(object):
 		@length    - The number of bytes in the file to analyze.
 		@offset    - The starting offset into the file to begin analysis.
 		@n         - The minimum valid string length.
-		@block     - The block size to use when performing entropy analysis.
+		@block     - The block size to use iwhen performing entropy analysis. Set to None to skip entropy analysis.
 		@algorithm - The entropy algorithm to use when performing entropy analysis.
 		@plugins   - An instance of the Plugins class.
 
@@ -59,22 +59,31 @@ class FileStrings(object):
 		self.valid_strings = []
 		self.external_validators = []
 		self.plugins = plugins
+		self.block = block
 
 		if not self.n:
 			self.n = self.MIN_STRING_LENGTH
 
-		# Perform an entropy analysis over the entire file (anything less may generate poor entropy data).
-		# Give fake file results list to prevent FileEntropy from doing too much analysis.
-		with entropy.FileEntropy(file_name, block=block, file_results=['foo']) as e:
-			(self.x, self.y, self.average_entropy) = e.analyze(algorithm=algorithm)
-			for i in range(0, len(self.x)):
-				self.entropy[self.x[i]] = self.y[i]
-			# Make sure our block size matches the entropy analysis's block size
-			self.block = e.block
-
-		# Make sure the starting offset is a multiple of the block size; else, when later checking
-		# the entropy analysis, block offsets won't line up.
-		self.start -= (self.start % self.block)
+		if self.block is not None:
+			# Perform an entropy analysis over the entire file (anything less may generate poor entropy data).
+			# Give fake file results list to prevent FileEntropy from doing too much analysis.
+			with entropy.FileEntropy(file_name, block=self.block, file_results=['foo']) as e:
+				(self.x, self.y, self.average_entropy) = e.analyze(algorithm=algorithm)
+				for i in range(0, len(self.x)):
+					self.entropy[self.x[i]] = self.y[i]
+				# Make sure our block size matches the entropy analysis's block size
+				self.block = e.block
+			# Make sure the starting offset is a multiple of the block size; else, when later checking
+			# the entropy analysis, block offsets won't line up.
+			self.start -= (self.start % self.block)
+		else:
+			i = 0
+			self.block = common.BlockFile.READ_BLOCK_SIZE
+			
+			# Fake the entropy scan
+			while i < common.file_size(file_name):
+				self.entropy[i] = 1.0
+				i += self.block
 
 		self.fd = common.BlockFile(file_name, 'r', length=length, offset=self.start)
 		# TODO: This is not optimal. We should read in larger chunks and process it into self.block chunks.
