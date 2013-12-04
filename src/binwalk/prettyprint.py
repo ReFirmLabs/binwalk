@@ -1,9 +1,9 @@
 import io
 import sys
-import hashlib
 import csv as pycsv
 from datetime import datetime
 from binwalk.compat import *
+from binwalk.common import file_md5
 
 class PrettyPrint:
 	'''
@@ -126,18 +126,6 @@ class PrettyPrint:
 		if not nolog:
 			self._log(data)
 
-	def _file_md5(self, file_name):
-		'''
-		Generate an MD5 hash of the specified file.
-		'''
-		md5 = hashlib.md5()
-                
-		with open(file_name, 'rb') as f:
-			for chunk in iter(lambda: f.read(128*md5.block_size), b''):
-				md5.update(chunk)
-
-		return md5.hexdigest()
-
 	def _append_to_data_parts(self, data, start, end):
 		'''
 		Intelligently appends data to self.string_parts.
@@ -225,7 +213,7 @@ class PrettyPrint:
 		Returns None.
 		'''
 		nolog = False
-		md5sum = self._file_md5(file_name)
+		md5sum = file_md5(file_name)
 		timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 		if self.csv:

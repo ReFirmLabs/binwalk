@@ -3,8 +3,25 @@ import io
 import os
 import re
 import ast
+import hashlib
 import operator as op
 from binwalk.compat import *
+
+def file_md5(file_name):
+	'''
+	Generate an MD5 hash of the specified file.
+	
+	@file_name - The file to hash.
+
+	Returns an MD5 hex digest string.
+	'''
+	md5 = hashlib.md5()
+
+	with open(file_name, 'rb') as f:
+		for chunk in iter(lambda: f.read(128*md5.block_size), b''):
+			md5.update(chunk)
+
+	return md5.hexdigest()
 
 def file_size(filename):
 	'''
