@@ -20,12 +20,13 @@ class HashMatch(object):
 
 	FUZZY_DEFAULT_CUTOFF = 50
 
-	def __init__(self, cutoff=None, fuzzy=True, same=False, missing=False, symlinks=False, matches={}, types={}):
+	def __init__(self, cutoff=None, fuzzy=True, strings=False, same=False, missing=False, symlinks=False, matches={}, types={}):
 		'''
 		Class constructor.
 
 		@cutoff          - The fuzzy cutoff which determines if files are different or not.
-		@fuzy            - Set to True to do fuzzy hashing; set to False to do traditional hashing.
+		@fuzzy           - Set to True to do fuzzy hashing; set to False to do traditional hashing.
+		@strings         - Only hash strings inside of the file, not the entire file itself.
 		@same            - Set to True to show files that are the same, False to show files that are different.
 		@missing         - Set to True to show missing files.
 		@symlinks        - Set to True to include symbolic link files.
@@ -36,6 +37,7 @@ class HashMatch(object):
 		'''
 		self.cutoff = cutoff
 		self.fuzzy = fuzzy
+		self.strings = strings
 		self.show_same = same
 		self.show_missing = missing
 		self.symlinks = symlinks
@@ -68,6 +70,7 @@ class HashMatch(object):
 			hash1 = ctypes.create_string_buffer(self.FUZZY_MAX_RESULT)
 			hash2 = ctypes.create_string_buffer(self.FUZZY_MAX_RESULT)
 
+			# TODO: Implement strings hashing
 			try:
 				if self.lib.fuzzy_hash_filename(str2bytes(file1), hash1) == 0 and self.lib.fuzzy_hash_filename(str2bytes(file2), hash2) == 0:
 					if hash1.raw == hash2.raw:
@@ -138,7 +141,35 @@ class HashMatch(object):
 			
 		return set(file_list)
 
+	def file(self, fname, directories):
+		'''
+		Search for a particular file in multiple directories.
+
+		@fname       - File to search for.
+		@directories - List of directories to search in.
+
+		Returns a list of tuple results.
+		'''
+		matching_files = []
+
+		for directory in directories:
+			for f in self._get_file_list(directory):
+				f = os.path.join(directory, f)
+				m = self.files(fname, f)
+				if self.is_match(m):
+					matching_files.append((m, f))
+					
+		return matching_files
+
 	def directories(self, dir1, dir2):
+		'''
+		Search two directories for matching files.
+
+		@dir1 - First directory.
+		@dir2 - Second directory.
+
+		Returns a list of tuple results.
+		'''
 		results = []
 
 		dir1_files = self._get_file_list(dir1)
@@ -161,14 +192,12 @@ class HashMatch(object):
 
 		return results
 
-	def find_file(self, fname, directories):
-		pass
-
 
 if __name__ == '__main__':
 	import sys
 	
 	hmatch = HashMatch(missing=True)
-	for (match, fname) in hmatch.directories(sys.argv[1], sys.argv[2]):
+	#for (match, fname) in hmatch.directories(sys.argv[1], sys.argv[2]):
+	for (match, fname) in hmatch.find_file(sys.argv[1], sys.argv[2:]):
 		print match, fname
 
