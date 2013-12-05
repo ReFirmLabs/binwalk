@@ -26,7 +26,7 @@ class HashMatch(object):
 	# Files smaller than this won't produce meaningful fuzzy results (from ssdeep.h)
 	FUZZY_MIN_FILE_SIZE = 4096
 
-	FUZZY_DEFAULT_CUTOFF = 50
+	FUZZY_DEFAULT_CUTOFF = 0
 
 	def __init__(self, cutoff=None, strings=False, same=False, symlinks=False, name=False, max_results=None, display=False, log=None, csv=False, quiet=False, format_to_screen=False, abspath=False, matches={}, types={}):
 		'''

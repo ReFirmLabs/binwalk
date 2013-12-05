@@ -7,6 +7,8 @@ import binwalk.hashmatch as hashmatch
 from binwalk.compat import *
 from getopt import GetoptError, gnu_getopt as GetOpt
 
+DEFAULT_CUTOFF = 50
+
 def usage(fd):
 	fd.write("\n")
 	fd.write('Diff files or directories using Context Triggered Piecewise Hashing ("fuzzy" hashing).\n')
@@ -21,10 +23,10 @@ def usage(fd):
 	
 	fd.write("\n")
 	fd.write("Diffing Options:\n")
-	fd.write("\t-d, --diff                    Show files that are different (default)\n")
-	fd.write("\t-s, --same                    Show files that are the same\n")
+	fd.write("\t-d, --diff                    Only show files that are different\n")
+	fd.write("\t-s, --same                    Only show files that are the same\n")
 	fd.write("\t-S, --strings                 Diff strings inside files instead of the entire file\n")
-	fd.write("\t-c, --cutoff=<n>              Set the cutoff percentage (default: 50%)\n")
+	fd.write("\t-c, --cutoff=<n>              Set the cutoff percentage (default: %d%)\n" % DEFAULT_CUTOFF)
 	fd.write("\t-m, --max=<n>                 Quit after n number of matches\n")
 	
 	fd.write("\n")
@@ -74,9 +76,9 @@ def main():
 	strings = False
 	symlinks = False
 	name = False
-	same = False
-	cutoff = None
+	same = None
 	max_results = None
+	cutoff = 0
 
 	short_options = "acdf:hlm:no:qSstx:X:y:Y:"
 	long_options = [
@@ -148,6 +150,11 @@ def main():
 	for opt in sys.argv[1:]:
 		if opt not in arguments and opt not in options and not opt.startswith('-'):
 			file_list.append(opt)
+
+	if same is None:
+		same = True
+	elif cutoff == 0:
+		cutoff = DEFAULT_CUTOFF
 
 	if include_files:
 		matches[True] = include_files
