@@ -147,7 +147,7 @@ def usage(fd):
 	fd.write("\t-c, --csv                     Log results to file in csv format\n")
 	fd.write("\t-O, --skip-unopened           Ignore file open errors and process only the files that can be opened\n")
 	fd.write("\t-t, --term                    Format output to fit the terminal window\n")
-	fd.write("\t-q, --quiet                   Supress output to stdout\n")
+	fd.write("\t-q, --quiet                   Suppress output to stdout\n")
 	fd.write("\t-v, --verbose                 Be verbose (specify twice for very verbose)\n")
 	fd.write("\t-u, --update                  Update magic signature files\n")
 	fd.write("\t-?, --examples                Show example usage\n")

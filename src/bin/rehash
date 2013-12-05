@@ -40,7 +40,7 @@ def usage(fd):
 	fd.write("General Options:\n")
 	fd.write("\t-f, --file=<file>             Log results to file\n")
 	fd.write("\t-c, --csv                     Log results to file in csv format\n")
-	fd.write("\t-q, --quiet                   Supress output to stdout\n")
+	fd.write("\t-q, --quiet                   Suppress output to stdout\n")
 	fd.write("\t-t, --term                    Format output to fit the terminal window\n")
 	fd.write("\t-h, --help                    Show help\n")
 
