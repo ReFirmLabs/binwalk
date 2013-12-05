@@ -286,7 +286,7 @@ class PrettyPrint:
 					else:
 						self._pprint("%s\t  %s\t%s\n" % (' '*10, ' '*8, self._format(info['description'])))
 				else:
-					self._pprint(info['description'])
+					self._pprint(self._format(info['description']))
 
 	def easy_results(self, offset, description):
 		'''

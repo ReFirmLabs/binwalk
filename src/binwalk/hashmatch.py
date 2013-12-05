@@ -28,19 +28,24 @@ class HashMatch(object):
 
 	FUZZY_DEFAULT_CUTOFF = 50
 
-	def __init__(self, cutoff=None, strings=False, same=False, symlinks=False, name=False, max_results=None, display=False, log=None, csv=False, quiet=False, format_to_screen=False, matches={}, types={}):
+	def __init__(self, cutoff=None, strings=False, same=False, symlinks=False, name=False, max_results=None, display=False, log=None, csv=False, quiet=False, format_to_screen=False, abspath=False, matches={}, types={}):
 		'''
 		Class constructor.
 
-		@cutoff          - The fuzzy cutoff which determines if files are different or not.
-		@strings         - Only hash strings inside of the file, not the entire file itself.
-		@same            - Set to True to show files that are the same, False to show files that are different.
-		@symlinks        - Set to True to include symbolic link files.
-		@name            - Set to True to only compare files whose base names match.
-		@max_results     - Stop searching after x number of matches.
-		@display         - Set to True to display results to stdout.
-		@matches         - A dictionary of file names to diff.
-		@types           - A dictionary of file types to diff.
+		@cutoff           - The fuzzy cutoff which determines if files are different or not.
+		@strings          - Only hash strings inside of the file, not the entire file itself.
+		@same             - Set to True to show files that are the same, False to show files that are different.
+		@symlinks         - Set to True to include symbolic link files.
+		@name             - Set to True to only compare files whose base names match.
+		@max_results      - Stop searching after x number of matches.
+		@display          - Set to True to display results to stdout.
+		@log              - Specify a log file to log results to.
+		@csv              - Set to True to log data in CSV format.
+		@quiet            - Set to True to suppress output to stdout.
+		@format_to_screen - Set to True to format the output to the terminal window width.
+		@abspath          - Set to True to display absolute file paths.
+		@matches          - A dictionary of file names to diff.
+		@types            - A dictionary of file types to diff.
 
 		Returns None.
 		'''
@@ -51,11 +56,12 @@ class HashMatch(object):
 		self.matches = matches
 		self.name = name
 		self.types = types
+		self.abspath = abspath
 		self.max_results = max_results
 
 		if display:
 			self.pretty_print = PrettyPrint(log=log, csv=csv, format_to_screen=format_to_screen, quiet=quiet)
-			self.pretty_print.header(header="PERCENTAGE\tFILE NAME")
+			self.pretty_print.header(header="PERCENTAGE\t\t\tFILE NAME")
 		else:
 			self.pretty_print = None
 
@@ -80,7 +86,9 @@ class HashMatch(object):
 
 	def _print(self, match, fname):
 		if self.pretty_print:
-			self.pretty_print.results(None, [{'description' : '%4d\t\t%s\n' % (match, fname)}], formatted=True)
+			if self.abspath:
+				fname = os.path.abspath(fname)
+			self.pretty_print._pprint('%4d\t\t\t\t%s\n' % (match, self.pretty_print._format(fname)))
 
 	def _print_footer(self):
 		if self.pretty_print:
@@ -106,6 +114,7 @@ class HashMatch(object):
 				hash1 = ctypes.create_string_buffer(self.FUZZY_MAX_RESULT)
 				hash2 = ctypes.create_string_buffer(self.FUZZY_MAX_RESULT)
 
+				# Check if the last file1 or file2 matches this file1 or file2; no need to re-hash if they match.
 				if file1 == self.last_file1.name and self.last_file1.hash:
 					file1_dup = True
 				else:
@@ -310,8 +319,8 @@ class HashMatch(object):
 
 					m = self._compare_files(file1, file2)
 					if m is not None and self.is_match(m):
-						self._print(m, f)
-						results.append((m, f))
+						self._print(m, file2)
+						results.append((m, file2))
 
 						self.total += 1
 						if self.max_results and self.total >= self.max_results:

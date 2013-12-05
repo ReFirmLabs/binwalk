@@ -39,6 +39,7 @@ def usage(fd):
 	fd.write("\n")
 	fd.write("General Options:\n")
 	fd.write("\t-f, --file=<file>             Log results to file\n")
+	fd.write("\t-a, --abspath                 Display the absolute path of each file\n")
 	fd.write("\t-c, --csv                     Log results to file in csv format\n")
 	fd.write("\t-q, --quiet                   Suppress output to stdout\n")
 	fd.write("\t-t, --term                    Format output to fit the terminal window\n")
@@ -65,6 +66,7 @@ def main():
 	types = {}
 	matches = {}
 
+	abspath = False
 	log_file = None
 	log_csv = False
 	fit_to_width = False
@@ -76,8 +78,9 @@ def main():
 	cutoff = None
 	max_results = None
 
-	short_options = "cdf:hlm:no:qSstx:X:y:Y:"
+	short_options = "acdf:hlm:no:qSstx:X:y:Y:"
 	long_options = [
+			"abspath",
 			"help",
 			"cutoff=",
 			"strings",
@@ -131,6 +134,8 @@ def main():
 			include_types.append(arg.lower())
 		elif opt in ("-X", "--exclude-types"):
 			exclude_types.append(arg.lower())
+		elif opt in ("-a", "--abspath"):
+			abspath = True
 
 		# Keep track of the options and arguments.
 		# This is used later to determine which argv entries are file names.
@@ -166,6 +171,7 @@ def main():
 						log=log_file,
 						csv=log_csv,
 						format_to_screen=fit_to_width,
+						abspath=abspath,
 						types=types,
 						matches=matches)
 
