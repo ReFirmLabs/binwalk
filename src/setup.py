@@ -117,6 +117,6 @@ setup(	name = "binwalk",
 	requires = ["magic", "pyqtgraph"],
 	packages = ["binwalk"],
 	package_data = {"binwalk" : install_data_files},
-	scripts = ["bin/binwalk"],
+	scripts = ["bin/binwalk", "bin/rehash"],
 )
 

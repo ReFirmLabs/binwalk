@@ -26,7 +26,7 @@ def usage(fd):
 	fd.write("\t-d, --diff                    Only show files that are different\n")
 	fd.write("\t-s, --same                    Only show files that are the same\n")
 	fd.write("\t-S, --strings                 Diff strings inside files instead of the entire file\n")
-	fd.write("\t-c, --cutoff=<n>              Set the cutoff percentage (default: %d%)\n" % DEFAULT_CUTOFF)
+	fd.write("\t-c, --cutoff=<n>              Set the cutoff percentage (default: %d)\n" % DEFAULT_CUTOFF)
 	fd.write("\t-m, --max=<n>                 Quit after n number of matches\n")
 	
 	fd.write("\n")
@@ -96,6 +96,9 @@ def main():
 			"term",
 			"quiet",
 	]
+
+	if len(sys.argv) < 3:
+		usage(sys.stderr)
 
 	try:
 		opts, args = GetOpt(sys.argv[1:], short_options, long_options)
