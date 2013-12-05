@@ -6,7 +6,15 @@ import ctypes
 import ctypes.util
 import binwalk.smartstrings
 from binwalk.compat import *
-from binwalk.common import file_md5
+from binwalk.common import strings
+from binwalk.prettyprint import PrettyPrint
+
+class HashResult(object):
+	
+	def __init__(self, name, hash=None, strings=None):
+		self.name = name
+		self.hash = hash
+		self.strings = strings
 
 class HashMatch(object):
 
@@ -20,35 +28,40 @@ class HashMatch(object):
 
 	FUZZY_DEFAULT_CUTOFF = 50
 
-	def __init__(self, cutoff=None, strings=False, same=False, missing=False, symlinks=False, name=False, max_results=None, matches={}, types={}, verbose=False):
+	def __init__(self, cutoff=None, strings=False, same=False, symlinks=False, name=False, max_results=None, display=False, log=None, csv=False, quiet=False, format_to_screen=False, matches={}, types={}):
 		'''
 		Class constructor.
 
 		@cutoff          - The fuzzy cutoff which determines if files are different or not.
 		@strings         - Only hash strings inside of the file, not the entire file itself.
 		@same            - Set to True to show files that are the same, False to show files that are different.
-		@missing         - Set to True to show missing files.
 		@symlinks        - Set to True to include symbolic link files.
 		@name            - Set to True to only compare files whose base names match.
 		@max_results     - Stop searching after x number of matches.
+		@display         - Set to True to display results to stdout.
 		@matches         - A dictionary of file names to diff.
 		@types           - A dictionary of file types to diff.
-		@verbose         - Enable verbose mode.
 
 		Returns None.
 		'''
 		self.cutoff = cutoff
 		self.strings = strings
 		self.show_same = same
-		self.show_missing = missing
 		self.symlinks = symlinks
 		self.matches = matches
 		self.name = name
 		self.types = types
 		self.max_results = max_results
-		self.verbose = verbose
+
+		if display:
+			self.pretty_print = PrettyPrint(log=log, csv=csv, format_to_screen=format_to_screen, quiet=quiet)
+			self.pretty_print.header(header="PERCENTAGE\tFILE NAME")
+		else:
+			self.pretty_print = None
 
 		self.total = 0
+		self.last_file1 = HashResult(None)
+		self.last_file2 = HashResult(None)
 
 		self.magic = magic.open(0)
 		self.magic.load()
@@ -59,14 +72,19 @@ class HashMatch(object):
 			self.cutoff = self.FUZZY_DEFAULT_CUTOFF
 		
 		for k in get_keys(self.types):
-			self.types[k] = re.compile(self.types[k])
+			for i in range(0, len(self.types[k])):
+				self.types[k][i] = re.compile(self.types[k][i])
 
 	def _get_strings(self, fname):
-		return ''.join([string for (offset, string) in binwalk.smartstrings.FileStrings(fname, n=10, block=None).strings()])
+		return ''.join(list(binwalk.common.strings(fname, minimum=10)))
 
-	def _print(self, message):
-		if self.verbose:
-			print(message)
+	def _print(self, match, fname):
+		if self.pretty_print:
+			self.pretty_print.results(None, [{'description' : '%4d\t\t%s\n' % (match, fname)}], formatted=True)
+
+	def _print_footer(self):
+		if self.pretty_print:
+			self.pretty_print.footer()
 
 	def _compare_files(self, file1, file2):
 		'''
@@ -79,31 +97,67 @@ class HashMatch(object):
 		Returns None on error.
 		'''
 		status = 0
+		file1_dup = False
+		file2_dup = False
 
 		if not self.name or os.path.basename(file1) == os.path.basename(file2):
 			if os.path.exists(file1) and os.path.exists(file2):
 
-				self._print("Checking %s -> %s" % (file1, file2))
-
 				hash1 = ctypes.create_string_buffer(self.FUZZY_MAX_RESULT)
 				hash2 = ctypes.create_string_buffer(self.FUZZY_MAX_RESULT)
 
+				if file1 == self.last_file1.name and self.last_file1.hash:
+					file1_dup = True
+				else:
+					self.last_file1.name = file1
+
+				if file2 == self.last_file2.name and self.last_file2.hash:
+					file2_dup = True
+				else:
+					self.last_file2.name = file2
+
 				try:
 					if self.strings:
-						file1_strings = self._get_strings(file1)
-						file2_strings = self._get_strings(file2)
+						if file1_dup:
+							file1_strings = self.last_file1.strings
+						else:
+							self.last_file1.strings = file1_strings = self._get_strings(file1)
+							
+						if file2_dup:
+							file2_strings = self.last_file2.strings
+						else:
+							self.last_file2.strings = file2_strings = self._get_strings(file2)
 
 						if file1_strings == file2_strings:
 							return 100
 						else:
-							status |= self.lib.fuzzy_hash_buf(str2bytes(file1_strings), len(file1_strings), hash1)
-							status |= self.lib.fuzzy_hash_buf(str2bytes(file2_strings), len(file2_strings), hash2)
+							if file1_dup:
+								hash1 = self.last_file1.hash
+							else:
+								status |= self.lib.fuzzy_hash_buf(str2bytes(file1_strings), len(file1_strings), hash1)
+
+							if file2_dup:
+								hash2 = self.last_file2.hash
+							else:
+								status |= self.lib.fuzzy_hash_buf(str2bytes(file2_strings), len(file2_strings), hash2)
 						
 					else:
-						status |= self.lib.fuzzy_hash_filename(str2bytes(file1), hash1)
-						status |= self.lib.fuzzy_hash_filename(str2bytes(file2), hash2)
+						if file1_dup:
+							hash1 = self.last_file1.hash
+						else:
+							status |= self.lib.fuzzy_hash_filename(str2bytes(file1), hash1)
+							
+						if file2_dup:
+							hash2 = self.last_file2.hash
+						else:
+							status |= self.lib.fuzzy_hash_filename(str2bytes(file2), hash2)
 				
 					if status == 0:
+						if not file1_dup:
+							self.last_file1.hash = hash1
+						if not file2_dup:
+							self.last_file2.hash = hash2
+
 						if hash1.raw == hash2.raw:
 							return 100
 						else:
@@ -115,10 +169,10 @@ class HashMatch(object):
 
 	def is_match(self, match):
 		'''
-		Returns True if the match value is greater than or equal to the cutoff.
-		Returns False if the match value is less than the cutoff.
+		Returns True if this is a good match.
+		Returns False if his is not a good match.
 		'''
-		return (match is not None and match >= self.cutoff)
+		return (match is not None and ((match >= self.cutoff and self.show_same) or (match < self.cutoff and not self.show_same)))
 
 	def _get_file_list(self, directory):
 		'''
@@ -147,100 +201,126 @@ class HashMatch(object):
 				# Filter based on the file type, as reported by libmagic
 				if self.types:
 					for f in files:
-						for (include, type_regex) in iterator(self.types):
-							try:
-								magic_result = self.magic.file(os.path.join(directory, f)).lower()
-							except Exception as e:
-								magic_result = ''
+						for (include, regex_list) in iterator(self.types):
+							for regex in regex_list:
+								try:
+									magic_result = self.magic.file(os.path.join(directory, f)).lower()
+								except Exception as e:
+									magic_result = ''
 
-							match = type_regex.match(magic_result)
+								match = regex.match(magic_result)
 
-							# If this matched an include filter, or didn't match an exclude filter
-							if (match and include) or (not match and not include):
-								file_list.append(f)
+								# If this matched an include filter, or didn't match an exclude filter
+								if (match and include) or (not match and not include):
+									file_list.append(f)
 
 				# Filter based on file name
 				if self.matches:
-					for (include, file_filter) in iterator(self.matches):
-						matching_files = fnmatch.filter(files, file_filter)
+					for (include, file_filter_list) in iterator(self.matches):
+						for file_filter in file_filter_list:
+							matching_files = fnmatch.filter(files, file_filter)
 	
-						# If this is an include filter, add all matching files to the list
-						if include:
-							file_list += matching_files
-						# Else, this add all files except those that matched to the list
-						else:
-							file_list += list(set(files) - set(matching_files))
+							# If this is an include filter, add all matching files to the list
+							if include:
+								file_list += matching_files
+							# Else, this add all files except those that matched to the list
+							else:
+								file_list += list(set(files) - set(matching_files))
 			
 		return set(file_list)
 
-	def files(self, file1, file2):
-		m = self._compare_files(file1, file2)
-		if m is None:
-			m = 0
-		return [(m, file2)]
-
-	def file(self, fname, directories):
+	def files(self, needle, haystack):
 		'''
-		Search for a particular file in multiple directories.
+		Compare one file against a list of other files.
+		
+		@needle   - File to match against.
+		@haystack - A list of haystack files.
+	
+		Returns a list of tuple results.
+		'''
+		results = []
+		self.total = 0
 
-		@fname       - File to search for.
-		@directories - List of directories to search in.
+		for f in haystack:
+			m = self._compare_files(needle, f)
+			if m is not None and self.is_match(m):
+				self._print(m, f)
+				results.append((m, f))
+					
+				self.total += 1
+				if self.max_results and self.total >= self.max_results:
+					break
+
+		self._print_footer()
+		return results
+
+	def file(self, needle, haystack):
+		'''
+		Search for one file inside one or more directories.
+
+		@needle   - File to search for.
+		@haystack - List of directories to search in.
 
 		Returns a list of tuple results.
 		'''
 		matching_files = []
 		self.total = 0
+		done = False
 
-		for directory in directories:
+		for directory in haystack:
 			for f in self._get_file_list(directory):
 				f = os.path.join(directory, f)
-				m = self._compare_files(fname, f)
+				m = self._compare_files(needle, f)
 				if m is not None and self.is_match(m):
+					self._print(m, f)
 					matching_files.append((m, f))
 					
 					self.total += 1
 					if self.max_results and self.total >= self.max_results:
-						return matching_files
+						done = True
+						break
+			if done:
+				break
 					
+		self._print_footer()
 		return matching_files
 	
-	def directories(self, source, dir_list):
+	def directories(self, needle, haystack):
 		'''
-		Search two directories for matching files.
+		Compare the contents of one directory with the contents of other directories.
 
 		@source   - Source directory to compare everything to.
 		@dir_list - Compare files in source to files in these directories.
 
 		Returns a list of tuple results.
 		'''
+		done = False
 		results = []
 		self.total = 0
 
-		source_files = self._get_file_list(source)
+		source_files = self._get_file_list(needle)
 
-		for directory in dir_list:
+		for directory in haystack:
 			dir_files = self._get_file_list(directory)
 		
 			for f in source_files:
 				if f in dir_files:
-					file1 = os.path.join(source, f)
+					file1 = os.path.join(needle, f)
 					file2 = os.path.join(directory, f)
 
 					m = self._compare_files(file1, file2)
-					if m is not None:
-						matches = self.is_match(m)
+					if m is not None and self.is_match(m):
+						self._print(m, f)
+						results.append((m, f))
 
-						if (matches and self.show_same) or (not matches and not self.show_same):
-							results.append(("%3d" % m, f))
+						self.total += 1
+						if self.max_results and self.total >= self.max_results:
+							done = True
+							break
+			if done:
+				break
 
-							self.total += 1
-							if self.max_results and self.total >= self.max_results:
-								return results
-	
-		if self.show_missing and len(dir_list) == 1:
-			results += [('---', f) for f in (source_files-dir_files)]
-			results += [('+++', f) for f in (dir_files-source_files)]
-
+		self._print_footer()
 		return results
 
 

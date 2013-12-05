@@ -3,13 +3,53 @@
 import os
 import re
 import sys
-import magic
 import binwalk.hashmatch as hashmatch
 from binwalk.compat import *
 from getopt import GetoptError, gnu_getopt as GetOpt
 
 def usage(fd):
-	fd.write("Usage: %s [OPTIONS] [FILE | DIR] [FILE | DIR] ...\n" % sys.argv[0])
+	fd.write("\n")
+	fd.write('Diff files or directories using Context Triggered Piecewise Hashing ("fuzzy" hashing).\n')
+	fd.write("Craig Heffner, http://www.devttys0.com\n")
+
+	fd.write("\n")
+	fd.write("Usage: %s [OPTIONS] [NEEDLE] [HAYSTACK] [HAYSTACK] [HAYSTACK] ...\n" % os.path.basename(sys.argv[0]))
+
+	fd.write("\n")
+	fd.write("NEEDLE may be a file or a directory.\n")
+	fd.write("HAYSTACKs must be either all files or all directories.\n")
+	
+	fd.write("\n")
+	fd.write("Diffing Options:\n")
+	fd.write("\t-d, --diff                    Show files that are different (default)\n")
+	fd.write("\t-s, --same                    Show files that are the same\n")
+	fd.write("\t-S, --strings                 Diff strings inside files instead of the entire file\n")
+	fd.write("\t-c, --cutoff=<n>              Set the cutoff percentage (default: 50%)\n")
+	fd.write("\t-m, --max=<n>                 Quit after n number of matches\n")
+	
+	fd.write("\n")
+	fd.write("Filtering Options:\n")
+	fd.write("\t-n, --name                    Only diff files whose base names are the same\n")
+	fd.write("\t-l, --symlinks                Don't ignore symlinks\n")
+	fd.write("\t-y, --include-file=<match>    Only diff against a specific file name (e.g., *.py, *.bin, etc)\n")
+	fd.write("\t-x, --exclude-file=<match>    Do not diff against a specific file name (e.g., *.py, *.bin, etc)\n")
+	fd.write("\t-Y, --include-type=<type>     Only diff against a certian file type (e.g., elf, jpeg, etc)\n")
+	fd.write("\t-X, --exclude-type=<type>     Do not diff against a certian file type (e.g., elf, jpeg, etc)\n")
+	
+	fd.write("\n")
+	fd.write("General Options:\n")
+	fd.write("\t-f, --file=<file>             Log results to file\n")
+	fd.write("\t-c, --csv                     Log results to file in csv format\n")
+	fd.write("\t-q, --quiet                   Supress output to stdout\n")
+	fd.write("\t-t, --term                    Format output to fit the terminal window\n")
+	fd.write("\t-h, --help                    Show help\n")
+
+	fd.write("\n")
+
+	if fd == sys.stdout:
+		sys.exit(0)
+	else:
+		sys.exit(1)
 
 def main():
 
@@ -17,31 +57,39 @@ def main():
 	options = []
 	arguments = []
 	file_list = []
+	include_files = []
+	exclude_files = []
+	include_types = []
+	exclude_types = []
 
 	types = {}
+	matches = {}
+
+	log_file = None
+	log_csv = False
+	fit_to_width = False
+	quiet = False	
 	strings = False
 	symlinks = False
-	all_types = False
 	name = False
 	same = False
-	missing = False
 	cutoff = None
 	max_results = None
-	verbose = False
 
-	short_options = "c:hlmnSsvx:"
+	short_options = "cdf:hlm:no:qSstx:X:y:Y:"
 	long_options = [
 			"help",
 			"cutoff=",
 			"strings",
-			"show-same",
-			"show-missing",
+			"same",
+			"diff",
 			"max=",
 			"symlinks",
 			"name",
-			"file-type",
-			"file-name",
-			"verbose",
+			"file=",
+			"csv",
+			"term",
+			"quiet",
 	]
 
 	try:
@@ -59,16 +107,30 @@ def main():
 			symlinks = True
 		elif opt in ("-n", "--name"):
 			name = True
-		elif opt in ("-s", "--show-same"):
+		elif opt in ("-s", "--same"):
 			same = True
-		elif opt in ("-m", "--show-missing"):
-			missing = True
-		elif opt in ("-x", "--max"):
+		elif opt in ("-d", "--diff"):
+			same = False
+		elif opt in ("-t", "--term"):
+			fit_to_width = True
+		elif opt in ("-c", "--csv"):
+			log_csv = True
+		elif opt in ("-q", "--quiet"):
+			quiet = True
+		elif opt in ("-f", "--file"):
+			log_file = arg
+		elif opt in ("-m", "--max"):
 			max_results = int(arg, 0)
-		elif opt in ("-c", "--cutoff"):
+		elif opt in ("-o", "--cutoff"):
 			cutoff = int(arg, 0)
-		elif opt in ("-v", "--verbose"):
-			verbose = True
+		elif opt in ("-y", "--include-file"):
+			include_files.append(arg)
+		elif opt in ("-x", "--exclude-file"):
+			exclude_files.append(arg)
+		elif opt in ("-Y", "--include-type"):
+			include_types.append(arg.lower())
+		elif opt in ("-X", "--exclude-types"):
+			exclude_types.append(arg.lower())
 
 		# Keep track of the options and arguments.
 		# This is used later to determine which argv entries are file names.
@@ -82,38 +144,39 @@ def main():
 		if opt not in arguments and opt not in options and not opt.startswith('-'):
 			file_list.append(opt)
 
+	if include_files:
+		matches[True] = include_files
+	if exclude_files:
+		matches[False] = exclude_files
+	
+	if include_types:
+		types[True] = include_types
+	if exclude_types:
+		types[False] = exclude_types
+
 	if len(file_list) >= 2:
 		rehash = hashmatch.HashMatch(cutoff=cutoff,
 						strings=strings,
+						same=same,
 						symlinks=symlinks, 
 						name=name, 
-						same=same,
-						missing=missing,
 						max_results=max_results,
-						verbose=verbose)
+						display=True,
+						quiet=quiet,
+						log=log_file,
+						csv=log_csv,
+						format_to_screen=fit_to_width,
+						types=types,
+						matches=matches)
 
 		if os.path.isfile(file_list[0]):
-
-			if not all_types and len(types) == 0:
-				m = magic.open(0)
-				m.load()
-				file_type = m.file(file_list[0])
-				if file_type:
-					types[True] = re.escape(file_type.lower())
-
 			if os.path.isfile(file_list[1]):
-				results = rehash.files(file_list[0], file_list[1])
+				rehash.files(file_list[0], file_list[1:])
 			else:
-				results = rehash.file(file_list[0], file_list[1:])
+				rehash.file(file_list[0], file_list[1:])
 		else:
-			for f in file_list:
-				if not os.path.isdir(f):
-					print("Invalid usage")
-					usage(sys.stderr)
-			results = rehash.directories(file_list[0], file_list[1])
+			rehash.directories(file_list[0], file_list[1:])
 
-	for (match, fname) in results:
-		print("%s  %s" % (match, fname))
 
 if __name__ == "__main__":
 	main()

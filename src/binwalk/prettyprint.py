@@ -37,7 +37,7 @@ class PrettyPrint:
 	MAX_LINE_LEN = 0
 	DEFAULT_DESCRIPTION_HEADER = "DESCRIPTION"
 
-	def __init__(self, binwalk, log=None, csv=False, quiet=False, verbose=0, format_to_screen=False):
+	def __init__(self, binwalk=None, log=None, csv=False, quiet=False, verbose=0, format_to_screen=False):
 		'''
 		Class constructor.
 		
@@ -109,7 +109,7 @@ class PrettyPrint:
 
 				data_parts = data.split(None, 2)
 
-				if len(data_parts) == 3:
+				if len(data_parts) in [2,3]:
 					for i in range(0, len(data_parts)):
 						data_parts[i] = data_parts[i].strip()
 
@@ -223,7 +223,8 @@ class PrettyPrint:
 
 		self._pprint("\n")
 		self._pprint("Scan Time:     %s\n" % timestamp, nolog=nolog)
-		self._pprint("Signatures:    %d\n" % self.binwalk.parser.signature_count, nolog=nolog)
+		if self.binwalk:
+			self._pprint("Signatures:    %d\n" % self.binwalk.parser.signature_count, nolog=nolog)
 		self._pprint("Target File:   %s\n" % file_name, nolog=nolog)
 		self._pprint("MD5 Checksum:  %s\n" % md5sum, nolog=nolog)
 
@@ -276,9 +277,9 @@ class PrettyPrint:
 
 		for info in results:
 			# Check for any grep filters before printing
-			if self.binwalk.filter.grep(info['description']):
+			if not self.binwalk or self.binwalk.filter.grep(info['description']):
 				if not formatted:
-				# Only display the offset once per list of results
+					# Only display the offset once per list of results
 					if not offset_printed:
 						self._pprint("%-10d\t0x%-8X\t%s\n" % (offset, offset, self._format(info['description'])))
 						offset_printed = True

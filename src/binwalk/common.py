@@ -110,6 +110,32 @@ def unique_file_name(base_name, extension=''):
 
 	return fname
 
+def strings(filename, minimum=4):
+	'''
+	A strings generator, similar to the Unix strings utility.
+
+	@filename - The file to search for strings in.
+	@minimum  - The minimum string length to search for.
+
+	Yeilds printable ASCII strings from filename.
+	'''
+	result = ""
+
+	with BlockFile(filename) as f:
+		while True:
+			(data, dlen) = f.read_block()
+			if not data:
+				break
+
+			for c in data:
+				if c in string.printable:
+					result += c
+					continue
+				elif len(result) >= minimum:
+					yield result
+					result = ""
+				else:
+					result = ""
 
 class MathExpression(object):
 	'''
