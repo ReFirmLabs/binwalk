@@ -228,13 +228,14 @@ class PrettyPrint:
 		self._pprint("Target File:   %s\n" % file_name, nolog=nolog)
 		self._pprint("MD5 Checksum:  %s\n" % md5sum, nolog=nolog)
 
-	def header(self, file_name=None, header=None, description=DEFAULT_DESCRIPTION_HEADER):
+	def header(self, file_name=None, header=None, description=DEFAULT_DESCRIPTION_HEADER, csv=True):
 		'''
 		Prints the binwalk header, typically used just before starting a scan.
 
 		@file_name   - If specified, and if self.verbose > 0, then detailed file info will be included in the header.
 		@header      - If specified, this is a custom header to display at the top of the output.
 		@description - The description header text to display (default: "DESCRIPTION")
+		@csv         - Set to True to print the header verbatim to the CSV file.
 
 		Returns None.
 		'''
@@ -244,16 +245,21 @@ class PrettyPrint:
 			self.file_info(file_name)
 
 		if self.log_csv:
-			nolog = True
+			if csv:
+				nolog1 = False
+			else:
+				nolog1 = True
+
+			nolog2 = True
 
 		self._pprint("\n")
 
 		if not header:
-			self._pprint("DECIMAL   \tHEX       \t%s\n" % description, nolog=nolog)
+			self._pprint("DECIMAL   \tHEX       \t%s\n" % description, nolog=nolog1)
 		else:
-			self._pprint(header + "\n", nolog=nolog)
+			self._pprint(header + "\n", nolog=nolog1)
 		
-		self._pprint("-" * self.HEADER_WIDTH + "\n", nolog=nolog)
+		self._pprint("-" * self.HEADER_WIDTH + "\n", nolog=nolog2)
 
 	def footer(self, bwalk=None, file_name=None):
 		'''

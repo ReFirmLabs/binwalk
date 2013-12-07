@@ -60,6 +60,7 @@ class Binwalk(object):
 
 	# Valid scan_type values.
 	# ENTROPY must be the largest value to ensure it is performed last if multiple scans are performed.
+	# REHASH must also be larger than any scans that would generate extracted files.
 	BINWALK = 0x01
 	BINARCH = 0x02
 	BINCAST = 0x03
@@ -67,8 +68,9 @@ class Binwalk(object):
 	COMPRESSION = 0x05
 	HEXDIFF = 0x06
 	CUSTOM = 0x07
-	BINVIS = 0x08
-	ENTROPY = 0x09
+	REHASH = 0x08
+	BINVIS = 0x09
+	ENTROPY = 0x0A
 
 	def __init__(self, magic_files=[], flags=magic.MAGIC_NONE, log=None, quiet=False, verbose=0, ignore_smart_keywords=False, ignore_time_skews=False, load_extractor=False, load_plugins=True, exec_commands=True, max_extract_size=None):
 		'''

@@ -38,7 +38,7 @@ class HashMatch(object):
 		@symlinks         - Set to True to include symbolic link files.
 		@name             - Set to True to only compare files whose base names match.
 		@max_results      - Stop searching after x number of matches.
-		@display          - Set to True to display results to stdout.
+		@display          - Set to True to display results to stdout, or pass an instance of binwalk.prettyprint.PrettyPrint.
 		@log              - Specify a log file to log results to.
 		@csv              - Set to True to log data in CSV format.
 		@quiet            - Set to True to suppress output to stdout.
@@ -60,8 +60,12 @@ class HashMatch(object):
 		self.max_results = max_results
 
 		if display:
-			self.pretty_print = PrettyPrint(log=log, csv=csv, format_to_screen=format_to_screen, quiet=quiet)
-			self.pretty_print.header(header="PERCENTAGE\t\t\tFILE NAME")
+			if isinstance(display, PrettyPrint):
+				self.pretty_print = display
+			else:
+				self.pretty_print = PrettyPrint(log=log, csv=csv, format_to_screen=format_to_screen, quiet=quiet)
+
+			self.pretty_print.header(header="PERCENTAGE\t\t\tFILE", csv=True)
 		else:
 			self.pretty_print = None
 

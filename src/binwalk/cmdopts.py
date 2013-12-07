@@ -14,6 +14,7 @@ long_options = [
 		"green",
 		"red",
 		"blue",
+		"rehash",
 		"examples",
 		"quiet", 
 		"csv",
@@ -130,6 +131,7 @@ def usage(fd):
 	fd.write("\t-r, --rm                      Cleanup extracted files and zero-size files\n")
 	fd.write("\t-d, --honor-footers           Only extract files up to their corresponding footer signatures\n")
 	fd.write("\t-z, --carve                   Carve data from files, but don't execute extraction utilities (implies -d)\n")
+	fd.write("\t-P, --rehash                  Recursively diff data extracted from FILE1 with the data extracted from all other files.\n")
 	fd.write("\n")
 
 	fd.write("Plugin Options:\n")
