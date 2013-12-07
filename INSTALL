@@ -25,14 +25,19 @@ If easy_install.sh didn't work, or if you want to only install the core dependen
 INSTALLING CORE DEPENDENCIES
 ----------------------------------
 
-Binwalk has two core dependencies:
+Binwalk has three core dependencies:
 
 	o python-magic
+	o libfuzzy
 	o pyqtgraph
 
 You can install python-magic from your distro's repositories, or from source (ftp://ftp.astron.com/pub/file/):
 
 	$ sudo apt-get install python-magic
+
+Likewise, libfuzzy can be installed from your distro's repositories, or from source (http://ssdeep.sourceforge.net/#download):
+
+	$ sudo apt-get install libfuzzy2
 
 Next, you'll need to install the dependencies for pyqtgraph (you may also need to install OpenGL drivers for your video card):
 	
