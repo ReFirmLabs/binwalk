@@ -239,7 +239,8 @@ class PrettyPrint:
 
 		Returns None.
 		'''
-		nolog = False
+		nolog1 = False
+		nolog2 = False
 
 		if self.verbose and file_name is not None:
 			self.file_info(file_name)

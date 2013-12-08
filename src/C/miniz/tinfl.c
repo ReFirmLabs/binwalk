@@ -563,6 +563,9 @@ int tinfl_decompress_mem_to_callback(const void *pIn_buf, size_t *pIn_buf_size, 
     size_t in_buf_size = *pIn_buf_size - in_buf_ofs, dst_buf_size = TINFL_LZ_DICT_SIZE - dict_ofs;
     tinfl_status status = tinfl_decompress(&decomp, (const mz_uint8*)pIn_buf + in_buf_ofs, &in_buf_size, pDict, pDict + dict_ofs, &dst_buf_size,
       (flags & ~(TINFL_FLAG_HAS_MORE_INPUT | TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF)));
+    // CJH: Added to prevent infinite extraction loops
+    if(in_buf_size == 0)
+      break;
     in_buf_ofs += in_buf_size;
     if ((dst_buf_size) && (!(*pPut_buf_func)(pDict + dict_ofs, (int)dst_buf_size, pPut_buf_user)))
       break;
@@ -590,6 +593,7 @@ int is_deflated(char *buf, size_t buf_size, int includes_zlib_header)
 {
   tinfl_decompressor decomp_struct = { 0 };
   char out_buf[DATA_SIZE] = { 0 };
+  char dummy_buf[DATA_SIZE] = { 0 };
   size_t out_buf_size = DATA_SIZE;
   size_t in_buf_size = buf_size;
   int flags = TINFL_FLAG_HAS_MORE_INPUT | TINFL_FLAG_COMPUTE_ADLER32;
@@ -607,20 +611,32 @@ int is_deflated(char *buf, size_t buf_size, int includes_zlib_header)
                       &out_buf_size,
                       flags) >= 0 && out_buf_size > 0)
   {
-      //printf("%d => %d    DATA: '%s'\n", in_buf_size, out_buf_size, out_buf);
-      return (int) out_buf_size;
+      // CJH: To prevent false positives, check to see if this data filled the output buffer with NULL bytes.
+      //      If so, it's probably a false positive.
+      if(!(out_buf_size == DATA_SIZE && memcmp(out_buf, dummy_buf, out_buf_size) == 0))
+      	return (int) out_buf_size;
   }
 
   return 0;
 }
 
-#define MAX_READ_SIZE 1*1024*1024
+int inflate_raw_file_callback(const void *pBuf, int len, void *pUser)
+{
+	if(fwrite(pBuf, 1, len, (FILE *) pUser) == len)
+	{
+		return 1;
+	}
+	
+	return 0;
+	
+}
+
 int inflate_raw_file(char *in_file, char *out_file)
 {
-	int retval = 0, i = 0;
-	size_t out_size = 0, in_size = 0, nbytes = 0;
+	int retval = 0;
+	char *compressed_data = NULL;
+	size_t in_size = 0, nbytes = 0;
 	FILE *fp_in = NULL, *fp_out = NULL;
-	char *compressed_data = NULL, *decompressed_data = NULL;
 
 	fp_in = fopen(in_file, "rb");
 	if(fp_in)
@@ -633,26 +649,15 @@ int inflate_raw_file(char *in_file, char *out_file)
 			in_size = ftell(fp_in);
 			fseek(fp_in, 0L, SEEK_SET);
 
-			compressed_data = malloc(MAX_READ_SIZE);
+			compressed_data = malloc(in_size);
 			if(compressed_data)
 			{
-				
-				for(i=0; i<in_size; i+=MAX_READ_SIZE)
-				{
-					memset(compressed_data, 0, MAX_READ_SIZE);
+				memset(compressed_data, 0, in_size);
 
-					nbytes = fread(compressed_data, 1, MAX_READ_SIZE, fp_in);
-					if(nbytes > 0)
-					{
-						decompressed_data = (char *) tinfl_decompress_mem_to_heap(compressed_data, nbytes, &out_size, 0);
-	
-						if(decompressed_data && out_size > 0)
-						{
-							fwrite(decompressed_data, 1, out_size, fp_out);
-							free(decompressed_data);
-							retval += out_size;
-						}
-					}
+				nbytes = fread(compressed_data, 1, in_size, fp_in);
+				if(nbytes > 0)
+				{
+					retval = tinfl_decompress_mem_to_callback(compressed_data, &nbytes, inflate_raw_file_callback, (void *) fp_out, 0);
 				}
 				
 				free(compressed_data);
@@ -704,7 +709,11 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	printf("Inflated to %d bytes.\n", inflate_raw_file(argv[1], argv[2]));
-	return EXIT_SUCCESS;
+	if(inflate_raw_file(argv[1], argv[2]))
+	{
+		return EXIT_SUCCESS;
+	}
+
+	return EXIT_FAILURE;
 }
 #endif

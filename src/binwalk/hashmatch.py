@@ -26,7 +26,8 @@ class HashMatch(object):
 	# Files smaller than this won't produce meaningful fuzzy results (from ssdeep.h)
 	FUZZY_MIN_FILE_SIZE = 4096
 
-	FUZZY_DEFAULT_CUTOFF = 0
+	DEFAULT_CUTOFF = 0
+	CONSERVATIVE_CUTOFF = 90
 
 	def __init__(self, cutoff=None, strings=False, same=False, symlinks=False, name=False, max_results=None, display=False, log=None, csv=False, quiet=False, format_to_screen=False, abspath=False, matches={}, types={}):
 		'''
@@ -79,7 +80,7 @@ class HashMatch(object):
 		self.lib = ctypes.cdll.LoadLibrary(ctypes.util.find_library(self.LIBRARY_NAME))
 
 		if self.cutoff is None:
-			self.cutoff = self.FUZZY_DEFAULT_CUTOFF
+			self.cutoff = self.DEFAULT_CUTOFF
 		
 		for k in get_keys(self.types):
 			for i in range(0, len(self.types[k])):

@@ -7,7 +7,7 @@ import binwalk.hashmatch as hashmatch
 from binwalk.compat import *
 from getopt import GetoptError, gnu_getopt as GetOpt
 
-DEFAULT_CUTOFF = 50
+DEFAULT_CUTOFF = hashmatch.HashMatch.CONSERVATIVE_CUTOFF
 
 def usage(fd):
 	fd.write("\n")

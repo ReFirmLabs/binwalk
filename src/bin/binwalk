@@ -462,7 +462,7 @@ def main():
 										diff_dirs.append(base_dir)
 
 				if len(diff_dirs) > 1:
-					HashMatch(display=bwalk.display, cutoff=50).directories(diff_dirs[0], diff_dirs[1:])
+					HashMatch(display=bwalk.display, cutoff=HashMatch.CONSERTATIVE_CUTOFF).directories(diff_dirs[0], diff_dirs[1:])
 					
 
 			elif scan_type == binwalk.Binwalk.BINVIS:
