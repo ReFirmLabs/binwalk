@@ -28,6 +28,7 @@ class SmartSignature:
 		'delay'			: '%sextract-delay:' % KEYWORD_DELIM_START,
 		'year'			: '%sfile-year:' % KEYWORD_DELIM_START,
 		'epoch'			: '%sfile-epoch:' % KEYWORD_DELIM_START,
+		'math'		: '%smath:' % KEYWORD_DELIM_START,
 
 		'raw-replace'		: '%sraw-replace%s' % (KEYWORD_DELIM_START, KEYWORD_DELIM_END),
 		'one-of-many'		: '%sone-of-many%s' % (KEYWORD_DELIM_START, KEYWORD_DELIM_END),
@@ -77,6 +78,9 @@ class SmartSignature:
 		if self.ignore_smart_signatures or not self._is_valid(data):
 			results['description'] = data
 		else:
+			# Calculate and replace math keyword values
+			data = self._replace_maths(data)
+
 			# Parse the offset-adjust value. This is used to adjust the reported offset at which 
 			# a signature was located due to the fact that MagicParser.match expects all signatures
 			# to be located at offset 0, which some wil not be.
@@ -215,6 +219,22 @@ class SmartSignature:
 				pass
 
 		return offset
+
+	def _replace_maths(self, data):
+		'''
+		Replace math keywords with the requested values.
+			
+		@data - String result data.
+
+		Returns the modified string result data.
+		'''
+		while self.KEYWORDS['math'] in data:
+			arg = self._get_keyword_arg(data, 'math')
+			v = '%s%s%s' % (self.KEYWORDS['math'], arg, self.KEYWORD_DELIM_END)
+			math_value = "%d" % self._get_math_arg(data, 'math')
+			data = data.replace(v, math_value)
+
+		return data
 
 	def _parse_raw_strings(self, data):
 		'''

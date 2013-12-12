@@ -1648,12 +1648,24 @@
 0       string        KDMV             VMware4 disk image
 
 #--------------------------------------------------------------------
-# Qemu Emulator Images
+# Qemu Emulator Image
 # Lines written by Friedrich Schwittay (f.schwittay@yousable.de)
 # Updated by Adam Buchbinder (adam.buchbinder@gmail.com)
 # Made by reading sources, reading documentation, and doing trial and error
 # on existing QCOW files
-0       string        QFI\xFB QEMU QCOW Image
+0       string		QFI\xFB QEMU QCOW Image
+
+# BSD 2.x file system image; used in RetroBSD for PIC32.
+0		string		FS\x3C\x3C		BSD 2.x filesystem,
+>1020	string		!\x3E\x3EFS		invalid (missing FSMAGIC2),
+>8		lelong		x				size: {math:%d*1024} bytes,
+>8		lelong		x				\b{file-size:%d*1024}
+>8		lelong		x				\b{jump-to-offset:%d*1024}
+>8		lelong		x				total blocks: %d,
+>972	lelong		x				free blocks: %d,
+>968	ledate		x				last modified: %s
+>980	byte		!0
+>>980	string		x				\b, last mounted on: "%s"
 
 
 #--------------------------Firmware Formats---------------------------
