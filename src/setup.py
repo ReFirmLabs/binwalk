@@ -109,7 +109,7 @@ install_data_files = ["magic/*", "config/*", "plugins/*"]
 
 # Install the binwalk module, script and support files
 setup(	name = "binwalk",
-	version = "1.3.0 beta",
+	version = "2.0.0 beta",
 	description = "Firmware analysis tool",
 	author = "Craig Heffner",
 	url = "https://github.com/devttys0/binwalk",
