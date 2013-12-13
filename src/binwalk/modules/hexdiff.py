@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 
+# TODO: Use sane defaults for block size and file size, if not specified.
+#		Handle header output for multiple files.
+
 import os
 import sys
 import curses
 import platform
+import binwalk.module
 import binwalk.common as common
 from binwalk.compat import *
 
@@ -22,22 +26,42 @@ class HexDiff(object):
 		'blue'	: '34',
 	}
 
-	def __init__(self, binwalk=None):
+	NAME = "Binary Diffing"
+	CLI = [
+			binwalk.module.ModuleOption(short='W',
+										long='hexdump',
+										kwargs={'enabled' : True},
+										description='Perform a hexdump / diff of a file or files'),
+			binwalk.module.ModuleOption(short='G',
+										long='green',
+										kwargs={'show_green' : True, 'show_blue' : False, 'show_green' : False},
+										description='Only show lines containing bytes that are the same among all files'),
+			binwalk.module.ModuleOption(short='i',
+										long='red',
+										kwargs={'show_red' : True, 'show_blue' : False, 'show_green' : False},
+										description='Only show lines containing bytes that are different among all files'),
+			binwalk.module.ModuleOption(short='U',
+										long='blue',
+										kwargs={'show_blue' : True, 'show_red' : False, 'show_green' : False},
+										description='Only show lines containing bytes that are different among some files'),
+			binwalk.module.ModuleOption(short='w',
+										long='terse',
+										kwargs={'terse' : True},
+										description='Diff all files, but only display a hex dump of the first file'),
+	]
+	
+	KWARGS = [
+			binwalk.module.ModuleKwarg(name='show_red', default=True),
+			binwalk.module.ModuleKwarg(name='show_blue', default=True),
+			binwalk.module.ModuleKwarg(name='show_green', default=True),
+			binwalk.module.ModuleKwarg(name='terse', default=False),
+	]
+
+	def __init__(self, **kwargs):
+		binwalk.module.process_kwargs(self, kwargs)
+
 		self.block_hex = ""
 		self.printed_alt_text = False
-
-		if binwalk:
-			self._pprint = binwalk.display._pprint
-			self._show_header = binwalk.display.header
-			self._footer = binwalk.display.footer
-			self._display_result = binwalk.display.results
-			self._grep = binwalk.filter.grep
-		else:
-			self._pprint = sys.stdout.write
-			self._show_header = self._print
-			self._footer = self._simple_footer
-			self._display_result = self._print
-			self._grep = None
 
 		if hasattr(sys.stderr, 'isatty') and sys.stderr.isatty() and platform.system() != 'Windows':
 			curses.setupterm()
@@ -57,15 +81,28 @@ class HexDiff(object):
 
 		return "\x1b[%sm%s\x1b[0m" % (';'.join(attr), c)
 
+	def _color_filter(self, data):
+		red = '\x1b[' + self.COLORS['red'] + ';'
+		green = '\x1b[' + self.COLORS['green'] + ';'
+		blue = '\x1b[' + self.COLORS['blue'] + ';'
+
+		if self.show_blue and blue in data:
+			return True
+		if self.show_green and green in data:
+			return True
+		if self.show_red and red in data:
+			return True
+		return False
+
 	def _print_block_hex(self, alt_text="*"):
 		printed = False
 
-		if self._grep is None or self._grep(self.block_hex):
-			self._pprint(self.block_hex)
+		if self._color_filter(self.block_hex):
+			self.config.display.result(self.block_hex)
 			self.printed_alt_text = False
 			printed = True
 		elif not self.printed_alt_text:
-			self._pprint("%s\n" % alt_text)
+			self.config.display.result("%s\n" % alt_text)
 			self.printed_alt_text = True
 			printed = True
 
@@ -82,33 +119,29 @@ class HexDiff(object):
 		else:
 			self.block_hex += c
 
-	def _simple_footer(self):
-		print("")
-
-	def _header(self, files, block):
-		header = "OFFSET    "
-		for i in range(0, len(files)):
-			f = files[i]
-			header += "%s" % os.path.basename(f)
-			if i != len(files)-1:
-				header += " " * ((block*4) + 10 - len(os.path.basename(f)))
-		self._show_header(header=header)
-
-	def display(self, files, offset=0, size=DEFAULT_DIFF_SIZE, block=DEFAULT_BLOCK_SIZE, show_first_only=False):
+	def run(self):
 		i = 0
 		total = 0
 		fps = []
 		data = {}
 		delim = '/'
 
+		offset = self.config.offset
+		size = self.config.length
+		block = self.config.block
+		files = self.config.target_files
+
+		self.config.display.format_strings("\n%s\n", "%s\n")
+
 		# If negative offset, then we're going that far back from the end of the file
 		if offset < 0:
 			size = offset * -1
 
-		if show_first_only:
-			self._header([files[0]], block)
+		# TODO: Display all file names in hexdump
+		if self.terse:
+			self.config.display.header(files[0])
 		else:
-			self._header(files, block)
+			self.config.display.header(files[0])
 
 		if common.BlockFile.READ_BLOCK_SIZE < block:
 			read_block_size = block
@@ -169,7 +202,7 @@ class HexDiff(object):
 						diff_same[j] = self.SOME_DIFF
 
 				for index in range(0, len(files)):
-					if show_first_only and index > 0:
+					if self.terse and index > 0:
 						break
 			
 					f = files[index]
@@ -194,7 +227,7 @@ class HexDiff(object):
 								except:
 									self._build_block(' ')
 
-							if index == len(files)-1 or (show_first_only and index == 0):
+							if index == len(files)-1 or (self.terse and index == 0):
 								self._build_block("|\n")
 							else:
 								self._build_block('|   %s   ' % delim)
@@ -211,8 +244,7 @@ class HexDiff(object):
 		for fp in fps:
 			fp.close()
 
-		self._footer()
+		self.config.display.footer()
 
-if __name__ == "__main__":
-	HexDiff().display(sys.argv[1:])
+		return True
 
