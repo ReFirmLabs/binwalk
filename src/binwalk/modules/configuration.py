@@ -3,9 +3,12 @@ import sys
 import binwalk.common
 import binwalk.module
 import binwalk.display
+from binwalk.config import *
+from binwalk.compat import *
 
 class Configuration(object):
 
+	NAME = "General"
 	CLI = [
 		binwalk.module.ModuleOption(long='length',
 									short='l',
@@ -19,6 +22,12 @@ class Configuration(object):
 									type=int,
 									kwargs={'offset' : 0},
 									description='Start scan at this file offset'),
+		binwalk.module.ModuleOption(long='block',
+									short='K',
+									nargs=1,
+									type=int,
+									kwargs={'block' : 0},
+									description='Set file block size'),
 		binwalk.module.ModuleOption(long='grep',
 									short='g',
 									nargs=1,
@@ -51,15 +60,24 @@ class Configuration(object):
 									type=list,
 									kwargs={'verbose' : True},
 									description='Enable verbose output (specify twice for more verbosity)'),
+		binwalk.module.ModuleOption(short='h',
+									long='help',
+									kwargs={'show_help' : True},
+									description='Show help output'),
 		binwalk.module.ModuleOption(long=None,
 									short=None,
 									type=binwalk.common.BlockFile,
 									kwargs={'target_files' : []}),
+		binwalk.module.ModuleOption(short='u',
+									long='update',
+									kwargs={'do_update' : True},
+									description='Update magic signature files'),
 	]
 
 	KWARGS = [
-		binwalk.module.ModuleKwarg(name='length', default=None),
-		binwalk.module.ModuleKwarg(name='offset', default=None),
+		binwalk.module.ModuleKwarg(name='length', default=0),
+		binwalk.module.ModuleKwarg(name='offset', default=0),
+		binwalk.module.ModuleKwarg(name='block', default=0),
 		binwalk.module.ModuleKwarg(name='log_file', default=None),
 		binwalk.module.ModuleKwarg(name='csv', default=False),
 		binwalk.module.ModuleKwarg(name='format_to_terminal', default=False),
@@ -69,10 +87,20 @@ class Configuration(object):
 		binwalk.module.ModuleKwarg(name='debug_verbose', default=False),
 		binwalk.module.ModuleKwarg(name='skip_unopened', default=False),
 		binwalk.module.ModuleKwarg(name='target_files', default=[]),
+		binwalk.module.ModuleKwarg(name='show_help', default=False),
+		binwalk.module.ModuleKwarg(name='do_update', default=False),
 	]
 
 	def __init__(self, **kwargs):
 		binwalk.module.process_kwargs(self, kwargs)
+
+		if self.show_help:
+			binwalk.module.show_help()
+			sys.exit(0)
+
+		if self.do_update:
+			Update(self.verbose).update()
+			sys.exit(0)
 
 		self._test_target_files()
 		self._set_verbosity()
@@ -122,4 +150,119 @@ class Configuration(object):
 			else:
 				plural = ''
 			raise Exception("Failed to open %d file%s for scanning" % (failed_open_count, plural))
+
+class Update(object):
+	'''
+	Class for updating binwalk configuration and signatures files from the subversion trunk.
+
+	Example usage:
+
+		from binwalk import Update
+
+		Update().update()
+	'''
+	BASE_URL = "https://raw.github.com/devttys0/binwalk/master/src/binwalk/"
+	MAGIC_PREFIX = "magic/"
+	CONFIG_PREFIX = "config/"
+
+	def __init__(self, verbose):
+		'''
+		Class constructor.
+
+		@verbose - Verbose flag.
+
+		Returns None.
+		'''
+		self.verbose = verbose
+		self.config = Config()
+
+	def update(self):
+		'''
+		Updates all system wide signatures and config files.
+
+		Returns None.
+		'''
+		self.update_binwalk()
+		self.update_bincast()
+		self.update_binarch()
+		self.update_extract()
+		self.update_zlib()
+		self.update_compressd()
+
+	def _do_update_from_svn(self, prefix, fname):
+		'''
+		Updates the specified file to the latest version of that file in SVN.
+
+		@prefix - The URL subdirectory where the file is located.
+		@fname  - The name of the file to update.
+
+		Returns None.
+		'''
+		# Get the local http proxy, if any
+		# csoban.kesmarki
+		proxy_url = os.getenv('HTTP_PROXY')
+		if proxy_url:
+			proxy_support = urllib2.ProxyHandler({'http' : proxy_url})
+			opener = urllib2.build_opener(proxy_support)
+			urllib2.install_opener(opener)
+
+		url = self.BASE_URL + prefix + fname
+		
+		try:
+			if self.verbose:
+				print("Fetching %s..." % url)
+			
+			data = urllib2.urlopen(url).read()
+			open(self.config.paths['system'][fname], "wb").write(data)
+		except Exception as e:
+			raise Exception("Update._do_update_from_svn failed to update file '%s': %s" % (url, str(e)))
+
+	def update_binwalk(self):
+		'''
+		Updates the binwalk signature file.
+
+		Returns None.
+		'''
+		self._do_update_from_svn(self.MAGIC_PREFIX, self.config.BINWALK_MAGIC_FILE)
+	
+	def update_bincast(self):
+		'''
+		Updates the bincast signature file.
+
+		Returns None.
+		'''
+		self._do_update_from_svn(self.MAGIC_PREFIX, self.config.BINCAST_MAGIC_FILE)
+	
+	def update_binarch(self):
+		'''
+		Updates the binarch signature file.
+	
+		Returns None.
+		'''
+		self._do_update_from_svn(self.MAGIC_PREFIX, self.config.BINARCH_MAGIC_FILE)
+	
+	def update_zlib(self):
+		'''
+		Updates the zlib signature file.
+
+		Returns None.
+		'''
+		self._do_update_from_svn(self.MAGIC_PREFIX, self.config.ZLIB_MAGIC_FILE)
+
+	def update_compressd(self):
+		'''
+		Updates the compress'd signature file.
+		
+		Returns None.
+		'''
+		self._do_update_from_svn(self.MAGIC_PREFIX, self.config.COMPRESSD_MAGIC_FILE)
+
+	def update_extract(self):
+		'''
+		Updates the extract.conf file.
+	
+		Returns None.
+		'''
+		self._do_update_from_svn(self.CONFIG_PREFIX, self.config.EXTRACT_FILE)
+
 

@@ -1,2 +1,4 @@
 from configuration import Configuration
-from hashmatch import HashFile, HashFiles, HashDirectories
+from hashmatch import HashMatch
+from binvis import Plotter
+from hexdiff import HexDiff

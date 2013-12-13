@@ -47,34 +47,71 @@ class ModuleKwarg(object):
 def process_kwargs(module, kwargs):
 	return Modules(dummy=True).kwargs(module, kwargs)
 
+def show_help():
+	print Modules(dummy=True).help()
+
 class Modules(object):
 
 	def __init__(self, dummy=False):
 		self.config = None
-		
+		self.dependency_results = {}
+
 		if not dummy:
 			from binwalk.modules.configuration import Configuration
 			self.config = self.load(Configuration)
 
-	def list(self):
+	def list(self, attribute="run"):
 		import binwalk.modules
 
 		objects = []
 
 		for (name, obj) in inspect.getmembers(binwalk.modules):
-			if inspect.isclass(obj) and hasattr(obj, "run"):
+			if inspect.isclass(obj) and hasattr(obj, attribute):
 				objects.append(obj)
 		return objects
 
+	def help(self):
+		help_string = ""
+
+		for obj in self.list(attribute="CLI"):
+			help_string += "\n%s Options:\n" % obj.NAME
+
+			for module_option in obj.CLI:
+				if module_option.long:
+					long_opt = '--' + module_option.long
+					
+					if module_option.nargs > 0:
+						optargs = "=%s" % str(module_option.type)
+					else:
+						optargs = ""
+
+					if module_option.short:
+						short_opt = "-" + module_option.short + ","
+					else:
+						short_opt = "   "
+
+					fmt = "    %%s %%s%%-%ds%%s\n" % (32-len(long_opt))
+					help_string += fmt % (short_opt, long_opt, optargs, module_option.description)
+
+		return help_string
+
+	def execute(self):
+		results = {}
+		for module in self.list():
+			result = self.run(module)
+			if result is not None:
+				results[module] = result
+		return results
+
 	def run(self, module):
 		results = None
-		obj = self.load()
+		obj = self.load(module)
 
 		if obj.enabled:
 			try:
-				obj.run()
-			except AttributeError:
-				pass
+				results = obj.run()
+			except AttributeError as e:
+				print("WARNING:", e)
 
 		return results
 			
@@ -93,8 +130,10 @@ class Modules(object):
 			self.config.display.log = False
 			self.config.display.quiet = True
 
-			for (kwarg, mod) in module.DEPENDS:
-				kwargs[kwarg] = self.run(mod)
+			for (kwarg, mod) in iterator(module.DEPENDS):
+				if not has_key(self.dependency_results, mod):
+					self.dependency_results[mod] = self.run(mod)
+				kwargs[kwarg] = self.dependency_results[mod]
 	
 			self.config.display.log = orig_log	
 			self.config.display.quiet = orig_quiet
@@ -158,9 +197,9 @@ class Modules(object):
 
 							# Do this manually as argparse doesn't seem to be able to handle hexadecimal values
 							if module_option.type == int:
-								kwargs[name] = int(kwargs[name], 0)
+								kwargs[name] = int(value, 0)
 							elif module_option.type == float:
-								kwargs[name] = float(kwargs[name])
+								kwargs[name] = float(value)
 							elif module_option.type == dict:
 								if not has_key(kwargs, name):
 									kwargs[name] = {}
@@ -176,13 +215,6 @@ class Modules(object):
 
 		if self.config is not None and not has_key(kwargs, 'config'):
 			kwargs['config'] = self.config
-
-		# If some command line arguments for this module were parsed, then set it to enabled.
-		# Else, disable it by default.
-		if kwargs:
-			kwargs['enabled'] = True
-		else:
-			kwargs['enabled'] = False
 				
 		return kwargs
 	
@@ -204,8 +236,12 @@ class Modules(object):
 
 				setattr(module, module_argument.name, arg_value)
 
-			if has_key(kwargs, 'config'):
-				setattr(module, 'config', kwargs['config'])
+			for (k, v) in iterator(kwargs):
+				if not hasattr(module, k):
+					setattr(module, k, v)
+
+			if not hasattr(module, 'enabled'):
+				setattr(module, 'enabled', False)
 		else:
 			raise Exception("binwalk.module.process_kwargs: %s has no attribute 'KWARGS'" % str(module))
 

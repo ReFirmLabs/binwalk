@@ -27,7 +27,12 @@ class HashMatch(object):
 	DEFAULT_CUTOFF = 0
 	CONSERVATIVE_CUTOFF = 90
 
+	NAME = "Fuzzy Hash"
 	CLI = [
+		binwalk.module.ModuleOption(short='F',
+									long='fuzzy',
+									kwargs={'enabled' : True},
+									description='Perform fuzzy hash matching on files/directories'),
 		binwalk.module.ModuleOption(short='c',
 									long='cutoff',
 									nargs=1,
@@ -43,7 +48,7 @@ class HashMatch(object):
 									long='same',
 									kwargs={'same' : True, 'cutoff' : CONSERVATIVE_CUTOFF},
 									description='Only show files that are the same'),
-		binwalk.module.ModuleOption(short='d',
+		binwalk.module.ModuleOption(short='',
 									long='diff',
 									kwargs={'same' : False, 'cutoff' : CONSERVATIVE_CUTOFF},
 									description='Only show files that are different'),
@@ -90,9 +95,6 @@ class HashMatch(object):
 		Returns None.
 		'''
 		binwalk.module.process_kwargs(self, kwargs)
-
-		self.config.display.format_strings(self.HEADER_FORMAT, self.RESULT_FORMAT)
-		self.config.display.header(*self.HEADER)
 
 		self.total = 0
 		self.last_file1 = HashResult(None)
@@ -262,17 +264,12 @@ class HashMatch(object):
 			
 		return set(file_list)
 
-class HashFiles(HashMatch):
-
-	def run(self):
+	def hash_files(self, needle, haystack):
 		'''
 		Compare one file against a list of other files.
 		
 		Returns a list of tuple results.
 		'''
-		needle = self.config.target_files[0]
-		haystack = self.config.target_files[1:]
-
 		results = []
 		self.total = 0
 
@@ -286,20 +283,14 @@ class HashFiles(HashMatch):
 				if self.max_results and self.total >= self.max_results:
 					break
 
-		self._print_footer()
 		return results
 
-class HashFile(HashMatch):
-
-	def run(self):
+	def hash_file(self, needle, haystack):
 		'''
 		Search for one file inside one or more directories.
 
 		Returns a list of tuple results.
 		'''
-		needle = self.config.target_files[0]
-		haystack = self.config.target_files[1:]
-
 		matching_files = []
 		self.total = 0
 		done = False
@@ -319,20 +310,14 @@ class HashFile(HashMatch):
 			if done:
 				break
 					
-		self._print_footer()
 		return matching_files
 
-class HashDirectories(HashMatch):
-	
-	def run(self):
+	def hash_directories(self, needle, haystack):
 		'''
 		Compare the contents of one directory with the contents of other directories.
 
 		Returns a list of tuple results.
 		'''
-		needle = self.config.target_files[0]
-		haystack = self.config.target_files[1:]
-
 		done = False
 		results = []
 		self.total = 0
@@ -359,6 +344,28 @@ class HashDirectories(HashMatch):
 			if done:
 				break
 
-		self._print_footer()
+		return results
+
+	def run(self):
+		'''
+		Main module method.
+		'''
+		results = None
+		needle = self.config.target_files[0]
+		haystack = self.config.target_files[1:]
+
+		self.config.display.format_strings(self.HEADER_FORMAT, self.RESULT_FORMAT)
+		self.config.display.header(*self.HEADER)
+		
+		if os.path.isfile(needle):
+			if os.path.isfile(haystack[0]):
+				results = self.hash_files(needle, haystack)
+			else:
+				results = self.hash_file(needle, haystack)
+		else:
+			results = self.hash_directories(needle, haystack)
+
+		self.config.display.footer()
+
 		return results
 
