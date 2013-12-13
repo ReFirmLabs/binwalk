@@ -105,7 +105,7 @@ for magic in magic_files:
 fd.close()
 
 # The data files to install along with the binwalk module
-install_data_files = ["magic/*", "config/*", "plugins/*"]
+install_data_files = ["magic/*", "config/*", "plugins/*", "modules/*"]
 
 # Install the binwalk module, script and support files
 setup(	name = "binwalk",

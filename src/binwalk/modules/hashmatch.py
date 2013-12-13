@@ -4,10 +4,10 @@ import magic
 import fnmatch
 import ctypes
 import ctypes.util
+import binwalk.common
+import binwalk.module
 import binwalk.smartstrings
 from binwalk.compat import *
-from binwalk.common import strings
-from binwalk.prettyprint import PrettyPrint
 
 class HashResult(object):
 	'''
@@ -24,6 +24,43 @@ class HashMatch(object):
 	'''
 	Class for fuzzy hash matching of files and directories.
 	'''
+	DEFAULT_CUTOFF = 0
+	CONSERVATIVE_CUTOFF = 90
+
+	CLI = [
+		binwalk.module.ModuleOption(short='c',
+									long='cutoff',
+									nargs=1,
+									priority=100,
+									type=int,
+									kwargs={'cutoff' : DEFAULT_CUTOFF},
+									description='Set the cutoff percentage'),
+		binwalk.module.ModuleOption(short='S',
+									long='strings',
+									kwargs={'strings' : True},
+									description='Diff strings inside files instead of the entire file'),
+		binwalk.module.ModuleOption(short='s',
+									long='same',
+									kwargs={'same' : True, 'cutoff' : CONSERVATIVE_CUTOFF},
+									description='Only show files that are the same'),
+		binwalk.module.ModuleOption(short='d',
+									long='diff',
+									kwargs={'same' : False, 'cutoff' : CONSERVATIVE_CUTOFF},
+									description='Only show files that are different'),
+	]
+
+	KWARGS = [
+		binwalk.module.ModuleKwarg(name='cutoff', default=DEFAULT_CUTOFF),
+		binwalk.module.ModuleKwarg(name='strings', default=False),
+		binwalk.module.ModuleKwarg(name='same', default=True),
+		binwalk.module.ModuleKwarg(name='symlinks', default=False),
+		binwalk.module.ModuleKwarg(name='name', default=False),
+		binwalk.module.ModuleKwarg(name='max_results', default=None),
+		binwalk.module.ModuleKwarg(name='abspath', default=False),
+		binwalk.module.ModuleKwarg(name='matches', default={}),
+		binwalk.module.ModuleKwarg(name='types', default={}),
+	]
+
 	# Requires libfuzzy.so
 	LIBRARY_NAME = "fuzzy"
 
@@ -32,10 +69,11 @@ class HashMatch(object):
 	# Files smaller than this won't produce meaningful fuzzy results (from ssdeep.h)
 	FUZZY_MIN_FILE_SIZE = 4096
 
-	DEFAULT_CUTOFF = 0
-	CONSERVATIVE_CUTOFF = 90
+	HEADER = ["SIMILARITY", "FILE NAME"]
+	HEADER_FORMAT = "\n%s" + " " * 11 + "%s\n" 
+	RESULT_FORMAT = "%4d%%" + " " * 16 + "%s\n"
 
-	def __init__(self, cutoff=None, strings=False, same=False, symlinks=False, name=False, max_results=None, display=False, log=None, csv=False, quiet=False, format_to_screen=False, abspath=False, matches={}, types={}):
+	def __init__(self, **kwargs):
 		'''
 		Class constructor.
 
@@ -45,36 +83,16 @@ class HashMatch(object):
 		@symlinks         - Set to True to include symbolic link files.
 		@name             - Set to True to only compare files whose base names match.
 		@max_results      - Stop searching after x number of matches.
-		@display          - Set to True to display results to stdout, or pass an instance of binwalk.prettyprint.PrettyPrint.
-		@log              - Specify a log file to log results to.
-		@csv              - Set to True to log data in CSV format.
-		@quiet            - Set to True to suppress output to stdout.
-		@format_to_screen - Set to True to format the output to the terminal window width.
 		@abspath          - Set to True to display absolute file paths.
 		@matches          - A dictionary of file names to diff.
 		@types            - A dictionary of file types to diff.
 
 		Returns None.
 		'''
-		self.cutoff = cutoff
-		self.strings = strings
-		self.show_same = same
-		self.symlinks = symlinks
-		self.matches = matches
-		self.name = name
-		self.types = types
-		self.abspath = abspath
-		self.max_results = max_results
+		binwalk.module.process_kwargs(self, kwargs)
 
-		if display:
-			if isinstance(display, PrettyPrint):
-				self.pretty_print = display
-			else:
-				self.pretty_print = PrettyPrint(log=log, csv=csv, format_to_screen=format_to_screen, quiet=quiet)
-
-			self.pretty_print.header(header="PERCENTAGE\t\t\tFILE", csv=True)
-		else:
-			self.pretty_print = None
+		self.config.display.format_strings(self.HEADER_FORMAT, self.RESULT_FORMAT)
+		self.config.display.header(*self.HEADER)
 
 		self.total = 0
 		self.last_file1 = HashResult(None)
@@ -85,9 +103,6 @@ class HashMatch(object):
 
 		self.lib = ctypes.cdll.LoadLibrary(ctypes.util.find_library(self.LIBRARY_NAME))
 
-		if self.cutoff is None:
-			self.cutoff = self.DEFAULT_CUTOFF
-		
 		for k in get_keys(self.types):
 			for i in range(0, len(self.types[k])):
 				self.types[k][i] = re.compile(self.types[k][i])
@@ -96,14 +111,12 @@ class HashMatch(object):
 		return ''.join(list(binwalk.common.strings(fname, minimum=10)))
 
 	def _print(self, match, fname):
-		if self.pretty_print:
-			if self.abspath:
-				fname = os.path.abspath(fname)
-			self.pretty_print._pprint('%4d\t\t\t\t%s\n' % (match, self.pretty_print._format(fname)))
+		if self.abspath:
+			fname = os.path.abspath(fname)
+		self.config.display.result(match, fname)
 
 	def _print_footer(self):
-		if self.pretty_print:
-			self.pretty_print.footer()
+		self.config.display.footer()
 
 	def _compare_files(self, file1, file2):
 		'''
@@ -192,7 +205,7 @@ class HashMatch(object):
 		Returns True if this is a good match.
 		Returns False if his is not a good match.
 		'''
-		return (match is not None and ((match >= self.cutoff and self.show_same) or (match < self.cutoff and not self.show_same)))
+		return (match is not None and ((match >= self.cutoff and self.same) or (match < self.cutoff and not self.same)))
 
 	def _get_file_list(self, directory):
 		'''
@@ -249,15 +262,17 @@ class HashMatch(object):
 			
 		return set(file_list)
 
-	def files(self, needle, haystack):
+class HashFiles(HashMatch):
+
+	def run(self):
 		'''
 		Compare one file against a list of other files.
 		
-		@needle   - File to match against.
-		@haystack - A list of haystack files.
-	
 		Returns a list of tuple results.
 		'''
+		needle = self.config.target_files[0]
+		haystack = self.config.target_files[1:]
+
 		results = []
 		self.total = 0
 
@@ -274,15 +289,17 @@ class HashMatch(object):
 		self._print_footer()
 		return results
 
-	def file(self, needle, haystack):
+class HashFile(HashMatch):
+
+	def run(self):
 		'''
 		Search for one file inside one or more directories.
 
-		@needle   - File to search for.
-		@haystack - List of directories to search in.
-
 		Returns a list of tuple results.
 		'''
+		needle = self.config.target_files[0]
+		haystack = self.config.target_files[1:]
+
 		matching_files = []
 		self.total = 0
 		done = False
@@ -304,16 +321,18 @@ class HashMatch(object):
 					
 		self._print_footer()
 		return matching_files
+
+class HashDirectories(HashMatch):
 	
-	def directories(self, needle, haystack):
+	def run(self):
 		'''
 		Compare the contents of one directory with the contents of other directories.
 
-		@source   - Source directory to compare everything to.
-		@dir_list - Compare files in source to files in these directories.
-
 		Returns a list of tuple results.
 		'''
+		needle = self.config.target_files[0]
+		haystack = self.config.target_files[1:]
+
 		done = False
 		results = []
 		self.total = 0
@@ -342,14 +361,4 @@ class HashMatch(object):
 
 		self._print_footer()
 		return results
-
-
-if __name__ == '__main__':
-	import sys
-	
-	hmatch = HashMatch(strings=True, name=False, types={True:"^elf"})
-	print (hmatch.file(sys.argv[1], sys.argv[2:]))
-	#for (match, fname) in hmatch.directories(sys.argv[1], sys.argv[2]):
-	#for (match, fname) in hmatch.find_file(sys.argv[1], sys.argv[2:]):
-	#	print match, fname
 
