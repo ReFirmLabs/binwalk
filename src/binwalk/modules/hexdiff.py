@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-
-# TODO: Use sane defaults for block size and file size, if not specified.
-#		Handle header output for multiple files.
-
 import os
 import sys
 import curses
@@ -34,7 +29,7 @@ class HexDiff(object):
 										description='Perform a hexdump / diff of a file or files'),
 			binwalk.module.ModuleOption(short='G',
 										long='green',
-										kwargs={'show_green' : True, 'show_blue' : False, 'show_green' : False},
+										kwargs={'show_green' : True, 'show_blue' : False, 'show_red' : False},
 										description='Only show lines containing bytes that are the same among all files'),
 			binwalk.module.ModuleOption(short='i',
 										long='red',
@@ -62,12 +57,6 @@ class HexDiff(object):
 
 		self.block_hex = ""
 		self.printed_alt_text = False
-
-		if hasattr(sys.stderr, 'isatty') and sys.stderr.isatty() and platform.system() != 'Windows':
-			curses.setupterm()
-			self.colorize = self._colorize
-		else:
-			self.colorize = self._no_colorize
 
 	def _no_colorize(self, c, color="red", bold=True):
 		return c
@@ -102,7 +91,7 @@ class HexDiff(object):
 			self.printed_alt_text = False
 			printed = True
 		elif not self.printed_alt_text:
-			self.config.display.result("%s\n" % alt_text)
+			self.config.display.result("%s" % alt_text)
 			self.printed_alt_text = True
 			printed = True
 
@@ -119,55 +108,67 @@ class HexDiff(object):
 		else:
 			self.block_hex += c
 
+	def _build_header(self, files, block_size):
+		header = "OFFSET" + (" " * 4) + files[0].name
+
+		for i in range(1, len(files)):
+			header += " " * ((block_size * 3) + 2 + block_size + 8 - len(files[i-1].name))
+			header += files[i].name
+
+		return header
+
 	def run(self):
 		i = 0
 		total = 0
-		fps = []
 		data = {}
 		delim = '/'
 
 		offset = self.config.offset
 		size = self.config.length
 		block = self.config.block
-		files = self.config.target_files
+
+		if not block:
+			block = self.DEFAULT_BLOCK_SIZE
 
 		self.config.display.format_strings("\n%s\n", "%s\n")
+
+		if hasattr(sys.stderr, 'isatty') and sys.stderr.isatty() and platform.system() != 'Windows':
+			curses.setupterm()
+			self.colorize = self._colorize
+		else:
+			self.colorize = self._no_colorize
 
 		# If negative offset, then we're going that far back from the end of the file
 		if offset < 0:
 			size = offset * -1
 
-		# TODO: Display all file names in hexdump
 		if self.terse:
-			self.config.display.header(files[0])
+			header = self._build_header(self.config.target_files[:1], block)
 		else:
-			self.config.display.header(files[0])
+			header = self._build_header(self.config.target_files, block)
+
+		self.config.display.header(header)
 
 		if common.BlockFile.READ_BLOCK_SIZE < block:
 			read_block_size = block
 		else:
 			read_block_size = common.BlockFile.READ_BLOCK_SIZE
 
-		for f in files:
-			fp = common.BlockFile(f, 'r', length=size, offset=offset)
-			fp.READ_BLOCK_SIZE = read_block_size
-			fp.MAX_TRAILING_SIZE = 0
-			fps.append(fp)
-
 		# BlockFile handles calculation of negative offsets, if one was specified
-		offset = fps[0].offset
+		offset = self.config.target_files[0].offset
+		size = self.config.target_files[0].length
 
 		while total < size:
 			i = 0
 			files_finished = 0
 
-			for fp in fps:
+			for fp in self.config.target_files:
 				(ddata, dlen) = fp.read_block()
 				data[fp.name] = ddata
 				if not ddata or dlen == 0:
 					files_finished += 1
 			
-			if files_finished == len(fps):
+			if files_finished == len(self.config.target_files):
 				break
 			
 			while i < read_block_size and (total+i) < size:
@@ -181,13 +182,13 @@ class HexDiff(object):
 					byte_list = []
 
 					try:
-						c = data[files[0]][j+i]
+						c = data[self.config.target_files[0].name][j+i]
 					except:
 						c = None
 
-					for f in files:
+					for f in self.config.target_files:
 						try:
-							c = data[f][j+i]
+							c = data[f.name][j+i]
 						except Exception as e:
 							c = None
 
@@ -196,23 +197,23 @@ class HexDiff(object):
 
 					if len(byte_list) == 1:
 						diff_same[j] = self.ALL_SAME
-					elif len(byte_list) == len(files):
+					elif len(byte_list) == len(self.config.target_files):
 						diff_same[j] = self.ALL_DIFF
 					else:
 						diff_same[j] = self.SOME_DIFF
 
-				for index in range(0, len(files)):
+				for index in range(0, len(self.config.target_files)):
 					if self.terse and index > 0:
 						break
 			
-					f = files[index]
+					f = self.config.target_files[index]
 
 					alt_text += " " * (3 + (3 * block) + 3 + block + 3)
 					alt_text += delim
 
 					for j in range(0, block):
 						try:
-							self._build_block("%.2X " % ord(data[f][j+i]), highlight=diff_same[j])
+							self._build_block("%.2X " % ord(data[f.name][j+i]), highlight=diff_same[j])
 						except Exception as e:
 							self._build_block("   ")
 
@@ -220,15 +221,15 @@ class HexDiff(object):
 							self._build_block(" |")
 							for k in range(0, block):
 								try:
-									if data[f][k+i] in string.printable and data[f][k+i] not in string.whitespace:
-										self._build_block(data[f][k+i], highlight=diff_same[k])
+									if data[f.name][k+i] in string.printable and data[f.name][k+i] not in string.whitespace:
+										self._build_block(data[f.name][k+i], highlight=diff_same[k])
 									else:
 										self._build_block('.', highlight=diff_same[k])
 								except:
 									self._build_block(' ')
 
-							if index == len(files)-1 or (self.terse and index == 0):
-								self._build_block("|\n")
+							if index == len(self.config.target_files)-1 or (self.terse and index == 0):
+								self._build_block("|")
 							else:
 								self._build_block('|   %s   ' % delim)
 
@@ -241,9 +242,6 @@ class HexDiff(object):
 				i += block
 			total += read_block_size
 		
-		for fp in fps:
-			fp.close()
-
 		self.config.display.footer()
 
 		return True

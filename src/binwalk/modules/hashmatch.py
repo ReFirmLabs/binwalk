@@ -351,8 +351,11 @@ class HashMatch(object):
 		Main module method.
 		'''
 		results = None
-		needle = self.config.target_files[0]
-		haystack = self.config.target_files[1:]
+		needle = self.config.target_files[0].name
+		haystack = []
+		
+		for fp in self.config.target_files[1:]:
+			haystack.append(fp.name)
 
 		self.config.display.format_strings(self.HEADER_FORMAT, self.RESULT_FORMAT)
 		self.config.display.header(*self.HEADER)

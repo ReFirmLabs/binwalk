@@ -78,8 +78,8 @@ class Plotter(object):
 		self.window = gl.GLViewWidget()
 		self.window.opts['distance'] = self.VIEW_DISTANCE
 		
-		if len(self.target_files) == 1:
-			self.window.setWindowTitle(self.target_files[0].name)
+		if len(self.config.target_files) == 1:
+			self.window.setWindowTitle(self.config.target_files[0].name)
 
 	def _print(self, message):
 		'''
@@ -254,7 +254,7 @@ class Plotter(object):
 			ygrid.scale(12.8, 12.8, 12.8)
 			zgrid.scale(12.8, 12.8, 12.8)
 
-		for fd in self.target_files:
+		for fd in self.config.target_files:
 			data_points = self._generate_data_points(fd)
 
 			self._print("Generating plot points from %d data points" % len(data_points))

@@ -67,7 +67,7 @@ class Configuration(object):
 		binwalk.module.ModuleOption(long=None,
 									short=None,
 									type=binwalk.common.BlockFile,
-									kwargs={'target_files' : []}),
+									kwargs={'files' : []}),
 		binwalk.module.ModuleOption(short='u',
 									long='update',
 									kwargs={'do_update' : True},
@@ -86,12 +86,14 @@ class Configuration(object):
 		binwalk.module.ModuleKwarg(name='verbose', default=[]),
 		binwalk.module.ModuleKwarg(name='debug_verbose', default=False),
 		binwalk.module.ModuleKwarg(name='skip_unopened', default=False),
-		binwalk.module.ModuleKwarg(name='target_files', default=[]),
+		binwalk.module.ModuleKwarg(name='files', default=[]),
 		binwalk.module.ModuleKwarg(name='show_help', default=False),
 		binwalk.module.ModuleKwarg(name='do_update', default=False),
 	]
 
 	def __init__(self, **kwargs):
+		self.target_files = []
+
 		binwalk.module.process_kwargs(self, kwargs)
 
 		if self.show_help:
@@ -111,6 +113,19 @@ class Configuration(object):
 											   verbose=self.verbose,
 											   fit_to_screen=self.format_to_terminal)
 
+	def __del__(self):
+		self._cleanup()
+
+	def __exit__(self, a, b, c):
+		self._cleanup()
+
+	def __enter__(self):
+		return self
+
+	def _cleanup(self):
+		for fp in self.target_files:
+			fp.close()
+
 	def _set_verbosity(self):
 		'''
 		Sets the appropriate verbosity.
@@ -123,33 +138,29 @@ class Configuration(object):
 		if len(self.target_files) > 1 and self.verbose == 0:
 			self.verbose = 1
 
-	def _test_target_files(self):
+	def _open_target_files(self):
 		'''
 		Checks if the target files can be opened.
 		Any files that cannot be opened are removed from the self.target_files list.
 		'''
-		open_files = []
-
 		# Validate the target files listed in target_files
-		for tfile in self.target_files:
+		for tfile in self.files:
 			# Ignore directories.
 			if not os.path.isdir(tfile):
 				# Make sure we can open the target files
 				try:
-					open_files.append(BlockFile(tfile, length=self.length, offset=self.offset))
+					self.target_files.append(binwalk.common.BlockFile(tfile, length=self.length, offset=self.offset))
 				except Exception as e:
 					sys.stderr.write("Cannot open file : %s\n" % str(e))
 
 		# Unless -O was specified, don't run the scan unless we are able to scan all specified files
-		if len(open_files) != len(self.target_files) and not self.skip_unopened:
-			failed_open_count = len(self.target_files) - len(open_files)
+		if len(self.target_files) != len(self.files) and not self.skip_unopened:
+			failed_open_count = len(self.files) - len(self.target_files)
 			if failed_open_count > 1:
 				plural = 's'
 			else:
 				plural = ''
 			raise Exception("Failed to open %d file%s for scanning" % (failed_open_count, plural))
-		else:
-			self.target_files = open_files
 
 class Update(object):
 	'''
