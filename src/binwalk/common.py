@@ -212,7 +212,7 @@ class BlockFile(io.FileIO):
 	# limit disk I/O, but small enough to limit the size of processed data blocks.
 	READ_BLOCK_SIZE = 1 * 1024 * 1024
 
-	def __init__(self, fname, mode='r', length=0, offset=0):
+	def __init__(self, fname, mode='r', length=0, offset=0, block=READ_BLOCK_SIZE):
 		'''
 		Class constructor.
 
@@ -254,6 +254,9 @@ class BlockFile(io.FileIO):
 			self.length = 0
 		elif self.length > self.size:
 			self.length = self.size
+
+		if block > 0:
+			self.READ_BLOCK_SIZE = block
 
 		io.FileIO.__init__(self, fname, mode)
 

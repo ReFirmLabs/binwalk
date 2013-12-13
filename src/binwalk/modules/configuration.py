@@ -102,7 +102,7 @@ class Configuration(object):
 			Update(self.verbose).update()
 			sys.exit(0)
 
-		self._test_target_files()
+		self._open_target_files()
 		self._set_verbosity()
 
 		self.display = binwalk.display.Display(log=self.log_file,
@@ -128,7 +128,7 @@ class Configuration(object):
 		Checks if the target files can be opened.
 		Any files that cannot be opened are removed from the self.target_files list.
 		'''
-		failed_open_count = 0
+		open_files = []
 
 		# Validate the target files listed in target_files
 		for tfile in self.target_files:
@@ -136,20 +136,20 @@ class Configuration(object):
 			if not os.path.isdir(tfile):
 				# Make sure we can open the target files
 				try:
-					fd = open(tfile, "rb")
-					fd.close()
+					open_files.append(BlockFile(tfile, length=self.length, offset=self.offset))
 				except Exception as e:
 					sys.stderr.write("Cannot open file : %s\n" % str(e))
-					self.target_files.pop(self.target_files.index(tfile))
-					failed_open_count += 1
 
 		# Unless -O was specified, don't run the scan unless we are able to scan all specified files
-		if failed_open_count > 0 and not self.skip_unopened:
+		if len(open_files) != len(self.target_files) and not self.skip_unopened:
+			failed_open_count = len(self.target_files) - len(open_files)
 			if failed_open_count > 1:
 				plural = 's'
 			else:
 				plural = ''
 			raise Exception("Failed to open %d file%s for scanning" % (failed_open_count, plural))
+		else:
+			self.target_files = open_files
 
 class Update(object):
 	'''

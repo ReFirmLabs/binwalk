@@ -57,7 +57,6 @@ class Plotter(object):
 		binwalk.module.process_kwargs(self, kwargs)
 
 		self.verbose = self.config.verbose
-		self.files = self.config.target_files
 		self.offset = self.config.offset
 		self.length = self.config.length
 		self.plane_count = -1
@@ -79,8 +78,8 @@ class Plotter(object):
 		self.window = gl.GLViewWidget()
 		self.window.opts['distance'] = self.VIEW_DISTANCE
 		
-		if len(self.files) == 1:
-			self.window.setWindowTitle(self.files[0])
+		if len(self.target_files) == 1:
+			self.window.setWindowTitle(self.target_files[0].name)
 
 	def _print(self, message):
 		'''
@@ -159,35 +158,35 @@ class Plotter(object):
 		'''
 		return (0,0,0)
 
-	def _generate_data_points(self, file_name):
+	def _generate_data_points(self, fp):
 		'''
 		Generates a dictionary of data points and their frequency of occurrance.
 
-		@file_name - The file to generate data points from.
+		@fp - The BlockFile object to generate data points from.
 
 		Returns a dictionary.
 		'''
 		i = 0
 		data_points = {}
 
-		self._print("Generating data points for %s" % file_name)
+		self._print("Generating data points for %s" % fp.name)
 
-		with BlockFile(file_name, 'r', offset=self.offset, length=self.length) as fp:
-			fp.MAX_TRAILING_SIZE = 0
+		# We don't need any extra data from BlockFile
+		fp.MAX_TRAILING_SIZE = 0
 
-			while True:
-				(data, dlen) = fp.read_block()
-				if not data or not dlen:
-					break
+		while True:
+			(data, dlen) = fp.read_block()
+			if not data or not dlen:
+				break
 
-				i = 0
-				while (i+(self.axis-1)) < dlen:
-					point = self._generate_data_point(data[i:i+self.axis])
-					if has_key(data_points, point):	
-						data_points[point] += 1
-					else:
-						data_points[point] = 1
-					i += 3
+			i = 0
+			while (i+(self.axis-1)) < dlen:
+				point = self._generate_data_point(data[i:i+self.axis])
+				if has_key(data_points, point):	
+					data_points[point] += 1
+				else:
+					data_points[point] = 1
+				i += 3
 
 		return data_points
 
@@ -255,8 +254,8 @@ class Plotter(object):
 			ygrid.scale(12.8, 12.8, 12.8)
 			zgrid.scale(12.8, 12.8, 12.8)
 
-		for file_name in self.files:
-			data_points = self._generate_data_points(file_name)
+		for fd in self.target_files:
+			data_points = self._generate_data_points(fd)
 
 			self._print("Generating plot points from %d data points" % len(data_points))
 
