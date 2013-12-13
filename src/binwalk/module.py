@@ -100,9 +100,9 @@ class Error(Result):
 		Result.__init__(self, **kwargs)
 
 		if self.exception:
-			sys.stderr.write(str(self.exception) + "\n")
+			sys.stderr.write("Exception: " + str(self.exception) + "\n")
 		elif self.description:
-			sys.stderr.write(self.description + "\n")
+			sys.stderr.write("Error: " + self.description + "\n")
 
 class Module(object):
 	'''
@@ -137,8 +137,22 @@ class Module(object):
 	def __init__(self, **kwargs):
 		# TODO: Instantiate plugins object
 		# self.plugins = x
+		self.errors = []
 		self.results = []
 		process_kwargs(self, kwargs)
+		try:
+			self.load()
+		except KeyboardInterrupt as e:
+			raise e
+		except Exception as e:
+			self.error(exception=e)
+
+	def load(self):
+		'''
+		Invoked at module load time.
+		May be overridden by the module sub-class.
+		'''
+		return None
 
 	def init(self):
 		'''
@@ -225,9 +239,17 @@ class Module(object):
 		'''
 		e = Error(**kwargs)
 		self.errors.append(e)
-		if e.exception:
-			raise e.exception
 
+	def header(self):
+		self.config.display.format_strings(self.HEADER_FORMAT, self.RESULT_FORMAT)
+		if type(self.HEADER) == type([]):
+			self.config.display.header(*self.HEADER)
+		elif self.HEADER:
+			self.config.display.header(self.HEADER)
+	
+	def footer(self):
+		self.config.display.footer()
+			
 	def main(self):
 		'''
 		Responsible for calling self.init, initializing self.config.display, printing the header and calling self.run.
@@ -242,12 +264,7 @@ class Module(object):
 			self.error(exception=e)
 			return False
 
-		self.config.display.format_strings(self.HEADER_FORMAT, self.RESULT_FORMAT)
-		if type(self.HEADER) == type([]):
-			self.config.display.header(*self.HEADER)
-		elif self.HEADER:
-			self.config.display.header(self.HEADER)
-		
+		self.header()	
 		self._plugins_pre_scan()
 
 		try:
@@ -259,8 +276,8 @@ class Module(object):
 			return False
 
 		self._plugins_post_scan()
-		
-		self.config.display.footer()
+		self.footer()
+
 		return retval
 
 class Modules(object):
@@ -277,13 +294,18 @@ class Modules(object):
 
 		Returns None.
 		'''
+		self.ok = True
 		self.config = None
-		self.argv = argv
+		self.arguments = argv
 		self.dependency_results = {}
 
 		if not dummy:
 			from binwalk.modules.configuration import Configuration
 			self.config = self.load(Configuration)
+			for e in self.config.errors:
+				if e.exception:
+					self.ok = False
+					break
 
 	def list(self, attribute="run"):
 		'''
@@ -337,26 +359,31 @@ class Modules(object):
 		return run_modules
 
 	def run(self, module):
-		retval = False
 		obj = self.load(module)
 
-		if obj.enabled:
+		if isinstance(obj, Module) and obj.enabled:
 			try:
-				retval = obj.main()
+				obj.main()
 			except AttributeError as e:
-				print("WARNING:", e)
+				sys.stderr.write("WARNING: " + str(e) + "\n")
+				obj = None
+		else:
+			obj = None
 
-		return retval
+		return obj
 			
 	def load(self, module):
-		kwargs = self.argv(module, argv=self.argv)
-		kwargs.update(self.dependencies(module))
-		return module(**kwargs)
-
+		if self.ok:
+			kwargs = self.argv(module, argv=self.arguments)
+			kwargs.update(self.dependencies(module))
+			return module(**kwargs)
+		else:
+			return None
+		
 	def dependencies(self, module):
 		kwargs = {}
 
-		if hasattr(module, "DEPENDS"):
+		if self.ok and hasattr(module, "DEPENDS"):
 			# Disable output when modules are loaded as dependencies
 			orig_log = self.config.display.log
 			orig_quiet = self.config.display.quiet
@@ -365,8 +392,7 @@ class Modules(object):
 
 			for (kwarg, mod) in iterator(module.DEPENDS):
 				if not has_key(self.dependency_results, mod):
-					self.dependency_results[mod] = self.load(mod)
-					self.dependency_results[mod].main()
+					self.dependency_results[mod] = self.run(mod)
 				kwargs[kwarg] = self.dependency_results[mod]
 	
 			self.config.display.log = orig_log	
@@ -449,7 +475,9 @@ class Modules(object):
 
 		if self.config is not None and not has_key(kwargs, 'config'):
 			kwargs['config'] = self.config
-				
+		if not has_key(kwargs, 'enabled'):
+			kwargs['enabled'] = False
+
 		return kwargs
 	
 	def kwargs(self, module, kwargs):
@@ -473,9 +501,6 @@ class Modules(object):
 			for (k, v) in iterator(kwargs):
 				if not hasattr(module, k):
 					setattr(module, k, v)
-
-			if not hasattr(module, 'enabled'):
-				setattr(module, 'enabled', False)
 		else:
 			raise Exception("binwalk.module.Modules.process_kwargs: %s has no attribute 'KWARGS'" % str(module))
 
@@ -489,7 +514,7 @@ def process_kwargs(obj, kwargs):
 
 	Returns None.
 	'''
-	return Modules(dummy=True).kwargs(module, kwargs)
+	return Modules(dummy=True).kwargs(obj, kwargs)
 
 def show_help(fd=sys.stdout):
 	'''

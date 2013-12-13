@@ -8,6 +8,7 @@ from binwalk.compat import *
 
 class Configuration(binwalk.module.Module):
 
+	RUN = False
 	NAME = "General"
 	CLI = [
 		binwalk.module.ModuleOption(long='length',
@@ -83,11 +84,15 @@ class Configuration(binwalk.module.Module):
 		binwalk.module.ModuleKwarg(name='do_update', default=False),
 	]
 
-	def __init__(self, **kwargs):
+	def load(self):
 		self.target_files = []
 
-		binwalk.module.process_kwargs(self, kwargs)
-
+		self.display = binwalk.display.Display(log=self.log_file,
+											   csv=self.csv,
+											   quiet=self.quiet,
+											   verbose=self.verbose,
+											   fit_to_screen=self.format_to_terminal)
+		
 		if self.show_help:
 			binwalk.module.show_help()
 			sys.exit(0)
@@ -98,12 +103,6 @@ class Configuration(binwalk.module.Module):
 
 		self._open_target_files()
 		self._set_verbosity()
-
-		self.display = binwalk.display.Display(log=self.log_file,
-											   csv=self.csv,
-											   quiet=self.quiet,
-											   verbose=self.verbose,
-											   fit_to_screen=self.format_to_terminal)
 
 	def __del__(self):
 		self._cleanup()
@@ -145,7 +144,7 @@ class Configuration(binwalk.module.Module):
 				except KeyboardInterrupt as e:
 					raise e
 				except Exception as e:
-					self.error(description="Cannot open file : %s\n" % str(e))
+					self.error(description="Cannot open file : %s" % str(e))
 
 		# Unless -O was specified, don't run the scan unless we are able to scan all specified files
 		if len(self.target_files) != len(self.files) and not self.skip_unopened:
