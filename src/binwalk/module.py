@@ -86,13 +86,23 @@ class Result(object):
 class Error(Result):
 	'''
 	A subclass of binwalk.module.Result.
-	Accepts all the same kwargs as binwalk.module.Result, but the following are also suggested:
-
-	@exception - In case of an exception, this is the exception object.
-
-	__init__ returns None.
 	'''
-	pass
+	
+	def __init__(self, **kwargs):
+		'''
+		Accepts all the same kwargs as binwalk.module.Result, but the following are also added:
+
+		@exception - In case of an exception, this is the exception object.
+
+		Returns None.
+		'''
+		self.exception = None
+		Result.__init__(self, **kwargs)
+
+		if self.exception:
+			sys.stderr.write(str(self.exception) + "\n")
+		elif self.description:
+			sys.stderr.write(self.description + "\n")
 
 class Module(object):
 	'''
@@ -215,6 +225,8 @@ class Module(object):
 		'''
 		e = Error(**kwargs)
 		self.errors.append(e)
+		if e.exception:
+			raise e.exception
 
 	def main(self):
 		'''
@@ -222,7 +234,13 @@ class Module(object):
 
 		Returns the value returned from self.run.
 		'''
-		self.init()
+		try:
+			self.init()
+		except KeyboardInterrupt as e:
+			raise e
+		except Exception as e:
+			self.error(exception=e)
+			return False
 
 		self.config.display.format_strings(self.HEADER_FORMAT, self.RESULT_FORMAT)
 		if type(self.HEADER) == type([]):
@@ -231,7 +249,15 @@ class Module(object):
 			self.config.display.header(self.HEADER)
 		
 		self._plugins_pre_scan()
-		retval = self.run()
+
+		try:
+			retval = self.run()
+		except KeyboardInterrupt as e:
+			raise e
+		except Exception as e:
+			self.error(exception=e)
+			return False
+
 		self._plugins_post_scan()
 		
 		self.config.display.footer()

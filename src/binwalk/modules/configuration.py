@@ -142,8 +142,10 @@ class Configuration(binwalk.module.Module):
 				# Make sure we can open the target files
 				try:
 					self.target_files.append(binwalk.common.BlockFile(tfile, length=self.length, offset=self.offset))
+				except KeyboardInterrupt as e:
+					raise e
 				except Exception as e:
-					sys.stderr.write("Cannot open file : %s\n" % str(e))
+					self.error(description="Cannot open file : %s\n" % str(e))
 
 		# Unless -O was specified, don't run the scan unless we are able to scan all specified files
 		if len(self.target_files) != len(self.files) and not self.skip_unopened:
@@ -192,7 +194,7 @@ class Update(object):
 		self.update_zlib()
 		self.update_compressd()
 
-	def _do_update_from_svn(self, prefix, fname):
+	def _do_update_from_git(self, prefix, fname):
 		'''
 		Updates the specified file to the latest version of that file in SVN.
 
@@ -217,8 +219,10 @@ class Update(object):
 			
 			data = urllib2.urlopen(url).read()
 			open(self.config.paths['system'][fname], "wb").write(data)
+		except KeyboardInterrupt as e:
+			raise e
 		except Exception as e:
-			raise Exception("Update._do_update_from_svn failed to update file '%s': %s" % (url, str(e)))
+			raise Exception("Update._do_update_from_git failed to update file '%s': %s" % (url, str(e)))
 
 	def update_binwalk(self):
 		'''
@@ -226,7 +230,7 @@ class Update(object):
 
 		Returns None.
 		'''
-		self._do_update_from_svn(self.MAGIC_PREFIX, self.config.BINWALK_MAGIC_FILE)
+		self._do_update_from_git(self.MAGIC_PREFIX, self.config.BINWALK_MAGIC_FILE)
 	
 	def update_bincast(self):
 		'''
@@ -234,7 +238,7 @@ class Update(object):
 
 		Returns None.
 		'''
-		self._do_update_from_svn(self.MAGIC_PREFIX, self.config.BINCAST_MAGIC_FILE)
+		self._do_update_from_git(self.MAGIC_PREFIX, self.config.BINCAST_MAGIC_FILE)
 	
 	def update_binarch(self):
 		'''
@@ -242,7 +246,7 @@ class Update(object):
 	
 		Returns None.
 		'''
-		self._do_update_from_svn(self.MAGIC_PREFIX, self.config.BINARCH_MAGIC_FILE)
+		self._do_update_from_git(self.MAGIC_PREFIX, self.config.BINARCH_MAGIC_FILE)
 	
 	def update_zlib(self):
 		'''
@@ -250,7 +254,7 @@ class Update(object):
 
 		Returns None.
 		'''
-		self._do_update_from_svn(self.MAGIC_PREFIX, self.config.ZLIB_MAGIC_FILE)
+		self._do_update_from_git(self.MAGIC_PREFIX, self.config.ZLIB_MAGIC_FILE)
 
 	def update_compressd(self):
 		'''
@@ -258,7 +262,7 @@ class Update(object):
 		
 		Returns None.
 		'''
-		self._do_update_from_svn(self.MAGIC_PREFIX, self.config.COMPRESSD_MAGIC_FILE)
+		self._do_update_from_git(self.MAGIC_PREFIX, self.config.COMPRESSD_MAGIC_FILE)
 
 	def update_extract(self):
 		'''
@@ -266,6 +270,6 @@ class Update(object):
 	
 		Returns None.
 		'''
-		self._do_update_from_svn(self.CONFIG_PREFIX, self.config.EXTRACT_FILE)
+		self._do_update_from_git(self.CONFIG_PREFIX, self.config.EXTRACT_FILE)
 
 

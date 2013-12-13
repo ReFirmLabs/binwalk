@@ -216,6 +216,8 @@ class HexDiff(binwalk.module.Module):
 					for j in range(0, block):
 						try:
 							self._build_block("%.2X " % ord(data[f.name][j+i]), highlight=diff_same[j])
+						except KeyboardInterrupt as e:
+							raise e
 						except Exception as e:
 							self._build_block("   ")
 

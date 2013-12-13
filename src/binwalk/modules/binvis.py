@@ -5,7 +5,7 @@ from binwalk.common import BlockFile
 
 class Plotter(binwalk.module.Module):
 	'''
-	Base class for plotting binaries in Qt.
+	Base class for visualizing binaries in Qt.
 	Other plotter classes are derived from this.
 	'''
 	VIEW_DISTANCE = 1024
@@ -41,6 +41,7 @@ class Plotter(binwalk.module.Module):
 			binwalk.module.ModuleKwarg(name='show_grids', default=False),
 	]
 
+	# There isn't really any useful data to print to console. Disable header and result output.
 	HEADER = None
 	RESULT = None
 
@@ -61,7 +62,7 @@ class Plotter(binwalk.module.Module):
 			self.MAX_PLOT_POINTS = self.MAX_3D_PLOT_POINTS
 			self._generate_data_point = self._generate_3d_data_point
 		else:
-			raise Exception("Invalid Plotter axis specified: %d. Must be one of: [2, 3]." % self.axis)
+			raise Exception("Invalid Plotter axis specified: %d. Must be one of: [2,3]" % self.axis)
 
 		if not self.max_points:
 			self.max_points = self.MAX_PLOT_POINTS
@@ -78,7 +79,7 @@ class Plotter(binwalk.module.Module):
 		Print console messages. For internal use only.
 		'''
 		if self.verbose:
-			print (message)
+			print(message)
 
 	def _generate_plot_points(self, data_points):
 		'''
