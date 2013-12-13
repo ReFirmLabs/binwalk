@@ -20,7 +20,7 @@ class HashResult(object):
 		self.hash = hash
 		self.strings = strings
 
-class HashMatch(object):
+class HashMatch(binwalk.module.Module):
 	'''
 	Class for fuzzy hash matching of files and directories.
 	'''
@@ -74,11 +74,12 @@ class HashMatch(object):
 	# Files smaller than this won't produce meaningful fuzzy results (from ssdeep.h)
 	FUZZY_MIN_FILE_SIZE = 4096
 
-	HEADER = ["SIMILARITY", "FILE NAME"]
 	HEADER_FORMAT = "\n%s" + " " * 11 + "%s\n" 
 	RESULT_FORMAT = "%4d%%" + " " * 16 + "%s\n"
+	HEADER = ["SIMILARITY", "FILE NAME"]
+	RESULT = ["percentage", "description"]
 
-	def __init__(self, **kwargs):
+	def init(self):
 		'''
 		Class constructor.
 
@@ -94,8 +95,6 @@ class HashMatch(object):
 
 		Returns None.
 		'''
-		binwalk.module.process_kwargs(self, kwargs)
-
 		self.total = 0
 		self.last_file1 = HashResult(None)
 		self.last_file2 = HashResult(None)
@@ -112,13 +111,10 @@ class HashMatch(object):
 	def _get_strings(self, fname):
 		return ''.join(list(binwalk.common.strings(fname, minimum=10)))
 
-	def _print(self, match, fname):
+	def _show_result(self, match, fname):
 		if self.abspath:
 			fname = os.path.abspath(fname)
-		self.config.display.result(match, fname)
-
-	def _print_footer(self):
-		self.config.display.footer()
+		self.result(percentage=match, description=fname)
 
 	def _compare_files(self, file1, file2):
 		'''
@@ -270,20 +266,16 @@ class HashMatch(object):
 		
 		Returns a list of tuple results.
 		'''
-		results = []
 		self.total = 0
 
 		for f in haystack:
 			m = self._compare_files(needle, f)
 			if m is not None and self.is_match(m):
-				self._print(m, f)
-				results.append((m, f))
+				self._show_result(m, f)
 					
 				self.total += 1
 				if self.max_results and self.total >= self.max_results:
 					break
-
-		return results
 
 	def hash_file(self, needle, haystack):
 		'''
@@ -300,7 +292,7 @@ class HashMatch(object):
 				f = os.path.join(directory, f)
 				m = self._compare_files(needle, f)
 				if m is not None and self.is_match(m):
-					self._print(m, f)
+					self._show_result(m, f)
 					matching_files.append((m, f))
 					
 					self.total += 1
@@ -319,7 +311,6 @@ class HashMatch(object):
 		Returns a list of tuple results.
 		'''
 		done = False
-		results = []
 		self.total = 0
 
 		source_files = self._get_file_list(needle)
@@ -334,8 +325,7 @@ class HashMatch(object):
 
 					m = self._compare_files(file1, file2)
 					if m is not None and self.is_match(m):
-						self._print(m, file2)
-						results.append((m, file2))
+						self._show_result(m, file2)
 
 						self.total += 1
 						if self.max_results and self.total >= self.max_results:
@@ -344,31 +334,22 @@ class HashMatch(object):
 			if done:
 				break
 
-		return results
-
 	def run(self):
 		'''
 		Main module method.
 		'''
-		results = None
 		needle = self.config.target_files[0].name
 		haystack = []
 		
 		for fp in self.config.target_files[1:]:
 			haystack.append(fp.name)
 
-		self.config.display.format_strings(self.HEADER_FORMAT, self.RESULT_FORMAT)
-		self.config.display.header(*self.HEADER)
-		
 		if os.path.isfile(needle):
 			if os.path.isfile(haystack[0]):
-				results = self.hash_files(needle, haystack)
+				self.hash_files(needle, haystack)
 			else:
-				results = self.hash_file(needle, haystack)
+				self.hash_file(needle, haystack)
 		else:
-			results = self.hash_directories(needle, haystack)
+			self.hash_directories(needle, haystack)
 
-		self.config.display.footer()
-
-		return results
-
+		return True

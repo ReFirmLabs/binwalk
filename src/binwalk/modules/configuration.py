@@ -6,7 +6,7 @@ import binwalk.display
 from binwalk.config import *
 from binwalk.compat import *
 
-class Configuration(object):
+class Configuration(binwalk.module.Module):
 
 	NAME = "General"
 	CLI = [
@@ -28,12 +28,6 @@ class Configuration(object):
 									type=int,
 									kwargs={'block' : 0},
 									description='Set file block size'),
-		binwalk.module.ModuleOption(long='grep',
-									short='g',
-									nargs=1,
-									kwargs={'grep' : []},
-									type=list,
-									description='Grep results for the specified text'),
 		binwalk.module.ModuleOption(long='log',
 									short='f',
 									nargs=1,
@@ -81,10 +75,8 @@ class Configuration(object):
 		binwalk.module.ModuleKwarg(name='log_file', default=None),
 		binwalk.module.ModuleKwarg(name='csv', default=False),
 		binwalk.module.ModuleKwarg(name='format_to_terminal', default=False),
-		binwalk.module.ModuleKwarg(name='grep', default=[]),
 		binwalk.module.ModuleKwarg(name='quiet', default=False),
 		binwalk.module.ModuleKwarg(name='verbose', default=[]),
-		binwalk.module.ModuleKwarg(name='debug_verbose', default=False),
 		binwalk.module.ModuleKwarg(name='skip_unopened', default=False),
 		binwalk.module.ModuleKwarg(name='files', default=[]),
 		binwalk.module.ModuleKwarg(name='show_help', default=False),

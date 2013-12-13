@@ -3,7 +3,7 @@ import binwalk.module
 from binwalk.compat import *
 from binwalk.common import BlockFile
 
-class Plotter(object):
+class Plotter(binwalk.module.Module):
 	'''
 	Base class for plotting binaries in Qt.
 	Other plotter classes are derived from this.
@@ -41,20 +41,12 @@ class Plotter(object):
 			binwalk.module.ModuleKwarg(name='show_grids', default=False),
 	]
 
-	def __init__(self, **kwargs):
-		'''
-		Class constructor.
+	HEADER = None
+	RESULT = None
 
-		@axis       - Set to 2 for 2D plotting, 3 for 3D plotting.
-		@max_points - The maximum number of data points to display.
-		@show_grids - Set to True to display x-y-z grids.
-
-		Returns None.
-		'''
+	def init(self):
 		import pyqtgraph.opengl as gl
 		from pyqtgraph.Qt import QtGui
-
-		binwalk.module.process_kwargs(self, kwargs)
 
 		self.verbose = self.config.verbose
 		self.offset = self.config.offset
@@ -142,6 +134,7 @@ class Plotter(object):
 
 		for point in sorted(data_points, key=data_points.get, reverse=True):
 			plot_points[point] = data_points[point]
+			self.result(point=point)
 			total += 1
 			if total >= self.max_points:
 				break
@@ -305,5 +298,5 @@ class Plotter(object):
 	
 	def run(self):
 		self.plot()
-		return self.plot_points
+		return True
 

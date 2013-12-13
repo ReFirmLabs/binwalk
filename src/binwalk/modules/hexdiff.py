@@ -6,7 +6,8 @@ import binwalk.module
 import binwalk.common as common
 from binwalk.compat import *
 
-class HexDiff(object):
+# TODO: This code is an effing mess.
+class HexDiff(binwalk.module.Module):
 
 	ALL_SAME = 0
 	ALL_DIFF = 1
@@ -52,12 +53,10 @@ class HexDiff(object):
 			binwalk.module.ModuleKwarg(name='terse', default=False),
 	]
 
-	def __init__(self, **kwargs):
-		binwalk.module.process_kwargs(self, kwargs)
-
-		self.block_hex = ""
-		self.printed_alt_text = False
-
+	HEADER_FORMAT = "\n%s\n"
+	RESULT_FORMAT = "%s\n"
+	RESULT = ['description']
+	
 	def _no_colorize(self, c, color="red", bold=True):
 		return c
 
@@ -84,19 +83,16 @@ class HexDiff(object):
 		return False
 
 	def _print_block_hex(self, alt_text="*"):
-		printed = False
-
 		if self._color_filter(self.block_hex):
-			self.config.display.result(self.block_hex)
+			desc = self.block_hex
 			self.printed_alt_text = False
-			printed = True
 		elif not self.printed_alt_text:
-			self.config.display.result("%s" % alt_text)
+			desc = "%s" % alt_text
 			self.printed_alt_text = True
-			printed = True
 
+		self.result(description=desc)
 		self.block_hex = ""
-		return printed
+		return True
 
 	def _build_block(self, c, highlight=None):
 		if highlight == self.ALL_DIFF:
@@ -117,20 +113,17 @@ class HexDiff(object):
 
 		return header
 
-	def run(self):
-		i = 0
-		total = 0
-		data = {}
-		delim = '/'
-
-		offset = self.config.offset
-		size = self.config.length
+	def init(self):
 		block = self.config.block
-
 		if not block:
 			block = self.DEFAULT_BLOCK_SIZE
 
-		self.config.display.format_strings("\n%s\n", "%s\n")
+		if self.terse:
+			header_files = self.config.target_files[:1]
+		else:
+			header_files = self.config.target_files
+
+		self.HEADER = self._build_header(header_files, block)
 
 		if hasattr(sys.stderr, 'isatty') and sys.stderr.isatty() and platform.system() != 'Windows':
 			curses.setupterm()
@@ -138,16 +131,25 @@ class HexDiff(object):
 		else:
 			self.colorize = self._no_colorize
 
+	def run(self):
+		i = 0
+		total = 0
+		data = {}
+		delim = '/'
+
+		self.block_hex = ""
+		self.printed_alt_text = False
+		
+		offset = self.config.offset
+		size = self.config.length
+		block = self.config.block
+
+		if not block:
+			block = self.DEFAULT_BLOCK_SIZE
+
 		# If negative offset, then we're going that far back from the end of the file
 		if offset < 0:
 			size = offset * -1
-
-		if self.terse:
-			header = self._build_header(self.config.target_files[:1], block)
-		else:
-			header = self._build_header(self.config.target_files, block)
-
-		self.config.display.header(header)
 
 		if common.BlockFile.READ_BLOCK_SIZE < block:
 			read_block_size = block
@@ -242,7 +244,5 @@ class HexDiff(object):
 				i += block
 			total += read_block_size
 		
-		self.config.display.footer()
-
 		return True
 

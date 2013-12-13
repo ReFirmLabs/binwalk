@@ -6,8 +6,11 @@ import binwalk.common
 from binwalk.compat import *
 
 class ModuleOption(object):
+	'''
+	A container class that allows modules to declare command line options.
+	'''
 
-	def __init__(self, kwargs={}, nargs=0, priority=0, description="", short="", long="", type=str):
+	def __init__(self, kwargs={}, nargs=0, priority=0, description="", short="", long="", type=str, dtype=""):
 		'''
 		Class constructor.
 
@@ -18,6 +21,9 @@ class ModuleOption(object):
 		@short       - The short option to use (optional).
 		@long        - The long option to use (if None, this option will not be displayed in help output).
 		@type        - The accepted data type (one of: io.FileIO/argparse.FileType/binwalk.common.BlockFile, list, str, int, float).
+		@dtype       - The accepted data type, as displayed in the help output.
+
+		Returns None.
 		'''
 		self.kwargs = kwargs
 		self.nargs = nargs
@@ -26,9 +32,16 @@ class ModuleOption(object):
 		self.short = short
 		self.long = long
 		self.type = type
+		self.dtype = str(dtype)
+
+		if not self.dtype and self.type:
+			self.dtype = str(self.type)
 
 class ModuleKwarg(object):
-		
+		'''
+		A container class allowing modules to specify their expected __init__ kwarg(s).
+		'''
+
 		def __init__(self, name="", default=None, description=""):
 			'''
 			Class constructor.
@@ -43,17 +56,203 @@ class ModuleKwarg(object):
 			self.default = default
 			self.description = description
 
+class Result(object):
+	'''
+	Generic class for storing and accessing scan results.
+	'''
 
-def process_kwargs(module, kwargs):
-	return Modules(dummy=True).kwargs(module, kwargs)
+	def __init__(self, **kwargs):
+		'''
+		Class constructor.
 
-def show_help():
-	print Modules(dummy=True).help()
+		@offset      - The file offset of the result.
+		@description - The result description, as displayed to the user.
+		@file        - The file object of the scanned file.
+		@valid       - Set to True if the result if value, False if invalid.
+		@display     - Set to True to display the result to the user, False to hide it.
+
+		Provide additional kwargs as necessary.
+		Returns None.
+		'''
+		self.offset = 0
+		self.description = ''
+		self.file = None
+		self.valid = True
+		self.display = True
+
+		for (k, v) in iterator(kwargs):
+			setattr(self, k, v)
+
+class Error(Result):
+	'''
+	A subclass of binwalk.module.Result.
+	Accepts all the same kwargs as binwalk.module.Result, but the following are also suggested:
+
+	@exception - In case of an exception, this is the exception object.
+
+	__init__ returns None.
+	'''
+	pass
+
+class Module(object):
+	'''
+	All module classes must be subclassed from this.
+	'''
+
+	# The module name, as displayed in help output
+	NAME = ""
+
+	# A list of binwalk.module.ModuleOption command line options
+	CLI = []
+
+	# A list of binwalk.module.ModuleKwargs accepted by __init__
+	KWARGS = []
+
+	# Format string for printing the header during a scan
+	HEADER_FORMAT = "%s\n"
+
+	# Format string for printing each result during a scan 
+	RESULT_FORMAT = "%.8d      %s\n"
+
+	# The header to print during a scan.
+	# Set to None to not print a header.
+	# Note that this will be formatted per the HEADER_FORMAT format string.
+	HEADER = ["OFFSET      DESCRIPTION"]
+
+	# The attribute names to print during a scan, as provided to the self.results method.
+	# Set to None to not print any results.
+	# Note that these will be formatted per the RESULT_FORMAT format string.
+	RESULT = ['offset', 'description']
+
+	def __init__(self, **kwargs):
+		# TODO: Instantiate plugins object
+		# self.plugins = x
+		self.results = []
+		process_kwargs(self, kwargs)
+
+	def init(self):
+		'''
+		Invoked prior to self.run.
+		May be overridden by the module sub-class.
+
+		Returns None.
+		'''
+		return None
+
+	def run(self):
+		'''
+		Executes the main module routine.
+		Must be overridden by the module sub-class.
+
+		Returns True on success, False on failure.
+		'''
+		return False
+
+	def validate(self, r):
+		'''
+		Validates the result.
+		May be overridden by the module sub-class.
+
+		@r - The result, an instance of binwalk.module.Result.
+
+		Returns None.
+		'''
+		r.valid = True
+		return None
+
+	def _plugins_pre_scan(self):
+		# plugins(self)
+		return None
+
+	def _plugins_post_scan(self):
+		# plugins(self)
+		return None
+
+	def _plugins_callback(self, r):
+		return None
+
+	def _build_display_args(self, r):
+		args = []
+
+		if self.RESULT:
+			if type(self.RESULT) != type([]):
+				result = [self.RESULT]
+			else:
+				result = self.RESULT
+	
+			for name in result:
+				args.append(getattr(r, name))
+		
+		return args
+
+	def result(self, **kwargs):
+		'''
+		Validates a result, stores it in self.results and prints it.
+
+		Accepts the same kwargs as the binwalk.module.Result class.
+
+		Returns None.
+		'''
+		r = Result(**kwargs)
+
+		self.validate(r)
+		self._plugins_callback(r)
+
+		if r.valid:
+			self.results.append(r)
+			if r.display:
+				display_args = self._build_display_args(r)
+				if display_args:
+					self.config.display.result(*display_args)
+
+	def error(self, **kwargs):
+		'''
+		Stores the specified error in self.errors.
+
+		Accepts the same kwargs as the binwalk.module.Error class.
+
+		Returns None.
+		'''
+		e = Error(**kwargs)
+		self.errors.append(e)
+
+	def main(self):
+		'''
+		Responsible for calling self.init, initializing self.config.display, printing the header and calling self.run.
+
+		Returns the value returned from self.run.
+		'''
+		self.init()
+
+		self.config.display.format_strings(self.HEADER_FORMAT, self.RESULT_FORMAT)
+		if type(self.HEADER) == type([]):
+			self.config.display.header(*self.HEADER)
+		elif self.HEADER:
+			self.config.display.header(self.HEADER)
+		
+		self._plugins_pre_scan()
+		retval = self.run()
+		self._plugins_post_scan()
+		
+		self.config.display.footer()
+		return retval
 
 class Modules(object):
+	'''
+	Main class used for running and managing modules.
+	'''
 
-	def __init__(self, dummy=False):
+	def __init__(self, argv=sys.argv[1:], dummy=False):
+		'''
+		Class constructor.
+
+		@argv  - List of command line options. Must not include the program name (sys.argv[0]).
+		@dummy - Set to True if you only need the class instance for interrogating modules (run, load, execute will not work).
+
+		Returns None.
+		'''
 		self.config = None
+		self.argv = argv
 		self.dependency_results = {}
 
 		if not dummy:
@@ -61,62 +260,70 @@ class Modules(object):
 			self.config = self.load(Configuration)
 
 	def list(self, attribute="run"):
+		'''
+		Finds all modules with the specified attribute.
+
+		@attribute - The desired module attribute.
+
+		Returns a list of modules that contain the specified attribute.
+		'''
 		import binwalk.modules
 
-		objects = []
+		modules = []
 
-		for (name, obj) in inspect.getmembers(binwalk.modules):
-			if inspect.isclass(obj) and hasattr(obj, attribute):
-				objects.append(obj)
-		return objects
+		for (name, module) in inspect.getmembers(binwalk.modules):
+			if inspect.isclass(module) and hasattr(module, attribute):
+				modules.append(module)
+
+		return modules
 
 	def help(self):
 		help_string = ""
 
 		for obj in self.list(attribute="CLI"):
-			help_string += "\n%s Options:\n" % obj.NAME
+			if obj.CLI:
+				help_string += "\n%s Options:\n" % obj.NAME
 
-			for module_option in obj.CLI:
-				if module_option.long:
-					long_opt = '--' + module_option.long
+				for module_option in obj.CLI:
+					if module_option.long:
+						long_opt = '--' + module_option.long
 					
-					if module_option.nargs > 0:
-						optargs = "=%s" % str(module_option.type)
-					else:
-						optargs = ""
+						if module_option.nargs > 0:
+							optargs = "=%s" % module_option.dtype
+						else:
+							optargs = ""
 
-					if module_option.short:
-						short_opt = "-" + module_option.short + ","
-					else:
-						short_opt = "   "
+						if module_option.short:
+							short_opt = "-" + module_option.short + ","
+						else:
+							short_opt = "   "
 
-					fmt = "    %%s %%s%%-%ds%%s\n" % (32-len(long_opt))
-					help_string += fmt % (short_opt, long_opt, optargs, module_option.description)
+						fmt = "    %%s %%s%%-%ds%%s\n" % (32-len(long_opt))
+						help_string += fmt % (short_opt, long_opt, optargs, module_option.description)
 
 		return help_string
 
 	def execute(self):
-		results = {}
+		run_modules = []
 		for module in self.list():
-			result = self.run(module)
-			if result is not None:
-				results[module] = result
-		return results
+			if self.run(module):
+				run_modules.append(module)
+		return run_modules
 
 	def run(self, module):
-		results = None
+		retval = False
 		obj = self.load(module)
 
 		if obj.enabled:
 			try:
-				results = obj.run()
+				retval = obj.main()
 			except AttributeError as e:
 				print("WARNING:", e)
 
-		return results
+		return retval
 			
 	def load(self, module):
-		kwargs = self.argv(module)
+		kwargs = self.argv(module, argv=self.argv)
 		kwargs.update(self.dependencies(module))
 		return module(**kwargs)
 
@@ -132,7 +339,8 @@ class Modules(object):
 
 			for (kwarg, mod) in iterator(module.DEPENDS):
 				if not has_key(self.dependency_results, mod):
-					self.dependency_results[mod] = self.run(mod)
+					self.dependency_results[mod] = self.load(mod)
+					self.dependency_results[mod].main()
 				kwargs[kwarg] = self.dependency_results[mod]
 	
 			self.config.display.log = orig_log	
@@ -211,7 +419,7 @@ class Modules(object):
 							else:
 								kwargs[name] = value
 		else:
-			raise Exception("binwalk.module.argv: %s has no attribute 'CLI'" % str(module))
+			raise Exception("binwalk.module.Modules.argv: %s has no attribute 'CLI'" % str(module))
 
 		if self.config is not None and not has_key(kwargs, 'config'):
 			kwargs['config'] = self.config
@@ -243,5 +451,28 @@ class Modules(object):
 			if not hasattr(module, 'enabled'):
 				setattr(module, 'enabled', False)
 		else:
-			raise Exception("binwalk.module.process_kwargs: %s has no attribute 'KWARGS'" % str(module))
+			raise Exception("binwalk.module.Modules.process_kwargs: %s has no attribute 'KWARGS'" % str(module))
+
+
+def process_kwargs(obj, kwargs):
+	'''
+	Convenience wrapper around binwalk.module.Modules.kwargs.
+
+	@obj    - The class object (an instance of a sub-class of binwalk.module.Module).
+	@kwargs - The kwargs provided to the object's __init__ method.
+
+	Returns None.
+	'''
+	return Modules(dummy=True).kwargs(module, kwargs)
+
+def show_help(fd=sys.stdout):
+	'''
+	Convenience wrapper around binwalk.module.Modules.help.
+
+	@fd - An object with a write method (e.g., sys.stdout, sys.stderr, etc).
+
+	Returns None.
+	'''
+	fd.write(Modules(dummy=True).help())
+
 
