@@ -99,11 +99,6 @@ class Error(Result):
 		self.exception = None
 		Result.__init__(self, **kwargs)
 
-		if self.exception:
-			sys.stderr.write("Exception: " + str(self.exception) + "\n")
-		elif self.description:
-			sys.stderr.write("Error: " + self.description + "\n")
-
 class Module(object):
 	'''
 	All module classes must be subclassed from this.
@@ -247,7 +242,14 @@ class Module(object):
 		Returns None.
 		'''
 		e = Error(**kwargs)
+		e.module = self
+
 		self.errors.append(e)
+		
+		if e.exception:
+			sys.stderr.write(e.module.__class__.__name__ + " Exception: " + str(e.exception) + "\n")
+		elif e.description:
+			sys.stderr.write(e.module.__class__.__name__ + " Error: " + e.description + "\n")
 
 	def header(self):
 		self.config.display.format_strings(self.HEADER_FORMAT, self.RESULT_FORMAT)
@@ -273,7 +275,13 @@ class Module(object):
 			self.error(exception=e)
 			return False
 
-		self.config.display.format_strings(self.HEADER_FORMAT, self.RESULT_FORMAT)
+		try:
+			self.config.display.format_strings(self.HEADER_FORMAT, self.RESULT_FORMAT)
+		except KeyboardInterrupt as e:
+			raise e
+		except Exception as e:
+			self.error(exception=e)
+			return False
 		
 		self._plugins_pre_scan()
 
@@ -303,7 +311,7 @@ class Modules(object):
 		Returns None.
 		'''
 		self.arguments = argv
-		self.dependency_results = {}
+		self.loaded_modules = {}
 
 	def list(self, attribute="run"):
 		'''
@@ -358,12 +366,12 @@ class Modules(object):
 		obj = self.load(module)
 
 		if isinstance(obj, binwalk.module.Module) and obj.enabled:
-			try:
-				obj.main()
-			except AttributeError as e:
-				sys.stderr.write("WARNING: " + str(e) + "\n")
-				obj = None
+			obj.main()
 
+		# Add object to loaded_modules here, that way if a module has already been
+		# loaded directly and is subsequently also listed as a dependency we don't waste
+		# time loading it twice.
+		self.loaded_modules[module] = obj
 		return obj
 			
 	def load(self, module):
@@ -375,14 +383,15 @@ class Modules(object):
 		kwargs = {}
 
 		if hasattr(module, "DEPENDS"):
-			for (kwarg, mod) in iterator(module.DEPENDS):
-				if mod == module:
+			for (kwarg, dependency) in iterator(module.DEPENDS):
+				# No recursive dependencies, thanks
+				if dependency == module:
 					continue
 
-				if not has_key(self.dependency_results, mod):
-					# TODO: What to do if a dependency fails?
-					self.dependency_results[mod] = self.run(mod)
-				kwargs[kwarg] = self.dependency_results[mod]
+				if not has_key(self.loaded_modules, dependency):
+					# TODO: What to do if a dependency fails? Anything?
+					self.run(dependency)
+				kwargs[kwarg] = self.loaded_modules[dependency]
 	
 		return kwargs
 

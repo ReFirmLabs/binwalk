@@ -11,10 +11,13 @@ class Signature(binwalk.module.Module):
 
 	DEPENDS = {'config' : Configuration}
 
+	NAME = "Signature Scan"
+
 	CLI = [
 			binwalk.module.ModuleOption(short='B',
 										long='signature',
-										kwargs={'enabled' : True}),
+										kwargs={'enabled' : True},
+										description='Scan target file(s) for file signatures'),
 	]
 
 	KWARGS = [
@@ -32,6 +35,7 @@ class Signature(binwalk.module.Module):
 	def init(self):
 		# Instantiate the config class so we can access file/directory paths
 		self.conf = binwalk.config.Config()
+		self.config = None
 
 		# Create SmartSignature and MagicParser class instances. These are mostly for internal use.
 		self.filter = binwalk.filter.MagicFilter()
