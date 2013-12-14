@@ -308,6 +308,16 @@ class BlockFile(io.FileIO):
 
 		return bytes2str(data)
 
+	def seek(self, n, whence=os.SEEK_SET):
+		if whence == os.SEEK_SET:
+			self.total_read = n
+		elif whence == os.SEEK_CUR:
+			self.total_read += n
+		elif whence == os.SEEK_END:
+			self.total_read = self.size + n
+
+		io.FileIO.seek(self, n, whence)
+
 	def read_block(self):
 		'''
 		Reads in a block of data from the target file.

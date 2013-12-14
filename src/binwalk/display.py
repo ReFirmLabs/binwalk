@@ -4,7 +4,7 @@ import binwalk.common
 
 class Display(object):
 
-	BUFFER_WIDTH = 32
+	BUFFER_WIDTH = 0
 	HEADER_WIDTH = 115
 	MAX_LINE_LEN = 0
 	DEFAULT_FORMAT = "%s\n"
@@ -46,7 +46,8 @@ class Display(object):
 
 	def _fprint(self, fmt, columns, csv=True):
 		if not self.quiet:
-			sys.stdout.write(fmt % tuple(columns))
+			line = fmt % tuple(columns)
+			sys.stdout.write(self._format_line(line.strip()) + "\n")
 
 		if not (self.csv and not csv):
 			self.log(fmt, columns)
@@ -92,7 +93,7 @@ class Display(object):
 
 				offset += space_offset
 
-		self._append_to_data_parts(line, offset, offset+len(data[offset:]))
+		self._append_to_data_parts(line, offset, offset+len(line[offset:]))
 
 		return delim.join(self.string_parts)
 
