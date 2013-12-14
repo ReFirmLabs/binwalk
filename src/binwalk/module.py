@@ -345,7 +345,7 @@ class Modules(object):
 						fmt = "    %%s %%s%%-%ds%%s\n" % (32-len(long_opt))
 						help_string += fmt % (short_opt, long_opt, optargs, module_option.description)
 
-		return help_string
+		return help_string + "\n"
 
 	def execute(self):
 		run_modules = []
