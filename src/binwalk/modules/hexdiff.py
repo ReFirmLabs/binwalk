@@ -5,6 +5,7 @@ import platform
 import binwalk.module
 import binwalk.common as common
 from binwalk.compat import *
+from binwalk.modules.configuration import Configuration
 
 # TODO: This code is an effing mess.
 class HexDiff(binwalk.module.Module):
@@ -21,6 +22,8 @@ class HexDiff(binwalk.module.Module):
 		'green'	: '32',
 		'blue'	: '34',
 	}
+
+	DEPENDS = {'config' : Configuration}
 
 	NAME = "Binary Diffing"
 	CLI = [

@@ -2,6 +2,7 @@ import os
 import binwalk.module
 from binwalk.compat import *
 from binwalk.common import BlockFile
+from binwalk.modules.configuration import Configuration
 
 class Plotter(binwalk.module.Module):
 	'''
@@ -13,6 +14,8 @@ class Plotter(binwalk.module.Module):
 	MAX_3D_PLOT_POINTS = 25000
 
 	NAME = "Binary Visualization"
+
+	DEPENDS = {'config' : Configuration}
 
 	CLI = [
 			binwalk.module.ModuleOption(short='3',

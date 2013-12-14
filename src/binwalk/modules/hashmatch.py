@@ -8,6 +8,7 @@ import binwalk.common
 import binwalk.module
 import binwalk.smartstrings
 from binwalk.compat import *
+from binwalk.modules.configuration import Configuration
 
 class HashResult(object):
 	'''
@@ -26,6 +27,8 @@ class HashMatch(binwalk.module.Module):
 	'''
 	DEFAULT_CUTOFF = 0
 	CONSERVATIVE_CUTOFF = 90
+
+	DEPENDS = {'config' : Configuration }
 
 	NAME = "Fuzzy Hash"
 	CLI = [

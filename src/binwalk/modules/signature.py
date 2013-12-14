@@ -5,8 +5,11 @@ import binwalk.parser
 import binwalk.filter
 import binwalk.smartsignature
 from binwalk.compat import *
+from binwalk.modules.configuration import Configuration
 
 class Signature(binwalk.module.Module):
+
+	DEPENDS = {'config' : Configuration}
 
 	CLI = [
 			binwalk.module.ModuleOption(short='B',
