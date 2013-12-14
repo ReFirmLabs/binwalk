@@ -5,13 +5,10 @@ import binwalk.parser
 import binwalk.filter
 import binwalk.smartsignature
 from binwalk.compat import *
-from binwalk.modules.configuration import Configuration
 
 class Signature(binwalk.module.Module):
 
-	DEPENDS = {'config' : Configuration}
-
-	NAME = "Signature Scan"
+	TITLE = "Signature Scan"
 
 	CLI = [
 			binwalk.module.ModuleOption(short='B',
@@ -32,8 +29,8 @@ class Signature(binwalk.module.Module):
 			binwalk.module.ModuleKwarg(name='magic_files', default=[]),
 	]
 
-	HEADER = "BINWALK"
-	HEADER_FORMAT = "%s\n"
+	HEADER = ["DECIMAL", "HEX", "DESCRIPTION"]
+	HEADER_FORMAT = "%-12s  %-12s    %s\n"
 	RESULT = ["offset", "offset", "description"]
 	RESULT_FORMAT = "%-12d  0x%-12X  %s\n"
 

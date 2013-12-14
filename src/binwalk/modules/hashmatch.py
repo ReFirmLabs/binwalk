@@ -8,7 +8,6 @@ import binwalk.common
 import binwalk.module
 import binwalk.smartstrings
 from binwalk.compat import *
-from binwalk.modules.configuration import Configuration
 
 class HashResult(object):
 	'''
@@ -28,15 +27,14 @@ class HashMatch(binwalk.module.Module):
 	DEFAULT_CUTOFF = 0
 	CONSERVATIVE_CUTOFF = 90
 
-	DEPENDS = {'config' : Configuration }
+	TITLE = "Fuzzy Hash"
 
-	NAME = "Fuzzy Hash"
 	CLI = [
 		binwalk.module.ModuleOption(short='F',
 									long='fuzzy',
 									kwargs={'enabled' : True},
 									description='Perform fuzzy hash matching on files/directories'),
-		binwalk.module.ModuleOption(short='c',
+		binwalk.module.ModuleOption(short='t',
 									long='cutoff',
 									nargs=1,
 									priority=100,

@@ -1,12 +1,10 @@
 import sys
 import csv as pycsv
-import binwalk.common
 
 class Display(object):
 
-	BUFFER_WIDTH = 0
-	HEADER_WIDTH = 115
-	MAX_LINE_LEN = 0
+	SCREEN_WIDTH = 0
+	HEADER_WIDTH = 150
 	DEFAULT_FORMAT = "%s\n"
 
 	def __init__(self, quiet=False, verbose=0, log=None, csv=False, fit_to_screen=False):
@@ -15,17 +13,21 @@ class Display(object):
 		self.fit_to_screen = fit_to_screen
 		self.fp = None
 		self.csv = None
+		self.num_columns = 0
 
 		self._configure_formatting()
 
 		if log:
-			self.fp = binwalk.common.BlockFile(log, mode="w")
-			if self.csv:
+			self.fp = open(log, "w")
+			if csv:
 				self.csv = pycsv.writer(self.fp)
 
 	def format_strings(self, header, result):
 		self.result_format = result
 		self.header_format = header
+		
+		if self.num_columns == 0:
+			self.num_columns = len(header.split())
 
 	def log(self, fmt, columns):
 		if self.fp:
@@ -35,6 +37,8 @@ class Display(object):
 				self.fp.write(fmt % tuple(columns))
 
 	def header(self, *args):
+		self.num_columns = len(args)
+		self._fprint("%s", "\n", csv=False)
 		self._fprint(self.header_format, args)
 		self._fprint("%s", ["-" * self.HEADER_WIDTH + "\n"], csv=False)
 
@@ -49,7 +53,7 @@ class Display(object):
 			line = fmt % tuple(columns)
 			sys.stdout.write(self._format_line(line.strip()) + "\n")
 
-		if not (self.csv and not csv):
+		if self.fp and not (self.csv and not csv):
 			self.log(fmt, columns)
 
 	def _append_to_data_parts(self, data, start, end):
@@ -81,17 +85,22 @@ class Display(object):
 		offset = 0
 		space_offset = 0
 		self.string_parts = []
-		delim = '\n' + ' ' * self.BUFFER_WIDTH
+		delim = '\n'
 
-		if self.fit_to_screen:
-			while len(line[offset:]) > self.MAX_LINE_LEN:
-				space_offset = line[offset:offset+self.MAX_LINE_LEN].rfind(' ')
-				if space_offset == -1 or space_offset == 0:
-					space_offset = self.MAX_LINE_LEN
+		if self.fit_to_screen and len(line) > self.SCREEN_WIDTH:
+			line_columns = line.split(None, self.num_columns-1)
 
-				self._append_to_data_parts(line, offset, offset+space_offset)
+			if line_columns:
+				delim = '\n' + ' ' * line.rfind(line_columns[-1])
 
-				offset += space_offset
+				while len(line[offset:]) > self.SCREEN_WIDTH:
+					space_offset = line[offset:offset+self.HEADER_WIDTH].rfind(' ')
+					if space_offset == -1 or space_offset == 0:
+						space_offset = self.SCREEN_WIDTH
+
+					self._append_to_data_parts(line, offset, offset+space_offset)
+
+					offset += space_offset
 
 		self._append_to_data_parts(line, offset, offset+len(line[offset:]))
 
@@ -113,9 +122,7 @@ class Display(object):
 
 				# Get the terminal window width
 				hw = struct.unpack('hh', fcntl.ioctl(1, termios.TIOCGWINSZ, '1234'))
-				self.HEADER_WIDTH = hw[1]
+				self.SCREEN_WIDTH = self.HEADER_WIDTH = hw[1]
 			except Exception as e:
 				pass
-
-			self.MAX_LINE_LEN = self.HEADER_WIDTH - self.BUFFER_WIDTH
 

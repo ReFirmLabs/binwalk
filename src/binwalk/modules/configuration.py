@@ -8,8 +8,8 @@ from binwalk.compat import *
 
 class Configuration(binwalk.module.Module):
 
-	RUN = False
-	NAME = "General"
+	TITLE = "General"
+	
 	CLI = [
 		binwalk.module.ModuleOption(long='length',
 									short='l',

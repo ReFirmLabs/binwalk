@@ -1,4 +1,5 @@
 import io
+import os
 import sys
 import inspect
 import argparse
@@ -103,8 +104,11 @@ class Module(object):
 	'''
 	All module classes must be subclassed from this.
 	'''
-	# The module name, as displayed in help output
+	# The module name, automatically populated.
 	NAME = ""
+
+	# The module title, as displayed in help output
+	TITLE = ""
 
 	# A list of binwalk.module.ModuleOption command line options
 	CLI = []
@@ -113,7 +117,7 @@ class Module(object):
 	KWARGS = []
 
 	# A dictionary of module dependencies; all modules depend on binwalk.modules.configuration.Configuration
-	DEPENDS = {}
+	DEPENDS = {'config' : 'Configuration'}
 
 	# Format string for printing the header during a scan
 	HEADER_FORMAT = "%s\n"
@@ -136,6 +140,7 @@ class Module(object):
 		# self.plugins = x
 		self.errors = []
 		self.results = []
+		self.NAME = self.__class__.__name__
 
 		process_kwargs(self, kwargs)
 
@@ -302,16 +307,40 @@ class Modules(object):
 	Main class used for running and managing modules.
 	'''
 
-	def __init__(self, argv=sys.argv[1:]):
+	def __init__(self, *argv, **kargv):
 		'''
 		Class constructor.
 
-		@argv  - List of command line options. Must not include the program name (sys.argv[0]).
+		@argv  - List of command line options. Must not include the program name (e.g., sys.argv[1:]).
+		@kargv - Keyword dictionary of command line options.
 
 		Returns None.
 		'''
+		argv = list(argv)
+
+		for (k,v) in iterator(kargv):
+			k = self._parse_api_opt(k)
+
+			if v not in [True, False, None]:
+				argv.append("%s %s" % (k, v))
+			else:
+				argv.append(k)
+
+		if not argv:
+			argv = sys.argv[1:]
+
 		self.arguments = argv
 		self.loaded_modules = {}
+
+	def _parse_api_opt(self, opt):
+		# If the argument already starts with a hyphen, don't add hyphens in front of it
+		if opt.startswith('-'):
+			return opt
+		# Short options are only 1 character
+		elif len(opt) == 1:
+			return '-' + opt
+		else:
+			return '--' + opt
 
 	def list(self, attribute="run"):
 		'''
@@ -334,7 +363,7 @@ class Modules(object):
 
 		for obj in self.list(attribute="CLI"):
 			if obj.CLI:
-				help_string += "\n%s Options:\n" % obj.NAME
+				help_string += "\n%s Options:\n" % obj.TITLE
 
 				for module_option in obj.CLI:
 					if module_option.long:
@@ -384,6 +413,14 @@ class Modules(object):
 
 		if hasattr(module, "DEPENDS"):
 			for (kwarg, dependency) in iterator(module.DEPENDS):
+
+				# The dependency module must be imported by binwalk.modules.__init__.py
+				if hasattr(binwalk.modules, dependency):
+					dependency = getattr(binwalk.modules, dependency)
+				else:
+					sys.stderr.write("WARNING: %s depends on %s which was not found in binwalk.modules.__init__.py\n" % (str(module), dependency))
+					continue
+				
 				# No recursive dependencies, thanks
 				if dependency == module:
 					continue
