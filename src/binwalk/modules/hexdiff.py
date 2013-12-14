@@ -147,6 +147,8 @@ class HexDiff(binwalk.module.Module):
 		size = self.config.length
 		block = self.config.block
 
+		self.header()
+
 		if not block:
 			block = self.DEFAULT_BLOCK_SIZE
 
@@ -248,6 +250,7 @@ class HexDiff(binwalk.module.Module):
 
 				i += block
 			total += read_block_size
-		
+
+		self.footer()		
 		return True
 

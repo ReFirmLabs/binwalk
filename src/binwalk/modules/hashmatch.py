@@ -343,7 +343,9 @@ class HashMatch(binwalk.module.Module):
 		'''
 		needle = self.config.target_files[0].name
 		haystack = []
-		
+
+		self.header()
+				
 		for fp in self.config.target_files[1:]:
 			haystack.append(fp.name)
 
@@ -354,5 +356,7 @@ class HashMatch(binwalk.module.Module):
 				self.hash_file(needle, haystack)
 		else:
 			self.hash_directories(needle, haystack)
+
+		self.footer()
 
 		return True

@@ -69,5 +69,7 @@ class Signature(binwalk.module.Module):
 
 	def run(self):
 		for fp in self.config.target_files:
+			self.header()
 			self.scan_file(fp)
+			self.footer()
 
