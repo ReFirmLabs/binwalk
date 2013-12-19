@@ -5,6 +5,7 @@ import inspect
 import argparse
 import binwalk.common
 import binwalk.config
+import binwalk.plugin
 from binwalk.compat import *
 
 class ModuleOption(object):
@@ -72,6 +73,7 @@ class Result(object):
 		@file        - The file object of the scanned file.
 		@valid       - Set to True if the result if value, False if invalid.
 		@display     - Set to True to display the result to the user, False to hide it.
+		@extract     - Set to True to flag this result for extraction.
 
 		Provide additional kwargs as necessary.
 		Returns None.
@@ -81,6 +83,7 @@ class Result(object):
 		self.file = None
 		self.valid = True
 		self.display = True
+		self.extract = True
 
 		for (k, v) in iterator(kwargs):
 			setattr(self, k, v)
@@ -134,12 +137,11 @@ class Module(object):
 	RESULT = ['offset', 'description']
 
 	def __init__(self, dependency=False, **kwargs):
-		# TODO: Instantiate plugins object
-		# self.plugins = x
 		self.errors = []
 		self.results = []
 		self.status = None
 		self.name = self.__class__.__name__
+		self.plugins = binwalk.plugin.Plugins(self)
 
 		process_kwargs(self, kwargs)
 
@@ -154,6 +156,8 @@ class Module(object):
 			raise e
 		except Exception as e:
 			self.error(exception=e)
+	
+		self.plugins.load_plugins()
 
 	def load(self):
 		'''
@@ -193,15 +197,13 @@ class Module(object):
 		return None
 
 	def _plugins_pre_scan(self):
-		# plugins(self)
-		return None
+		self.plugins.pre_scan_callbacks(self)
 
 	def _plugins_post_scan(self):
-		# plugins(self)
-		return None
+		self.plugins.post_scan_callbacks(self)
 
-	def _plugins_callback(self, r):
-		return None
+	def _plugins_result(self, r):
+		self.plugins.scan_callbacks(r)
 
 	def _build_display_args(self, r):
 		args = []
@@ -230,7 +232,7 @@ class Module(object):
 			r = Result(**kwargs)
 
 		self.validate(r)
-		self._plugins_callback(r)
+		self._plugins_result(r)
 
 		if r.valid:
 			self.results.append(r)

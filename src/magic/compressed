@@ -160,12 +160,16 @@
 >4      byte            x               \b%d
 
 # New LZMA format signature
-0	string		\xFFLZMA\x00	LZMA compressed data (new),
->6	byte&0x10	0		single-block stream
->6	byte&0x10	0x10		multi-block stream
-
 # See lzma file for LZMA signatures
-
+0	string		\xFFLZMA\x00	LZMA compressed data (new),
+>6	byte&0x10	0				single-block stream
+>6	byte&0x10	0x10			multi-block stream
 
 0	string	\xff\x06\x00\x00\x73\x4e\x61\x50\x70\x59	Snappy compression, stream identifier
 
+0   string	\x1f\x9d\x90	compress'd data, 16 bits
+
+#0	beshort		0x7801		Zlib header, no compression
+0	beshort		0x789c		Zlib header, default compression
+0	beshort		0x78da		Zlib header, best compression
+0	beshort		0x785e		Zlib header, compressed

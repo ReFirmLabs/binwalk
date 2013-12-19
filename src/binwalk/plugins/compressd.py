@@ -1,47 +1,31 @@
 import ctypes
 import ctypes.util
 from binwalk.common import *
-from binwalk.plugins import *
 
 class Plugin:
 	'''
 	Searches for and validates compress'd data.
 	'''
 
-	ENABLED = True
 	READ_SIZE = 64
 
-	def __init__(self, binwalk):
+	def __init__(self, module):
 		self.fd = None
 		self.comp = None
-		self.binwalk = binwalk
-		compressd_magic_file = binwalk.config.find_magic_file("compressd")
 
-		if binwalk.scan_type == binwalk.BINWALK:
+		if module.name == 'Signature':
 			self.comp = ctypes.cdll.LoadLibrary(ctypes.util.find_library("compress42"))
-			if self.comp:
-				binwalk.magic_files.append(compressd_magic_file)
-		elif compressd_magic_file in binwalk.magic_files:
-			binwalk.magic_files.pop(binwalk.magic_files.index(compressd_magic_file))
 
-	def __del__(self):
-		try:
-			self.fd.close()
-		except:
-			pass
+	def scan(self, result):
+		if self.comp:
+			if result.file and result.description.lower().startswith("compress'd data"):
+				fd = BlockFile(result.file.name, "r")
+				fd.seek(result.offset)
 
-	def pre_scan(self, fd):
-		try:
-			if self.comp:
-				self.fd = BlockFile(fd.name, 'r')
-		except:
-			pass
-
-	def callback(self, results):
-		if self.fd and results['description'].lower().startswith("compress'd data"):
-			self.fd.seek(results['offset'])
-			compressed_data = self.fd.read(self.READ_SIZE)
+				compressed_data = fd.read(self.READ_SIZE)
                         
-			if not self.comp.is_compressed(compressed_data, len(compressed_data)):
-				return (PLUGIN_NO_DISPLAY | PLUGIN_NO_EXTRACT)
+				if not self.comp.is_compressed(compressed_data, len(compressed_data)):
+					result.valid = False
+
+				fd.close()
 

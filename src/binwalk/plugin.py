@@ -34,15 +34,6 @@ class Plugins:
 		  This method is called after running a scan against a file, but before the file has been closed.
 		  It is passed the file object of the scanned file.
 
-	Valid return values for all plugin callbacks are (PLUGIN_* values may be OR'd together):
-
-		PLUGIN_CONTINUE     - Do nothing, continue the scan normally.
-		PLUGIN_NO_EXTRACT   - Do not preform data extraction.
-		PLUGIN_NO_DISPLAY   - Ignore the result(s); they will not be displayed or further processed.
-		PLUGIN_STOP_PLUGINS - Do not call any other plugins.
-		PLUGIN_TERMINATE    - Terminate the scan.
-		None                - The same as PLUGIN_CONTINUE.
-
 	Values returned by pre_scan affect all results during the scan of that particular file.
 	Values returned by callback affect only that specific scan result.
 	Values returned by post_scan are ignored since the scan of that file has already been completed.
@@ -50,50 +41,20 @@ class Plugins:
 	By default, all plugins are loaded during binwalk signature scans. Plugins that wish to be disabled by 
 	default may create a class variable named 'ENABLED' and set it to False. If ENABLED is set to False, the
 	plugin will only be loaded if it is explicitly named in the plugins whitelist.
-
-	Simple example plugin:
-
-		from binwalk.plugins import *
-
-		class Plugin:
-
-			# Set to False to have this plugin disabled by default.
-			ENABLED = True
-
-			def __init__(self):
-				self.binwalk = binwalk
-				print 'Scanning initialized!'
-
-			def __del__(self):
-				print 'Scanning complete!'
-
-			def pre_scan(self, fd):
-				print 'About to scan', fd.name
-				return PLUGIN_CONTINUE
-
-			def callback(self, results):
-				print 'Got a result:', results['description']
-				return PLUGIN_CONTINUE
-
-			def post_scan(self, fd):
-				print 'Done scanning', fd.name 
-				return PLUGIN_CONTINUE
 	'''
 
-	RESULT = 'result'
+	SCAN = 'scan'
 	PRESCAN = 'pre_scan'
 	POSTSCAN = 'post_scan'
 	PLUGIN = 'Plugin'
 	MODULE_EXTENSION = '.py'
 
-	def __init__(self, whitelist=[], blacklist=[]):
-		self.config = binwalk.config.Config()
-		self.result = []
+	def __init__(self, parent=None):
+		self.scan = []
 		self.pre_scan = []
-		self.pre_parser = []
 		self.post_scan = []
-		self.whitelist = whitelist
-		self.blacklist = blacklist
+		self.parent = parent
+		self.config = binwalk.config.Config()
 
 	def __del__(self):
 		pass
@@ -105,22 +66,13 @@ class Plugins:
 		pass
 
 	def _call_plugins(self, callback_list, arg):
-		retval = PLUGIN_CONTINUE
-
 		for callback in callback_list:
-			if (retval & PLUGIN_STOP_PLUGINS):
-				break
-
 			try:
-				val = callback(arg)
-				if val is not None:
-					retval |= val
+				callback(arg)
 			except KeyboardInterrupt as e:
 				raise e
 			except Exception as e:
 				sys.stderr.write("WARNING: %s.%s failed: %s\n" % (callback.__module__, callback.__name__, e))
-
-		return retval
 
 	def list_plugins(self):
 		'''
@@ -165,32 +117,22 @@ class Plugins:
 			for file_name in os.listdir(plugins[key]['path']):
 				if file_name.endswith(self.MODULE_EXTENSION):
 					module = file_name[:-len(self.MODULE_EXTENSION)]
-					if module in self.blacklist:
-						continue
-					else:
-						plugin = imp.load_source(module, os.path.join(plugins[key]['path'], file_name))
-						plugin_class = getattr(plugin, self.PLUGIN)
-
-						try:
-							enabled = plugin_class.ENABLED
-						except KeyboardInterrupt as e:
-							raise e
-						except Exception as e:
-							enabled = True
 						
-						plugins[key]['enabled'][module] = enabled
+					plugin = imp.load_source(module, os.path.join(plugins[key]['path'], file_name))
+					plugin_class = getattr(plugin, self.PLUGIN)
 
-						plugins[key]['modules'].append(module)
+					plugins[key]['enabled'][module] = True
+					plugins[key]['modules'].append(module)
 						
-						try:
-							plugins[key]['descriptions'][module] = plugin_class.__doc__.strip().split('\n')[0]
-						except KeyboardInterrupt as e:
-							raise e
-						except Exception as e:
-							plugins[key]['descriptions'][module] = 'No description'
+					try:
+						plugins[key]['descriptions'][module] = plugin_class.__doc__.strip().split('\n')[0]
+					except KeyboardInterrupt as e:
+						raise e
+					except Exception as e:
+						plugins[key]['descriptions'][module] = 'No description'
 		return plugins
 
-	def _load_plugins(self):
+	def load_plugins(self):
 		plugins = self.list_plugins()
 		self._load_plugin_modules(plugins['user'])
 		self._load_plugin_modules(plugins['system'])
@@ -203,19 +145,10 @@ class Plugins:
 				plugin = imp.load_source(module, file_path)
 				plugin_class = getattr(plugin, self.PLUGIN)
 
-				try:
-					# If this plugin is disabled by default and has not been explicitly white listed, ignore it
-					if plugin_class.ENABLED == False and module not in self.whitelist:
-						continue
-				except KeyboardInterrupt as e:
-					raise e
-				except Exception as e:
-					pass
-
-				class_instance = plugin_class()
+				class_instance = plugin_class(self.parent)
 
 				try:
-					self.result.append(getattr(class_instance, self.RESULT))
+					self.scan.append(getattr(class_instance, self.SCAN))
 				except KeyboardInterrupt as e:
 					raise e
 				except Exception as e:
@@ -240,12 +173,12 @@ class Plugins:
 			except Exception as e:
 				sys.stderr.write("WARNING: Failed to load plugin module '%s': %s\n" % (module, str(e)))
 
-	def _pre_scan_callbacks(self, obj):
+	def pre_scan_callbacks(self, obj):
 		return self._call_plugins(self.pre_scan, obj)
 
-	def _post_scan_callbacks(self, obj):
+	def post_scan_callbacks(self, obj):
 		return self._call_plugins(self.post_scan, obj)
 
-	def _result_callbacks(self, obj):
-		return self._call_plugins(self.result, obj)
+	def scan_callbacks(self, obj):
+		return self._call_plugins(self.scan, obj)
 
