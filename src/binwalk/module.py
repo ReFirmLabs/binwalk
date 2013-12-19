@@ -491,9 +491,9 @@ class Modules(object):
 					action = None
 
 				if module_option.short:
-					parser.add_argument('-' + module_option.short, '--' + module_option.long, action=action, dest=module_option.long)
+					parser.add_argument('-' + module_option.short, '--' + module_option.long, nargs=module_option.nargs, action=action, dest=module_option.long)
 				else:
-					parser.add_argument('--' + module_option.long, action=action, dest=module_option.long)
+					parser.add_argument('--' + module_option.long, nargs=module_option.nargs, action=action, dest=module_option.long)
 
 			print argv
 			args, unknown = parser.parse_known_args(argv)
