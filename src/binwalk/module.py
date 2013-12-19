@@ -464,6 +464,9 @@ class Modules(object):
 	
 		return kwargs
 
+	def _is_file(self, fname):
+		return (not fname.startswith('-')) and (os.path.exists(fname) or fname.startswith('./') or fname.startswith('/'))
+
 	def argv(self, module, argv=sys.argv[1:]):
 		'''
 		Processes argv for any options specific to the specified module.
@@ -479,6 +482,8 @@ class Modules(object):
 		shorts = ""
 		parser = argparse.ArgumentParser(add_help=False)
 
+		# TODO: Add all arguments for all modules to parser so that the only unknowns will be file names.
+		#       Only return arguments for the specified module though.
 		if hasattr(module, "CLI"):
 
 			for module_option in module.CLI:
@@ -491,11 +496,10 @@ class Modules(object):
 					action = None
 
 				if module_option.short:
-					parser.add_argument('-' + module_option.short, '--' + module_option.long, nargs=module_option.nargs, action=action, dest=module_option.long)
+					parser.add_argument('-' + module_option.short, '--' + module_option.long, action=action, dest=module_option.long)
 				else:
-					parser.add_argument('--' + module_option.long, nargs=module_option.nargs, action=action, dest=module_option.long)
+					parser.add_argument('--' + module_option.long, action=action, dest=module_option.long)
 
-			print argv
 			args, unknown = parser.parse_known_args(argv)
 			args = args.__dict__
 
@@ -506,7 +510,7 @@ class Modules(object):
 					for k in get_keys(module_option.kwargs):
 						kwargs[k] = []
 						for unk in unknown:
-							if not unk.startswith('-'):
+							if self._is_file(unk):
 								kwargs[k].append(unk)
 
 				elif has_key(args, module_option.long) and args[module_option.long] not in [None, False]:
