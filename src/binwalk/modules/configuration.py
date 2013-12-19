@@ -41,10 +41,6 @@ class Configuration(binwalk.module.Module):
 									short='c',
 									kwargs={'csv' : True},
 									description='Log results to file in CSV format'),
-		binwalk.module.ModuleOption(long='skip-unopened',
-									short='O',
-									kwargs={'skip_unopened' : True},
-									description='Ignore file open errors and process only the files that can be opened'),
 		binwalk.module.ModuleOption(long='term',
 									short='t',
 									kwargs={'format_to_terminal' : True},
@@ -77,13 +73,15 @@ class Configuration(binwalk.module.Module):
 		binwalk.module.ModuleKwarg(name='format_to_terminal', default=False),
 		binwalk.module.ModuleKwarg(name='quiet', default=False),
 		binwalk.module.ModuleKwarg(name='verbose', default=[]),
-		binwalk.module.ModuleKwarg(name='skip_unopened', default=False),
 		binwalk.module.ModuleKwarg(name='files', default=[]),
 		binwalk.module.ModuleKwarg(name='show_help', default=False),
 	]
 
 	def load(self):
 		self.target_files = []
+		
+		self._set_verbosity()
+		self._open_target_files()
 
 		self.settings = binwalk.config.Config()
 		self.display = binwalk.display.Display(log=self.log_file,
@@ -95,9 +93,6 @@ class Configuration(binwalk.module.Module):
 		if self.show_help:
 			binwalk.module.show_help()
 			sys.exit(0)
-
-		self._open_target_files()
-		self._set_verbosity()
 
 	def __del__(self):
 		self._cleanup()
@@ -135,18 +130,14 @@ class Configuration(binwalk.module.Module):
 			if not os.path.isdir(tfile):
 				# Make sure we can open the target files
 				try:
-					self.target_files.append(binwalk.common.BlockFile(tfile, length=self.length, offset=self.offset))
+					fp = binwalk.common.BlockFile(tfile, length=self.length, offset=self.offset)
+					self.target_files.append(fp)
 				except KeyboardInterrupt as e:
 					raise e
 				except Exception as e:
 					self.error(description="Cannot open file : %s" % str(e))
-
-		# Unless -O was specified, don't run the scan unless we are able to scan all specified files
-		if len(self.target_files) != len(self.files) and not self.skip_unopened:
-			failed_open_count = len(self.files) - len(self.target_files)
-			if failed_open_count > 1:
-				plural = 's'
-			else:
-				plural = ''
-			raise Exception("Failed to open %d file%s for scanning" % (failed_open_count, plural))
+		
+		# If no files could be opened, quit permaturely
+		if len(self.target_files) == 0:
+			raise Exception("Failed to open any files for scanning")
 

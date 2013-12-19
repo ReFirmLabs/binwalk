@@ -21,11 +21,18 @@ class Signature(binwalk.module.Module):
 										type=[],
 										dtype='file',
 										description='Specify a custom magic file to use'),
+			binwalk.module.ModuleOption(short='R',
+										long='raw-bytes',
+										nargs=1,
+										kwargs={'raw_bytes' : None},
+										type=str,
+										description='Specify a sequence of bytes to search for'),
 	]
 
 	KWARGS = [
 			binwalk.module.ModuleKwarg(name='enabled', default=False),
 			binwalk.module.ModuleKwarg(name='magic_files', default=[]),
+			binwalk.module.ModuleKwarg(name='raw_bytes', default=None),
 	]
 
 	HEADER = ["DECIMAL", "HEX", "DESCRIPTION"]
@@ -41,6 +48,10 @@ class Signature(binwalk.module.Module):
 		self.smart = binwalk.smartsignature.SmartSignature(self.filter, ignore_smart_signatures=False)
 		self.parser = binwalk.parser.MagicParser(self.filter, self.smart)
 
+		# If a raw byte sequence was specified, build a magic file from that instead of using the default magic files
+		if self.raw_bytes is not None:
+			self.magic_files = [self.parser.file_from_string(self.raw_bytes)]
+
 		# Use the system default magic file if no other was specified
 		if not self.magic_files:
 			# Append the user's magic file first so that those signatures take precedence
@@ -54,8 +65,8 @@ class Signature(binwalk.module.Module):
 		self.magic = magic.open(self.MAGIC_FLAGS)
 		self.magic.load(str2bytes(self.mfile))
 		
-		# Once the temporary magic file is loaded into libmagic, we don't need it anymore; delete the temp file
-		self.parser.rm_magic_file()
+		# Once the temporary magic files are loaded into libmagic, we don't need them anymore; delete the temp files
+		self.parser.rm_magic_files()
 
 	def validate(self, r):
 		'''
@@ -77,7 +88,7 @@ class Signature(binwalk.module.Module):
 				break
 
 			current_block_offset = 0
-			block_start = fp.tell() - dlen
+			block_start = fp.total_read - dlen
 			self.status.completed = block_start - fp.offset
 
 			for candidate_offset in self.parser.find_signature_candidates(data, dlen):

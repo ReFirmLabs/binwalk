@@ -495,12 +495,13 @@ class Modules(object):
 				else:
 					parser.add_argument('--' + module_option.long, action=action, dest=module_option.long)
 
+			print argv
 			args, unknown = parser.parse_known_args(argv)
 			args = args.__dict__
 
 			for module_option in module.CLI:
 
-				if module_option.type in [io.FileIO, argparse.FileType, binwalk.common.BlockFile]:
+				if module_option.type == binwalk.common.BlockFile:
 
 					for k in get_keys(module_option.kwargs):
 						kwargs[k] = []

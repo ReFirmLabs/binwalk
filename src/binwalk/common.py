@@ -316,7 +316,17 @@ class BlockFile(io.FileIO):
 			else:
 				break
 
+		self.total_read += len(data)
 		return bytes2str(data)
+
+	def _internal_read(self, n=-1):
+		'''
+		Same as self.read, but doesn't increment self.total_read.
+		For use by self.read_block.
+		'''
+		data = self.read(n)
+		self.total_read -= len(data)
+		return data
 
 	def seek(self, n, whence=os.SEEK_SET):
 		if whence == os.SEEK_SET:
@@ -341,7 +351,7 @@ class BlockFile(io.FileIO):
 			# Read in READ_BLOCK_SIZE plus MAX_TRAILING_SIZE bytes, but return a max dlen value
 			# of READ_BLOCK_SIZE. This ensures that there is a MAX_TRAILING_SIZE buffer at the
 			# end of the returned data in case a signature is found at or near data[dlen].
-			data = self.read(self.READ_BLOCK_SIZE + self.MAX_TRAILING_SIZE)
+			data = self._internal_read(self.READ_BLOCK_SIZE + self.MAX_TRAILING_SIZE)
 
 			if data and data is not None:
 
