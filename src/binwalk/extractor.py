@@ -115,7 +115,9 @@ class Extractor:
 				r['regex'] = re.compile(values[0])
 				r['extension'] = values[1]
 				r['cmd'] = values[2]
-			except:
+			except KeyboardInterrupt as e:
+				raise e
+			except Exception:
 				pass
 
 			# Verify that the match string was retrieved.
@@ -183,6 +185,8 @@ class Extractor:
 			with open(fname, 'r') as f:
 				for rule in f.readlines():
 					self.add_rule(rule.split(self.COMMENT_DELIM, 1)[0])
+		except KeyboardInterrupt as e:
+			raise e
 		except Exception as e:
 			raise Exception("Extractor.load_from_file failed to load file '%s': %s" % (fname, str(e)))
 
@@ -201,6 +205,8 @@ class Extractor:
 		for extract_file in extract_files:
 			try:
 				self.load_from_file(extract_file)
+			except KeyboardInterrupt as e:
+				raise e
 			except Exception as e:
 				if self.verbose:
 					raise Exception("Extractor.load_defaults failed to load file '%s': %s" % (extract_file, str(e)))
@@ -289,7 +295,9 @@ class Extractor:
 						# Remove the original file that we extracted
 						try:
 							os.unlink(fname)
-						except:
+						except KeyboardInterrupt as e:
+							raise e
+						except Exception as e:
 							pass
 
 						# If the command worked, assume it removed the file extension from the extracted file
@@ -297,7 +305,9 @@ class Extractor:
 						if cleanup_extracted_fname and os.path.exists(extracted_fname) and file_size(extracted_fname) == 0:
 							try:
 								os.unlink(extracted_fname)
-							except:
+							except KeyboardInterrupt as e:
+								raise e
+							except Exception as e:
 								pass
 					
 					# If the command executed OK, don't try any more rules
@@ -308,7 +318,9 @@ class Extractor:
 					elif i != (len(rules)-1):
 						try:
 							os.unlink(fname)
-						except:
+						except KeyboardInterrupt as e:
+							raise e
+						except Exception as e:
 							pass
 
 				# If there was no command to execute, just use the first rule
@@ -442,6 +454,8 @@ class Extractor:
 			# Open the output file
 			try:
 				fdout = BlockFile(fname, 'w')
+			except KeyboardInterrupt as e:
+				raise e
 			except Exception as e:
 				# Fall back to the default name if the requested name fails
 				fname = unique_file_name(default_bname, extension)
@@ -455,6 +469,8 @@ class Extractor:
 			# Cleanup
 			fdout.close()
 			fdin.close()
+		except KeyboardInterrupt as e:
+			raise e
 		except Exception as e:
 			raise Exception("Extractor.dd failed to extract data from '%s' to '%s': %s" % (file_name, fname, str(e)))
 		
@@ -479,6 +495,8 @@ class Extractor:
 			if callable(cmd):
 				try:
 					cmd(fname)
+				except KeyboardInterrupt as e:
+					raise e
 				except Exception as e:
 					sys.stderr.write("WARNING: Extractor.execute failed to run '%s': %s\n" % (str(cmd), str(e)))
 			else:
@@ -492,6 +510,8 @@ class Extractor:
 				# Execute.
 				if subprocess.call(shlex.split(cmd), stdout=tmp, stderr=tmp) != 0:
 					retval = False
+		except KeyboardInterrupt as e:
+			raise e
 		except Exception as e:
 			# Silently ignore no such file or directory errors. Why? Because these will inevitably be raised when
 			# making the switch to the new firmware mod kit directory structure. We handle this elsewhere, but it's

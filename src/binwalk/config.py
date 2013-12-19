@@ -35,12 +35,12 @@ class Config:
 		o PLUGINS             - Path to the plugins directory.
 	'''
 	# Release version
-	VERSION = "1.3.0 beta"
+	VERSION = "2.0.0 alpha"
 
 	# Sub directories
 	BINWALK_USER_DIR = ".binwalk"
 	BINWALK_MAGIC_DIR = "magic"
-	BINWALK_CONFIG_DIR = "config"
+	BINWALK_CONFIG_DIR = "configs"
 	BINWALK_PLUGINS_DIR = "plugins"
 
 	# File names
@@ -118,7 +118,9 @@ class Config:
 			if os.path.islink(root):
 				root = os.path.realpath(root)
 			return os.path.dirname(os.path.abspath(root))
-		except:
+		except KeyboardInterrupt as e:
+			raise e
+		except Exception:
 			return ''
 
 	def _get_user_dir(self):
@@ -128,7 +130,9 @@ class Config:
 		try:
 			# This should work in both Windows and Unix environments
 			return os.getenv('USERPROFILE') or os.getenv('HOME')
-		except:
+		except KeyboardInterrupt as e:
+			raise e
+		except Exception:
 			return ''
 
 	def _file_path(self, dirname, filename):
@@ -143,7 +147,9 @@ class Config:
 		if not os.path.exists(dirname):
 			try:
 				os.makedirs(dirname)
-			except:
+			except KeyboardInterrupt as e:
+				raise e
+			except Exception:
 				pass
 		
 		fpath = os.path.join(dirname, filename)
@@ -151,7 +157,9 @@ class Config:
 		if not os.path.exists(fpath):
 			try:
 				open(fpath, "w").close()
-			except:
+			except KeyboardInterrupt as e:
+				raise e
+			except Exception:
 				pass
 
 		return fpath

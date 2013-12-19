@@ -115,6 +115,8 @@ class Plugins:
 				val = callback(arg)
 				if val is not None:
 					retval |= val
+			except KeyboardInterrupt as e:
+				raise e
 			except Exception as e:
 				sys.stderr.write("WARNING: %s.%s failed: %s\n" % (callback.__module__, callback.__name__, e))
 
@@ -171,7 +173,9 @@ class Plugins:
 
 						try:
 							enabled = plugin_class.ENABLED
-						except:
+						except KeyboardInterrupt as e:
+							raise e
+						except Exception as e:
 							enabled = True
 						
 						plugins[key]['enabled'][module] = enabled
@@ -180,7 +184,9 @@ class Plugins:
 						
 						try:
 							plugins[key]['descriptions'][module] = plugin_class.__doc__.strip().split('\n')[0]
-						except:
+						except KeyboardInterrupt as e:
+							raise e
+						except Exception as e:
 							plugins[key]['descriptions'][module] = 'No description'
 		return plugins
 
@@ -201,26 +207,36 @@ class Plugins:
 					# If this plugin is disabled by default and has not been explicitly white listed, ignore it
 					if plugin_class.ENABLED == False and module not in self.whitelist:
 						continue
-				except:
+				except KeyboardInterrupt as e:
+					raise e
+				except Exception as e:
 					pass
 
 				class_instance = plugin_class()
 
 				try:
 					self.result.append(getattr(class_instance, self.RESULT))
-				except:
+				except KeyboardInterrupt as e:
+					raise e
+				except Exception as e:
 					pass
 
 				try:
 					self.pre_scan.append(getattr(class_instance, self.PRESCAN))
-				except:
+				except KeyboardInterrupt as e:
+					raise e
+				except Exception as e:
 					pass
 
 				try:
 					self.post_scan.append(getattr(class_instance, self.POSTSCAN))
-				except:
+				except KeyboardInterrupt as e:
+					raise e
+				except Exception as e:
 					pass
 							
+			except KeyboardInterrupt as e:
+				raise e
 			except Exception as e:
 				sys.stderr.write("WARNING: Failed to load plugin module '%s': %s\n" % (module, str(e)))
 

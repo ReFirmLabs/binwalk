@@ -161,7 +161,9 @@ class CompressionEntropyAnalyzer(object):
 	def __del__(self):
 		try:
 			self.fp.close()
-		except:
+		except KeyboardInterrupt as e:
+			raise e
+		except Exception:
 			pass
 
 	def analyze(self):

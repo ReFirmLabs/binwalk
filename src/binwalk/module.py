@@ -4,6 +4,7 @@ import sys
 import inspect
 import argparse
 import binwalk.common
+import binwalk.config
 from binwalk.compat import *
 
 class ModuleOption(object):
@@ -380,7 +381,7 @@ class Modules(object):
 		return modules
 
 	def help(self):
-		help_string = ""
+		help_string = "\nBinwalk v%s\nCraig Heffner, http://www.binwalk.org\n" % binwalk.config.Config.VERSION
 
 		for obj in self.list(attribute="CLI"):
 			if obj.CLI:

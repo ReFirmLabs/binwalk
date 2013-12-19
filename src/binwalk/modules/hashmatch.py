@@ -6,7 +6,6 @@ import ctypes
 import ctypes.util
 import binwalk.common
 import binwalk.module
-import binwalk.smartstrings
 from binwalk.compat import *
 
 class HashResult(object):

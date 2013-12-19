@@ -69,10 +69,14 @@ class Display(object):
 				end = len(data[start:])
 
 			self.string_parts.append(data[start:end])
-		except:
+		except KeyboardInterrupt as e:
+			raise e
+		except Exception:
 			try:
 				self.string_parts.append(data[start:])
-			except:
+			except KeyboardInterrupt as e:
+				raise e
+			except Exception:
 				pass
 		
 		return start
@@ -123,6 +127,8 @@ class Display(object):
 				# Get the terminal window width
 				hw = struct.unpack('hh', fcntl.ioctl(1, termios.TIOCGWINSZ, '1234'))
 				self.SCREEN_WIDTH = self.HEADER_WIDTH = hw[1]
-			except Exception as e:
+			except KeyboardInterrupt as e:
+				raise e
+			except Exception:
 				pass
 

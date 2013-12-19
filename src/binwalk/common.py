@@ -35,6 +35,8 @@ def file_size(filename):
 	fd = os.open(filename, os.O_RDONLY)
 	try:
 		return os.lseek(fd, 0, os.SEEK_END)
+	except KeyboardInterrupt as e:
+		raise e
 	except Exception as e:
 		raise Exception("file_size failed to obtain the size of '%s': %s" % (filename, str(e)))
 	finally:
@@ -51,7 +53,9 @@ def str2int(string):
 	'''
 	try:
 		return int(string)
-	except:
+	except KeyboardInterrupt as e:
+		raise e
+	except Exception:
 		return int(string, 16)
 
 def strip_quoted_strings(string):
@@ -85,7 +89,9 @@ def get_quoted_strings(string):
 		# double quotes, and this function should ignore those. However, it also means that any 
 		# data between two quoted strings (ex: '"quote 1" non-quoted data "quote 2"') will also be included.
 		return re.findall(r'\"(.*)\"', string)[0]
-	except:
+	except KeyboardInterrupt as e:
+		raise e
+	except Exception:
 		return ''
 
 def unique_file_name(base_name, extension=''):
@@ -159,7 +165,9 @@ class MathExpression(object):
 		if expression:
 			try:
 				self.value = self.evaluate(self.expression)
-			except:
+			except KeyboardInterrupt as e:
+				raise e
+			except Exception:
 				pass
 
 	def evaluate(self, expr):
@@ -230,7 +238,9 @@ class BlockFile(io.FileIO):
 		
 		try:
 			self.size = file_size(fname)
-		except:
+		except KeyboardInterrupt as e:
+			raise e
+		except Exception:
 			self.size = 0
 
 		if offset < 0:

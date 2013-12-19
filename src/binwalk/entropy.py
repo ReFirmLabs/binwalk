@@ -185,7 +185,9 @@ class FileEntropy(object):
 		'''
 		try:
 			self.fd.close()
-		except:
+		except KeyboardInterrupt as e:
+			raise e
+		except Exception:
 			pass
 
 	def _read_block(self):
@@ -288,7 +290,9 @@ class FileEntropy(object):
 			# This results in a divide by zero if one/all plugins returns PLUGIN_TERMINATE or PLUGIN_NO_DISPLAY,
 			# or if the file being scanned is a zero-size file.
 			average = float(float(total) / float(len(offsets)))
-		except:
+		except KeyboardInterrupt as e:
+			raise e
+		except Exception:
 			pass
 
 		if self.plugins:
@@ -372,7 +376,9 @@ class FileEntropy(object):
 			try:
 				if algorithm.lower() == 'gzip':
 					algo = self.gzip
-			except:
+			except KeyboardInterrupt as e:
+				raise e
+			except Exception:
 				pass
 
 		return self._do_analysis(algo)
