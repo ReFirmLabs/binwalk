@@ -1,4 +1,5 @@
 import re
+import binwalk.module
 from binwalk.compat import *
 from binwalk.common import str2int, get_quoted_strings, MathExpression
 
@@ -18,20 +19,20 @@ class SmartSignature:
 	KEYWORD_DELIM_START = "{"
 	KEYWORD_DELIM_END = "}"
 	KEYWORDS = {
-		'jump'			: '%sjump-to-offset:' % KEYWORD_DELIM_START,
-		'filename'		: '%sfile-name:' % KEYWORD_DELIM_START,
-		'filesize'		: '%sfile-size:' % KEYWORD_DELIM_START,
-		'raw-string'		: '%sraw-string:' % KEYWORD_DELIM_START,	# This one is special and must come last in a signature block
-		'string-len'		: '%sstring-len:' % KEYWORD_DELIM_START,	# This one is special and must come last in a signature block
-		'raw-size'		: '%sraw-string-length:' % KEYWORD_DELIM_START,
-		'adjust'		: '%soffset-adjust:' % KEYWORD_DELIM_START,
-		'delay'			: '%sextract-delay:' % KEYWORD_DELIM_START,
-		'year'			: '%sfile-year:' % KEYWORD_DELIM_START,
-		'epoch'			: '%sfile-epoch:' % KEYWORD_DELIM_START,
-		'math'		: '%smath:' % KEYWORD_DELIM_START,
+		'jump'					: '%sjump-to-offset:' % KEYWORD_DELIM_START,
+		'filename'				: '%sfile-name:' % KEYWORD_DELIM_START,
+		'filesize'				: '%sfile-size:' % KEYWORD_DELIM_START,
+		'raw-string'			: '%sraw-string:' % KEYWORD_DELIM_START,	# This one is special and must come last in a signature block
+		'string-len'			: '%sstring-len:' % KEYWORD_DELIM_START,	# This one is special and must come last in a signature block
+		'raw-size'				: '%sraw-string-length:' % KEYWORD_DELIM_START,
+		'adjust'				: '%soffset-adjust:' % KEYWORD_DELIM_START,
+		'delay'					: '%sextract-delay:' % KEYWORD_DELIM_START,
+		'year'					: '%sfile-year:' % KEYWORD_DELIM_START,
+		'epoch'					: '%sfile-epoch:' % KEYWORD_DELIM_START,
+		'math'					: '%smath:' % KEYWORD_DELIM_START,
 
-		'raw-replace'		: '%sraw-replace%s' % (KEYWORD_DELIM_START, KEYWORD_DELIM_END),
-		'one-of-many'		: '%sone-of-many%s' % (KEYWORD_DELIM_START, KEYWORD_DELIM_END),
+		'raw-replace'			: '%sraw-replace%s' % (KEYWORD_DELIM_START, KEYWORD_DELIM_END),
+		'one-of-many'			: '%sone-of-many%s' % (KEYWORD_DELIM_START, KEYWORD_DELIM_END),
 		'string-len-replace'	: '%sstring-len%s' % (KEYWORD_DELIM_START, KEYWORD_DELIM_END),
 	}
 
@@ -45,7 +46,7 @@ class SmartSignature:
 		Returns None.
 		'''
 		self.filter = filter
-		self.invalid = False
+		self.valid = True
 		self.last_one_of_many = None
 		self.ignore_smart_signatures = ignore_smart_signatures
 
@@ -58,28 +59,30 @@ class SmartSignature:
 		Returns a dictionary of parsed values.
 		'''
 		results = {
-			'offset'	: '',		# Offset where the match was found, filled in by Binwalk.single_scan.
+			'offset'		: '',		# Offset where the match was found, filled in by Binwalk.single_scan.
 			'description'	: '',		# The libmagic data string, stripped of all keywords
-			'name'		: '',		# The original name of the file, if known
-			'delay'		: '',		# Extract delay description
-			'extract'	: '',		# Name of the extracted file, filled in by Binwalk.single_scan.
-			'jump'		: 0,		# The relative offset to resume the scan from
-			'size'		: 0,		# The size of the file, if known
-			'adjust'	: 0,		# The relative offset to add to the reported offset
-			'year'		: 0,		# The file's creation/modification year, if reported in the signature
-			'epoch'		: 0,		# The file's creation/modification epoch time, if reported in the signature
-			'invalid'	: False,	# Set to True if parsed numerical values appear invalid
+			'name'			: '',		# The original name of the file, if known
+			'delay'			: '',		# Extract delay description
+			'extract'		: '',		# Name of the extracted file, filled in by Binwalk.single_scan.
+			'jump'			: 0,		# The relative offset to resume the scan from
+			'size'			: 0,		# The size of the file, if known
+			'adjust'		: 0,		# The relative offset to add to the reported offset
+			'year'			: 0,		# The file's creation/modification year, if reported in the signature
+			'epoch'			: 0,		# The file's creation/modification epoch time, if reported in the signature
+			'valid'			: True,		# Set to False if parsed numerical values appear invalid
 		}
 
-		self.invalid = False
+		self.valid = True
 
 		# If smart signatures are disabled, or the result data is not valid (i.e., potentially malicious), 
 		# don't parse anything, just return the raw data as the description.
 		if self.ignore_smart_signatures or not self._is_valid(data):
 			results['description'] = data
 		else:
-			# Calculate and replace math keyword values
+			# Calculate and replace special keywords/values
 			data = self._replace_maths(data)
+			data = self._parse_raw_strings(data)
+			data = self._parse_string_len(data)
 
 			# Parse the offset-adjust value. This is used to adjust the reported offset at which 
 			# a signature was located due to the fact that MagicParser.match expects all signatures
@@ -91,17 +94,23 @@ class SmartSignature:
 			# extracted (see Binwalk.scan).
 			try:
 				results['size'] = str2int(self._get_math_arg(data, 'filesize'))
-			except:
+			except KeyboardInterrupt as e:
+				raise e
+			except Exception:
 				pass
 
 			try:
 				results['year'] = str2int(self._get_keyword_arg(data, 'year'))
-			except:
+			except KeyboardInterrupt as e:
+				raise e
+			except Exception:
 				pass
 			
 			try:
 				results['epoch'] = str2int(self._get_keyword_arg(data, 'epoch'))
-			except:
+			except KeyboardInterrupt as e:
+				raise e
+			except Exception:
 				pass
 
 			results['delay'] = self._get_keyword_arg(data, 'delay')
@@ -116,9 +125,9 @@ class SmartSignature:
 				results['name'] = self._get_keyword_arg(data, 'filename').strip('"')
 				results['description'] = self._strip_tags(data)
 
-		results['invalid'] = self.invalid
+		results['valid'] = self.valid
 
-		return results
+		return binwalk.module.Result(**results)
 
 	def _is_valid(self, data):
 		'''
@@ -152,7 +161,7 @@ class SmartSignature:
 		Returns True if the string result is one of many.
 		Returns False if the string result is not one of many.
 		'''
-		if not self.filter.invalid(data):
+		if self.filter.valid_magic_result(data):
 			if self.last_one_of_many is not None and data.startswith(self.last_one_of_many):
 				return True
 		
@@ -197,7 +206,7 @@ class SmartSignature:
 			value = MathExpression(arg).value
 			if value is None:
 				value = 0
-				self.invalid = True
+				self.valid = False
 
 		return value
 
@@ -215,7 +224,9 @@ class SmartSignature:
 		if offset_str:
 			try:
 				offset = str2int(offset_str)
-			except:
+			except KeyboardInterrupt as e:
+				raise e
+			except Exception:
 				pass
 
 		return offset
@@ -281,7 +292,9 @@ class SmartSignature:
 				# Convert the string to an integer as a sanity check
 				try:
 					string_length = '%d' % len(raw_string)
-				except:
+				except KeyboardInterrupt as e:
+					raise e
+				except Exception:
 					string_length = '0'
 
 				# Strip out *everything* after the string-len keyword, including the keyword itself.

@@ -2,6 +2,7 @@ import os
 import sys
 import binwalk.common
 import binwalk.module
+import binwalk.config
 import binwalk.display
 from binwalk.config import *
 from binwalk.compat import *
@@ -87,6 +88,7 @@ class Configuration(binwalk.module.Module):
 	def load(self):
 		self.target_files = []
 
+		self.settings = binwalk.config.Config()
 		self.display = binwalk.display.Display(log=self.log_file,
 											   csv=self.csv,
 											   quiet=self.quiet,

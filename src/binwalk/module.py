@@ -104,9 +104,6 @@ class Module(object):
 	'''
 	All module classes must be subclassed from this.
 	'''
-	# The module name, automatically populated.
-	NAME = ""
-
 	# The module title, as displayed in help output
 	TITLE = ""
 
@@ -140,7 +137,8 @@ class Module(object):
 		# self.plugins = x
 		self.errors = []
 		self.results = []
-		self.NAME = self.__class__.__name__
+		self.status = None
+		self.name = self.__class__.__name__
 
 		process_kwargs(self, kwargs)
 
@@ -218,21 +216,29 @@ class Module(object):
 		
 		return args
 
-	def result(self, **kwargs):
+	def result(self, r=None, **kwargs):
 		'''
 		Validates a result, stores it in self.results and prints it.
-
 		Accepts the same kwargs as the binwalk.module.Result class.
+
+		@r - An existing instance of binwalk.module.Result.
 
 		Returns None.
 		'''
-		r = Result(**kwargs)
+		if r is None:
+			r = Result(**kwargs)
 
 		self.validate(r)
 		self._plugins_callback(r)
 
 		if r.valid:
 			self.results.append(r)
+
+			# Update the progress status automatically if it is not being done manually by the module
+			if r.file and not self.status.total:
+				self.status.total = r.file.length
+				self.status.completed = r.file.tell() - r.file.offset
+
 			if r.display:
 				display_args = self._build_display_args(r)
 				if display_args:
@@ -266,12 +272,14 @@ class Module(object):
 	def footer(self):
 		self.config.display.footer()
 			
-	def main(self):
+	def main(self, status):
 		'''
 		Responsible for calling self.init, initializing self.config.display, and calling self.run.
 
 		Returns the value returned from self.run.
 		'''
+		self.status = status
+
 		try:
 			self.init()
 		except KeyboardInterrupt as e:
@@ -302,6 +310,16 @@ class Module(object):
 
 		return retval
 
+class Status(object):
+	
+	def __init__(self, **kwargs):
+		self.kwargs = kwargs
+		self.clear()
+
+	def clear(self):
+		for (k,v) in iterator(self.kwargs):
+			setattr(self, k, v)
+
 class Modules(object):
 	'''
 	Main class used for running and managing modules.
@@ -316,21 +334,24 @@ class Modules(object):
 
 		Returns None.
 		'''
-		argv = list(argv)
+		self.arguments = []
+		self.loaded_modules = {}
+		self.status = Status(completed=0, total=0)
 
+		self._set_arguments(list(argv), kargv)
+
+	def _set_arguments(self, argv=[], kargv={}):
 		for (k,v) in iterator(kargv):
 			k = self._parse_api_opt(k)
-
 			if v not in [True, False, None]:
 				argv.append("%s %s" % (k, v))
 			else:
 				argv.append(k)
 
-		if not argv:
-			argv = sys.argv[1:]
-
-		self.arguments = argv
-		self.loaded_modules = {}
+		if not argv and not self.arguments:
+			self.arguments = sys.argv[1:]
+		elif argv:
+			self.arguments = argv
 
 	def _parse_api_opt(self, opt):
 		# If the argument already starts with a hyphen, don't add hyphens in front of it
@@ -384,18 +405,22 @@ class Modules(object):
 
 		return help_string + "\n"
 
-	def execute(self):
+	def execute(self, *args, **kwargs):
 		run_modules = []
+		self._set_arguments(list(args), kwargs)
+
 		for module in self.list():
-			if self.run(module):
-				run_modules.append(module)
+			obj = self.run(module)
+			if obj.enabled:
+				run_modules.append(obj)
 		return run_modules
 
 	def run(self, module):
 		obj = self.load(module)
 
 		if isinstance(obj, binwalk.module.Module) and obj.enabled:
-			obj.main()
+			obj.main(status=self.status)
+			self.status.clear()
 
 		# Add object to loaded_modules here, that way if a module has already been
 		# loaded directly and is subsequently also listed as a dependency we don't waste

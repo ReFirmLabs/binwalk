@@ -55,7 +55,9 @@ class MagicParser:
 	def __del__(self):
 		try:
 			self.cleanup()
-		except:
+		except KeyboardInterrupt as e:
+			raise e
+		except Exception:
 			pass
 
 	def rm_magic_file(self):
@@ -66,7 +68,9 @@ class MagicParser:
 		'''
 		try:
 			self.fd.close()
-		except:
+		except KeyboardInterrupt as e:
+			raise e
+		except Exception:
 			pass
 
 	def cleanup(self):
@@ -79,7 +83,9 @@ class MagicParser:
 
 		try:
 			self.raw_fd.close()
-		except:
+		except KeyboardInterrupt as e:
+			raise e
+		except Exception:
 			pass
 
 	def file_from_string(self, signature_string, offset=0, display_name=DEFAULT_DISPLAY_NAME):
@@ -170,6 +176,8 @@ class MagicParser:
 					self.fd.write(str2bytes(line))
 
 			self.build_signature_set()
+		except KeyboardInterrupt as e:
+			raise e
 		except Exception as e:
 			raise Exception("Error parsing magic file '%s' on line %d: %s" % (file_name, line_count, str(e)))
 		
@@ -207,6 +215,8 @@ class MagicParser:
 			# The condition line may contain escaped sequences, so be sure to decode it properly.
 			entry['condition'] = string_decode(line_parts[2])
 			entry['description'] = ' '.join(line_parts[3:])
+		except KeyboardInterrupt as e:
+			raise e
 		except Exception as e:
 			raise Exception("%s :: %s", (str(e), line))
 
@@ -214,6 +224,8 @@ class MagicParser:
 		# throw an exception, but let's catch it just in case...
 		try:
 			entry['offset'] = str2int(entry['offset'])
+		except KeyboardInterrupt as e:
+			raise e
 		except Exception as e:
 			raise Exception("%s :: %s", (str(e), line))
 
@@ -234,6 +246,8 @@ class MagicParser:
 			# but needing that is rare.
 			try:
 				intval = str2int(entry['condition'].strip('L'))
+			except KeyboardInterrupt as e:
+				raise e
 			except Exception as e:
 				raise Exception("Failed to evaluate condition for '%s' type: '%s', condition: '%s', error: %s" % (entry['description'], entry['type'], entry['condition'], str(e)))
 
@@ -322,6 +336,8 @@ class MagicParser:
 		'''
 		try:
 			return data.split(self.RESULT_SEPERATOR)
-		except:
+		except KeyboardInterrupt as e:
+			raise e
+		except Exception:
 			return []
 

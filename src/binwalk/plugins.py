@@ -1,14 +1,8 @@
 import os
 import sys
 import imp
+import binwalk.config
 from binwalk.compat import *
-
-# Valid return values for plugins
-PLUGIN_CONTINUE     = 0x00
-PLUGIN_NO_EXTRACT   = 0x01
-PLUGIN_NO_DISPLAY   = 0x02
-PLUGIN_STOP_PLUGINS = 0x04
-PLUGIN_TERMINATE    = 0x08
 
 class Plugins:
 	'''
@@ -66,7 +60,7 @@ class Plugins:
 			# Set to False to have this plugin disabled by default.
 			ENABLED = True
 
-			def __init__(self, binwalk):
+			def __init__(self):
 				self.binwalk = binwalk
 				print 'Scanning initialized!'
 
@@ -86,16 +80,15 @@ class Plugins:
 				return PLUGIN_CONTINUE
 	'''
 
-	CALLBACK = 'callback'
+	RESULT = 'result'
 	PRESCAN = 'pre_scan'
 	POSTSCAN = 'post_scan'
-	PREPARSER = 'pre_parser'
 	PLUGIN = 'Plugin'
 	MODULE_EXTENSION = '.py'
 
-	def __init__(self, binwalk, whitelist=[], blacklist=[]):
-		self.binwalk = binwalk
-		self.callback = []
+	def __init__(self, whitelist=[], blacklist=[]):
+		self.config = binwalk.config.Config()
+		self.result = []
 		self.pre_scan = []
 		self.pre_parser = []
 		self.post_scan = []
@@ -103,16 +96,13 @@ class Plugins:
 		self.blacklist = blacklist
 
 	def __del__(self):
-		self._cleanup()
+		pass
+
+	def __enter__(self):
+		return self
 
 	def __exit__(self, t, v, traceback):
-		self._cleanup()
-
-	def _cleanup(self):
-		try:
-			del self.binwalk
-		except:
-			pass
+		pass
 
 	def _call_plugins(self, callback_list, arg):
 		retval = PLUGIN_CONTINUE
@@ -168,7 +158,7 @@ class Plugins:
 		}
 
 		for key in plugins.keys():
-			plugins[key]['path'] = self.binwalk.config.paths[key][self.binwalk.config.PLUGINS]
+			plugins[key]['path'] = self.config.paths[key][self.config.PLUGINS]
 
 			for file_name in os.listdir(plugins[key]['path']):
 				if file_name.endswith(self.MODULE_EXTENSION):
@@ -214,10 +204,10 @@ class Plugins:
 				except:
 					pass
 
-				class_instance = plugin_class(self.binwalk)
+				class_instance = plugin_class()
 
 				try:
-					self.callback.append(getattr(class_instance, self.CALLBACK))
+					self.result.append(getattr(class_instance, self.RESULT))
 				except:
 					pass
 
@@ -227,11 +217,6 @@ class Plugins:
 					pass
 
 				try:
-					self.pre_parser.append(getattr(class_instance, self.PREPARSER))
-				except:
-					pass
-					
-				try:
 					self.post_scan.append(getattr(class_instance, self.POSTSCAN))
 				except:
 					pass
@@ -239,15 +224,12 @@ class Plugins:
 			except Exception as e:
 				sys.stderr.write("WARNING: Failed to load plugin module '%s': %s\n" % (module, str(e)))
 
-	def _pre_scan_callbacks(self, fd):
-		return self._call_plugins(self.pre_scan, fd)
+	def _pre_scan_callbacks(self, obj):
+		return self._call_plugins(self.pre_scan, obj)
 
-	def _post_scan_callbacks(self, fd):
-		return self._call_plugins(self.post_scan, fd)
+	def _post_scan_callbacks(self, obj):
+		return self._call_plugins(self.post_scan, obj)
 
-	def _scan_callbacks(self, results):
-		return self._call_plugins(self.callback, results)
-
-	def _scan_pre_parser_callbacks(self, results):
-		return self._call_plugins(self.pre_parser, results)
+	def _result_callbacks(self, obj):
+		return self._call_plugins(self.result, obj)
 

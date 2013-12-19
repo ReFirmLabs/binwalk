@@ -134,33 +134,37 @@ class MagicFilter:
 
 		return self.FILTER_INCLUDE
 
-	def invalid(self, data):
+	def valid_magic_result(self, data):
 		'''
 		Checks if the given string contains invalid data.
 		Called internally by Binwalk.scan().
 
 		@data - String to validate.
 
-		Returns True if data is invalid, False if valid.
+		Returns True if data is valid, False if invalid.
 		'''
 		# A result of 'data' is never ever valid.
 		if data == self.DATA_RESULT:
-			return True
-
-		# If showing invalid results, just return False.
-		if self.show_invalid_results:
 			return False
+
+		# Make sure this result wasn't filtered
+		if self.filter(data) == self.FILTER_EXCLUDE:
+			return False
+
+		# If showing invalid results, just return True without further checking.
+		if self.show_invalid_results:
+			return True
 
 		# Don't include quoted strings or keyword arguments in this search, as 
 		# strings from the target file may legitimately contain the INVALID_RESULT text.
 		if self.INVALID_RESULT in common.strip_quoted_strings(self.smart._strip_tags(data)):
-			return True
+			return False
 
 		# There should be no non-printable characters in any of the data
 		if self.NON_PRINTABLE_RESULT in data:
-			return True
+			return False
 
-		return False
+		return True
 
 	def grep(self, data=None, filters=[]):
 		'''
