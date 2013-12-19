@@ -19,7 +19,7 @@ class Signature(binwalk.module.Module):
 										nargs=1,
 										kwargs={'magic_files' : []},
 										type=[],
-										dtype=str,
+										dtype='file',
 										description='Specify a custom magic file to use'),
 	]
 

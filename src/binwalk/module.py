@@ -24,7 +24,6 @@ class ModuleOption(object):
 		@short       - The short option to use (optional).
 		@long        - The long option to use (if None, this option will not be displayed in help output).
 		@type        - The accepted data type (one of: io.FileIO/argparse.FileType/binwalk.common.BlockFile, list, str, int, float).
-		@dtype       - The accepted data type, as displayed in the help output.
 
 		Returns None.
 		'''
@@ -37,8 +36,13 @@ class ModuleOption(object):
 		self.type = type
 		self.dtype = str(dtype)
 
-		if not self.dtype and self.type:
-			self.dtype = str(self.type)
+		if not self.dtype:
+			if self.type in [io.FileIO, argparse.FileType, binwalk.common.BlockFile]:
+				self.dtype = 'file'
+			elif self.type in [int, float, str]:
+				self.dtype = self.type.__name__
+			else:
+				self.dtype = str.__name__
 
 class ModuleKwarg(object):
 		'''
@@ -394,7 +398,7 @@ class Modules(object):
 						long_opt = '--' + module_option.long
 					
 						if module_option.nargs > 0:
-							optargs = "=%s" % module_option.dtype
+							optargs = "=<%s>" % module_option.dtype
 						else:
 							optargs = ""
 
