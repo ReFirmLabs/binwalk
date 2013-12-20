@@ -3,3 +3,4 @@ from binvis import Plotter
 from hexdiff import HexDiff
 from hashmatch import HashMatch
 from configuration import Configuration
+from extractor import Extractor

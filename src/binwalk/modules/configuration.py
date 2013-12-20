@@ -11,7 +11,9 @@ from binwalk.compat import *
 class Configuration(binwalk.module.Module):
 
 	TITLE = "General"
-	
+
+	DEPENDS = {}
+		
 	CLI = [
 		binwalk.module.ModuleOption(long='length',
 									short='l',

@@ -106,7 +106,7 @@ class HexDiff(binwalk.module.Module):
 			self.block_hex += c
 
 	def _build_header(self, files, block_size):
-		header = "OFFSET" + (" " * 4) + files[0].name
+		header = "OFFSET" + (" " * 6) + files[0].name
 
 		for i in range(1, len(files)):
 			header += " " * ((block_size * 3) + 2 + block_size + 8 - len(files[i-1].name))
@@ -178,9 +178,9 @@ class HexDiff(binwalk.module.Module):
 			
 			while i < read_block_size and (total+i) < size:
 				diff_same = {}
-				alt_text = "*" + " " * 6
+				alt_text = "*" + " " * 8
 
-				self._build_block("%.08X  " % (total + i + offset))
+				self._build_block("%.08X    " % (total + i + offset))
 
 				# For each byte in this block, is the byte the same in all files, the same in some files, or different in all files?
 				for j in range(0, block):

@@ -8,10 +8,6 @@ import binwalk.config
 import binwalk.plugin
 from binwalk.compat import *
 
-class Type(object):
-	Primary = 1
-	Support = 2
-
 class ModuleOption(object):
 	'''
 	A container class that allows modules to declare command line options.
@@ -118,9 +114,6 @@ class Module(object):
 	# The module title, as displayed in help output
 	TITLE = ""
 
-	# Default type is primary
-	TYPE = Types.Primary
-
 	# A list of binwalk.module.ModuleOption command line options
 	CLI = []
 
@@ -128,7 +121,7 @@ class Module(object):
 	KWARGS = []
 
 	# A dictionary of module dependencies; all modules depend on binwalk.modules.configuration.Configuration
-	DEPENDS = {'config' : 'Configuration'}
+	DEPENDS = {'config' : 'Configuration', 'extractor' : 'Extractor'}
 
 	# Format string for printing the header during a scan
 	HEADER_FORMAT = "%s\n"
@@ -194,6 +187,16 @@ class Module(object):
 		'''
 		return False
 
+	def process_result(self, r):
+		'''
+		Processes the result. Passed to all dependency modules when a valid result is found.
+
+		@r - The result, an instance of binwalk.module.Result.
+
+		Returns None.
+		'''
+		return None
+
 	def validate(self, r):
 		'''
 		Validates the result.
@@ -245,6 +248,10 @@ class Module(object):
 		self._plugins_result(r)
 
 		if r.valid:
+			for (attribute, module) in iterator(self.DEPENDS):
+				dependency = getattr(self, attribute)
+				dependency.process_result(r)
+
 			self.results.append(r)
 
 			# Update the progress status automatically if it is not being done manually by the module
@@ -421,13 +428,22 @@ class Modules(object):
 
 	def execute(self, *args, **kwargs):
 		run_modules = []
-		self._set_arguments(list(args), kwargs)
+		orig_arguments = self.arguments
 
+		if args or kwargs:
+			self._set_arguments(list(args), kwargs)
+
+		# Run all modules
 		for module in self.list():
-			if module.TYPE == Type.Primary:
-				obj = self.run(module)
-				if obj.enabled:
-					run_modules.append(obj)
+			obj = self.run(module)
+
+		# Add all loaded modules that marked themselves as enabled to the run_modules list
+		for (module, obj) in iterator(self.loaded_modules):
+			if obj.enabled:
+				run_modules.append(obj)
+
+		self.arguments = orig_arguments
+
 		return run_modules
 
 	def run(self, module):
@@ -446,12 +462,14 @@ class Modules(object):
 	def load(self, module):
 		kwargs = self.argv(module, argv=self.arguments)
 		kwargs.update(self.dependencies(module))
+		print "Loading", module
 		return module(**kwargs)
 		
 	def dependencies(self, module):
 		import binwalk.modules
 		kwargs = {}
 
+		print "Loading dependency:", module
 		if hasattr(module, "DEPENDS"):
 			for (kwarg, dependency) in iterator(module.DEPENDS):
 
