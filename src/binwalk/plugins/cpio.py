@@ -1,5 +1,3 @@
-from binwalk.plugin import *
-
 class Plugin:
 	'''
 	Ensures that ASCII CPIO archive entries only get extracted once.	

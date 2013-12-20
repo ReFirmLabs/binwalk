@@ -1,7 +1,7 @@
 import os
 import shutil
-from binwalk.compat import *
-from binwalk.common import BlockFile
+from binwalk.core.compat import *
+from binwalk.core.common import BlockFile
 
 class Plugin:
 	'''
@@ -15,22 +15,23 @@ class Plugin:
 	def __init__(self, module):
 		self.original_cmd = ''
 		self.enabled = (module.name == 'Signature')
+		self.module = module
 
-		#if module.extractor.enabled:
+		if self.enabled:
 			# Replace the existing LZMA extraction command with our own
-		#	rules = self.binwalk.extractor.get_rules()
-		#	for i in range(0, len(rules)):
-		#		if rules[i]['regex'].match(self.SIGNATURE):
-		#			self.original_cmd = rules[i]['cmd']
-		#			rules[i]['cmd'] = self.lzma_cable_extractor
-		#			break
+			rules = self.extractor.get_rules()
+			for i in range(0, len(rules)):
+				if rules[i]['regex'].match(self.SIGNATURE):
+					self.original_cmd = rules[i]['cmd']
+					rules[i]['cmd'] = self.lzma_cable_extractor
+					break
 
 	def lzma_cable_extractor(self, fname):
 		# Try extracting the LZMA file without modification first
-		if not self.binwalk.extractor.execute(self.original_cmd, fname):
+		if not self.module.extractor.execute(self.original_cmd, fname):
 			out_name = os.path.splitext(fname)[0] + '-patched' + os.path.splitext(fname)[1]
 			fp_out = BlockFile(out_name, 'w')
-			fp_in = BlockFile(fname)
+			fp_in = BlockFile(fname, swap=self.module.config.swap_size)
 			fp_in.MAX_TRAILING_SIZE = 0
 			i = 0
 
@@ -51,11 +52,11 @@ class Plugin:
 
 			# Overwrite the original file so that it can be cleaned up if -r was specified
 			shutil.move(out_name, fname)
-			self.binwalk.extractor.execute(self.original_cmd, fname)
+			self.module.extractor.execute(self.original_cmd, fname)
 
 	def scan(self, result):
 		# The modified cable modem LZMA headers all have valid dictionary sizes and a properties byte of 0x5D.
-		if result.description.lower().startswith(self.SIGNATURE) and "invalid uncompressed size" in result.description:
+		if self.enabled and result.description.lower().startswith(self.SIGNATURE) and "invalid uncompressed size" in result.description:
 			if "properties: 0x5D" in result.description and "invalid dictionary size" not in result.description:
 				result.valid = True
 				result.description = result.description.split("invalid uncompressed size")[0] + "missing uncompressed size"

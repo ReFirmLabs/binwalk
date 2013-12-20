@@ -2,12 +2,12 @@ import os
 import sys
 import curses
 import platform
-import binwalk.module
-import binwalk.common as common
-from binwalk.compat import *
+import binwalk.core.common as common
+from binwalk.core.compat import *
+from binwalk.core.module import Module, Option, Kwarg
 
 # TODO: This code is an effing mess.
-class HexDiff(binwalk.module.Module):
+class HexDiff(Module):
 
 	ALL_SAME = 0
 	ALL_DIFF = 1
@@ -25,33 +25,33 @@ class HexDiff(binwalk.module.Module):
 	TITLE = "Binary Diffing"
 
 	CLI = [
-			binwalk.module.ModuleOption(short='W',
-										long='hexdump',
-										kwargs={'enabled' : True},
-										description='Perform a hexdump / diff of a file or files'),
-			binwalk.module.ModuleOption(short='G',
-										long='green',
-										kwargs={'show_green' : True, 'show_blue' : False, 'show_red' : False},
-										description='Only show lines containing bytes that are the same among all files'),
-			binwalk.module.ModuleOption(short='i',
-										long='red',
-										kwargs={'show_red' : True, 'show_blue' : False, 'show_green' : False},
-										description='Only show lines containing bytes that are different among all files'),
-			binwalk.module.ModuleOption(short='U',
-										long='blue',
-										kwargs={'show_blue' : True, 'show_red' : False, 'show_green' : False},
-										description='Only show lines containing bytes that are different among some files'),
-			binwalk.module.ModuleOption(short='w',
-										long='terse',
-										kwargs={'terse' : True},
-										description='Diff all files, but only display a hex dump of the first file'),
+			Option(short='W',
+				   long='hexdump',
+				   kwargs={'enabled' : True},
+				   description='Perform a hexdump / diff of a file or files'),
+			Option(short='G',
+				   long='green',
+				   kwargs={'show_green' : True, 'show_blue' : False, 'show_red' : False},
+				   description='Only show lines containing bytes that are the same among all files'),
+			Option(short='i',
+				   long='red',
+				   kwargs={'show_red' : True, 'show_blue' : False, 'show_green' : False},
+				   description='Only show lines containing bytes that are different among all files'),
+			Option(short='U',
+				   long='blue',
+				   kwargs={'show_blue' : True, 'show_red' : False, 'show_green' : False},
+				   description='Only show lines containing bytes that are different among some files'),
+			Option(short='w',
+				   long='terse',
+				   kwargs={'terse' : True},
+				   description='Diff all files, but only display a hex dump of the first file'),
 	]
 	
 	KWARGS = [
-			binwalk.module.ModuleKwarg(name='show_red', default=True),
-			binwalk.module.ModuleKwarg(name='show_blue', default=True),
-			binwalk.module.ModuleKwarg(name='show_green', default=True),
-			binwalk.module.ModuleKwarg(name='terse', default=False),
+			Kwarg(name='show_red', default=True),
+			Kwarg(name='show_blue', default=True),
+			Kwarg(name='show_green', default=True),
+			Kwarg(name='terse', default=False),
 	]
 
 	HEADER_FORMAT = "\n%s\n"

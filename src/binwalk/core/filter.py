@@ -1,7 +1,7 @@
 import re
-import binwalk.common as common
-from binwalk.smartsignature import SmartSignature
-from binwalk.compat import *
+import binwalk.core.common as common
+from binwalk.core.smartsignature import SmartSignature
+from binwalk.core.compat import *
 
 class MagicFilter:
 	'''

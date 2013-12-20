@@ -1,9 +1,9 @@
 import os
-import binwalk.module
-from binwalk.compat import *
-from binwalk.common import BlockFile
+from binwalk.core.compat import *
+from binwalk.core.common import BlockFile
+from binwalk.core.module import Module, Option, Kwarg
 
-class Plotter(binwalk.module.Module):
+class Plotter(Module):
 	'''
 	Base class for visualizing binaries in Qt.
 	Other plotter classes are derived from this.
@@ -15,29 +15,29 @@ class Plotter(binwalk.module.Module):
 	TITLE = "Binary Visualization"
 
 	CLI = [
-			binwalk.module.ModuleOption(short='3',
-										long='3D',
-										kwargs={'axis' : 3, 'enabled' : True},
-										description='Generate a 3D binary visualization'),
-			binwalk.module.ModuleOption(short='2',
-										long='2D',
-										kwargs={'axis' : 2, 'enabled' : True},
-										description='Project data points onto 3D cube walls only'),
-			binwalk.module.ModuleOption(short='Z',
-										long='max-points',
-										type=int,
-										kwargs={'max_points' : 0},
-										description='Set the maximum number of plotted data points'),
-			binwalk.module.ModuleOption(short='V',
-										long='show-grids',
-										kwargs={'show_grids' : True},
-										description='Display the x-y-z grids in the resulting plot'),
+			Option(short='3',
+				   long='3D',
+				   kwargs={'axis' : 3, 'enabled' : True},
+				   description='Generate a 3D binary visualization'),
+			Option(short='2',
+				   long='2D',
+				   kwargs={'axis' : 2, 'enabled' : True},
+				   description='Project data points onto 3D cube walls only'),
+			Option(short='Z',
+				   long='max-points',
+				   type=int,
+				   kwargs={'max_points' : 0},
+				   description='Set the maximum number of plotted data points'),
+			Option(short='V',
+				   long='show-grids',
+				   kwargs={'show_grids' : True},
+				   description='Display the x-y-z grids in the resulting plot'),
 	]
 
 	KWARGS = [
-			binwalk.module.ModuleKwarg(name='axis', default=3),
-			binwalk.module.ModuleKwarg(name='max_points', default=0),
-			binwalk.module.ModuleKwarg(name='show_grids', default=False),
+			Kwarg(name='axis', default=3),
+			Kwarg(name='max_points', default=0),
+			Kwarg(name='show_grids', default=False),
 	]
 
 	# There isn't really any useful data to print to console. Disable header and result output.

@@ -1,7 +1,7 @@
 import re
-import binwalk.module
-from binwalk.compat import *
-from binwalk.common import str2int, get_quoted_strings, MathExpression
+import binwalk.core.module
+from binwalk.core.compat import *
+from binwalk.core.common import str2int, get_quoted_strings, MathExpression
 
 class SmartSignature:
 	'''
@@ -127,7 +127,7 @@ class SmartSignature:
 
 		results['valid'] = self.valid
 
-		return binwalk.module.Result(**results)
+		return binwalk.core.module.Result(**results)
 
 	def _is_valid(self, data):
 		'''

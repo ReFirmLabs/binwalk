@@ -3,12 +3,12 @@ import os
 import sys
 import inspect
 import argparse
-import binwalk.common
-import binwalk.config
-import binwalk.plugin
-from binwalk.compat import *
+import binwalk.core.common
+import binwalk.core.config
+import binwalk.core.plugin
+from binwalk.core.compat import *
 
-class ModuleOption(object):
+class Option(object):
 	'''
 	A container class that allows modules to declare command line options.
 	'''
@@ -22,7 +22,7 @@ class ModuleOption(object):
 		@description - A description to be displayed in the help output.
 		@short       - The short option to use (optional).
 		@long        - The long option to use (if None, this option will not be displayed in help output).
-		@type        - The accepted data type (one of: io.FileIO/argparse.FileType/binwalk.common.BlockFile, list, str, int, float).
+		@type        - The accepted data type (one of: io.FileIO/argparse.FileType/binwalk.core.common.BlockFile, list, str, int, float).
 		@dtype       - The displayed accepted type string, to be shown in help output.
 
 		Returns None.
@@ -36,14 +36,14 @@ class ModuleOption(object):
 		self.dtype = str(dtype)
 
 		if not self.dtype:
-			if self.type in [io.FileIO, argparse.FileType, binwalk.common.BlockFile]:
+			if self.type in [io.FileIO, argparse.FileType, binwalk.core.common.BlockFile]:
 				self.dtype = 'file'
 			elif self.type in [int, float, str]:
 				self.dtype = self.type.__name__
 			else:
 				self.dtype = str.__name__
 
-class ModuleKwarg(object):
+class Kwarg(object):
 		'''
 		A container class allowing modules to specify their expected __init__ kwarg(s).
 		'''
@@ -93,12 +93,12 @@ class Result(object):
 
 class Error(Result):
 	'''
-	A subclass of binwalk.module.Result.
+	A subclass of binwalk.core.module.Result.
 	'''
 	
 	def __init__(self, **kwargs):
 		'''
-		Accepts all the same kwargs as binwalk.module.Result, but the following are also added:
+		Accepts all the same kwargs as binwalk.core.module.Result, but the following are also added:
 
 		@exception - In case of an exception, this is the exception object.
 
@@ -114,13 +114,13 @@ class Module(object):
 	# The module title, as displayed in help output
 	TITLE = ""
 
-	# A list of binwalk.module.ModuleOption command line options
+	# A list of binwalk.core.module.ModuleOption command line options
 	CLI = []
 
-	# A list of binwalk.module.ModuleKwargs accepted by __init__
+	# A list of binwalk.core.module.ModuleKwargs accepted by __init__
 	KWARGS = []
 
-	# A dictionary of module dependencies; all modules depend on binwalk.modules.configuration.Configuration
+	# A dictionary of module dependencies; all modules depend on binwalk.core.modules.configuration.Configuration
 	DEPENDS = {'config' : 'Configuration', 'extractor' : 'Extractor'}
 
 	# Format string for printing the header during a scan
@@ -144,7 +144,7 @@ class Module(object):
 		self.results = []
 		self.status = None
 		self.name = self.__class__.__name__
-		self.plugins = binwalk.plugin.Plugins(self)
+		self.plugins = binwalk.core.plugin.Plugins(self)
 
 		process_kwargs(self, kwargs)
 
@@ -187,11 +187,11 @@ class Module(object):
 		'''
 		return False
 
-	def process_result(self, r):
+	def callback(self, r):
 		'''
-		Processes the result. Passed to all dependency modules when a valid result is found.
+		Processes the result from all modules. Called for all dependency modules when a valid result is found.
 
-		@r - The result, an instance of binwalk.module.Result.
+		@r - The result, an instance of binwalk.core.module.Result.
 
 		Returns None.
 		'''
@@ -202,7 +202,7 @@ class Module(object):
 		Validates the result.
 		May be overridden by the module sub-class.
 
-		@r - The result, an instance of binwalk.module.Result.
+		@r - The result, an instance of binwalk.core.module.Result.
 
 		Returns None.
 		'''
@@ -235,9 +235,9 @@ class Module(object):
 	def result(self, r=None, **kwargs):
 		'''
 		Validates a result, stores it in self.results and prints it.
-		Accepts the same kwargs as the binwalk.module.Result class.
+		Accepts the same kwargs as the binwalk.core.module.Result class.
 
-		@r - An existing instance of binwalk.module.Result.
+		@r - An existing instance of binwalk.core.module.Result.
 
 		Returns None.
 		'''
@@ -245,13 +245,14 @@ class Module(object):
 			r = Result(**kwargs)
 
 		self.validate(r)
+
+		for (attribute, module) in iterator(self.DEPENDS):
+			dependency = getattr(self, attribute)
+			dependency.callback(r)
+		
 		self._plugins_result(r)
 
 		if r.valid:
-			for (attribute, module) in iterator(self.DEPENDS):
-				dependency = getattr(self, attribute)
-				dependency.process_result(r)
-
 			self.results.append(r)
 
 			# Update the progress status automatically if it is not being done manually by the module
@@ -268,7 +269,7 @@ class Module(object):
 		'''
 		Stores the specified error in self.errors.
 
-		Accepts the same kwargs as the binwalk.module.Error class.
+		Accepts the same kwargs as the binwalk.core.module.Error class.
 
 		Returns None.
 		'''
@@ -331,7 +332,10 @@ class Module(object):
 		return retval
 
 class Status(object):
-	
+	'''
+	Class used for tracking module status (e.g., % complete).
+	'''
+
 	def __init__(self, **kwargs):
 		self.kwargs = kwargs
 		self.clear()
@@ -391,17 +395,17 @@ class Modules(object):
 
 		Returns a list of modules that contain the specified attribute.
 		'''
-		import binwalk.modules
+		import binwalk.core.modules
 		modules = []
 
-		for (name, module) in inspect.getmembers(binwalk.modules):
+		for (name, module) in inspect.getmembers(binwalk.core.modules):
 			if inspect.isclass(module) and hasattr(module, attribute):
 				modules.append(module)
 
 		return modules
 
 	def help(self):
-		help_string = "\nBinwalk v%s\nCraig Heffner, http://www.binwalk.org\n" % binwalk.config.Config.VERSION
+		help_string = "\nBinwalk v%s\nCraig Heffner, http://www.binwalk.core.org\n" % binwalk.core.config.Config.VERSION
 
 		for obj in self.list(attribute="CLI"):
 			if obj.CLI:
@@ -449,7 +453,7 @@ class Modules(object):
 	def run(self, module):
 		obj = self.load(module)
 
-		if isinstance(obj, binwalk.module.Module) and obj.enabled:
+		if isinstance(obj, binwalk.core.module.Module) and obj.enabled:
 			obj.main(status=self.status)
 			self.status.clear()
 
@@ -465,17 +469,17 @@ class Modules(object):
 		return module(**kwargs)
 		
 	def dependencies(self, module):
-		import binwalk.modules
+		import binwalk.core.modules
 		kwargs = {}
 
 		if hasattr(module, "DEPENDS"):
 			for (kwarg, dependency) in iterator(module.DEPENDS):
 
-				# The dependency module must be imported by binwalk.modules.__init__.py
-				if hasattr(binwalk.modules, dependency):
-					dependency = getattr(binwalk.modules, dependency)
+				# The dependency module must be imported by binwalk.core.modules.__init__.py
+				if hasattr(binwalk.core.modules, dependency):
+					dependency = getattr(binwalk.core.modules, dependency)
 				else:
-					sys.stderr.write("WARNING: %s depends on %s which was not found in binwalk.modules.__init__.py\n" % (str(module), dependency))
+					sys.stderr.write("WARNING: %s depends on %s which was not found in binwalk.core.modules.__init__.py\n" % (str(module), dependency))
 					continue
 				
 				# No recursive dependencies, thanks
@@ -530,7 +534,7 @@ class Modules(object):
 		# Only add parsed options pertinent to the requested module
 		for module_option in module.CLI:
 
-			if module_option.type == binwalk.common.BlockFile:
+			if module_option.type == binwalk.core.common.BlockFile:
 
 				for k in get_keys(module_option.kwargs):
 					kwargs[k] = []
@@ -590,14 +594,14 @@ class Modules(object):
 				if not hasattr(module, k):
 					setattr(module, k, v)
 		else:
-			raise Exception("binwalk.module.Modules.process_kwargs: %s has no attribute 'KWARGS'" % str(module))
+			raise Exception("binwalk.core.module.Modules.process_kwargs: %s has no attribute 'KWARGS'" % str(module))
 
 
 def process_kwargs(obj, kwargs):
 	'''
-	Convenience wrapper around binwalk.module.Modules.kwargs.
+	Convenience wrapper around binwalk.core.module.Modules.kwargs.
 
-	@obj    - The class object (an instance of a sub-class of binwalk.module.Module).
+	@obj    - The class object (an instance of a sub-class of binwalk.core.module.Module).
 	@kwargs - The kwargs provided to the object's __init__ method.
 
 	Returns None.
@@ -606,7 +610,7 @@ def process_kwargs(obj, kwargs):
 
 def show_help(fd=sys.stdout):
 	'''
-	Convenience wrapper around binwalk.module.Modules.help.
+	Convenience wrapper around binwalk.core.module.Modules.help.
 
 	@fd - An object with a write method (e.g., sys.stdout, sys.stderr, etc).
 

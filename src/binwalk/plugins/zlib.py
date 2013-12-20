@@ -7,11 +7,12 @@ class Plugin:
 	Searches for and validates zlib compressed data.
 	'''
 
-	MIN_DECOMP_SIZE = 16*1024
+	MIN_DECOMP_SIZE = 16 * 1024
 	MAX_DATA_SIZE = 33 * 1024
 
 	def __init__(self, module):
 		self.tinfl = None
+		self.module = module
 
 		# Only initialize this plugin if this is a signature scan
 		if module.name == 'Signature':
@@ -22,8 +23,7 @@ class Plugin:
 		# If this result is a zlib signature match, try to decompress the data
 		if self.tinfl and result.file and result.description.lower().startswith('zlib'):
 			# Seek to and read the suspected zlib data
-			fd = BlockFile(result.file.name, "r")
-			fd.seek(result.offset)
+			fd = BlockFile(result.file.name, offset=result.offset, swap=self.module.config.swap_size)
 			data = fd.read(self.MAX_DATA_SIZE)
 			fd.close()
 

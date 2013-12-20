@@ -2,8 +2,8 @@ import io
 import re
 import os.path
 import tempfile
-from binwalk.compat import *
-from binwalk.common import str2int
+from binwalk.core.compat import *
+from binwalk.core.common import str2int
 
 class MagicParser:
 	'''

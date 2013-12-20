@@ -1,6 +1,6 @@
 import os
-import binwalk.common as common
-from binwalk.compat import *
+import binwalk.core.common as common
+from binwalk.core.compat import *
 
 class Config:
 	'''
@@ -117,7 +117,7 @@ class Config:
 			root = __file__
 			if os.path.islink(root):
 				root = os.path.realpath(root)
-			return os.path.dirname(os.path.abspath(root))
+			return os.path.dirname(os.path.dirname(os.path.abspath(root)))
 		except KeyboardInterrupt as e:
 			raise e
 		except Exception:

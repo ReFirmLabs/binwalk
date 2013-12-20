@@ -1,6 +1,6 @@
 import ctypes
 import ctypes.util
-from binwalk.common import *
+from binwalk.core.common import *
 
 class Plugin:
 	'''

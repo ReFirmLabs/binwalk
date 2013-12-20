@@ -5,7 +5,7 @@ import re
 import ast
 import hashlib
 import operator as op
-from binwalk.compat import *
+from binwalk.core.compat import *
 
 # This allows other modules/scripts to subclass BlockFile from a custom class. Defaults to io.FileIO.
 if has_key(__builtins__, 'BLOCK_FILE_PARENT_CLASS'):

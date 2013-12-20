@@ -4,9 +4,9 @@ import magic
 import fnmatch
 import ctypes
 import ctypes.util
-import binwalk.common
-import binwalk.module
-from binwalk.compat import *
+import binwalk.core.common
+from binwalk.core.compat import *
+from binwalk.core.module import Module, Option, Kwarg
 
 class HashResult(object):
 	'''
@@ -19,7 +19,7 @@ class HashResult(object):
 		self.hash = hash
 		self.strings = strings
 
-class HashMatch(binwalk.module.Module):
+class HashMatch(Module):
 	'''
 	Class for fuzzy hash matching of files and directories.
 	'''
@@ -29,50 +29,50 @@ class HashMatch(binwalk.module.Module):
 	TITLE = "Fuzzy Hash"
 
 	CLI = [
-		binwalk.module.ModuleOption(short='F',
-									long='fuzzy',
-									kwargs={'enabled' : True},
-									description='Perform fuzzy hash matching on files/directories'),
-		binwalk.module.ModuleOption(short='u',
-									long='cutoff',
-									priority=100,
-									type=int,
-									kwargs={'cutoff' : DEFAULT_CUTOFF},
-									description='Set the cutoff percentage'),
-		binwalk.module.ModuleOption(short='S',
-									long='strings',
-									kwargs={'strings' : True},
-									description='Diff strings inside files instead of the entire file'),
-		binwalk.module.ModuleOption(short='s',
-									long='same',
-									kwargs={'same' : True, 'cutoff' : CONSERVATIVE_CUTOFF},
-									description='Only show files that are the same'),
-		binwalk.module.ModuleOption(short='p',
-									long='diff',
-									kwargs={'same' : False, 'cutoff' : CONSERVATIVE_CUTOFF},
-									description='Only show files that are different'),
-		binwalk.module.ModuleOption(short='n',
-									long='name',
-									kwargs={'filter_by_name' : True},
-									description='Only compare files whose base names are the same'),
-		binwalk.module.ModuleOption(short='L',
-									long='symlinks',
-									kwargs={'symlinks' : True},
-									description="Don't ignore symlinks"),
+		Option(short='F',
+			   long='fuzzy',
+			   kwargs={'enabled' : True},
+			   description='Perform fuzzy hash matching on files/directories'),
+		Option(short='u',
+			   long='cutoff',
+			   priority=100,
+			   type=int,
+			   kwargs={'cutoff' : DEFAULT_CUTOFF},
+			   description='Set the cutoff percentage'),
+		Option(short='S',
+			   long='strings',
+			   kwargs={'strings' : True},
+			   description='Diff strings inside files instead of the entire file'),
+		Option(short='s',
+			   long='same',
+			   kwargs={'same' : True, 'cutoff' : CONSERVATIVE_CUTOFF},
+			   description='Only show files that are the same'),
+		Option(short='p',
+			   long='diff',
+			   kwargs={'same' : False, 'cutoff' : CONSERVATIVE_CUTOFF},
+			   description='Only show files that are different'),
+		Option(short='n',
+			   long='name',
+			   kwargs={'filter_by_name' : True},
+			   description='Only compare files whose base names are the same'),
+		Option(short='L',
+			   long='symlinks',
+			   kwargs={'symlinks' : True},
+			   description="Don't ignore symlinks"),
 	]
 
 	KWARGS = [
-		binwalk.module.ModuleKwarg(name='cutoff', default=DEFAULT_CUTOFF),
-		binwalk.module.ModuleKwarg(name='strings', default=False),
-		binwalk.module.ModuleKwarg(name='same', default=True),
-		binwalk.module.ModuleKwarg(name='symlinks', default=False),
-		binwalk.module.ModuleKwarg(name='name', default=False),
-		binwalk.module.ModuleKwarg(name='max_results', default=None),
-		binwalk.module.ModuleKwarg(name='abspath', default=False),
-		binwalk.module.ModuleKwarg(name='matches', default={}),
-		binwalk.module.ModuleKwarg(name='types', default={}),
-		binwalk.module.ModuleKwarg(name='filter_by_name', default=False),
-		binwalk.module.ModuleKwarg(name='symlinks', default=False),
+		Kwarg(name='cutoff', default=DEFAULT_CUTOFF),
+		Kwarg(name='strings', default=False),
+		Kwarg(name='same', default=True),
+		Kwarg(name='symlinks', default=False),
+		Kwarg(name='name', default=False),
+		Kwarg(name='max_results', default=None),
+		Kwarg(name='abspath', default=False),
+		Kwarg(name='matches', default={}),
+		Kwarg(name='types', default={}),
+		Kwarg(name='filter_by_name', default=False),
+		Kwarg(name='symlinks', default=False),
 	]
 
 	# Requires libfuzzy.so
@@ -89,21 +89,6 @@ class HashMatch(binwalk.module.Module):
 	RESULT = ["percentage", "description"]
 
 	def init(self):
-		'''
-		Class constructor.
-
-		@cutoff           - The fuzzy cutoff which determines if files are different or not.
-		@strings          - Only hash strings inside of the file, not the entire file itself.
-		@same             - Set to True to show files that are the same, False to show files that are different.
-		@symlinks         - Set to True to include symbolic link files.
-		@name             - Set to True to only compare files whose base names match.
-		@max_results      - Stop searching after x number of matches.
-		@abspath          - Set to True to display absolute file paths.
-		@matches          - A dictionary of file names to diff.
-		@types            - A dictionary of file types to diff.
-
-		Returns None.
-		'''
 		self.total = 0
 		self.last_file1 = HashResult(None)
 		self.last_file2 = HashResult(None)
@@ -118,7 +103,7 @@ class HashMatch(binwalk.module.Module):
 				self.types[k][i] = re.compile(self.types[k][i])
 
 	def _get_strings(self, fname):
-		return ''.join(list(binwalk.common.strings(fname, minimum=10)))
+		return ''.join(list(binwalk.core.common.strings(fname, minimum=10)))
 
 	def _show_result(self, match, fname):
 		if self.abspath:

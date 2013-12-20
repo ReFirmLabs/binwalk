@@ -1,8 +1,8 @@
 import os
 import sys
 import imp
-import binwalk.config
-from binwalk.compat import *
+import binwalk.core.config
+from binwalk.core.compat import *
 
 class Plugins:
 	'''
@@ -54,7 +54,7 @@ class Plugins:
 		self.pre_scan = []
 		self.post_scan = []
 		self.parent = parent
-		self.config = binwalk.config.Config()
+		self.config = binwalk.core.config.Config()
 
 	def __del__(self):
 		pass

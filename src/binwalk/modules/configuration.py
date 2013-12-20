@@ -1,84 +1,84 @@
 import os
 import sys
 import argparse
-import binwalk.common
-import binwalk.module
-import binwalk.config
-import binwalk.display
-from binwalk.config import *
-from binwalk.compat import *
+import binwalk.core.common
+import binwalk.core.config
+import binwalk.core.display
+from binwalk.core.config import *
+from binwalk.core.compat import *
+from binwalk.core.module import Module, Option, Kwarg, show_help
 
-class Configuration(binwalk.module.Module):
+class Configuration():
 
 	TITLE = "General"
 
 	DEPENDS = {}
 		
 	CLI = [
-		binwalk.module.ModuleOption(long='length',
-									short='l',
-									type=int,
-									kwargs={'length' : 0},
-									description='Number of bytes to scan'),
-		binwalk.module.ModuleOption(long='offset',
-									short='o',
-									type=int,
-									kwargs={'offset' : 0},
-									description='Start scan at this file offset'),
-		binwalk.module.ModuleOption(long='block',
-									short='K',
-									type=int,
-									kwargs={'block' : 0},
-									description='Set file block size'),
-		binwalk.module.ModuleOption(long='swap',
-									short='g',
-									type=int,
-									kwargs={'swap_size' : 0},
-									description='Reverse every n bytes before scanning'),
-		binwalk.module.ModuleOption(long='log',
-									short='f',
-									type=argparse.FileType,
-									kwargs={'log_file' : None},
-									description='Log results to file'),
-		binwalk.module.ModuleOption(long='csv',
-									short='c',
-									kwargs={'csv' : True},
-									description='Log results to file in CSV format'),
-		binwalk.module.ModuleOption(long='term',
-									short='t',
-									kwargs={'format_to_terminal' : True},
-									description='Format output to fit the terminal window'),
-		binwalk.module.ModuleOption(long='quiet',
-									short='q',
-									kwargs={'quiet' : True},
-									description='Supress output to stdout'),
-		binwalk.module.ModuleOption(long='verbose',
-									short='v',
-									type=list,
-									kwargs={'verbose' : True},
-									description='Enable verbose output (specify twice for more verbosity)'),
-		binwalk.module.ModuleOption(short='h',
-									long='help',
-									kwargs={'show_help' : True},
-									description='Show help output'),
-		binwalk.module.ModuleOption(long=None,
-									short=None,
-									type=binwalk.common.BlockFile,
-									kwargs={'files' : []}),
+		Option(long='length',
+			   short='l',
+			   type=int,
+			   kwargs={'length' : 0},
+			   description='Number of bytes to scan'),
+		Option(long='offset',
+			   short='o',
+			   type=int,
+			   kwargs={'offset' : 0},
+			   description='Start scan at this file offset'),
+		Option(long='block',
+			   short='K',
+			   type=int,
+			   kwargs={'block' : 0},
+			   description='Set file block size'),
+		Option(long='swap',
+			   short='g',
+			   type=int,
+			   kwargs={'swap_size' : 0},
+			   description='Reverse every n bytes before scanning'),
+		Option(long='log',
+			   short='f',
+			   type=argparse.FileType,
+			   kwargs={'log_file' : None},
+			   description='Log results to file'),
+		Option(long='csv',
+			   short='c',
+			   kwargs={'csv' : True},
+			   description='Log results to file in CSV format'),
+		Option(long='term',
+			   short='t',
+			   kwargs={'format_to_terminal' : True},
+			   description='Format output to fit the terminal window'),
+		Option(long='quiet',
+			   short='q',
+			   kwargs={'quiet' : True},
+			   description='Supress output to stdout'),
+		Option(long='verbose',
+			   short='v',
+			   type=list,
+			   kwargs={'verbose' : True},
+			   description='Enable verbose output (specify twice for more verbosity)'),
+		Option(short='h',
+			   long='help',
+			   kwargs={'show_help' : True},
+			   description='Show help output'),
+		Option(long=None,
+			   short=None,
+			   type=binwalk.core.common.BlockFile,
+			   kwargs={'files' : []}),
 	]
 
 	KWARGS = [
-		binwalk.module.ModuleKwarg(name='length', default=0),
-		binwalk.module.ModuleKwarg(name='offset', default=0),
-		binwalk.module.ModuleKwarg(name='block', default=0),
-		binwalk.module.ModuleKwarg(name='swap_size', default=0),
-		binwalk.module.ModuleKwarg(name='log_file', default=None),
-		binwalk.module.ModuleKwarg(name='csv', default=False),
-		binwalk.module.ModuleKwarg(name='format_to_terminal', default=False),
-		binwalk.module.ModuleKwarg(name='quiet', default=False),
-		binwalk.module.ModuleKwarg(name='verbose', default=[]),
-		binwalk.module.ModuleKwarg(name='files', default=[]),
-		binwalk.module.ModuleKwarg(name='show_help', default=False),
+		Kwarg(name='length', default=0),
+		Kwarg(name='offset', default=0),
+		Kwarg(name='block', default=0),
+		Kwarg(name='swap_size', default=0),
+		Kwarg(name='log_file', default=None),
+		Kwarg(name='csv', default=False),
+		Kwarg(name='format_to_terminal', default=False),
+		Kwarg(name='quiet', default=False),
+		Kwarg(name='verbose', default=[]),
+		Kwarg(name='files', default=[]),
+		Kwarg(name='show_help', default=False),
 	]
 
 	def load(self):
@@ -87,15 +87,15 @@ class Configuration(binwalk.module.Module):
 		self._set_verbosity()
 		self._open_target_files()
 
-		self.settings = binwalk.config.Config()
-		self.display = binwalk.display.Display(log=self.log_file,
-											   csv=self.csv,
-											   quiet=self.quiet,
-											   verbose=self.verbose,
-											   fit_to_screen=self.format_to_terminal)
+		self.settings = binwalk.core.config.Config()
+		self.display = binwalk.core.display.Display(log=self.log_file,
+													csv=self.csv,
+													quiet=self.quiet,
+													verbose=self.verbose,
+													fit_to_screen=self.format_to_terminal)
 		
 		if self.show_help:
-			binwalk.module.show_help()
+			show_help()
 			sys.exit(0)
 
 	def __del__(self):
@@ -134,7 +134,7 @@ class Configuration(binwalk.module.Module):
 			if not os.path.isdir(tfile):
 				# Make sure we can open the target files
 				try:
-					fp = binwalk.common.BlockFile(tfile, length=self.length, offset=self.offset, swap=self.swap_size)
+					fp = binwalk.core.common.BlockFile(tfile, length=self.length, offset=self.offset, swap=self.swap_size)
 					self.target_files.append(fp)
 				except KeyboardInterrupt as e:
 					raise e
