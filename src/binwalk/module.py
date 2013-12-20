@@ -377,6 +377,7 @@ class Modules(object):
 
 		Returns a list of modules that contain the specified attribute.
 		'''
+		import binwalk.modules
 		modules = []
 
 		for (name, module) in inspect.getmembers(binwalk.modules):
@@ -440,6 +441,7 @@ class Modules(object):
 		return module(**kwargs)
 		
 	def dependencies(self, module):
+		import binwalk.modules
 		kwargs = {}
 
 		if hasattr(module, "DEPENDS"):

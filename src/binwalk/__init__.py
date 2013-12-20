@@ -1,1 +1,1 @@
-from module import Modules
+from binwalk.module import Modules
