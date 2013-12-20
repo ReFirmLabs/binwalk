@@ -462,14 +462,12 @@ class Modules(object):
 	def load(self, module):
 		kwargs = self.argv(module, argv=self.arguments)
 		kwargs.update(self.dependencies(module))
-		print "Loading", module
 		return module(**kwargs)
 		
 	def dependencies(self, module):
 		import binwalk.modules
 		kwargs = {}
 
-		print "Loading dependency:", module
 		if hasattr(module, "DEPENDS"):
 			for (kwarg, dependency) in iterator(module.DEPENDS):
 

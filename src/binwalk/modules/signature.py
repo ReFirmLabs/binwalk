@@ -112,13 +112,15 @@ class Signature(binwalk.module.Module):
 				r.valid = False
 
 	def scan_file(self, fp):
+		current_file_offset = 0
+
 		while True:
 			(data, dlen) = fp.read_block()
 			if not data:
 				break
 
 			current_block_offset = 0
-			block_start = fp.total_read - dlen
+			block_start = fp.offset + fp.total_read - dlen
 			self.status.completed = block_start - fp.offset
 
 			for candidate_offset in self.parser.find_signature_candidates(data, dlen):

@@ -358,7 +358,7 @@ class BlockFile(io.FileIO):
 
 	def seek(self, n, whence=os.SEEK_SET):
 		if whence == os.SEEK_SET:
-			self.total_read = n
+			self.total_read = n - self.offset
 		elif whence == os.SEEK_CUR:
 			self.total_read += n
 		elif whence == os.SEEK_END:
