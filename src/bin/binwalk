@@ -3,12 +3,13 @@
 import sys
 import binwalk
 from threading import Thread
+from binwalk.core.compat import user_input
 
 def display_status(m):
 	# Display the current scan progress when the enter key is pressed.
 	while True:
 		try:
-			raw_input()
+			user_input()
 			sys.stderr.write("Progress: %.2f%% (%d / %d)\n\n" % (((float(m.status.completed) / float(m.status.total)) * 100), m.status.completed, m.status.total))
 		except KeyboardInterrupt as e:
 			raise e
@@ -31,9 +32,7 @@ def main():
 		if len(sys.argv) == 1:
 			usage(modules)
 		elif not modules.execute():
-			for module in modules.execute(*sys.argv[1:], signature=True):
-				for result in module.results:
-					print result.description
+			modules.execute(*sys.argv[1:], signature=True)
 	except binwalk.ModuleException as e:
 		sys.exit(1)
 
@@ -47,4 +46,5 @@ if __name__ == '__main__':
 		else:
 			main()
 	except KeyboardInterrupt:
-		print("")
+		sys.stdout.write("\n")
+

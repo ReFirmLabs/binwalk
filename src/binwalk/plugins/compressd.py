@@ -2,7 +2,7 @@ import ctypes
 import ctypes.util
 from binwalk.core.common import *
 
-class Plugin:
+class Plugin(object):
 	'''
 	Searches for and validates compress'd data.
 	'''

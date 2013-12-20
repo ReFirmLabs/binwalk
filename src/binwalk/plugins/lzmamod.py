@@ -3,7 +3,7 @@ import shutil
 from binwalk.core.compat import *
 from binwalk.core.common import BlockFile
 
-class Plugin:
+class Plugin(object):
 	'''
 	Finds and extracts modified LZMA files commonly found in cable modems.
 	Based on Bernardo Rodrigues' work: http://w00tsec.blogspot.com/2013/11/unpacking-firmware-images-from-cable.html

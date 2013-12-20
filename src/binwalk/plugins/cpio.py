@@ -1,4 +1,4 @@
-class Plugin:
+class Plugin(object):
 	'''
 	Ensures that ASCII CPIO archive entries only get extracted once.	
 	'''

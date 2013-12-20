@@ -7,10 +7,7 @@ import string
 PY_MAJOR_VERSION = sys.version_info[0]
 
 if PY_MAJOR_VERSION > 2:
-	import urllib.request as urllib2
 	string.letters = string.ascii_letters
-else:
-	import urllib2
 
 def iterator(dictionary):
 	'''
@@ -65,4 +62,13 @@ def string_decode(string):
 		return bytes(string, 'utf-8').decode('unicode_escape')
 	else:
 		return string.decode('string_escape')
+
+def user_input(prompt=''):
+	'''
+	For getting raw user input in Python 2 and 3.
+	'''
+	if PY_MAJOR_VERSION > 2:
+		return input(prompt)
+	else:
+		return raw_input(prompt)
 
