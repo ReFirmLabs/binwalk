@@ -2,7 +2,7 @@
 from __future__ import print_function
 import os
 import sys
-from os import listdir, path
+import shutil
 from distutils.core import setup
 
 # Python2/3 compliance
@@ -10,13 +10,6 @@ try:
 	raw_input
 except:
 	raw_input = input
-
-# This is super hacky.
-if "--yes" in sys.argv:
-	sys.argv.pop(sys.argv.index("--yes"))
-	IGNORE_WARNINGS = True
-else:
-	IGNORE_WARNINGS = False
 
 def warning(lines, terminate=True, prompt=True):
 	WIDTH = 115
@@ -36,6 +29,29 @@ def warning(lines, terminate=True, prompt=True):
 		if terminate:
 			sys.exit(1)
 		
+# This is super hacky.
+if "--yes" in sys.argv:
+	sys.argv.pop(sys.argv.index("--yes"))
+	IGNORE_WARNINGS = True
+else:
+	IGNORE_WARNINGS = False
+
+# Look for old installations of binwalk and remove them to prevent conflicts with the new API
+try:
+	import binwalk
+	for path in binwalk.__path__:
+		if not os.path.exists(os.path.join(path, "core")):
+			try:
+				print ("Cleaning up old installation...")
+				shutil.rmtree(path)
+			except:
+				pass
+except:
+	pass
+
+# Change to the binwalk src directory
+os.chdir(os.path.join(os.path.dirname(os.path.realpath(__file__)), "src"))
+
 print("checking pre-requisites")
 try:
 	import magic
@@ -95,12 +111,12 @@ os.chdir(working_directory)
 
 # Generate a new magic file from the files in the magic directory
 print("generating binwalk magic file")
-magic_files = listdir("magic")
+magic_files = os.listdir("magic")
 magic_files.sort()
 fd = open("binwalk/magic/binwalk", "wb")
 for magic in magic_files:
-	fpath = path.join("magic", magic)
-	if path.isfile(fpath):
+	fpath = os.path.join("magic", magic)
+	if os.path.isfile(fpath):
 		fd.write(open(fpath, "rb").read())
 fd.close()
 
@@ -117,6 +133,6 @@ setup(	name = "binwalk",
 	requires = ["magic", "pyqtgraph"],
 	packages = ["binwalk"],
 	package_data = {"binwalk" : install_data_files},
-	scripts = ["bin/binwalk", "bin/rehash"],
+	scripts = ["scripts/binwalk"],
 )
 
