@@ -8,6 +8,10 @@ import binwalk.config
 import binwalk.plugin
 from binwalk.compat import *
 
+class Type(object):
+	Primary = 1
+	Support = 2
+
 class ModuleOption(object):
 	'''
 	A container class that allows modules to declare command line options.
@@ -113,6 +117,9 @@ class Module(object):
 	'''
 	# The module title, as displayed in help output
 	TITLE = ""
+
+	# Default type is primary
+	TYPE = Types.Primary
 
 	# A list of binwalk.module.ModuleOption command line options
 	CLI = []
@@ -417,9 +424,10 @@ class Modules(object):
 		self._set_arguments(list(args), kwargs)
 
 		for module in self.list():
-			obj = self.run(module)
-			if obj.enabled:
-				run_modules.append(obj)
+			if module.TYPE == Type.Primary:
+				obj = self.run(module)
+				if obj.enabled:
+					run_modules.append(obj)
 		return run_modules
 
 	def run(self, module):
