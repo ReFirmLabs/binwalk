@@ -33,9 +33,8 @@ class HashMatch(binwalk.module.Module):
 									long='fuzzy',
 									kwargs={'enabled' : True},
 									description='Perform fuzzy hash matching on files/directories'),
-		binwalk.module.ModuleOption(short='t',
+		binwalk.module.ModuleOption(short='u',
 									long='cutoff',
-									nargs=1,
 									priority=100,
 									type=int,
 									kwargs={'cutoff' : DEFAULT_CUTOFF},
@@ -48,10 +47,18 @@ class HashMatch(binwalk.module.Module):
 									long='same',
 									kwargs={'same' : True, 'cutoff' : CONSERVATIVE_CUTOFF},
 									description='Only show files that are the same'),
-		binwalk.module.ModuleOption(short='',
+		binwalk.module.ModuleOption(short='p',
 									long='diff',
 									kwargs={'same' : False, 'cutoff' : CONSERVATIVE_CUTOFF},
 									description='Only show files that are different'),
+		binwalk.module.ModuleOption(short='n',
+									long='name',
+									kwargs={'filter_by_name' : True},
+									description='Only compare files whose base names are the same'),
+		binwalk.module.ModuleOption(short='L',
+									long='symlinks',
+									kwargs={'symlinks' : True},
+									description="Don't ignore symlinks"),
 	]
 
 	KWARGS = [
@@ -64,6 +71,8 @@ class HashMatch(binwalk.module.Module):
 		binwalk.module.ModuleKwarg(name='abspath', default=False),
 		binwalk.module.ModuleKwarg(name='matches', default={}),
 		binwalk.module.ModuleKwarg(name='types', default={}),
+		binwalk.module.ModuleKwarg(name='filter_by_name', default=False),
+		binwalk.module.ModuleKwarg(name='symlinks', default=False),
 	]
 
 	# Requires libfuzzy.so
@@ -130,7 +139,7 @@ class HashMatch(binwalk.module.Module):
 		file1_dup = False
 		file2_dup = False
 
-		if not self.name or os.path.basename(file1) == os.path.basename(file2):
+		if not self.filter_by_name or os.path.basename(file1) == os.path.basename(file2):
 			if os.path.exists(file1) and os.path.exists(file2):
 
 				hash1 = ctypes.create_string_buffer(self.FUZZY_MAX_RESULT)

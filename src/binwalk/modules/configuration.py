@@ -15,25 +15,26 @@ class Configuration(binwalk.module.Module):
 	CLI = [
 		binwalk.module.ModuleOption(long='length',
 									short='l',
-									nargs=1,
 									type=int,
 									kwargs={'length' : 0},
 									description='Number of bytes to scan'),
 		binwalk.module.ModuleOption(long='offset',
 									short='o',
-									nargs=1,
 									type=int,
 									kwargs={'offset' : 0},
 									description='Start scan at this file offset'),
 		binwalk.module.ModuleOption(long='block',
 									short='K',
-									nargs=1,
 									type=int,
 									kwargs={'block' : 0},
 									description='Set file block size'),
+		binwalk.module.ModuleOption(long='swap',
+									short='g',
+									type=int,
+									kwargs={'swap_size' : 0},
+									description='Reverse every n bytes before scanning'),
 		binwalk.module.ModuleOption(long='log',
 									short='f',
-									nargs=1,
 									type=argparse.FileType,
 									kwargs={'log_file' : None},
 									description='Log results to file'),
@@ -68,6 +69,7 @@ class Configuration(binwalk.module.Module):
 		binwalk.module.ModuleKwarg(name='length', default=0),
 		binwalk.module.ModuleKwarg(name='offset', default=0),
 		binwalk.module.ModuleKwarg(name='block', default=0),
+		binwalk.module.ModuleKwarg(name='swap_size', default=0),
 		binwalk.module.ModuleKwarg(name='log_file', default=None),
 		binwalk.module.ModuleKwarg(name='csv', default=False),
 		binwalk.module.ModuleKwarg(name='format_to_terminal', default=False),
@@ -130,7 +132,7 @@ class Configuration(binwalk.module.Module):
 			if not os.path.isdir(tfile):
 				# Make sure we can open the target files
 				try:
-					fp = binwalk.common.BlockFile(tfile, length=self.length, offset=self.offset)
+					fp = binwalk.common.BlockFile(tfile, length=self.length, offset=self.offset, swap=self.swap_size)
 					self.target_files.append(fp)
 				except KeyboardInterrupt as e:
 					raise e

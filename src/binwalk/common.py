@@ -220,7 +220,7 @@ class BlockFile(io.FileIO):
 	# limit disk I/O, but small enough to limit the size of processed data blocks.
 	READ_BLOCK_SIZE = 1 * 1024 * 1024
 
-	def __init__(self, fname, mode='r', length=0, offset=0, block=READ_BLOCK_SIZE):
+	def __init__(self, fname, mode='r', length=0, offset=0, block=READ_BLOCK_SIZE, trail=MAX_TRAILING_SIZE, swap=0):
 		'''
 		Class constructor.
 
@@ -228,10 +228,14 @@ class BlockFile(io.FileIO):
 		@mode   - Mode to open the file in (default: 'r').
 		@length - Maximum number of bytes to read from the file via self.block_read().
 		@offset - Offset at which to start reading from the file.
+		@block  - Size of data block to read (excluding any trailing size),
+		@trail  - Size of trailing data to append to the end of each block.
+		@swap   - Swap every n bytes of data.
 
 		Returns None.
 		'''
 		self.total_read = 0
+		self.swap_size = swap
 
 		# Python 2.6 doesn't like modes like 'rb' or 'wb'
 		mode = mode.replace('b', '')
@@ -267,6 +271,9 @@ class BlockFile(io.FileIO):
 
 		if block > 0:
 			self.READ_BLOCK_SIZE = block
+	
+		if trail > 0:
+			self.MAX_TRAILING_SIZE = trail
 
 		io.FileIO.__init__(self, fname, mode)
 
@@ -277,6 +284,27 @@ class BlockFile(io.FileIO):
 			self._name = fname
 
 		self.seek(self.offset)
+
+	def _swap_data_block(self, block):
+		'''
+		Reverses every self.swap_size bytes inside the specified data block.
+		Size of data block must be a multiple of self.swap_size.
+
+		@block - The data block to swap.
+
+		Returns a swapped string.
+		'''
+		i = 0
+		data = ""
+		
+		if self.swap_size > 0:
+			while i < len(block):
+				data += block[i:i+self.swap_size][::-1]
+				i += self.swap_size
+		else:
+			data = block
+
+		return data
 
 	def write(self, data):
 		'''
@@ -317,7 +345,7 @@ class BlockFile(io.FileIO):
 				break
 
 		self.total_read += len(data)
-		return bytes2str(data)
+		return self._swap_data_block(bytes2str(data))
 
 	def _internal_read(self, n=-1):
 		'''

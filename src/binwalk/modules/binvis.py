@@ -27,7 +27,6 @@ class Plotter(binwalk.module.Module):
 										long='max-points',
 										type=int,
 										kwargs={'max_points' : 0},
-										nargs=1,
 										description='Set the maximum number of plotted data points'),
 			binwalk.module.ModuleOption(short='V',
 										long='show-grids',

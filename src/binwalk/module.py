@@ -13,22 +13,21 @@ class ModuleOption(object):
 	A container class that allows modules to declare command line options.
 	'''
 
-	def __init__(self, kwargs={}, nargs=0, priority=0, description="", short="", long="", type=str, dtype=""):
+	def __init__(self, kwargs={}, priority=0, description="", short="", long="", type=None, dtype=""):
 		'''
 		Class constructor.
 
 		@kwargs      - A dictionary of kwarg key-value pairs affected by this command line option.
-		@nargs       - The number of arguments this option accepts (only 1 or 0 is currently supported).
 		@priority    - A value from 0 to 100. Higher priorities will override kwarg values set by lower priority options.
 		@description - A description to be displayed in the help output.
 		@short       - The short option to use (optional).
 		@long        - The long option to use (if None, this option will not be displayed in help output).
 		@type        - The accepted data type (one of: io.FileIO/argparse.FileType/binwalk.common.BlockFile, list, str, int, float).
+		@dtype       - The displayed accepted type string, to be shown in help output.
 
 		Returns None.
 		'''
 		self.kwargs = kwargs
-		self.nargs = nargs
 		self.priority = priority
 		self.description = description
 		self.short = short
@@ -397,7 +396,7 @@ class Modules(object):
 					if module_option.long:
 						long_opt = '--' + module_option.long
 					
-						if module_option.nargs > 0:
+						if module_option.type is not None:
 							optargs = "=<%s>" % module_option.dtype
 						else:
 							optargs = ""
@@ -464,9 +463,6 @@ class Modules(object):
 	
 		return kwargs
 
-	def _is_file(self, fname):
-		return (not fname.startswith('-')) and (os.path.exists(fname) or fname.startswith('./') or fname.startswith('/'))
-
 	def argv(self, module, argv=sys.argv[1:]):
 		'''
 		Processes argv for any options specific to the specified module.
@@ -482,15 +478,17 @@ class Modules(object):
 		shorts = ""
 		parser = argparse.ArgumentParser(add_help=False)
 
-		# TODO: Add all arguments for all modules to parser so that the only unknowns will be file names.
-		#       Only return arguments for the specified module though.
-		if hasattr(module, "CLI"):
+		# Must build arguments from all modules so that:
+		#
+		#	1) Any conflicting arguments will raise an exception
+		#	2) The only unknown arguments will be the target files, making them easy to identify
+		for m in self.list(attribute="CLI"):
 
-			for module_option in module.CLI:
+			for module_option in m.CLI:
 				if not module_option.long:
 					continue
 
-				if module_option.nargs == 0:
+				if module_option.type is None:
 					action = 'store_true'
 				else:
 					action = None
@@ -500,47 +498,44 @@ class Modules(object):
 				else:
 					parser.add_argument('--' + module_option.long, action=action, dest=module_option.long)
 
-			args, unknown = parser.parse_known_args(argv)
-			args = args.__dict__
+		args, unknown = parser.parse_known_args(argv)
+		args = args.__dict__
 
-			for module_option in module.CLI:
+		# Only add parsed options pertinent to the requested module
+		for module_option in module.CLI:
 
-				if module_option.type == binwalk.common.BlockFile:
+			if module_option.type == binwalk.common.BlockFile:
 
-					for k in get_keys(module_option.kwargs):
-						kwargs[k] = []
-						for unk in unknown:
-							if self._is_file(unk):
-								kwargs[k].append(unk)
+				for k in get_keys(module_option.kwargs):
+					kwargs[k] = []
+					for unk in unknown:
+						kwargs[k].append(unk)
 
-				elif has_key(args, module_option.long) and args[module_option.long] not in [None, False]:
+			elif has_key(args, module_option.long) and args[module_option.long] not in [None, False]:
 
-					i = 0
-					for (name, value) in iterator(module_option.kwargs):
-						if not has_key(last_priority, name) or last_priority[name] <= module_option.priority:
-							if module_option.nargs > i:
-								value = args[module_option.long]
-								i += 1
+				for (name, value) in iterator(module_option.kwargs):
+					if not has_key(last_priority, name) or last_priority[name] <= module_option.priority:
 
-							last_priority[name] = module_option.priority
+						if module_option.type is not None:
+							value = args[module_option.long]
 
-							# Do this manually as argparse doesn't seem to be able to handle hexadecimal values
-							if module_option.type == int:
-								kwargs[name] = int(value, 0)
-							elif module_option.type == float:
-								kwargs[name] = float(value)
-							elif module_option.type == dict:
-								if not has_key(kwargs, name):
-									kwargs[name] = {}
-								kwargs[name][len(kwargs[name])] = value
-							elif module_option.type == list:
-								if not has_key(kwargs, name):
-									kwargs[name] = []
-								kwargs[name].append(value)
-							else:
-								kwargs[name] = value
-		else:
-			raise Exception("binwalk.module.Modules.argv: %s has no attribute 'CLI'" % str(module))
+						last_priority[name] = module_option.priority
+
+						# Do this manually as argparse doesn't seem to be able to handle hexadecimal values
+						if module_option.type == int:
+							kwargs[name] = int(value, 0)
+						elif module_option.type == float:
+							kwargs[name] = float(value)
+						elif module_option.type == dict:
+							if not has_key(kwargs, name):
+								kwargs[name] = {}
+							kwargs[name][len(kwargs[name])] = value
+						elif module_option.type == list:
+							if not has_key(kwargs, name):
+								kwargs[name] = []
+							kwargs[name].append(value)
+						else:
+							kwargs[name] = value
 
 		if not has_key(kwargs, 'enabled'):
 			kwargs['enabled'] = False
