@@ -160,6 +160,7 @@ class Signature(Module):
 			
 				self.footer()
 
+			# Add any pending extracted files to the target_files list and reset the extractor's pending file list
 			target_files = [self.config.open_file(f) for f in self.extractor.pending]
 			self.extractor.pending = []
 

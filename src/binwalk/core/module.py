@@ -170,6 +170,12 @@ class Module(object):
 		'''
 		return None
 
+	def reset(self):
+		'''
+		Invoked only for dependency modules immediately prior to starting a new primary module.
+		'''
+		return None
+
 	def init(self):
 		'''
 		Invoked prior to self.run.
@@ -312,6 +318,11 @@ class Module(object):
 		Returns the value returned from self.run.
 		'''
 		self.status = status
+
+		# Reset all dependency modules
+		for (dependency, module) in iterator(self.DEPENDS):
+			if hasattr(self, dependency):
+				getattr(self, dependency).reset()
 
 		try:
 			self.init()
@@ -509,7 +520,7 @@ class Modules(object):
 					raise ModuleException("Failed to load " + str(dependency))
 				else:	
 					kwargs[kwarg] = self.loaded_modules[dependency]
-	
+
 		return kwargs
 
 	def argv(self, module, argv=sys.argv[1:]):
