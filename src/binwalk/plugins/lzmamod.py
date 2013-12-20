@@ -19,7 +19,7 @@ class Plugin:
 
 		if self.enabled:
 			# Replace the existing LZMA extraction command with our own
-			rules = self.extractor.get_rules()
+			rules = self.module.extractor.get_rules()
 			for i in range(0, len(rules)):
 				if rules[i]['regex'].match(self.SIGNATURE):
 					self.original_cmd = rules[i]['cmd']

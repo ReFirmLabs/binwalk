@@ -8,7 +8,7 @@ from binwalk.core.config import *
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg, show_help
 
-class Configuration():
+class Configuration(Module):
 
 	TITLE = "General"
 
@@ -108,8 +108,9 @@ class Configuration():
 		return self
 
 	def _cleanup(self):
-		for fp in self.target_files:
-			fp.close()
+		if hasattr(self, 'target_files'):
+			for fp in self.target_files:
+				fp.close()
 
 	def _set_verbosity(self):
 		'''

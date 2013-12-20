@@ -97,7 +97,7 @@ os.chdir(working_directory)
 print("generating binwalk magic file")
 magic_files = listdir("magic")
 magic_files.sort()
-fd = open("binwalk/magics/binwalk", "wb")
+fd = open("binwalk/magic/binwalk", "wb")
 for magic in magic_files:
 	fpath = path.join("magic", magic)
 	if path.isfile(fpath):
@@ -105,7 +105,7 @@ for magic in magic_files:
 fd.close()
 
 # The data files to install along with the binwalk module
-install_data_files = ["magics/*", "configs/*", "plugins/*", "modules/*"]
+install_data_files = ["magic/*", "config/*", "plugins/*", "modules/*", "core/*"]
 
 # Install the binwalk module, script and support files
 setup(	name = "binwalk",

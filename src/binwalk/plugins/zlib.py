@@ -1,6 +1,6 @@
 import ctypes
 import ctypes.util
-from binwalk.common import BlockFile
+from binwalk.core.common import BlockFile
 
 class Plugin:
 	'''

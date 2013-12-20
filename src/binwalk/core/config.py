@@ -39,8 +39,8 @@ class Config:
 
 	# Sub directories
 	BINWALK_USER_DIR = ".binwalk"
-	BINWALK_MAGIC_DIR = "magics"
-	BINWALK_CONFIG_DIR = "configs"
+	BINWALK_MAGIC_DIR = "magic"
+	BINWALK_CONFIG_DIR = "config"
 	BINWALK_PLUGINS_DIR = "plugins"
 
 	# File names

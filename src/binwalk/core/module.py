@@ -120,7 +120,7 @@ class Module(object):
 	# A list of binwalk.core.module.ModuleKwargs accepted by __init__
 	KWARGS = []
 
-	# A dictionary of module dependencies; all modules depend on binwalk.core.modules.configuration.Configuration
+	# A dictionary of module dependencies; all modules depend on binwalk.modules.configuration.Configuration
 	DEPENDS = {'config' : 'Configuration', 'extractor' : 'Extractor'}
 
 	# Format string for printing the header during a scan
@@ -395,10 +395,10 @@ class Modules(object):
 
 		Returns a list of modules that contain the specified attribute.
 		'''
-		import binwalk.core.modules
+		import binwalk.modules
 		modules = []
 
-		for (name, module) in inspect.getmembers(binwalk.core.modules):
+		for (name, module) in inspect.getmembers(binwalk.modules):
 			if inspect.isclass(module) and hasattr(module, attribute):
 				modules.append(module)
 
@@ -469,17 +469,17 @@ class Modules(object):
 		return module(**kwargs)
 		
 	def dependencies(self, module):
-		import binwalk.core.modules
+		import binwalk.modules
 		kwargs = {}
 
 		if hasattr(module, "DEPENDS"):
 			for (kwarg, dependency) in iterator(module.DEPENDS):
 
-				# The dependency module must be imported by binwalk.core.modules.__init__.py
-				if hasattr(binwalk.core.modules, dependency):
-					dependency = getattr(binwalk.core.modules, dependency)
+				# The dependency module must be imported by binwalk.modules.__init__.py
+				if hasattr(binwalk.modules, dependency):
+					dependency = getattr(binwalk.modules, dependency)
 				else:
-					sys.stderr.write("WARNING: %s depends on %s which was not found in binwalk.core.modules.__init__.py\n" % (str(module), dependency))
+					sys.stderr.write("WARNING: %s depends on %s which was not found in binwalk.modules.__init__.py\n" % (str(module), dependency))
 					continue
 				
 				# No recursive dependencies, thanks
