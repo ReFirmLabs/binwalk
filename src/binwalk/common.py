@@ -7,6 +7,12 @@ import hashlib
 import operator as op
 from binwalk.compat import *
 
+# This allows other modules/scripts to subclass BlockFile from a custom class. Defaults to io.FileIO.
+if has_key(__builtins__, 'BLOCK_FILE_PARENT_CLASS'):
+	BLOCK_FILE_PARENT_CLASS = __builtins__['BLOCK_FILE_PARENT_CLASS']
+else:
+	BLOCK_FILE_PARENT_CLASS = io.FileIO
+
 def file_md5(file_name):
 	'''
 	Generate an MD5 hash of the specified file.
@@ -184,7 +190,7 @@ class MathExpression(object):
 			raise TypeError(node)
 
 
-class BlockFile(io.FileIO):
+class BlockFile(BLOCK_FILE_PARENT_CLASS):
 	'''
 	Abstraction class for accessing binary files.
 
@@ -275,7 +281,7 @@ class BlockFile(io.FileIO):
 		if trail > 0:
 			self.MAX_TRAILING_SIZE = trail
 
-		io.FileIO.__init__(self, fname, mode)
+		super(self.__class__, self).__init__(fname, mode)
 
 		# Work around for python 2.6 where FileIO._name is not defined
 		try:
@@ -320,7 +326,7 @@ class BlockFile(io.FileIO):
 		data = str2bytes(data)
 
 		while n < l:
-			n += io.FileIO.write(self, data[n:])
+			n += super(self.__class__, self).write(data[n:])
 
 		return n
 
@@ -337,7 +343,7 @@ class BlockFile(io.FileIO):
 		data = b''
 
 		while n < 0 or l < n:
-			tmp = io.FileIO.read(self, n-l)
+			tmp = super(self.__class__, self).read(n-l)
 			if tmp:
 				data += tmp
 				l += len(tmp)
@@ -364,7 +370,7 @@ class BlockFile(io.FileIO):
 		elif whence == os.SEEK_END:
 			self.total_read = self.size + n
 
-		io.FileIO.seek(self, n, whence)
+		super(self.__class__, self).seek(n, whence)
 
 	def read_block(self):
 		'''
