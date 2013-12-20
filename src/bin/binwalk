@@ -27,10 +27,13 @@ def main():
 	t.setDaemon(True)
 	t.start()
 
-	if len(sys.argv) == 1:
-		usage(modules)
-	elif not modules.execute():
-		modules.execute(*sys.argv[1:], signature=True)
+	try:
+		if len(sys.argv) == 1:
+			usage(modules)
+		elif not modules.execute():
+			modules.execute(*sys.argv[1:], signature=True)
+	except binwalk.DependencyError as e:
+		sys.exit(1)
 
 if __name__ == '__main__':
 	try:

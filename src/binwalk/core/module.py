@@ -274,6 +274,8 @@ class Module(object):
 
 		Returns None.
 		'''
+		exception_header_width = 100
+
 		e = Error(**kwargs)
 		e.module = self
 
@@ -281,9 +283,9 @@ class Module(object):
 		
 		if e.exception:
 			sys.stderr.write("\n" + e.module.__class__.__name__ + " Exception: " + str(e.exception) + "\n")
-			sys.stderr.write("-" * self.config.display.HEADER_WIDTH + "\n")
+			sys.stderr.write("-" * exception_header_width + "\n")
 			traceback.print_exc(file=sys.stderr)
-			sys.stderr.write("-" * self.config.display.HEADER_WIDTH + "\n\n")
+			sys.stderr.write("-" * exception_header_width + "\n\n")
 		elif e.description:
 			sys.stderr.write("\n" + e.module.__class__.__name__ + " Error: " + e.description + "\n\n")
 
@@ -347,6 +349,9 @@ class Status(object):
 	def clear(self):
 		for (k,v) in iterator(self.kwargs):
 			setattr(self, k, v)
+
+class DependencyError(Exception):
+	pass
 
 class Modules(object):
 	'''
@@ -491,9 +496,13 @@ class Modules(object):
 					continue
 
 				if not has_key(self.loaded_modules, dependency):
-					# TODO: What to do if a dependency fails? Anything?
+					# self.run will automatically add the dependency class instance to self.loaded_modules
 					self.run(dependency)
-				kwargs[kwarg] = self.loaded_modules[dependency]
+				
+				if self.loaded_modules[dependency].errors:
+					raise DependencyError("Failed to load " + str(dependency))
+				else:	
+					kwargs[kwarg] = self.loaded_modules[dependency]
 	
 		return kwargs
 
