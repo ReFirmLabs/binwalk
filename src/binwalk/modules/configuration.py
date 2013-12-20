@@ -54,9 +54,8 @@ class Configuration(Module):
 			   description='Supress output to stdout'),
 		Option(long='verbose',
 			   short='v',
-			   type=list,
-			   kwargs={'verbose' : True},
-			   description='Enable verbose output (specify twice for more verbosity)'),
+			   kwargs={'verbose' : 1},
+			   description='Enable verbose output'),
 		Option(short='h',
 			   long='help',
 			   kwargs={'show_help' : True},
@@ -76,7 +75,7 @@ class Configuration(Module):
 		Kwarg(name='csv', default=False),
 		Kwarg(name='format_to_terminal', default=False),
 		Kwarg(name='quiet', default=False),
-		Kwarg(name='verbose', default=[]),
+		Kwarg(name='verbose', default=0),
 		Kwarg(name='files', default=[]),
 		Kwarg(name='show_help', default=False),
 	]
@@ -84,8 +83,8 @@ class Configuration(Module):
 	def load(self):
 		self.target_files = []
 		
-		self._set_verbosity()
 		self._open_target_files()
+		self._set_verbosity()
 
 		self.settings = binwalk.core.config.Config()
 		self.display = binwalk.core.display.Display(log=self.log_file,
@@ -117,8 +116,6 @@ class Configuration(Module):
 		Sets the appropriate verbosity.
 		Must be called after self._test_target_files so that self.target_files is properly set.
 		'''
-		self.verbose = len(self.verbose)
-
 		# If more than one target file was specified, enable verbose mode; else, there is
 		# nothing in some outputs to indicate which scan corresponds to which file. 
 		if len(self.target_files) > 1 and self.verbose == 0:

@@ -2,7 +2,7 @@ import ctypes
 import ctypes.util
 from binwalk.core.common import BlockFile
 
-class Plugin:
+class Plugin(object):
 	'''
 	Searches for and validates zlib compressed data.
 	'''

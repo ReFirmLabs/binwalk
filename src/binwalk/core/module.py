@@ -3,6 +3,7 @@ import os
 import sys
 import inspect
 import argparse
+import traceback
 import binwalk.core.common
 import binwalk.core.config
 import binwalk.core.plugin
@@ -279,9 +280,12 @@ class Module(object):
 		self.errors.append(e)
 		
 		if e.exception:
-			sys.stderr.write(e.module.__class__.__name__ + " Exception: " + str(e.exception) + "\n")
+			sys.stderr.write("\n" + e.module.__class__.__name__ + " Exception: " + str(e.exception) + "\n")
+			sys.stderr.write("-" * self.config.display.HEADER_WIDTH + "\n")
+			traceback.print_exc(file=sys.stderr)
+			sys.stderr.write("-" * self.config.display.HEADER_WIDTH + "\n\n")
 		elif e.description:
-			sys.stderr.write(e.module.__class__.__name__ + " Error: " + e.description + "\n")
+			sys.stderr.write("\n" + e.module.__class__.__name__ + " Error: " + e.description + "\n\n")
 
 	def header(self):
 		self.config.display.format_strings(self.HEADER_FORMAT, self.RESULT_FORMAT)
