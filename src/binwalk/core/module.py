@@ -125,20 +125,24 @@ class Module(object):
 	DEPENDS = {'config' : 'Configuration', 'extractor' : 'Extractor'}
 
 	# Format string for printing the header during a scan
-	HEADER_FORMAT = "%s\n"
+	#HEADER_FORMAT = "%s\n"
+	HEADER_FORMAT = "%-12s  %-12s    %s\n"
 
 	# Format string for printing each result during a scan 
-	RESULT_FORMAT = "%.8d      %s\n"
+	#RESULT_FORMAT = "%.8d      %s\n"
+	RESULT_FORMAT = "%-12d  0x%-12X  %s\n"
 
 	# The header to print during a scan.
 	# Set to None to not print a header.
 	# Note that this will be formatted per the HEADER_FORMAT format string.
-	HEADER = ["OFFSET      DESCRIPTION"]
+	#HEADER = ["OFFSET      DESCRIPTION"]
+	HEADER = ["DECIMAL", "HEX", "DESCRIPTION"]
 
 	# The attribute names to print during a scan, as provided to the self.results method.
 	# Set to None to not print any results.
 	# Note that these will be formatted per the RESULT_FORMAT format string.
-	RESULT = ['offset', 'description']
+	#RESULT = ['offset', 'description']
+	RESULT = ["offset", "offset", "description"]
 
 	def __init__(self, dependency=False, **kwargs):
 		self.errors = []
@@ -239,6 +243,15 @@ class Module(object):
 		
 		return args
 
+	def clear(self, results=True, errors=True):
+		'''
+		Clears results and errors lists.
+		'''
+		if results:
+			self.results = []
+		if errors:
+			self.errors = []
+
 	def result(self, r=None, **kwargs):
 		'''
 		Validates a result, stores it in self.results and prints it.
@@ -246,7 +259,7 @@ class Module(object):
 
 		@r - An existing instance of binwalk.core.module.Result.
 
-		Returns None.
+		Returns an instance of binwalk.core.module.Result.
 		'''
 		if r is None:
 			r = Result(**kwargs)
@@ -277,6 +290,8 @@ class Module(object):
 				display_args = self._build_display_args(r)
 				if display_args:
 					self.config.display.result(*display_args)
+
+		return r
 
 	def error(self, **kwargs):
 		'''
