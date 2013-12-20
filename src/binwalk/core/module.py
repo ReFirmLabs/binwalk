@@ -245,13 +245,19 @@ class Module(object):
 		if r is None:
 			r = Result(**kwargs)
 
+		# Any module that is reporting results, valid or not, should be marked as enabled
+		if not self.enabled:
+			self.enabled = True
+
 		self.validate(r)
+		self._plugins_result(r)
 
 		for (attribute, module) in iterator(self.DEPENDS):
-			dependency = getattr(self, attribute)
-			dependency.callback(r)
-		
-		self._plugins_result(r)
+			try:
+				dependency = getattr(self, attribute)
+				dependency.callback(r)
+			except AttributeError:
+				continue
 
 		if r.valid:
 			self.results.append(r)
@@ -350,7 +356,7 @@ class Status(object):
 		for (k,v) in iterator(self.kwargs):
 			setattr(self, k, v)
 
-class DependencyError(Exception):
+class ModuleException(Exception):
 	pass
 
 class Modules(object):
@@ -500,7 +506,7 @@ class Modules(object):
 					self.run(dependency)
 				
 				if self.loaded_modules[dependency].errors:
-					raise DependencyError("Failed to load " + str(dependency))
+					raise ModuleException("Failed to load " + str(dependency))
 				else:	
 					kwargs[kwarg] = self.loaded_modules[dependency]
 	

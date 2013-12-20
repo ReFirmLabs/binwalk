@@ -1,1 +1,1 @@
-from binwalk.core.module import Modules, DependencyError
+from binwalk.core.module import Modules, ModuleException

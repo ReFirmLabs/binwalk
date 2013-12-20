@@ -121,6 +121,19 @@ class Configuration(Module):
 		if len(self.target_files) > 1 and self.verbose == 0:
 			self.verbose = 1
 
+	def open_file(self, fname, length=None, offset=None, swap=None):
+		'''
+		Opens the specified file with all pertinent configuration settings.
+		'''
+		if length is None:
+			length = self.length
+		if offset is None:
+			offset = self.offset
+		if swap is None:
+			swap = self.swap_size
+
+		return binwalk.core.common.BlockFile(fname, length=length, offset=offset, swap=swap)
+
 	def _open_target_files(self):
 		'''
 		Checks if the target files can be opened.
@@ -132,8 +145,7 @@ class Configuration(Module):
 			if not os.path.isdir(tfile):
 				# Make sure we can open the target files
 				try:
-					fp = binwalk.core.common.BlockFile(tfile, length=self.length, offset=self.offset, swap=self.swap_size)
-					self.target_files.append(fp)
+					self.target_files.append(self.open_file(tfile))
 				except KeyboardInterrupt as e:
 					raise e
 				except Exception as e:

@@ -146,14 +146,20 @@ class Signature(Module):
 						current_block_offset = r.jump
 
 	def run(self):
-		for fp in self.config.target_files:
-			self.header()
-			
-			self.status.clear()
-			self.status.total = fp.size
-			self.status.completed = 0
+		target_files = self.config.target_files
 
-			self.scan_file(fp)
+		while target_files:
+			for fp in target_files:
+				self.header()
 			
-			self.footer()
+				self.status.clear()
+				self.status.total = fp.size
+				self.status.completed = 0
+
+				self.scan_file(fp)
+			
+				self.footer()
+
+			target_files = [self.config.open_file(f) for f in self.extractor.pending]
+			self.extractor.pending = []
 

@@ -31,8 +31,10 @@ def main():
 		if len(sys.argv) == 1:
 			usage(modules)
 		elif not modules.execute():
-			modules.execute(*sys.argv[1:], signature=True)
-	except binwalk.DependencyError as e:
+			for module in modules.execute(*sys.argv[1:], signature=True):
+				for result in module.results:
+					print result.description
+	except binwalk.ModuleException as e:
 		sys.exit(1)
 
 if __name__ == '__main__':

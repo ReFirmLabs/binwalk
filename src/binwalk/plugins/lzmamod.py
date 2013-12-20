@@ -31,7 +31,8 @@ class Plugin:
 		if not self.module.extractor.execute(self.original_cmd, fname):
 			out_name = os.path.splitext(fname)[0] + '-patched' + os.path.splitext(fname)[1]
 			fp_out = BlockFile(out_name, 'w')
-			fp_in = BlockFile(fname, swap=self.module.config.swap_size)
+			# Use self.module.config.open_file here to ensure that other config settings (such as byte-swapping) are honored
+			fp_in = self.module.config.open_file(fname, offset=0, length=0)
 			fp_in.MAX_TRAILING_SIZE = 0
 			i = 0
 
