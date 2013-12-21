@@ -336,7 +336,8 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
 	def read(self, n=-1):
 		''''
 		Reads up to n bytes of data (or to EOF if n is not specified).
-		
+		Will not read more than self.length bytes.
+
 		io.FileIO.read does not guaruntee that all requested data will be read;
 		this method overrides io.FileIO.read and does guaruntee that all data will be read.
 
@@ -345,15 +346,21 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
 		l = 0
 		data = b''
 
-		while n < 0 or l < n:
-			tmp = super(self.__class__, self).read(n-l)
-			if tmp:
-				data += tmp
-				l += len(tmp)
-			else:
-				break
+		if self.total_read < self.length:
+			# Don't read more than self.length bytes from the file
+			if (self.total_read + n) > self.length:
+				n = self.length - self.total_read
+				
+			while n < 0 or l < n:
+				tmp = super(self.__class__, self).read(n-l)
+				if tmp:
+					data += tmp
+					l += len(tmp)
+				else:
+					break
 
-		self.total_read += len(data)
+			self.total_read += len(data)
+
 		return self._swap_data_block(bytes2str(data))
 
 	def _internal_read(self, n=-1):
@@ -383,35 +390,30 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
                 '''
 		dlen = 0
 		data = None
+		rsize = self.READ_BLOCK_SIZE + self.MAX_TRAILING_SIZE
 
-		if self.total_read < self.length:
-			# Read in self.READ_BLOCK_SIZE + self.MAX_TRAILING_SIZE, unless this exceeds self.length
-			rsize = self.READ_BLOCK_SIZE + self.MAX_TRAILING_SIZE
-			if (self.total_read + rsize) > self.length:
-				rsize = self.length - self.total_read
+		# Do the read. Must use self._internal_read so that the total_read value is untouched (we update this ourselves later)
+		data = self._internal_read(rsize)
 
-			# Do the read. Must use self._internal_read so that the total_read value is untouched (we update this ourselves later)
-			data = self._internal_read(rsize)
+		if data:
 
-			if data and data is not None:
-
-				# Get the actual length of the read in data
-				dlen = len(data)
+			# Get the actual length of the read in data
+			dlen = len(data)
 				
-				# Calculate how far back we need to seek to pick up at the self.READ_BLOCK_SIZE offset
-				seek_offset = dlen - self.READ_BLOCK_SIZE
-				# If rsize was less than self.READ_BLOCK_SIZE seek backwards zero bytes
-				if seek_offset < 0:
-					seek_offset = 0
+			# Calculate how far back we need to seek to pick up at the self.READ_BLOCK_SIZE offset
+			seek_offset = dlen - self.READ_BLOCK_SIZE
+			# If the actual read size was less than self.READ_BLOCK_SIZE seek backwards zero bytes
+			if seek_offset < 0:
+				seek_offset = 0
 
-				# Read in READ_BLOCK_SIZE plus MAX_TRAILING_SIZE bytes, but return a max dlen value
-				# Return a max dlen value of READ_BLOCK_SIZE. This ensures that there is a MAX_TRAILING_SIZE
-				# buffer at the end of the returned data in case a signature is found at or near data[READ_BLOCK_SIZE].
-				if dlen == (self.READ_BLOCK_SIZE + self.MAX_TRAILING_SIZE):
-					dlen = self.READ_BLOCK_SIZE
+			# Read in READ_BLOCK_SIZE plus MAX_TRAILING_SIZE bytes, but return a max dlen value
+			# Return a max dlen value of READ_BLOCK_SIZE. This ensures that there is a MAX_TRAILING_SIZE
+			# buffer at the end of the returned data in case a signature is found at or near data[READ_BLOCK_SIZE].
+			if dlen == rsize:
+				dlen = self.READ_BLOCK_SIZE
 
-				# Seek to the self.total_read offset so the next read can pick up where this one left off.
-				self.seek(self.tell() - seek_offset)
+			# Seek to the self.total_read offset so the next read can pick up where this one left off.
+			self.seek(self.tell() - seek_offset)
 
 		return (data, dlen)
 
