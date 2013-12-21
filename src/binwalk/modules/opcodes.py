@@ -55,17 +55,21 @@ class Disassembler(object):
 		return None
 
 	def disassemble_opcode(self, ins, data):
-		ins.opcode = ord(data[self.OPCODE_INDEX]) & self.OPCODE_MASK
-		if ins.opcode in self.OPCODES:
-			ins.valid = True
+		if len(data) > self.OPCODE_INDEX:
+			ins.opcode = ord(data[self.OPCODE_INDEX]) & self.OPCODE_MASK
+			if ins.opcode in self.OPCODES:
+				ins.valid = True
+			else:
+				ins.valid = False
 		else:
 			ins.valid = False
 
 	def disassemble(self, data):
-		data = self.pre_processor(data)
 		ins = Instruction(size=self.INSTRUCTION_SIZE, endianess=self.ENDIANESS)
-		self.disassemble_opcode(ins, data)
-		self.validate(ins)
+		if data:
+			data = self.pre_processor(data)
+			self.disassemble_opcode(ins, data)
+			self.validate(ins)
 		return ins
 
 class MIPS(Disassembler):
@@ -202,7 +206,7 @@ class OpcodeValidator(Module):
 							sequence_size = disassembler.MIN_INSTRUCTION_COUNT * disassembler.INSTRUCTION_SIZE
 							if self.is_valid_sequence(disassembler, data[offset:offset+sequence_size]):
 								desc = self.build_description_string(disassembler)
-								self.result(description=desc, offset=offset, file=fp, display=self.config.verbose)
+								self.result(description=desc, offset=(fp.tell()-dlen+offset), file=fp, display=self.config.verbose)
 								results[disassembler][j] += 1
 								total_hits[j] += 1
 
