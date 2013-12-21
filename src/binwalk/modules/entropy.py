@@ -27,7 +27,7 @@ class Entropy(Module):
 			Option(short='J',
 				   long='save-plot',
 				   kwargs={'save_plot' : True},
-				   description='Save plot as a PNG (implied if multiple files are specified)'),
+				   description='Save plot as a PNG'),
 			Option(short='N',
 				   long='no-plot',
 				   kwargs={'do_plot' : False},
@@ -35,7 +35,7 @@ class Entropy(Module):
 			Option(short='Q',
 				   long='no-legend',
 				   kwargs={'show_legend' : False},
-				   description='Omit the legend from the entropy plot graph (implied if multiple files are specified)'),
+				   description='Omit the legend from the entropy plot graph'),
 	]
 
 	KWARGS = [
@@ -54,30 +54,32 @@ class Entropy(Module):
 		self.algorithm = self.shannon
 		self.display_results = True
 		self.max_description_length = 0
-		self.markers = []
-
-		# Automatically save plots if there is more than one file specified
-		if len(self.config.target_files) > 1:
-			self.save_plot = True
-			self.show_legend = False
+		self.file_markers = {}
 
 		# Get a list of all other module's results to mark on the entropy graph
 		for (module, obj) in iterator(self.modules):
 			for result in obj.results:
-				if result.description:
+				if result.file and result.description:
 					description = result.description.split(',')[0]
+
+					if not has_key(self.file_markers, result.file.name):
+						self.file_markers[result.file.name] = []
+
 					if len(description) > self.max_description_length:
 						self.max_description_length = len(description)
-					self.markers.append((result.offset, description))
+
+					self.file_markers[result.file.name].append((result.offset, description))
 
 		# If other modules have been run and they produced results, don't spam the terminal with entropy results
-		if self.markers:
+		if self.file_markers:
 			self.display_results = False
 
 		if self.config.block:
 			self.block_size = self.config.block
 
 	def run(self):
+		from pyqtgraph.Qt import QtGui
+
 		for fp in self.config.target_files:
 
 			if self.display_results:
@@ -87,6 +89,9 @@ class Entropy(Module):
 
 			if self.display_results:
 				self.footer()
+	
+		if not self.save_plot:	
+			QtGui.QApplication.instance().exec_()
 
 	def calculate_file_entropy(self, fp):
 		# Clear results from any previously analyzed files
@@ -138,7 +143,6 @@ class Entropy(Module):
 	def plot_entropy(self, fname):
 		import numpy as np
 		import pyqtgraph as pg
-		from pyqtgraph.Qt import QtCore, QtGui
 
 		i = 0
 		x = []
@@ -151,12 +155,10 @@ class Entropy(Module):
 
 		plt = pg.plot(title=fname, clear=True)
 
-		plt.plot(x, y, pen='y')
-
-		if self.show_legend and self.markers:
+		if self.show_legend and has_key(self.file_markers, fname):
 			plt.addLegend(size=(self.max_description_length*10, 0))
 
-			for (offset, description) in self.markers:
+			for (offset, description) in self.file_markers[fname]:
 				# If this description has already been plotted at a different offset, we need to 
 				# use the same color for the marker, but set the description to None to prevent
 				# duplicate entries in the graph legend.
@@ -175,6 +177,10 @@ class Entropy(Module):
 
 				plt.plot(x=[offset,offset], y=[0,1.1], name=description, pen=pg.mkPen(color, width=2.5))
 
+		# Plot data points
+		plt.plot(x, y, pen='y')
+
+		# TODO: legend is not displayed properly when saving plots to disk
 		if self.save_plot:
 			exporter = pg.exporters.ImageExporter.ImageExporter(plt.plotItem)
 			exporter.parameters()['width'] = self.FILE_WIDTH
@@ -182,5 +188,4 @@ class Entropy(Module):
 		else:
 			plt.setLabel('left', self.YLABEL, units=self.YUNITS)
 			plt.setLabel('bottom', self.XLABEL, units=self.XUNITS)
-			QtGui.QApplication.instance().exec_()
 
