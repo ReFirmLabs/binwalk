@@ -86,5 +86,13 @@
 # x86 epilogue
 # push ebp
 # move ebp, esp
-0	string	\x55\x89\xE5	Intel x86 instructions, function epilogue
+# sub esp, XX
+#
+# push ebp
+# move ebp, esp
+# push edi
+# push esi
+0	string	\x55\x89\xE5\x83\xEC				Intel x86 instructions, function prologue
+0	string	\x55\x89\xE5\x57\x56				Intel x86 instructions, function prologue
+0	string	\x90\x90\x90\x90\x90\x90\x90\x90	Intel x86 instructions, nops{jump-to-offset:8}
 
