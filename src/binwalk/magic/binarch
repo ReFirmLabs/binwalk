@@ -27,6 +27,31 @@
 0	leshort	0x27BD		MIPS instructions, function epilogue
 >2	lelong	!0x03e00008	(invalid)
 
+# MIPS16e
+# nop (x4)
+0	string	\x65\x00\x65\x00\x65\x00\x65\x00	MIPS16e instructions, nops{jump-to-offset:8}
+0	string	\x00\x65\x00\x65\x00\x65\x00\x65	MIPSEL16e instructions, nops{jump-to-offset:8}
+
+# save a0-a1, XX
+# addiu XX, XX
+0	string	\xf0\x08\x64	MIPS16e instructions, function prologue
+>4	byte	!0x01			(invalid)
+
+# move $sp, $s1
+# restore XX, XX, XX
+# jrc $ra
+0	beshort	0x65B9			MIPS16e instructions, function epilogue
+>3	byte	!0x64			(invalid)
+>4	beshort	!0xE8A0			(invalid)
+0	leshort	0x65B9			MIPSEL16e instructions, function epilogue
+>3	byte	!0x64			(invalid)
+>4	leshort	!0xE8A0			(invalid)
+
+# jrc $ra
+# nop
+0	belong	0xe8a06500		MIPS16e instructions, function epilogue
+0	lelong	0xe8a06500		MIPSEL16e instructions, function epilogue
+
 # PowerPC prologue
 # mflr r0
 0	belong 0x7C0802A6	PowerPC big endian instructions, function prologue
@@ -37,13 +62,13 @@
 0	belong 0x4E800020	PowerPC big endian instructions, function epilogue
 0	lelong 0x4E800020	PowerPC little endian instructions, function epilogue
 
+# TODO: Add ARM Thumb dectection
 # ARM prologue
 # STMFD SP!, {XX}
 # <any instruction whose opcode begins with 0xE>
 0	beshort		0xE92D	ARMEB instructions, function prologue
->5	byte&0xF0	!0xE0	(invalid)
->9	byte&0xF0	!0xE0	(invalid)
-
+>4	byte&0xF0	!0xE0	(invalid)
+>8	byte&0xF0	!0xE0	(invalid)
 0	leshort		0xE92D	ARM instructions, function prologue{offset-adjust:-2}
 >5	byte&0xF0	!0xE0	(invalid)
 >9	byte&0xF0	!0xE0	(invalid)

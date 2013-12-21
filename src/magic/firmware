@@ -70,7 +70,8 @@
 >32	string	x		image name: "%s"
 
 #IMG0 header, found in VxWorks-based Mercury router firmware
-0	string		IMG0		IMG0 (VxWorks) header,
+0	string		IMG0	IMG0 (VxWorks) header,
+>4	belong		<1		invalid
 >4	belong		x		size: %d
 
 #Mediatek bootloader signature
@@ -79,13 +80,13 @@
 
 #CSYS header formats
 0	string		CSYS\x00	CSYS header, little endian, 
->8	lelong		x		size: %d
+>8	lelong		x			size: %d
 
 0	string		CSYS\x80	CSYS header, big endian,
->8	belong		x		size: %d
+>8	belong		x			size: %d
 
 # wrgg firmware image
-0	string		wrgg02		WRGG firmware header,
+0	string		wrgg02	WRGG firmware header,
 >6	string		x		name: "%s",
 >48	string		x		root device: "%s"
 
@@ -108,7 +109,7 @@
 
 
 # Ubicom firmware image
-0	belong	0xFA320080		Ubicom firmware header,
+0	belong	0xFA320080	Ubicom firmware header,
 >12	belong	x			checksum: 0x%X,
 >24	belong	<0			invalid
 >24	belong	x			image size: %d
