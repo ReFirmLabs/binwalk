@@ -1,6 +1,6 @@
 import re
 import binwalk.core.common as common
-from binwalk.core.smartsignature import SmartSignature
+from binwalk.core.smart import SmartSignature
 from binwalk.core.compat import *
 
 class MagicFilter:
@@ -8,28 +8,6 @@ class MagicFilter:
 	Class to filter libmagic results based on include/exclude rules and false positive detection.
 	An instance of this class is available via the Binwalk.filter object.
 	Note that all filter strings should be in lower case.
-
-	Example code which creates include, exclude, and grep filters before running a binwalk scan:
-
-		import binwalk
-
-		bw = binwalk.Binwalk()
-
-		# Include all signatures whose descriptions contain the string 'filesystem' in the first line of the signature, even if those signatures are normally excluded.
-		# Note that if exclusive=False was specified, this would merely add these signatures to the default signatures.
-		# Since exclusive=True (the default) has been specified, ONLY those matching signatures will be loaded; all others will be ignored.
-		bw.filter.include('filesystem')
-
-		# Exclude all signatures whose descriptions contain the string 'jffs2', even if those signatures are normally included.
-		# In this case, we are now searching for all filesystem signatures, except JFFS2.
-		bw.filter.exclude('jffs2')
-
-		# Add a grep filter. Unlike the include and exclude filters, it does not affect which results are returned by Binwalk.scan(), but it does affect which results
-		# are printed by Binwalk.display.results(). This is particularly useful for cases like the bincast scan, where multiple lines of results are returned per offset,
-		# but you only want certian ones displayed. In this case, only file systems whose description contain the string '2012' will be displayed.
-		bw.filter.grep(filters=['2012'])
-
-		bw.scan('firmware.bin')
 	'''
 
 	# If the result returned by libmagic is "data" or contains the text

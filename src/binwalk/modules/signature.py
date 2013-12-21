@@ -1,7 +1,7 @@
 import magic
 import binwalk.core.parser
 import binwalk.core.filter
-import binwalk.core.smartsignature
+import binwalk.core.smart
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg
 
@@ -63,7 +63,7 @@ class Signature(Module):
 	def init(self):
 		# Create SmartSignature and MagicParser class instances. These are mostly for internal use.
 		self.filter = binwalk.core.filter.MagicFilter()
-		self.smart = binwalk.core.smartsignature.SmartSignature(self.filter, ignore_smart_signatures=self.dumb_scan)
+		self.smart = binwalk.core.smart.SmartSignature(self.filter, ignore_smart_signatures=self.dumb_scan)
 		self.parser = binwalk.core.parser.MagicParser(self.filter, self.smart)
 
 		# Set any specified include/exclude filters
