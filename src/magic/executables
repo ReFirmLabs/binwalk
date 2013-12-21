@@ -23,7 +23,10 @@
 >>18	beshort		10
 >>>36	belong		&0x20		N32
 >4	byte		2		64-bit
->5	byte		0		invalid byte order
+>4	byte		>2
+>>4	byte		x		unknown ELF class: 0x%X
+>5	byte		!1
+>>5	byte		!2		invalid byte order
 >5	byte		1		LSB
 # The official e_machine number for MIPS is now #8, regardless of endianness.
 # The second number (#10) will be deprecated later. For now, we still
@@ -203,7 +206,7 @@
 >>36	belong		1		MathCoPro/FPU/MAU Required
 # Up to now only 0, 1 and 2 are defined; I've seen a file with 0x83, it seemed
 # like proper ELF, but extracting the string had bad results.
->4      byte            <0x80
+>4	byte		<0x80
 >>8	string		>\0		("%s")
 >8	string		\0
 >>7	byte		0		(SYSV)

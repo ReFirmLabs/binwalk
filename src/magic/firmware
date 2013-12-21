@@ -90,18 +90,20 @@
 >48	string		x		root device: "%s"
 
 # trx image file
-0	string          HDR0            TRX firmware header, little endian, header size: 28 bytes,
+0	string		HDR0	TRX firmware header, little endian, header size: 28 bytes,
 >4	lelong		<1		invalid
 >4	lelong		x		image size: %d bytes,
 >8	lelong		x		CRC32: 0x%X
 >12	leshort		x		flags: 0x%X,
+>14	leshort		>5		invalid
 >14	leshort		x		version: %d
 
-0	string          0RDH            TRX firmware header, big endian, header size: 28 bytes,
+0	string		0RDH	TRX firmware header, big endian, header size: 28 bytes,
 >4	belong		<1		invalid
 >4	belong		x		image size: %d bytes,
 >8	belong		x		CRC32: 0x%X
 >12	beshort		x		flags: 0x%X,
+>14	beshort		>5		invalid
 >14	beshort		x		version: %d
 
 
