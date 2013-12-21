@@ -7,7 +7,7 @@ class Display(object):
 	HEADER_WIDTH = 150
 	DEFAULT_FORMAT = "%s\n"
 
-	def __init__(self, quiet=False, verbose=0, log=None, csv=False, fit_to_screen=False):
+	def __init__(self, quiet=False, verbose=False, log=None, csv=False, fit_to_screen=False):
 		self.quiet = quiet
 		self.verbose = verbose
 		self.fit_to_screen = fit_to_screen

@@ -78,6 +78,7 @@ class Result(object):
 		@valid       - Set to True if the result if value, False if invalid.
 		@display     - Set to True to display the result to the user, False to hide it.
 		@extract     - Set to True to flag this result for extraction.
+		@plot        - Set to Flase to exclude this result from entropy plots.
 
 		Provide additional kwargs as necessary.
 		Returns None.
@@ -88,6 +89,7 @@ class Result(object):
 		self.valid = True
 		self.display = True
 		self.extract = True
+		self.plot = True
 
 		for (k, v) in iterator(kwargs):
 			setattr(self, k, v)
@@ -298,9 +300,9 @@ class Module(object):
 			self.results.append(r)
 
 			# Update the progress status automatically if it is not being done manually by the module
-			if r.file and self.AUTO_UPDATE_STATUS:
+			if r.offset and self.AUTO_UPDATE_STATUS:
 				self.status.total = r.file.length
-				self.status.completed = r.file.tell() - r.file.offset
+				self.status.completed = r.offset
 
 			if r.display:
 				display_args = self._build_display_args(r)

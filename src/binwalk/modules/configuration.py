@@ -53,7 +53,7 @@ class Configuration(Module):
 			   description='Supress output to stdout'),
 		Option(long='verbose',
 			   short='v',
-			   kwargs={'verbose' : 1},
+			   kwargs={'verbose' : True},
 			   description='Enable verbose output'),
 		Option(short='h',
 			   long='help',
@@ -74,7 +74,7 @@ class Configuration(Module):
 		Kwarg(name='csv', default=False),
 		Kwarg(name='format_to_terminal', default=False),
 		Kwarg(name='quiet', default=False),
-		Kwarg(name='verbose', default=0),
+		Kwarg(name='verbose', default=False),
 		Kwarg(name='files', default=[]),
 		Kwarg(name='show_help', default=False),
 	]
@@ -119,8 +119,8 @@ class Configuration(Module):
 		'''
 		# If more than one target file was specified, enable verbose mode; else, there is
 		# nothing in some outputs to indicate which scan corresponds to which file. 
-		if len(self.target_files) > 1 and self.verbose == 0:
-			self.verbose = 1
+		if len(self.target_files) > 1 and not self.verbose:
+			self.verbose = True
 
 	def open_file(self, fname, length=None, offset=None, swap=None):
 		'''
