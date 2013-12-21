@@ -326,7 +326,7 @@ class Module(object):
 		exception_header_width = 100
 
 		e = Error(**kwargs)
-		e.module = self
+		e.module = self.__class__.__name__
 
 		self.errors.append(e)
 		

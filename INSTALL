@@ -1,12 +1,12 @@
 BEFORE YOU START
 ----------------------------------
 
-Although binwalk supports Python 3, Python 2.7 is recommended.
+Binwalk supports Python 2.7 - 3.x.
 
 The following installation procedures assume that you are installing binwalk to be run using Python 2.7.
 If you want to use binwalk in Python 3, some package names and installation procedures may differ slightly.
 
-You will also need to have a C compiler installed to build some of the supporting libraries.
+You will also need to have a C compiler installed to build the supporting C libraries.
 
 
 
@@ -43,7 +43,7 @@ Next, you'll need to install the dependencies for pyqtgraph (you may also need t
 	
 	$ sudo apt-get install python-opengl python-qt4 python-qt4-gl python-numpy python-scipy
 
-Most distros don't have pyqtgraph in their repositories, so you'll need to build it from source:
+Most distros don't have pyqtgraph in their default repositories, so it's best to build it from source:
 
 	$ wget http://www.pyqtgraph.org/downloads/pyqtgraph-0.9.8.tar.gz
 	$ tar -zxvf pyqtgraph-0.9.8.tar.gz
@@ -59,6 +59,7 @@ Binwalk can be installed using the included setup.py installer in the src/ direc
 	$ sudo python ./setup.py install
 
 The installer will check for core dependencies and warn you if any are missing or not compatible.
+Note that setup.py also builds and installs the included C libraries.
 
 
 

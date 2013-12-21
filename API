@@ -8,101 +8,77 @@ DESCRIPTION
 	examples are provided here to help jump-start development efforts.
 
 
-BASIC SCAN
+BINWALK SCRIPTING
 
-	The following is an example of the simplest scan, and is equivalent to running binwalk on the command line 
-	with no additional arguments:
+	Each of binwalk's features (signature scans, entropy analysis, etc) are implemented as separate modules.
+	These modules can be invoked via the binwalk.core.module.Modules class, which makes scripting trivial 
+	through its execute method.
 
-		import pprint
-		from binwalk import Binwalk
+	In fact, the binwalk command line utility can be duplicated nearly entirely with just two lines of code:
 
-		with Binwalk() as bw:
-			pprint.PrettyPrinter().pprint(bw.scan('firmware.bin'))
+		import binwalk
+		binwalk.Modules().execute()
 
-	The scan() method will return a list of results, and may also be passed a list of files:
+	The Modules class constructor as well as the execute method accept both Python args and kwargs corresponding
+	to the normal command line options accepted by the binwalk command line utility, providing a large amount of
+	freedom in how you choose to specify binwalk options (if none are specified, sys.argv is used by default).
 
-		from binwalk import Binwalk
+	For example, to execute a signature scan, you at the very least have to specify the --signature command line 
+	option, as well as a list of files to scan. This can be done in a number of ways:
 
-		with Binwalk() as bw:
-			for (filename, file_results) in bw.scan(['firmware1.bin', 'firmware2.bin']).iteritems():
-			print "Results for %s:" % filename
-			for (offset, results) in file_results:
-				for result in results:
-					print offset, result['description']
+		binwalk.Modules().execute('firmware1.bin', 'firmware2.bin', signature=True)
 
-	Alternatively, a callback function may be specified. The callback function is called as soon as a valid signature is found. 
-	It is passed two arguments: the offset at which the match was found, and a list of results dictionaries (one dictionary 
-	per result found at that offset):
-
-		from binwalk import Binwalk
-
-		def my_callback(offset, results):
-			print "Found %d results at offset %d:" % (len(results), offset)
-			for result in results:
-				print " %s" % result['description']
-
-		with Binwalk() as bw:
-			bw.scan('firmware.bin', callback=my_callback)
-
-
-ADDING FILTERS
-
-	Include and exclude filters may be specified which operate identically to the --include, and --exclude binwalk
-	command line options:
-
-		from binwalk import Binwalk
+		binwalk.Modules().execute('firmware1.bin', 'firmware2.bin', **{'signature' : True})
 		
-		binwalk = Binwalk()
+		binwalk.Modules().execute(*['firmware1.bin', 'firmware2.bin'], signature=True)
 		
-		# Exclusively filters out all signatures except those containing the string 'filesystem' (same as --include)
-		binwalk.filter.include('filesystem')
+		binwalk.Modules().execute(*['--signature', 'firmware1.bin', 'firmware2.bin',])
 
-		# Excludes all results that contain the string 'jffs2' (same as --exclude)
-		binwalk.filter.exclude('jffs2')
+		binwalk.Modules().execute('--signature', 'firmware1.bin', 'firmware2.bin')
 
-		binwalk.scan('firmware')
+	All args and kwargs keys/values correspond to binwalk's command line options. Either args or kwargs, or a combination
+	of the two may be used, with the following caveats:
 
+		o All command line switches passed via args must be preceeded by hyphens (not required for kwargs)
+		o All file names must be passed via args, not kwargs
 
-EXTRACTING FILES
+ACCESSING SCAN RESULTS
 
-	Extract rules may be specified which operate identically to the --dd and --extract binwalk command line options.
-	Extraction is automatically enabled when one or more extraction rules are specified.
-	
-	To add a custom extract rule, or a list of extract rules (such as with the --dd option):
+	binwalk.core.module.Modules.execute returns a list of objects. Each object corresponds to a module that was run.
+	For example, if you specified --signature and --entropy, then both the Signature and Entropy modules would be executed
+	and you would be returned a list of two objects.
 
-		from binwalk import Binwalk
+	The two attributes of interest for each object are the 'results' and 'errors' objects. Each is a list of binwalk.core.module.Result
+	or binwalk.core.module.Error objects respectively. Each Result or Error object may contain custom attributes set by each module, 
+	but are guarunteed to have at least the following attributes (though modules are not required to populate all attributes):
 
-		binwalk = Binwalk()
+		o offset      - The file offset of the result/error (usually unused for errors).
+		o description - The result/error description, as displayed to the user.
+		o module      - Name of the module that generated the result/error.
+		o file        - The file object of the scanned file.
+		o valid       - Set to True if the result if value, False if invalid (usually unused for errors).
+		o display     - Set to True to display the result to the user, False to hide it (usually unused for errors).
+		o extract     - Set to True to flag this result for extraction (not used for errors).
+		o plot        - Set to Flase to exclude this result from entropy plots (not used for errors).
 
-		# Extract results containing the string 'gzip' with a file extension of 'gz' and run the gunzip command
-		binwalk.extractor.add_rule('gzip:gz:gunzip %e')
+	binwalk.core.module.Error has the additional guarunteed attribute:
 
-		# Extract 'lzma' and 'filesystem' results
-		binwalk.extractor.add_rule(['lzma:7z', 'filesystem:fs'])
+		o exception   - Contains the Python execption object if the encountered error was an exception
 
-		binwalk.scan('firmware')
+	Thus, scan results and errors can be programatically accessed rather easily:
 
-	To load the default extraction rules from the extract.conf file (such as with the -e command line option):
-	
-		from binwalk import Binwalk
-		
-		binwalk = Binwalk()
-		binwalk.extractor.load_defaults()
-		binwalk.scan('firmware.bin')
+		for module in binwalk.Modules().execute('firmware1.bin', 'firmware2.bin', signature=True):
+			print ("%s Results:" % module.name)
+			for result in module.results:
+				print ("\t%s    0x%.8X    %s" % (result.file.name, result.offset, result.description))
 
-	To enabled delayed file extraction (such as with the --delay option):
+MODULE EXCEPTIONS
 
-		from binwalk import Binwalk
-		
-		binwalk = Binwalk()
-		binwalk.extractor.enable_delayed_extract(True)
-		binwalk.scan('firmware.bin')
+	The only expected exception that should be raised by binwalk.Modules is that of binwalk.ModuleException. This exception
+	is thrown only if a required module encountered a fatal error (e.g., one of the specified target files could not be opened):
 
-	To enable file cleanup after extraction (such as with the --rm option):
-
-		from binwalk import Binwalk
-		
-		binwalk = Binwalk()
-		binwalk.extractor.cleanup_extracted_files(True)
-		binwalk.scan('firmware.bin')
+		try:
+			binwalk.Modules().execute()
+		except binwalk.ModuleException as e:
+			print ("Critical failure:", e)
 
