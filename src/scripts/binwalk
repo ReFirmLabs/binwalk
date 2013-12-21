@@ -45,6 +45,8 @@ if __name__ == '__main__':
 			cProfile.run('main()')
 		else:
 			main()
+	except IOError:
+		pass
 	except KeyboardInterrupt:
 		sys.stdout.write("\n")
 
