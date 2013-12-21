@@ -5,7 +5,7 @@ import inspect
 import argparse
 import traceback
 import binwalk.core.common
-import binwalk.core.config
+import binwalk.core.settings
 import binwalk.core.plugin
 from binwalk.core.compat import *
 
@@ -144,6 +144,10 @@ class Module(object):
 	#RESULT = ['offset', 'description']
 	RESULT = ["offset", "offset", "description"]
 
+	# If set to True, the progress status will be automatically updated for each result
+	# containing a valid file attribute.
+	AUTO_UPDATE_STATUS = True
+
 	def __init__(self, dependency=False, **kwargs):
 		self.errors = []
 		self.results = []
@@ -166,6 +170,15 @@ class Module(object):
 			self.error(exception=e)
 	
 		self.plugins.load_plugins()
+
+	def __del__(self):
+		return None
+
+	def __enter__(self):
+		return self
+
+	def __exit__(self, x, z, y):
+		return None
 
 	def load(self):
 		'''
@@ -282,7 +295,7 @@ class Module(object):
 			self.results.append(r)
 
 			# Update the progress status automatically if it is not being done manually by the module
-			if r.file and not self.status.total:
+			if r.file and self.AUTO_UPDATE_STATUS:
 				self.status.total = r.file.length
 				self.status.completed = r.file.tell() - r.file.offset
 
@@ -446,7 +459,7 @@ class Modules(object):
 		return modules
 
 	def help(self):
-		help_string = "\nBinwalk v%s\nCraig Heffner, http://www.binwalk.core.org\n" % binwalk.core.config.Config.VERSION
+		help_string = "\nBinwalk v%s\nCraig Heffner, http://www.binwalk.org\n" % binwalk.core.settings.Settings.VERSION
 
 		for obj in self.list(attribute="CLI"):
 			if obj.CLI:

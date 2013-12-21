@@ -1,7 +1,7 @@
 import os
 import sys
 import imp
-import binwalk.core.config
+import binwalk.core.settings
 from binwalk.core.compat import *
 
 class Plugins:
@@ -54,7 +54,7 @@ class Plugins:
 		self.pre_scan = []
 		self.post_scan = []
 		self.parent = parent
-		self.config = binwalk.core.config.Config()
+		self.settings = binwalk.core.settings.Settings()
 
 	def __del__(self):
 		pass
@@ -112,7 +112,7 @@ class Plugins:
 		}
 
 		for key in plugins.keys():
-			plugins[key]['path'] = self.config.paths[key][self.config.PLUGINS]
+			plugins[key]['path'] = self.settings.paths[key][self.settings.PLUGINS]
 
 			for file_name in os.listdir(plugins[key]['path']):
 				if file_name.endswith(self.MODULE_EXTENSION):

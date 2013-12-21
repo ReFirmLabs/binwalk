@@ -43,7 +43,17 @@ class Display(object):
 		self._fprint("%s", ["-" * self.HEADER_WIDTH + "\n"], csv=False)
 
 	def result(self, *args):
-		self._fprint(self.result_format, args)
+		# Convert to list for item assignment
+		args = list(args)
+
+		# Replace multiple spaces with single spaces. This is to prevent accidentally putting
+		# four spaces in the description string, which would break auto-formatting.
+		for i in range(len(args)):
+			if isinstance(args[i], str):
+				while "  " in args[i]:
+					args[i] = args[i].replace("  " , " ")
+
+		self._fprint(self.result_format, tuple(args))
 
 	def footer(self):
 		self._fprint("%s", "\n", csv=False)

@@ -58,11 +58,6 @@ class Signature(Module):
 			Kwarg(name='include_filters', default=[]),
 	]
 
-	HEADER = ["DECIMAL", "HEX", "DESCRIPTION"]
-	HEADER_FORMAT = "%-12s  %-12s    %s\n"
-	RESULT = ["offset", "offset", "description"]
-	RESULT_FORMAT = "%-12d  0x%-12X  %s\n"
-
 	MAGIC_FLAGS = magic.MAGIC_NO_CHECK_TEXT | magic.MAGIC_NO_CHECK_ENCODING | magic.MAGIC_NO_CHECK_APPTYPE | magic.MAGIC_NO_CHECK_TOKENS
 
 	def init(self):
@@ -124,6 +119,11 @@ class Signature(Module):
 			self.status.completed = block_start - fp.offset
 
 			for candidate_offset in self.parser.find_signature_candidates(data, dlen):
+
+				# current_block_offset is set when a jump-to-offset keyword is encountered while
+				# processing signatures. This points to an offset inside the current data block
+				# that scanning should jump to, so ignore any subsequent candidate signatures that
+				# occurr before this offset inside the current data block.
 				if candidate_offset < current_block_offset:
 					continue
 
@@ -134,16 +134,27 @@ class Signature(Module):
 				magic_result = self.magic.buffer(candidate_data)
 
 				if self.filter.valid_magic_result(magic_result):
-					# The smart filter parser returns a dictionary of keyword values and the signature description.
+					# The smart filter parser returns a binwalk.core.module.Result object
 					r = self.smart.parse(magic_result)
-					r.offset = block_start + candidate_offset + r.adjust
-					r.file = fp
 
+					# Set the absolute offset inside the target file
+					r.offset = block_start + candidate_offset + r.adjust
+					# Provide an instance of the current file object
+					r.file = fp
+		
+					# Register the result for futher processing/display
 					self.result(r=r)
 					
+					# Is this a valid result and did it specify a jump-to-offset keyword?
 					if r.valid and r.jump > 0:
-						fp.seek(r.offset + r.jump)
-						current_block_offset = r.jump
+						absolute_jump_offset = r.offset + r.jump
+						current_block_offset = candidate_offset + r.jump
+
+						# If the jump-to-offset is beyond the confines of the current block, seek the file to
+						# that offset and quit processing this block of data.
+						if absolute_jump_offset >= fp.tell():
+							fp.seek(r.offset + r.jump)
+							break
 
 	def run(self):
 		target_files = self.config.target_files
@@ -153,7 +164,7 @@ class Signature(Module):
 				self.header()
 			
 				self.status.clear()
-				self.status.total = fp.size
+				self.status.total = fp.length
 				self.status.completed = 0
 
 				self.scan_file(fp)

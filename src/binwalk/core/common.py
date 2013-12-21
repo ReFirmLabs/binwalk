@@ -312,6 +312,9 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
 
 		return data
 
+	def reset(self):
+		self.seek(self.offset)
+
 	def write(self, data):
 		'''
 		Writes data to the opened file.

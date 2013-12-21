@@ -2,36 +2,16 @@ import os
 import binwalk.core.common as common
 from binwalk.core.compat import *
 
-class Config:
+class Settings:
 	'''
-	Binwalk configuration class, used for accessing user and system file paths.
+	Binwalk settings class, used for accessing user and system file paths and general configuration settings.
 	
 	After instatiating the class, file paths can be accessed via the self.paths dictionary.
 	System file paths are listed under the 'system' key, user file paths under the 'user' key.
 
-	For example, to get the path to both the user and system binwalk magic files:
-
-		from binwalk import Config
-
-		conf = Config()
-		user_binwalk_file = conf.paths['user'][conf.BINWALK_MAGIC_FILE]
-		system_binwalk_file = conf.paths['system'][conf.BINWALK_MAGIC_FILE]
-
-	There is also an instance of this class available via the Binwalk.config object:
-
-		import binwalk
-
-		bw = binwalk.Binwalk()
-
-		user_binwalk_file = bw.config.paths['user'][conf.BINWALK_MAGIC_FILE]
-		system_binwalk_file = bw.config.paths['system'][conf.BINWALK_MAGIC_FILE]
-
 	Valid file names under both the 'user' and 'system' keys are as follows:
 
 		o BINWALK_MAGIC_FILE  - Path to the default binwalk magic file.
-		o BINCAST_MAGIC_FILE  - Path to the bincast magic file (used when -C is specified with the command line binwalk script).
-		o BINARCH_MAGIC_FILE  - Path to the binarch magic file (used when -A is specified with the command line binwalk script).
-		o EXTRACT_FILE        - Path to the extract configuration file (used when -e is specified with the command line binwalk script).
 		o PLUGINS             - Path to the plugins directory.
 	'''
 	# Release version
@@ -47,10 +27,6 @@ class Config:
 	PLUGINS = "plugins"
 	EXTRACT_FILE = "extract.conf"
 	BINWALK_MAGIC_FILE = "binwalk"
-	BINCAST_MAGIC_FILE = "bincast"
-	BINARCH_MAGIC_FILE = "binarch"
-	ZLIB_MAGIC_FILE = "zlib"
-	COMPRESSD_MAGIC_FILE = "compressd"
 
 	def __init__(self):
 		'''
@@ -69,17 +45,11 @@ class Config:
 
 		# Build the paths to all user-specific files
 		self.paths['user'][self.BINWALK_MAGIC_FILE] = self._user_path(self.BINWALK_MAGIC_DIR, self.BINWALK_MAGIC_FILE)
-		self.paths['user'][self.BINCAST_MAGIC_FILE] = self._user_path(self.BINWALK_MAGIC_DIR, self.BINCAST_MAGIC_FILE)
-		self.paths['user'][self.BINARCH_MAGIC_FILE] = self._user_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
 		self.paths['user'][self.EXTRACT_FILE] = self._user_path(self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE)
 		self.paths['user'][self.PLUGINS] = self._user_path(self.BINWALK_PLUGINS_DIR)
 
 		# Build the paths to all system-wide files
 		self.paths['system'][self.BINWALK_MAGIC_FILE] = self._system_path(self.BINWALK_MAGIC_DIR, self.BINWALK_MAGIC_FILE)
-		self.paths['system'][self.BINCAST_MAGIC_FILE] = self._system_path(self.BINWALK_MAGIC_DIR, self.BINCAST_MAGIC_FILE)
-		self.paths['system'][self.BINARCH_MAGIC_FILE] = self._system_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
-		self.paths['system'][self.ZLIB_MAGIC_FILE] = self._system_path(self.BINWALK_MAGIC_DIR, self.ZLIB_MAGIC_FILE)
-		self.paths['system'][self.COMPRESSD_MAGIC_FILE] = self._system_path(self.BINWALK_MAGIC_DIR, self.COMPRESSD_MAGIC_FILE)
 		self.paths['system'][self.EXTRACT_FILE] = self._system_path(self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE)
 		self.paths['system'][self.PLUGINS] = self._system_path(self.BINWALK_PLUGINS_DIR)
 

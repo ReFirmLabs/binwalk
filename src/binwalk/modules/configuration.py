@@ -2,9 +2,8 @@ import os
 import sys
 import argparse
 import binwalk.core.common
-import binwalk.core.config
 import binwalk.core.display
-from binwalk.core.config import *
+import binwalk.core.settings
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg, show_help
 
@@ -82,11 +81,12 @@ class Configuration(Module):
 
 	def load(self):
 		self.target_files = []
-		
+
+		# Order is important with these two methods		
 		self._open_target_files()
 		self._set_verbosity()
 
-		self.settings = binwalk.core.config.Config()
+		self.settings = binwalk.core.settings.Settings()
 		self.display = binwalk.core.display.Display(log=self.log_file,
 													csv=self.csv,
 													quiet=self.quiet,
@@ -97,14 +97,15 @@ class Configuration(Module):
 			show_help()
 			sys.exit(0)
 
+	def reset(self):
+		for fp in self.target_files:
+			fp.reset()
+
 	def __del__(self):
 		self._cleanup()
 
 	def __exit__(self, a, b, c):
 		self._cleanup()
-
-	def __enter__(self):
-		return self
 
 	def _cleanup(self):
 		if hasattr(self, 'target_files'):
