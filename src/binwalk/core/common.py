@@ -385,32 +385,33 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
 		data = None
 
 		if self.total_read < self.length:
-			# Read in READ_BLOCK_SIZE plus MAX_TRAILING_SIZE bytes, but return a max dlen value
-			# of READ_BLOCK_SIZE. This ensures that there is a MAX_TRAILING_SIZE buffer at the
-			# end of the returned data in case a signature is found at or near data[dlen].
-			data = self._internal_read(self.READ_BLOCK_SIZE + self.MAX_TRAILING_SIZE)
+			# Read in self.READ_BLOCK_SIZE + self.MAX_TRAILING_SIZE, unless this exceeds self.length
+			rsize = self.READ_BLOCK_SIZE + self.MAX_TRAILING_SIZE
+			if (self.total_read + rsize) > self.length:
+				rsize = self.length - self.total_read
+
+			# Do the read. Must use self._internal_read so that the total_read value is untouched (we update this ourselves later)
+			data = self._internal_read(rsize)
 
 			if data and data is not None:
 
 				# Get the actual length of the read in data
 				dlen = len(data)
-				seek_offset = dlen - self.READ_BLOCK_SIZE
 				
-				# If we've read in more data than the scan length, truncate the dlen value
-				if (self.total_read + self.READ_BLOCK_SIZE) > self.length:
-					dlen = self.length - self.total_read
-				# If dlen is the expected rlen size, it should be set to READ_BLOCK_SIZE
-				elif dlen == (self.READ_BLOCK_SIZE + self.MAX_TRAILING_SIZE):
+				# Calculate how far back we need to seek to pick up at the self.READ_BLOCK_SIZE offset
+				seek_offset = dlen - self.READ_BLOCK_SIZE
+				# If rsize was less than self.READ_BLOCK_SIZE seek backwards zero bytes
+				if seek_offset < 0:
+					seek_offset = 0
+
+				# Read in READ_BLOCK_SIZE plus MAX_TRAILING_SIZE bytes, but return a max dlen value
+				# Return a max dlen value of READ_BLOCK_SIZE. This ensures that there is a MAX_TRAILING_SIZE
+				# buffer at the end of the returned data in case a signature is found at or near data[READ_BLOCK_SIZE].
+				if dlen == (self.READ_BLOCK_SIZE + self.MAX_TRAILING_SIZE):
 					dlen = self.READ_BLOCK_SIZE
 
-				# Increment self.total_read to reflect the amount of data that has been read
-				# for processing (actual read size is larger of course, due to the MAX_TRAILING_SIZE
-				# buffer of data at the end of each block).
-				self.total_read += dlen
-
 				# Seek to the self.total_read offset so the next read can pick up where this one left off.
-				if seek_offset > 0:
-					self.seek(self.tell() - seek_offset)
+				self.seek(self.tell() - seek_offset)
 
 		return (data, dlen)
 

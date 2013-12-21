@@ -121,12 +121,13 @@ class Signature(Module):
 
 					# Set the absolute offset inside the target file
 					r.offset = block_start + candidate_offset + r.adjust
+
 					# Provide an instance of the current file object
 					r.file = fp
 		
 					# Register the result for futher processing/display
 					self.result(r=r)
-					
+				
 					# Is this a valid result and did it specify a jump-to-offset keyword?
 					if r.valid and r.jump > 0:
 						absolute_jump_offset = r.offset + r.jump

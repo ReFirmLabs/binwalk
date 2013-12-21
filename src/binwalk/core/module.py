@@ -74,6 +74,7 @@ class Result(object):
 
 		@offset      - The file offset of the result.
 		@description - The result description, as displayed to the user.
+		@module      - Name of the module that generated the result.
 		@file        - The file object of the scanned file.
 		@valid       - Set to True if the result if value, False if invalid.
 		@display     - Set to True to display the result to the user, False to hide it.
@@ -85,6 +86,7 @@ class Result(object):
 		'''
 		self.offset = 0
 		self.description = ''
+		self.module = ''
 		self.file = None
 		self.valid = True
 		self.display = True
@@ -281,6 +283,8 @@ class Module(object):
 		'''
 		if r is None:
 			r = Result(**kwargs)
+
+		r.module = self.__class__.__name__
 
 		# Any module that is reporting results, valid or not, should be marked as enabled
 		if not self.enabled:
