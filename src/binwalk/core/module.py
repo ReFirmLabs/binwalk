@@ -148,6 +148,9 @@ class Module(object):
 	# containing a valid file attribute.
 	AUTO_UPDATE_STATUS = True
 
+	# Modules with higher priorities are executed first
+	PRIORITY = 5
+
 	def __init__(self, dependency=False, **kwargs):
 		self.errors = []
 		self.results = []
@@ -339,13 +342,14 @@ class Module(object):
 	def footer(self):
 		self.config.display.footer()
 			
-	def main(self, status):
+	def main(self, parent):
 		'''
 		Responsible for calling self.init, initializing self.config.display, and calling self.run.
 
 		Returns the value returned from self.run.
 		'''
-		self.status = status
+		self.status = parent.status
+		self.modules = parent.loaded_modules
 
 		# Reset all dependency modules
 		for (dependency, module) in iterator(self.DEPENDS):
@@ -447,16 +451,16 @@ class Modules(object):
 
 		@attribute - The desired module attribute.
 
-		Returns a list of modules that contain the specified attribute.
+		Returns a list of modules that contain the specified attribute, in the order they should be executed.
 		'''
 		import binwalk.modules
-		modules = []
+		modules = {}
 
 		for (name, module) in inspect.getmembers(binwalk.modules):
 			if inspect.isclass(module) and hasattr(module, attribute):
-				modules.append(module)
+				modules[module] = module.PRIORITY
 
-		return modules
+		return sorted(modules, key=modules.get, reverse=True)
 
 	def help(self):
 		help_string = "\nBinwalk v%s\nCraig Heffner, http://www.binwalk.org\n" % binwalk.core.settings.Settings.VERSION
@@ -508,7 +512,7 @@ class Modules(object):
 		obj = self.load(module)
 
 		if isinstance(obj, binwalk.core.module.Module) and obj.enabled:
-			obj.main(status=self.status)
+			obj.main(parent=self)
 			self.status.clear()
 
 		# Add object to loaded_modules here, that way if a module has already been
