@@ -386,8 +386,8 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
 		'''
 		Reads in a block of data from the target file.
 
-                Returns a tuple of (str(file block data), block data length).
-                '''
+		Returns a tuple of (str(file block data), block data length).
+		'''
 		dlen = 0
 		data = None
 		rsize = self.READ_BLOCK_SIZE + self.MAX_TRAILING_SIZE
