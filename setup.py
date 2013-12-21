@@ -2,15 +2,38 @@
 from __future__ import print_function
 import os
 import sys
-import shutil
 from distutils.core import setup
+from distutils.dir_util import remove_tree
 
 # Python2/3 compliance
 try:
 	raw_input
-except:
+except NameError:
 	raw_input = input
 
+def cleanup_build_directory():
+	# Requires to chdir into the src directory first
+	try:
+		remove_tree("build")
+	except KeyboardInterrupt as e:
+		raise e
+	except Exception:
+		pass
+
+def cleanup_module_directory():
+	# Installing doesn't remove old files that may have been deleted from the module.
+	if "install" in sys.argv:
+		try:
+			import binwalk
+			for path in binwalk.__path__:
+				try:
+					remove_tree(path + os.path.sep + "*")
+				except OSError as e:
+					pass
+		except ImportError:
+			pass
+
+# Change to the binwalk src directory
 def warning(lines, terminate=True, prompt=True):
 	WIDTH = 115
 
@@ -36,20 +59,7 @@ if "--yes" in sys.argv:
 else:
 	IGNORE_WARNINGS = False
 
-# Look for old installations of binwalk and remove them to prevent conflicts with the new API
-try:
-	import binwalk
-	for path in binwalk.__path__:
-		if not os.path.exists(os.path.join(path, "core")):
-			try:
-				print ("Cleaning up old installation...")
-				shutil.rmtree(path)
-			except:
-				pass
-except:
-	pass
-
-# Change to the binwalk src directory
+# cd into the src directory, no matter where setup.py was invoked from
 os.chdir(os.path.join(os.path.dirname(os.path.realpath(__file__)), "src"))
 
 print("checking pre-requisites")
@@ -57,14 +67,14 @@ try:
 	import magic
 	try:
 		magic.MAGIC_NO_CHECK_TEXT
-	except Exception as e:
+	except AttributeError as e:
 		msg = ["Pre-requisite failure: " + str(e),
 			"It looks like you have an old or incompatible magic module installed.",
 			"Please install the official python-magic module, or download and install it from source: ftp://ftp.astron.com/pub/file/"
 		]
 		
 		warning(msg)
-except Exception as e:
+except ImportError as e:
 	msg = ["Pre-requisite failure:", str(e),
 		"Please install the python-magic module, or download and install it from source: ftp://ftp.astron.com/pub/file/",
 	]
@@ -73,7 +83,7 @@ except Exception as e:
 
 try:
 	import pyqtgraph
-except Exception as e:
+except ImportError as e:
 	msg = ["Pre-requisite check warning: " + str(e),
 		"To take advantage of this tool's graphing capabilities, please install the pyqtgraph module.",
 	]
@@ -94,23 +104,26 @@ if not os.path.exists(c_lib_makefile):
 status |= os.system("make")
 
 if status != 0:
-	msg = ["Build warning: failed to build compression libraries.",
-		"Some plugins will not work without these libraries."
+	msg = ["Build warning: failed to build C libraries.",
+		"Some features will not work without these libraries."
 	]
-	
 	warning(msg, prompt=True)
 elif "install" in sys.argv:
-		if os.system("make install") != 0:
-			msg = ["Install warning: failed to install compression libraries.",
-				"Some plugins will not work without these libraries."
-			]
+	if os.system("make install") != 0:
+		msg = ["Install warning: failed to install C libraries.",
+			   "Some features will not work without these libraries."
+		]
+		warning(msg, prompt=True)
 
-			warning(msg, prompt=True)
-		
+os.system("make distclean")
+	
 os.chdir(working_directory)
 
+cleanup_build_directory()
+cleanup_module_directory()
+
 # Generate a new magic file from the files in the magic directory
-print("generating binwalk magic file")
+print("creating binwalk magic file")
 magic_files = os.listdir("magic")
 magic_files.sort()
 fd = open("binwalk/magic/binwalk", "wb")
@@ -135,4 +148,6 @@ setup(	name = "binwalk",
 	package_data = {"binwalk" : install_data_files},
 	scripts = ["scripts/binwalk"],
 )
+
+cleanup_build_directory()
 

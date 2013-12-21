@@ -1,0 +1,261 @@
+2013-07-16: Jesse Kornblum <research@jessekornblum.com>:
+
+	* fuzzy.c: Fix heap corruption bug #15.
+	* dig.c: Removed extra call to GetFileAttributes
+
+2013-07-09: Jesse Kornblum <research@jessekornblum.com>:
+
+	* dig.cpp, engine.cpp, helpers.cpp: Created separate directory traversal code
+	for Win32 systems.
+
+2013-06-01: Jesse Kornblum <research@jessekornblum.com>:
+
+	* fuzzy.c: Experimental thread-safe patch from Helmut Grohne.
+	* fuzzy.h: Experimental thread-safe patch from Helmut Grohne.
+
+2013-05-25: Jesse Kornblum <research@jessekornblum.com>:
+
+	* fuzzy.c: Fixed bug on string scoring.
+
+2013-03-12: Jesse Kornblum <research@jessekornblum.com>:
+
+	* Changelog: Spelled my own name correctly.
+	* fuzzy.c: Fixed memory leak, bug 3607641.
+
+2012-07-23: Jesse Kornblum <research@jessekornblum.com>:
+
+	* main.cpp, match.cpp: Renamed the match_pretty function for clarity.
+
+2012-07-17: Jesse Kornblum <research@jessekornblum.com>:
+
+	* match.cpp: Fixing bugs in matching, clustering modes
+	* main.cpp: Clarifying comments. Added sanity check for -c, -g
+
+2012-07-16: Jesse Kornblum <research@jessekornblum.com>:
+
+	* filedata.cpp: Added includes for *nix compilation
+
+2012-07-14 Jesse Kornblum <research@jessekornblum.com>:
+
+	* win.sh: Updated for C++ compiler warnings
+	* normal.sh: Updated for C++ compiler warnings
+	* fuzzy.c: Corrected logic error for when sigs don't have filenames
+	* ui.cpp: Added const to print_error's state variable
+	* match.cpp: Rewrote to use Filedata class
+	* filedata.cpp: Created Filedata class
+	* main.cpp: Adapted to use Filedata class
+
+2012-07-13 Jesse Kornblum <research@jessekornblum.com>:
+
+	* fuzzy.c: Fixed major bug regarding incorrect match scores for hashes with long filenames
+	* dig.cpp: Added warning message when not all data on stdin was hashed. Also increased stdin buffer to 512MB.
+	* configure.ac: Version bump to 2.9.
+	* main.cpp: Added flags for clustering mode
+	* ssdeep.h: Added flags for clustering mode
+	* match.cpp: Setting up for clustering mode
+
+2012-05-25 Jesse Kornblum <research@jessekornblum.com>:
+
+	* main.cpp: Updated command line argument processing
+	* ssdeep.1: Clarifications on description.
+
+2012-05-24 Jesse Kornblum <research@jessekornblum.com>:
+
+	* match.cpp: Convert to C++
+
+2012-04-24 Jesse Kornblum <research@jessekornblum.com>:
+
+	* ssdeep.1: Updating support for stdin, clarifying modes
+        * Makefile.am: LF to CR/LF change now done by zip program
+	* ssdeep.h: Adding Doxygen comments
+	* match.cpp: Fixed bug in Win32 filename construction
+	* fuzzy.h: Cleanup and commenting
+	* engine.cpp: Added const definitions
+	* Experimental conversion to C++
+	* Commented out all references to clustering
+	* main.cpp: Fixed some bugs in the command line argument processing
+
+2012-04-15: Jesse Kornblum <research@jessekornblum.com>:
+
+	* main.c: Fixed error handling in getopt processing
+
+2012-02-16 Jesse Kornblum <research@jessekornblum.com>:
+
+	* main.c: Bump copyright to 2012 in usage message. Add flag for clustering
+	* main.h: Added mode_cluster
+	* ui.c: Changed Win32 to use fputc instead of _tfprintf for filenames
+
+2012-01-12 Jesse Kornblum <research@jessekornblum>:
+
+	* ChangeLog: Clean up
+
+2011-10-17 Jesse Kornblum <research@jessekornblum.com>:
+
+	* configure.ac: Added AC_SYS_LARGEFILE to handle large files on 32-bit platforms. See bug 3416762.
+
+2011-09-30 Jesse Kornblum <research@jessekornblum.com>:
+
+	* ui.c: Redirected error messages to stderr instead of stdout
+	* main.c: Added warning message when the program does not process any file large enough to produce meaningful results.
+
+2011-09-27 Jesse Kornblum <research@jessekornblum.com>:
+
+	* main.c: Added support to process stdin.
+	* dig.c: Added process_stdin function
+	* engine.c: Generalized display functions in display_result.
+
+2011-08-19 Jesse Kornblum <research@jessekornblum.com>:
+
+	* edit_dist.c: Accepted patch from Brad Spengler to make
+	  thread safe.
+
+2010-07-15 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Added quotes and quote escaping to filenames when
+	  displayed in CSV matching mode.
+	* Modified FILEFORMAT to reflect quotation marks in filenames.
+
+2010-06-24 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Added parameter checking to my_basename.
+
+2010-05-05 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Changed logic for reading files of known hashes to look for
+	  the header this version of the program writes instead of
+	  the v1 header. This was done for the DC3 branch of the code.
+
+	* Updated README documentation and published version 2.5.
+
+2010-03-20 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Fixed define in fuzzy.h to only allow one compilation
+
+2010-03-19 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Added 'extern "C"' definitions to fuzzy.h for C++ compatibility
+	* Added return values indicating errors to API functions.
+	* Modified sample program to use errors on return values
+	* Added Doxygen documentation for API function.
+	* Added inttypes.h include to fuzzy.h.
+	* Added error checking for NULL strings in API functions.
+	* Version bump to 2.5
+
+2010-02-24 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Experimenting with mode to compare unknown hashes to known
+	  without comparing the unknown against each other.
+	* Version bump to 2.4
+
+2009-01-20 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Added -a mode to display all matches regardless of score.
+
+2009-10-11 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Fixed typo in usage page.
+
+2009-07-14 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Fixed bug that prevented -x mode from working on Win32
+
+	* Added web pages to trunk. Updated quickstart guide with
+	  automatic installation options and -x mode.
+
+	* Version bump to 2.2 and updated man page, NEWS
+
+2009-07-11 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Cleaned up -x mode to compare two (or more) files of
+	  signatures.
+
+	* Cleaned up some code comments and Remove Before Flight tags
+
+2009-04-18 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Experimenting with -x mode to compare two (or more)
+	  files of signatures
+
+	* Added some parameter validation code
+
+2009-01-01 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Added fuzzy_hash_filename function to hash a file given
+	  its filename. This avoids issues passing FILE * structures
+	  on Win32 systems in programs not using the fopen convention.
+	  See feature request 2142005.
+
+	* Reconfigured all files using latest autoconf tools
+
+2008-09-23 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Reinstated the code to call match_pretty() at the end of
+	  main. This lets the -p and -d modes to display output and
+	  fixes bug 2124423.
+
+	* Version bump to 2.1.
+
+2008-04-06 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Updated man page to include -t and -c modes.
+
+
+2008-03-04 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Made b64 variable static in fuzzy.c
+
+2008-02-29 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Version bump to 2.0, reconfigured.
+
+2008-02-22 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Changed reading of known hash files back to using
+	  unsigned char values. This also required updating
+	  the match_compare function to handle Unicode
+	  characters when displaying match results.
+	* Flipped files in Win32 zip file to have CR/LF
+
+2008-02-18 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Added man pages to the EXTRA_DIST Makefile variable.
+	  Still need to reconfigure.
+	* Added more documentation to the Windows zip file along
+	  with the sample.c file
+	* Removed extraneous recongfiguration from Makefile.am
+
+2008-02-17 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Updated build system to create Win32 DLL, documentation,
+	  and packages.
+	* Added check in print_error functions to see if the state
+	  is valid.
+	* Updated documentation, usage message.
+	* Added signature comparison example to sample program.
+
+2008-02-16 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Removed block_size value from state variable.
+	  Nobody was using it.
+	* Ammended API functions to support hashing either a buffer
+	  or an open file handle
+	* Moved ssdeep code into engine.c, moved fuzzy hashing
+	  code into fuzzy.c. This will help us create libfuzzy
+	  and fuzzy.dll.
+	* Lots of cleanup to fuzzy hashing code. This includes removing
+	  types like 'uchar' and replacing them with C99 types like
+	  unsigned char. Less work for mother means less work debugging.
+	* Moved definition of __progname to ssdeep.h. It's not being
+	  used by the fuzzy hashing library and caused problems on OS X.
+	* Brought over code to support Unicode from Miss Identify
+	* Version bump to 2.0 beta1
+	* Added sample program to demonstrate API features
+
+2008-02-15 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Changing Win32 build to create DLL. All other
+	  versions should have library/header files installed
+
+2008-02-14 Jesse Kornblum <research@jessekornblum.com>:
+
+	* Moved to autotools structure

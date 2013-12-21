@@ -29,8 +29,9 @@
 
 # MIPS16e
 # nop (x4)
-0	string	\x65\x00\x65\x00\x65\x00\x65\x00	MIPS16e instructions, nops{jump-to-offset:8}
-0	string	\x00\x65\x00\x65\x00\x65\x00\x65	MIPSEL16e instructions, nops{jump-to-offset:8}
+# TODO: Produces false positives when scanning ARM Thumb code
+#0	string	\x65\x00\x65\x00\x65\x00\x65\x00	MIPS16e instructions, nops{jump-to-offset:8}
+#0	string	\x00\x65\x00\x65\x00\x65\x00\x65	MIPSEL16e instructions, nops{jump-to-offset:8}
 
 # save a0-a1, XX
 # addiu XX, XX

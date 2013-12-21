@@ -198,11 +198,11 @@ then
 	pyqtgraph
 fi
 
-if [ "$(python -c 'import ctypes.util; print (ctypes.util.find_library("fuzzy"))')" == "None" ]
-then
-	echo "libfuzzy not installed; building from source..."
-	libfuzzy
-fi
+#if [ "$(python -c 'import ctypes.util; print (ctypes.util.find_library("fuzzy"))')" == "None" ]
+#then
+#	echo "libfuzzy not installed; building from source..."
+#	libfuzzy
+#fi
 
 # Get and build the firmware mod kit
 fmk

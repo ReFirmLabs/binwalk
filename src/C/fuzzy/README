@@ -1,0 +1,110 @@
+
+**** FUZZY HASHING API ****
+
+This file documents the fuzzy hashing API. Information on how to use the
+fuzzy hashing program ssdeep can be found in the man page. On *nix
+systems you can view this file with:
+
+$ man ./ssdeep.1
+
+Windows users can get the ssdeep usage information from README.TXT.
+
+
+** Using the API in Your Own Progrms **
+
+You can use the fuzzy hashing API in your own programs by doing 
+the following:
+
+1. Include the fuzzy hashing header
+
+#include <fuzzy.h>
+
+
+2. Call one of the functions:
+
+* Fuzzy hashing a buffer of text:
+
+int fuzzy_hash_buf(const unsigned char *buf,
+		   uint32_t      buf_len,
+	           char          *result);
+
+This function computes the fuzzy hash of the buffer 'buf' and stores the
+result in result. You MUST allocate result to hold FUZZY_MAX_RESULT
+characters before calling this function. The length of the buffer should
+be passed in via buf_len. It is the user's responsibility to append the
+filename, if any, to the output. The function returns zero on success,
+one on error.
+
+
+* Fuzzy hashing a file:
+
+There are in fact two ways to fuzzy hash a file. If you already 
+have an open file handle you can use:
+
+int fuzzy_hash_file(FILE *handle,
+	            char *result);
+
+This function computes the fuzzy hash of the file pointed to by handle
+and stores the result in result. You MUST allocate result to hold
+FUZZY_MAX_RESULT characters before calling this function. It is the 
+user's responsibility to append the filename to the output. 
+The function returns zero on success, one on error.
+
+The other function to hash a file takes a file name:
+
+int fuzzy_hash_filename(const char * filename,
+			char * result);
+
+Like the function above, this function stores the fuzzy hash result
+in the parameter result. You MUST allocate result to hold 
+FUZZY_MAX_RESULT characters before calling this function.
+
+
+* Compare two fuzzy hash signatures:
+
+int fuzzy_compare(const char *sig1, const char *sig2);
+
+This function returns a value from 0 to 100 indicating the match 
+score of the two signatures. A match score of zero indicates the \
+sigantures did not match.
+
+
+3. Compile
+
+To compile the program using gcc:
+
+   $ gcc -Wall -I/usr/local/include -L/usr/local/lib sample.c -Lfuzzy
+
+Using mingw:
+
+   C:\> gcc -Wall -Ic:\path\to\includes sample.c fuzzy.dll
+
+Using Microsoft Visual C (MSVC):
+
+To paraphrase the MinGW documentation, 
+http://www.mingw.org/mingwfaq.shtml#faq-msvcdll:
+
+The Windows ssdeep package includes a Win32 DLL and a .def file. Although
+MSVC users can't use the DLL directly, they can easily create a .lib file
+using the Microsoft LIB tool:
+
+   C:\> lib /machine:i386 /def:fuzzy.def
+
+You can then compile your program using the resulting library:
+
+   C:\> cl sample.c fuzzy.lib
+
+
+
+** Sample Program **
+ 
+A sample program that uses the API is in sample.c. 
+
+
+
+** See Also ** 
+
+- Jesse D. Kornblum, "Identifying almost identical files using context 
+triggered piecewise hashing", Digital Investigaton, 3(S):91-97, 
+September 2006, http://dx.doi.org/10.1016/j.diin.2006.06.015,
+The Proceedings of the 6th Annual Digital Forensic Research Workshop

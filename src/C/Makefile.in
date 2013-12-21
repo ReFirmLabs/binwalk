@@ -10,18 +10,22 @@ export INSTALL_OPTIONS=@INSTALL_OPTIONS@
 all: clean
 	make -C miniz
 	make -C compress
+	make -C fuzzy
 
 install:
 	make -C miniz install
 	make -C compress install
+	make -C fuzzy install
 
 .PHONY: clean distclean
 
 clean:
 	make -C miniz clean
 	make -C compress clean
+	make -C fuzzy clean
 
 distclean:
 	make -C miniz distclean
 	make -C compress distclean
+	make -C fuzzy distclean
 	rm -rf *.cache config.* Makefile
