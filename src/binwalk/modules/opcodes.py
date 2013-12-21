@@ -32,6 +32,7 @@ class Instruction(object):
 
 class Disassembler(object):
 
+	MIN_INSTRUCTION_COUNT = 6
 	INSTRUCTION_SIZE = 4
 	OPCODE_INDEX = 0
 	OPCODE_MASK = 0
@@ -96,7 +97,6 @@ class ARM(ARMEB):
 
 class OpcodeValidator(Module):
 
-	MIN_INS_COUNT = 6
 	MIN_CONFIDENCE = 0.0
 
 	TITLE = 'Opcode'
@@ -143,10 +143,13 @@ class OpcodeValidator(Module):
 
 			for disassembler in self.search(fp):
 				if not self.config.verbose and disassembler.confidence > self.MIN_CONFIDENCE:
-					desc = disassembler.__class__.__name__ + " executable code, endianess: " + disassembler.ENDIANESS
+					desc = self.build_description_string(disassembler)
 					self.result(description=desc, confidence=disassembler.confidence, file=fp, plot=False)
 			
 			self.footer()
+
+	def build_description_string(self, disassembler):
+		return disassembler.__class__.__name__ + " executable code, endianess: " + disassembler.ENDIANESS
 
 	def is_valid_sequence(self, disassembler, data):
 		j = 0
@@ -167,42 +170,50 @@ class OpcodeValidator(Module):
 		return retval
 
 	def search(self, fp):
+		winners = {}
+		results = {}
+		total_hits = {}
+		offset_range = range(0, 4)
+
+		for i in offset_range:
+			total_hits[i] = 0
+
+		for disassembler in self.disassemblers:
+			results[disassembler] = {}
+			for i in offset_range:
+				results[disassembler][i] = 0
+
 		while True:
-			i = 0
+			offset = 0
 			(data, dlen) = fp.read_block()
 			if not data:
 				break
 
 			while i < dlen:
-				count = 1
+				for j in offset_range:
+					offset = i + j
 
-				for disassembler in get_keys(self.disassemblers):
-					if self.honor_instruction_alignment and (i % disassembler.INSTRUCTION_SIZE):
-						continue
+					for disassembler in self.disassemblers:
+						if self.honor_instruction_alignment and (offset % disassembler.INSTRUCTION_SIZE):
+							continue
 
-					ins = disassembler.disassemble(data[i:i+disassembler.INSTRUCTION_SIZE])
-					if ins.valid:
-						sequence_size = self.MIN_INS_COUNT * disassembler.INSTRUCTION_SIZE
-						sequence = data[i:i+sequence_size]
+						ins = disassembler.disassemble(data[offset:offset+disassembler.INSTRUCTION_SIZE])
+						if ins.valid:
+							sequence_size = disassembler.MIN_INSTRUCTION_COUNT * disassembler.INSTRUCTION_SIZE
+							if self.is_valid_sequence(disassembler, data[offset:offset+sequence_size]):
+								desc = self.build_description_string(disassembler)
+								self.result(description=desc, offset=offset, file=fp, display=self.config.verbose)
+								results[disassembler][j] += 1
+								total_hits[j] += 1
 
-						if len(sequence) == sequence_size and self.is_valid_sequence(disassembler, sequence):
-							self.result(description=disassembler.__class__.__name__ + " instructions, endianess: " + disassembler.ENDIANESS,
-										offset=(fp.total_read - dlen + i),
-										file=fp,
-										display=self.config.verbose)
+				i += len(offset_range)
 
-							self.disassemblers[disassembler] += 1
-							count = disassembler.INSTRUCTION_SIZE * self.MIN_INS_COUNT
-							break
-				i += count
+		for (disassembler, offset_results) in iterator(results):
+			sorted_offsets = sorted(offset_results, key=offset_results.get, reverse=True)
+			winning_offset = sorted_offsets[0]
+			if total_hits[winning_offset] > 0 and offset_results[winning_offset] > 0:
+				disassembler.confidence = ((offset_results[winning_offset] / float(total_hits[winning_offset])) * 100)
+				winners[disassembler] = disassembler.confidence
 
-		total_hits = 0
-
-		for (k, v) in iterator(self.disassemblers):
-			total_hits += v
-
-		for (k, v) in iterator(self.disassemblers):
-			k.confidence = ((v / float(total_hits)) * 100)
-
-		return sorted(self.disassemblers, key=self.disassemblers.get, reverse=True)
+		return sorted(winners, key=winners.get, reverse=True)
 

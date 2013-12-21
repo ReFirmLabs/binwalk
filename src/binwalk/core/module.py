@@ -300,7 +300,7 @@ class Module(object):
 			self.results.append(r)
 
 			# Update the progress status automatically if it is not being done manually by the module
-			if r.offset and self.AUTO_UPDATE_STATUS:
+			if r.offset and r.file and self.AUTO_UPDATE_STATUS:
 				self.status.total = r.file.length
 				self.status.completed = r.offset
 
