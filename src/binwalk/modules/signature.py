@@ -7,6 +7,7 @@ from binwalk.core.module import Module, Option, Kwarg
 class Signature(Module):
 
 	TITLE = "Signature Scan"
+	ORDER = 10
 
 	CLI = [
 			Option(short='B',

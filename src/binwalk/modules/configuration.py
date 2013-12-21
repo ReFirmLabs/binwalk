@@ -11,6 +11,7 @@ from binwalk.core.module import Module, Option, Kwarg, show_help
 class Configuration(Module):
 
 	TITLE = "General"
+	ORDER = 0
 
 	DEPENDS = {}
 		

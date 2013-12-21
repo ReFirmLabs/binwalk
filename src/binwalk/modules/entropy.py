@@ -18,7 +18,8 @@ class Entropy(Module):
 	COLORS = ['r', 'g', 'c', 'b', 'm']
 
 	TITLE = "Entropy"
-
+	ORDER = 8
+	
 	CLI = [
 			Option(short='E',
 				   long='entropy',

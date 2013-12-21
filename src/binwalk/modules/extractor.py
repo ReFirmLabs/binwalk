@@ -26,6 +26,7 @@ class Extractor(Module):
 	MAX_READ_SIZE = 10 * 1024 * 1024
 
 	TITLE = 'Extraction'
+	ORDER = 9
 
 	CLI = [
 			Option(short='e',

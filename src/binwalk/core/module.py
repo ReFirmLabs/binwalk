@@ -14,7 +14,7 @@ class Option(object):
 	A container class that allows modules to declare command line options.
 	'''
 
-	def __init__(self, kwargs={}, priority=0, description="", short="", long="", type=None, dtype=""):
+	def __init__(self, kwargs={}, priority=0, description="", short="", long="", type=None, dtype=None):
 		'''
 		Class constructor.
 
@@ -34,9 +34,9 @@ class Option(object):
 		self.short = short
 		self.long = long
 		self.type = type
-		self.dtype = str(dtype)
+		self.dtype = dtype
 
-		if not self.dtype:
+		if not self.dtype and self.type:
 			if self.type in [io.FileIO, argparse.FileType, binwalk.core.common.BlockFile]:
 				self.dtype = 'file'
 			elif self.type in [int, float, str]:
@@ -154,6 +154,9 @@ class Module(object):
 
 	# Modules with higher priorities are executed first
 	PRIORITY = 5
+
+	# Modules with a higher order are displayed first in help output
+	ORDER = 5
 
 	def __init__(self, dependency=False, **kwargs):
 		self.errors = []
@@ -469,28 +472,34 @@ class Modules(object):
 		return sorted(modules, key=modules.get, reverse=True)
 
 	def help(self):
+		modules = {}
 		help_string = "\nBinwalk v%s\nCraig Heffner, http://www.binwalk.org\n" % binwalk.core.settings.Settings.VERSION
 
-		for obj in self.list(attribute="CLI"):
-			if obj.CLI:
-				help_string += "\n%s Options:\n" % obj.TITLE
+		# Build a dictionary of modules and their ORDER attributes.
+		# This makes it easy to sort modules by their ORDER attribute for display.
+		for module in self.list(attribute="CLI"):
+			if module.CLI:
+				modules[module] = module.ORDER
 
-				for module_option in obj.CLI:
-					if module_option.long:
-						long_opt = '--' + module_option.long
+		for module in sorted(modules, key=modules.get, reverse=True):
+			help_string += "\n%s Options:\n" % module.TITLE
+
+			for module_option in module.CLI:
+				if module_option.long:
+					long_opt = '--' + module_option.long
 					
-						if module_option.type is not None:
-							optargs = "=<%s>" % module_option.dtype
-						else:
-							optargs = ""
+					if module_option.dtype:
+						optargs = "=<%s>" % module_option.dtype
+					else:
+						optargs = ""
 
-						if module_option.short:
-							short_opt = "-" + module_option.short + ","
-						else:
-							short_opt = "   "
+					if module_option.short:
+						short_opt = "-" + module_option.short + ","
+					else:
+						short_opt = "   "
 
-						fmt = "    %%s %%s%%-%ds%%s\n" % (32-len(long_opt))
-						help_string += fmt % (short_opt, long_opt, optargs, module_option.description)
+					fmt = "    %%s %%s%%-%ds%%s\n" % (32-len(long_opt))
+					help_string += fmt % (short_opt, long_opt, optargs, module_option.description)
 
 		return help_string + "\n"
 
@@ -553,7 +562,8 @@ class Modules(object):
 				if not has_key(self.loaded_modules, dependency):
 					# self.run will automatically add the dependency class instance to self.loaded_modules
 					self.run(dependency)
-				
+			
+				# If a dependency failed, consider this a non-recoverable error and raise an exception
 				if self.loaded_modules[dependency].errors:
 					raise ModuleException("Failed to load " + str(dependency))
 				else:	
