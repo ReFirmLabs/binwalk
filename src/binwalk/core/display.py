@@ -7,8 +7,9 @@ class Display(object):
 	HEADER_WIDTH = 150
 	DEFAULT_FORMAT = "%s\n"
 
-	def __init__(self, quiet=False, verbose=False, log=None, csv=False, fit_to_screen=False):
+	def __init__(self, quiet=False, verbose=False, log=None, csv=False, fit_to_screen=False, filter=None):
 		self.quiet = quiet
+		self.filter = filter
 		self.verbose = verbose
 		self.fit_to_screen = fit_to_screen
 		self.fp = None
@@ -61,7 +62,8 @@ class Display(object):
 	def _fprint(self, fmt, columns, csv=True):
 		if not self.quiet:
 			line = fmt % tuple(columns)
-			sys.stdout.write(self._format_line(line.strip()) + "\n")
+			if filter and self.filter.valid_result(line):
+				sys.stdout.write(self._format_line(line.strip()) + "\n")
 
 		if self.fp and not (self.csv and not csv):
 			self.log(fmt, columns)

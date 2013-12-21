@@ -1,6 +1,7 @@
 import os
 import sys
 import argparse
+import binwalk.core.filter
 import binwalk.core.common
 import binwalk.core.display
 import binwalk.core.settings
@@ -34,6 +35,22 @@ class Configuration(Module):
 			   type=int,
 			   kwargs={'swap_size' : 0},
 			   description='Reverse every n bytes before scanning'),
+		Option(short='I',
+			   long='show-invalid',
+			   kwargs={'show_invalid' : True},
+			   description='Show results marked as invalid'),
+		Option(short='x',
+			   long='exclude',
+			   kwargs={'exclude_filters' : []},
+			   type=list,
+			   dtype=str.__name__,
+			   description='Exclude results that match <str>'),
+		Option(short='y',
+			   long='include',
+			   kwargs={'include_filters' : []},
+			   type=list,
+			   dtype=str.__name__,
+			   description='Only show results that match <str>'),
 		Option(long='log',
 			   short='f',
 			   type=argparse.FileType,
@@ -70,6 +87,9 @@ class Configuration(Module):
 		Kwarg(name='offset', default=0),
 		Kwarg(name='block', default=0),
 		Kwarg(name='swap_size', default=0),
+		Kwarg(name='show_invalid', default=False),
+		Kwarg(name='include_filters', default=[]),
+		Kwarg(name='exclude_filters', default=[]),
 		Kwarg(name='log_file', default=None),
 		Kwarg(name='csv', default=False),
 		Kwarg(name='format_to_terminal', default=False),
@@ -86,11 +106,20 @@ class Configuration(Module):
 		self._open_target_files()
 		self._set_verbosity()
 
+		self.filter = binwalk.core.filter.Filter(self.show_invalid)
+		
+		# Set any specified include/exclude filters
+		for regex in self.exclude_filters:
+			self.filter.exclude(regex)
+		for regex in self.include_filters:
+			self.filter.include(regex)
+
 		self.settings = binwalk.core.settings.Settings()
 		self.display = binwalk.core.display.Display(log=self.log_file,
 													csv=self.csv,
 													quiet=self.quiet,
 													verbose=self.verbose,
+													filter=self.filter,
 													fit_to_screen=self.format_to_terminal)
 		
 		if self.show_help:

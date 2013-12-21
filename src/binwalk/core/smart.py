@@ -161,7 +161,7 @@ class SmartSignature:
 		Returns True if the string result is one of many.
 		Returns False if the string result is not one of many.
 		'''
-		if self.filter.valid_magic_result(data):
+		if self.filter.valid_result(data):
 			if self.last_one_of_many is not None and data.startswith(self.last_one_of_many):
 				return True
 		

@@ -27,6 +27,7 @@ class Settings:
 	PLUGINS = "plugins"
 	EXTRACT_FILE = "extract.conf"
 	BINWALK_MAGIC_FILE = "binwalk"
+	BINARCH_MAGIC_FILE = "binarch"
 
 	def __init__(self):
 		'''
@@ -45,11 +46,13 @@ class Settings:
 
 		# Build the paths to all user-specific files
 		self.paths['user'][self.BINWALK_MAGIC_FILE] = self._user_path(self.BINWALK_MAGIC_DIR, self.BINWALK_MAGIC_FILE)
+		self.paths['user'][self.BINARCH_MAGIC_FILE] = self._user_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
 		self.paths['user'][self.EXTRACT_FILE] = self._user_path(self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE)
 		self.paths['user'][self.PLUGINS] = self._user_path(self.BINWALK_PLUGINS_DIR)
 
 		# Build the paths to all system-wide files
 		self.paths['system'][self.BINWALK_MAGIC_FILE] = self._system_path(self.BINWALK_MAGIC_DIR, self.BINWALK_MAGIC_FILE)
+		self.paths['system'][self.BINARCH_MAGIC_FILE] = self._system_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
 		self.paths['system'][self.EXTRACT_FILE] = self._system_path(self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE)
 		self.paths['system'][self.PLUGINS] = self._system_path(self.BINWALK_PLUGINS_DIR)
 

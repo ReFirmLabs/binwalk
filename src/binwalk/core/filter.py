@@ -3,9 +3,9 @@ import binwalk.core.common as common
 from binwalk.core.smart import SmartSignature
 from binwalk.core.compat import *
 
-class MagicFilter:
+class Filter:
 	'''
-	Class to filter libmagic results based on include/exclude rules and false positive detection.
+	Class to filter results based on include/exclude rules and false positive detection.
 	An instance of this class is available via the Binwalk.filter object.
 	Note that all filter strings should be in lower case.
 	'''
@@ -112,16 +112,15 @@ class MagicFilter:
 
 		return self.FILTER_INCLUDE
 
-	def valid_magic_result(self, data):
+	def valid_result(self, data):
 		'''
 		Checks if the given string contains invalid data.
-		Called internally by Binwalk.scan().
 
 		@data - String to validate.
 
 		Returns True if data is valid, False if invalid.
 		'''
-		# A result of 'data' is never ever valid.
+		# A result of 'data' is never ever valid (for libmagic results)
 		if data == self.DATA_RESULT:
 			return False
 
