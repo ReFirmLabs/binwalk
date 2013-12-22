@@ -31,13 +31,13 @@ class Extractor(Module):
 	CLI = [
 			Option(short='e',
 				   long='extract',
-				   kwargs={'load_default_rules' : True},
+				   kwargs={'load_default_rules' : True, 'enabled' : True},
 				   description='Automatically extract known file types'),
 			Option(short='D',
 				   long='dd',
 				   type=[],
 				   dtype='type:ext:cmd',
-				   kwargs={'manual_rules' : []},
+				   kwargs={'manual_rules' : [], 'enabled' : True},
 				   description='Extract <type> signatures, give the files an extension of <ext>, and execute <cmd>'),
 			Option(short='M',
 				   long='matryoshka',
@@ -65,6 +65,7 @@ class Extractor(Module):
 			Kwarg(name='run_extractors', default=True),
 			Kwarg(name='manual_rules', default=[]),
 			Kwarg(name='matryoshka', default=0),
+			Kwarg(name='enabled', default=False),
 	]
 
 	def load(self):
