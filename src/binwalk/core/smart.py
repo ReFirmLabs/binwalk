@@ -15,9 +15,15 @@ class Tag(object):
 		self.type = None
 		self.handler = None
 		self.tag = None
+		self.default = None
 
 		for (k,v) in iterator(kwargs):
 			setattr(self, k, v)
+
+		if self.type == int:
+			self.default = 0
+		elif self.type == str:
+			self.default = ''
 
 		if self.keyword is not None:
 			self.tag = self.TAG_DELIM_START + self.keyword
@@ -46,9 +52,9 @@ class Signature(object):
 	'''
 
 	TAGS = [
-		Tag(name='raw-string', keyword='raw-string', handler='parse_raw_string'),
-		Tag(name='string-len', keyword='string-len', handler='parse_string_len'),
-		Tag(name='math', keyword='math', handler='parse_math'),
+		Tag(name='raw-string', keyword='raw-string', type=str, handler='parse_raw_string'),
+		Tag(name='string-len', keyword='string-len', type=str, handler='parse_string_len'),
+		Tag(name='math', keyword='math', type=int, handler='parse_math'),
 		Tag(name='one-of-many', keyword='one-of-many', handler='one_of_many'),
 
 		Tag(name='jump', keyword='jump-to-offset', type=int),
@@ -59,7 +65,7 @@ class Signature(object):
 		Tag(name='year', keyword='file-year', type=str),
 		Tag(name='epoch', keyword='file-epoch', type=int),
 		
-		Tag(name='raw-size', keyword='raw-string-length'),
+		Tag(name='raw-size', keyword='raw-string-length', type=int),
 		Tag(name='raw-replace', keyword='raw-replace'),
 		Tag(name='string-len-replace', keyword='string-len'),
 	]
@@ -89,21 +95,27 @@ class Signature(object):
 		results = {}
 		self.valid = True
 
-		# If smart signatures are disabled, or the result data is not valid (i.e., potentially malicious), 
-		# don't parse anything, just return the raw data as the description.
-		if self.ignore_smart_signatures:
-			results['description'] = data
-		else:
+		if data:
 			for tag in self.TAGS:
 				if tag.handler is not None:
-					(data, arg) = getattr(self, tag.handler)(data, tag)
+					(d, arg) = getattr(self, tag.handler)(data, tag)
+					if not self.ignore_smart_signatures:
+						data = d
 
-					if isinstance(arg, type(False)) and arg == False:
+					if isinstance(arg, type(False)) and arg == False and not self.ignore_smart_signatures:
 						self.valid = False
 					elif tag.type is not None:
-						results[tag.name] = arg
+						if self.ignore_smart_signatures:
+							results[tag.name] = tag.default
+						else:
+							results[tag.name] = arg
 
-			results['description'] = self.strip_tags(data)
+			if self.ignore_smart_signatures:
+				results['description'] = data
+			else:
+				results['description'] = self.strip_tags(data)
+		else:
+			self.valid = False
 			
 		results['valid'] = self.valid
 
@@ -179,10 +191,10 @@ class Signature(object):
 		Returns a blank string on failure.
 		'''
 		arg = ''
-		data = self.safe_string(data)
+		safe_data = self.safe_string(data)
 
-		if tag.tag in data:
-			arg = data.split(tag.tag)[1].split(tag.TAG_DELIM_END)[0]
+		if tag.tag in safe_data:
+			arg = safe_data.split(tag.tag)[1].split(tag.TAG_DELIM_END)[0]
 			
 		return (data, arg)
 
@@ -231,18 +243,18 @@ class Signature(object):
 
 		Returns a parsed string.
 		'''
-		if not self.ignore_smart_signatures and self.is_valid(data):
-			raw_size_tag = self.tag_lookup('raw-size')
+		if self.is_valid(data):
+			raw_str_length_tag = self.tag_lookup('raw-string-length')
 			raw_replace_tag = self.tag_lookup('raw-replace')
 
 			# Get the raw string  keyword arg
 			(data, raw_string) = self.get_keyword_arg(data, raw_str_tag)
-
+			
 			# Was a raw string keyword specified?
 			if raw_string:
 				# Get the raw string length arg
-				(data, raw_size) = self.get_math_arg(data, raw_size_tag)
-	
+				(data, raw_size) = self.get_math_arg(data, raw_str_length_tag)
+
 				# Replace all instances of raw-replace in data with raw_string[:raw_size]
 				# Also strip out everything after the raw-string keyword, including the keyword itself.
 				# Failure to do so may (will) result in non-printable characters and this string will be 

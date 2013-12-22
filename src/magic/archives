@@ -26,30 +26,30 @@
 0       string          PK\x07\x08PK\x03\x04    Zip multi-volume archive data, at least PKZIP v2.50 to extract
 
 # ZIP compression (Greg Roelofs, c/o zip-bugs@wkuvx1.wku.edu)
-0       string          PK\003\004      Zip
->6	leshort		&0x01		encrypted
->0	byte		x		archive data,
->4      byte            0x00            v0.0
->4      byte            0x09            at least v0.9 to extract,
->4      byte            0x0a            at least v1.0 to extract,
->4      byte            0x0b            at least v1.1 to extract,
->0x161  string          WINZIP          WinZIP self-extracting,
->4      byte            0x14
->>30    ubelong         !0x6d696d65     at least v2.0 to extract,
->18	lelong		!0
->>18	lelong		<0		invalid
->>18	lelong		x		compressed size: %d,
->>18	lelong		x		{jump-to-offset:%d}
->22	lelong		!0
->>22	lelong		<0		invalid
->>22	lelong		x		uncompressed size: %d,{extract-delay:End of Zip archive}
->30	string		x		{file-name:{raw-replace}}name: {raw-replace}
->26	leshort		x		{raw-string-length:%d}
->30	string		x		{raw-string:%s
->61	string		x		\b%s
->92	string		x		\b%s
->123	string		x		\b%s
->154	string		x		\b%s}
+0		string		PK\003\004      Zip
+>6		leshort		&0x01			encrypted
+>0		byte		x				archive data,
+>4      byte		0x00            v0.0
+>4      byte		0x09            at least v0.9 to extract,
+>4      byte		0x0a            at least v1.0 to extract,
+>4      byte		0x0b            at least v1.1 to extract,
+>0x161  string		WINZIP          WinZIP self-extracting,
+>4      byte		0x14
+>>30    ubelong		!0x6d696d65     at least v2.0 to extract,
+>18		lelong		!0
+>>18	lelong		<0				invalid
+>>18	lelong		x				compressed size: %d,
+>>18	lelong		x				{jump-to-offset:%d}
+>22		lelong		!0
+>>22	lelong		<0				invalid
+>>22	lelong		x				uncompressed size: %d,{extract-delay:End of Zip archive}
+>30		string		x				name: {raw-replace}
+>26		leshort		x				{raw-string-length:%d}
+>30		string		x				{raw-string:%s
+>61		string		x				\b%s
+>92		string		x				\b%s
+>123	string		x				\b%s
+>154	string		x				\b%s}
 
 # ZIP footer
 0	string		PK\x05\x06	End of Zip archive

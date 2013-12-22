@@ -117,9 +117,11 @@ class Signature(Module):
 				# In python3 we need a bytes object to pass to magic.buffer
 				candidate_data = str2bytes(data[candidate_offset:candidate_offset+fp.block_peek_size])
 			
-				# Pass the data to libmagic, and split out multiple results into a list
+				# Pass the data to libmagic for parsing
 				magic_result = self.magic.buffer(candidate_data)
-					
+				if not magic_result:
+					continue
+				
 				# The smart filter parser returns a binwalk.core.module.Result object
 				r = self.smart.parse(magic_result)
 
