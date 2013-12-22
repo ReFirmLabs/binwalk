@@ -100,6 +100,8 @@ class Configuration(Module):
 		Kwarg(name='show_help', default=False),
 	]
 
+	PRIMARY = False
+
 	def load(self):
 		self.target_files = []
 

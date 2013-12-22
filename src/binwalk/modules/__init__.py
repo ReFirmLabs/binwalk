@@ -6,3 +6,4 @@ from binwalk.modules.configuration import Configuration
 from binwalk.modules.extractor import Extractor
 from binwalk.modules.entropy import Entropy
 from binwalk.modules.heuristics import HeuristicCompressionAnalyzer
+from binwalk.modules.compression import RawCompression

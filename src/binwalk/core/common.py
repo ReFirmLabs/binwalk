@@ -276,6 +276,7 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
 			self._name = fname
 
 		self.seek(self.offset)
+		print self.name, self.offset, self.length, self.total_read
 
 	def _swap_data_block(self, block):
 		'''
@@ -302,7 +303,7 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
 		self.set_block_size(block=self.base_trail_size, trail=self.base_trail_size)
 		self.seek(self.offset)
 
-	def set_block_size(self, block=0, trail=0):
+	def set_block_size(self, block=None, trail=None):
 		if block is not None:
 			self.READ_BLOCK_SIZE = block
 		if trail is not None:

@@ -142,21 +142,7 @@ class Signature(Module):
 							break
 
 	def run(self):
-		target_files = self.config.target_files
-
-		while target_files:
-			for fp in target_files:
-				self.header()
-			
-				self.status.clear()
-				self.status.total = fp.length
-				self.status.completed = 0
-
-				self.scan_file(fp)
-			
-				self.footer()
-
-			# Add any pending extracted files to the target_files list and reset the extractor's pending file list
-			target_files = [self.config.open_file(f) for f in self.extractor.pending]
-			self.extractor.pending = []
-
+		for fp in iter(self.next_file, None):
+			self.header()
+			self.scan_file(fp)
+			self.footer()

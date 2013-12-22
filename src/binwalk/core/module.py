@@ -81,6 +81,7 @@ class Result(object):
 		Class constructor.
 
 		@offset      - The file offset of the result.
+		@size        - Size of the result, if known.
 		@description - The result description, as displayed to the user.
 		@module      - Name of the module that generated the result.
 		@file        - The file object of the scanned file.
@@ -93,6 +94,7 @@ class Result(object):
 		Returns None.
 		'''
 		self.offset = 0
+		self.size = 0
 		self.description = ''
 		self.module = ''
 		self.file = None
@@ -100,6 +102,7 @@ class Result(object):
 		self.display = True
 		self.extract = True
 		self.plot = True
+		self.name = None
 
 		for (k, v) in iterator(kwargs):
 			setattr(self, k, v)
@@ -172,9 +175,13 @@ class Module(object):
 	# Modules with a higher order are displayed first in help output
 	ORDER = 5
 
+	# Set to False if this is not a primary module
+	PRIMARY = True
+
 	def __init__(self, **kwargs):
 		self.errors = []
 		self.results = []
+		self.target_file_list = []
 		self.status = None
 		self.enabled = False
 		self.name = self.__class__.__name__
@@ -190,6 +197,11 @@ class Module(object):
 			raise e
 		except Exception as e:
 			self.error(exception=e)
+
+		try:
+			self.target_file_list = list(self.config.target_files)
+		except AttributeError as e:
+			pass
 
 	def __del__(self):
 		return None
@@ -275,6 +287,24 @@ class Module(object):
 				args.append(getattr(r, name))
 		
 		return args
+
+	def next_file(self):
+		'''
+		Gets the next file to be scanned (including pending extracted files, if applicable).
+		Also re/initializes self.status.
+		'''
+		fp = None
+
+		# Add any pending extracted files to the target_files list and reset the extractor's pending file list
+		self.target_file_list += [self.config.open_file(f) for f in self.extractor.pending]
+		self.extractor.pending = []
+		
+		if self.target_file_list:
+			fp = self.target_file_list.pop(0)
+			self.status.clear()
+			self.status.total = fp.length
+		
+		return fp
 
 	def clear(self, results=True, errors=True):
 		'''
@@ -526,7 +556,8 @@ class Modules(object):
 
 		# Add all loaded modules that marked themselves as enabled to the run_modules list
 		for (module, obj) in iterator(self.loaded_modules):
-			if obj.enabled:
+			# Report the results if the module is enabled and if it is a primary module or if it reported any results/errors
+			if obj.enabled and (obj.PRIMARY or obj.results or obj.errors):
 				run_modules.append(obj)
 
 		self.arguments = orig_arguments

@@ -22,11 +22,9 @@ class Extractor(Module):
 	# Place holder for the extracted file name in the command 
 	FILE_NAME_PLACEHOLDER = '%e'
 
-	# Max size of data to read/write at one time when extracting data
-	MAX_READ_SIZE = 10 * 1024 * 1024
-
 	TITLE = 'Extraction'
 	ORDER = 9
+	PRIMARY = False
 
 	CLI = [
 			Option(short='e',
@@ -95,7 +93,8 @@ class Extractor(Module):
 			r.file.size
 		except KeyboardInterrupt as e:
 			pass
-		except Exception:
+		except Exception as e:
+			print e
 			return
 
 		if not r.size:
