@@ -3,7 +3,35 @@ import binwalk.core.common as common
 from binwalk.core.smart import Signature
 from binwalk.core.compat import *
 
-class Filter:
+class FilterType(object):
+
+	FILTER_INCLUDE = 0
+	FILTER_EXCLUDE = 1
+
+	def __init__(self, **kwargs):
+		self.type = None
+		self.filter = None
+		self.regex = None
+
+		for (k,v) in iterator(kwargs):
+			setattr(self, k, v)
+
+		if self.regex is None:
+			self.regex = re.compile(self.filter)
+
+class FilterInclude(FilterType):
+	
+	def __init__(self, **kwargs):
+		super(FilterInclude, self).__init__(**kwargs)
+		self.type = self.FILTER_INCLUDE
+
+class FilterExclude(FilterType):
+	
+	def __init__(self, **kwargs):
+		super(FilterExclude, self).__init__(**kwargs)
+		self.type = self.FILTER_EXCLUDE
+
+class Filter(object):
 	'''
 	Class to filter results based on include/exclude rules and false positive detection.
 	An instance of this class is available via the Binwalk.filter object.
@@ -16,9 +44,6 @@ class Filter:
 	INVALID_RESULTS = ["invalid", "\\"]
 	INVALID_RESULT = "invalid"
 	NON_PRINTABLE_RESULT = "\\"
-
-	FILTER_INCLUDE = 0
-	FILTER_EXCLUDE = 1
 
 	def __init__(self, show_invalid_results=False):
 		'''
@@ -54,16 +79,11 @@ class Filter:
 			matches = match
 
 		for m in matches:
-			include_filter = {}
-
 			if m:
 				if exclusive and not self.exclusive_filter:
 					self.exclusive_filter = True
 
-				include_filter['type'] = self.FILTER_INCLUDE
-				include_filter['filter'] = m
-				include_filter['regex'] = re.compile(m)
-				self.filters.append(include_filter)
+				self.filters.append(FilterInclude(filter=m))
 
 	def exclude(self, match):
 		'''
@@ -80,13 +100,8 @@ class Filter:
 			matches = match
 
 		for m in matches:
-			exclude_filter = {}
-
 			if m:
-				exclude_filter['type'] = self.FILTER_EXCLUDE
-				exclude_filter['filter'] = m
-				exclude_filter['regex'] = re.compile(m)
-				self.filters.append(exclude_filter)
+				self.filters.append(FilterExclude(filter=m))
 
 	def filter(self, data):
 		'''
@@ -101,16 +116,16 @@ class Filter:
 		data = data.lower()
 
 		# Loop through the filters to see if any of them are a match. 
-		# If so, return the registered type for the matching filter (FILTER_INCLUDE | FILTER_EXCLUDE). 
+		# If so, return the registered type for the matching filter (FILTER_INCLUDE || FILTER_EXCLUDE). 
 		for f in self.filters:
-			if f['regex'].search(data):
-				return f['type']
+			if f.regex.search(data):
+				return f.type
 
 		# If there was not explicit match and exclusive filtering is enabled, return FILTER_EXCLUDE.
 		if self.exclusive_filter:
-			return self.FILTER_EXCLUDE
+			return FilterType.FILTER_EXCLUDE
 
-		return self.FILTER_INCLUDE
+		return FilterType.FILTER_INCLUDE
 
 	def valid_result(self, data):
 		'''
@@ -125,7 +140,7 @@ class Filter:
 			return False
 
 		# Make sure this result wasn't filtered
-		if self.filter(data) == self.FILTER_EXCLUDE:
+		if self.filter(data) == FilterType.FILTER_EXCLUDE:
 			return False
 
 		# If showing invalid results, just return True without further checking.

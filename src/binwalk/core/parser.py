@@ -3,6 +3,7 @@ import re
 import os.path
 import tempfile
 from binwalk.core.compat import *
+from binwalk.core.filter import FilterType
 
 class MagicSignature(object):
 
@@ -175,7 +176,7 @@ class MagicParser(object):
 
 				if entry is not None:
 					# If this signature is marked for inclusion, include it.
-					if self.filter.filter(entry.description) == self.filter.FILTER_INCLUDE:
+					if self.filter.filter(entry.description) == FilterType.FILTER_INCLUDE:
 
 						include = True	
 						self.signature_count += 1
