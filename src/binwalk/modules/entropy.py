@@ -17,6 +17,8 @@ class Entropy(Module):
 
 	COLORS = ['r', 'g', 'c', 'b', 'm']
 
+	DEFAULT_BLOCK_SIZE = 1024
+
 	TITLE = "Entropy"
 	ORDER = 8
 	
@@ -45,7 +47,7 @@ class Entropy(Module):
 			Kwarg(name='display_results', default=True),
 			Kwarg(name='do_plot', default=True),
 			Kwarg(name='show_legend', default=True),
-			Kwarg(name='block_size', default=1024),
+			Kwarg(name='block_size', default=0),
 	]
 
 	# Run this module last so that it can process all other module's results and overlay them on the entropy graph
@@ -75,8 +77,11 @@ class Entropy(Module):
 		if self.file_markers:
 			self.display_results = False
 
-		if self.config.block:
-			self.block_size = self.config.block
+		if not self.block_size:
+			if self.config.block:
+				self.block_size = self.config.block
+			else:
+				self.block_size = self.DEFAULT_BLOCK_SIZE
 
 	def run(self):
 		from pyqtgraph.Qt import QtGui

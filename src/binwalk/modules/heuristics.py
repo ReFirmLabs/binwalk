@@ -83,6 +83,7 @@ class HeuristicCompressionAnalyzer(Module):
 	ENTROPY_TRIGGER = .90
 	MIN_BLOCK_SIZE = 4096
 	BLOCK_OFFSET = 1024
+	ENTROPY_BLOCK_SIZE = 1024
 
 	TITLE = "Heuristic Compression"
 
@@ -91,7 +92,7 @@ class HeuristicCompressionAnalyzer(Module):
 					   attribute='config'),
 			Dependency(name='Entropy',
 					   attribute='entropy',
-					   kwargs={'enabled' : True, 'do_plot' : False, 'display_results' : False}),
+					   kwargs={'enabled' : True, 'do_plot' : False, 'display_results' : False, 'block_size' : ENTROPY_BLOCK_SIZE}),
 	]
 	
 	{'config' : 'Configuration', 'entropy' : 'Entropy'}
