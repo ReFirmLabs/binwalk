@@ -4,7 +4,26 @@ import os.path
 import tempfile
 from binwalk.core.compat import *
 
-class MagicParser:
+class MagicSignature(object):
+
+	def __init__(self, **kwargs):
+		self.offset = 0
+		self.type = ''
+		self.condition = ''
+		self.description = ''
+		self.length = 0
+		
+		for (k,v) in iterator(kwargs):
+			try:
+				v = int(v, 0)
+			except KeyboardInterrupt as e:
+				raise e
+			except Exception:
+				pass
+
+			setattr(self, k, v)
+
+class MagicParser(object):
 	'''
 	Class for loading, parsing and creating libmagic-compatible magic files.
 	
@@ -156,16 +175,16 @@ class MagicParser:
 
 				if entry is not None:
 					# If this signature is marked for inclusion, include it.
-					if self.filter.filter(entry['description']) == self.filter.FILTER_INCLUDE:
+					if self.filter.filter(entry.description) == self.filter.FILTER_INCLUDE:
 
 						include = True	
 						self.signature_count += 1
 
-						if not has_key(self.signatures, entry['offset']):
-							self.signatures[entry['offset']] = []
+						if not has_key(self.signatures, entry.offset):
+							self.signatures[entry.offset] = []
 						
-						if entry['condition'] not in self.signatures[entry['offset']]:
-							self.signatures[entry['offset']].append(entry['condition'])
+						if entry.condition not in self.signatures[entry.offset]:
+							self.signatures[entry.offset].append(entry.condition)
 					else:
 						include = False
 
@@ -190,13 +209,7 @@ class MagicParser:
 		Returns a dictionary with the respective line parts populated if the line is the first of a signature.
 		Returns a dictionary with all parts set to None if the line is not the first of a signature.
 		'''
-		entry = {
-			'offset'	: '',
-			'type'		: '',
-			'condition'	: '',
-			'description'	: '',
-			'length'	: 0
-		}
+		entry = MagicSignature()
 
 		# Quick and dirty pre-filter. We are only concerned with the first line of a
 		# signature, which will always start with a number. Make sure the first byte of
@@ -209,11 +222,11 @@ class MagicParser:
 			# For this to work properly, replace escaped spaces ('\ ') with '\x20'.
 			# This means the same thing, but doesn't confuse split().
 			line_parts = line.replace('\\ ', '\\x20').split()
-			entry['offset'] = line_parts[0]
-			entry['type'] = line_parts[1]
+			entry.offset = line_parts[0]
+			entry.type = line_parts[1]
 			# The condition line may contain escaped sequences, so be sure to decode it properly.
-			entry['condition'] = string_decode(line_parts[2])
-			entry['description'] = ' '.join(line_parts[3:])
+			entry.condition = string_decode(line_parts[2])
+			entry.description = ' '.join(line_parts[3:])
 		except KeyboardInterrupt as e:
 			raise e
 		except Exception as e:
@@ -222,20 +235,20 @@ class MagicParser:
 		# We've already verified that the first character in this line is a number, so this *shouldn't*
 		# throw an exception, but let's catch it just in case...
 		try:
-			entry['offset'] = int(entry['offset'], 0)
+			entry.offset = int(entry.offset, 0)
 		except KeyboardInterrupt as e:
 			raise e
 		except Exception as e:
 			raise Exception("%s :: %s", (str(e), line))
 
 		# If this is a string, get the length of the string
-		if 'string' in entry['type'] or entry['condition'] == self.WILDCARD:
-			entry['length'] = len(entry['condition'])
+		if 'string' in entry.type or entry.condition == self.WILDCARD:
+			entry.length = len(entry.condition)
 		# Else, we need to jump through a few more hoops...
 		else:	
 			# Default to little endian, unless the type field starts with 'be'. 
 			# This assumes that we're running on a little endian system...
-			if entry['type'].startswith('be'):
+			if entry.type.startswith('be'):
 				endianess = self.BIG_ENDIAN
 			else:
 				endianess = self.LITTLE_ENDIAN
@@ -244,32 +257,32 @@ class MagicParser:
 			# for more advanced conditions for the first line of a signature, 
 			# but needing that is rare.
 			try:
-				intval = int(entry['condition'].strip('L'), 0)
+				intval = int(entry.condition.strip('L'), 0)
 			except KeyboardInterrupt as e:
 				raise e
 			except Exception as e:
 				raise Exception("Failed to evaluate condition for '%s' type: '%s', condition: '%s', error: %s" % (entry['description'], entry['type'], entry['condition'], str(e)))
 
 			# How long is the field type?
-			if entry['type'] == 'byte':
-				entry['length'] = 1
-			elif 'short' in entry['type']:
-				entry['length'] = 2
-			elif 'long' in entry['type']:
-				entry['length'] = 4
-			elif 'quad' in entry['type']:
-				entry['length'] = 8
+			if entry.type == 'byte':
+				entry.length = 1
+			elif 'short' in entry.type:
+				entry.length = 2
+			elif 'long' in entry.type:
+				entry.length = 4
+			elif 'quad' in entry.type:
+				entry.length = 8
 
 			# Convert the integer value to a string of the appropriate endianess
-			entry['condition'] = self._to_string(intval, entry['length'], endianess)
+			entry.condition = self._to_string(intval, entry.length, endianess)
 
 		return entry
 
 	def build_signature_set(self):
 		'''
-		Builds a list of signature tuples.
+		Builds a set of signature tuples.
 
-		Returns a list of tuples in the format: [(<signature offset>, [signature regex])].
+		Returns a set of tuples in the format: [(<signature offset>, [signature regex])].
 		'''
 		self.signature_set = set()
 
