@@ -42,6 +42,7 @@ class Entropy(Module):
 	KWARGS = [
 			Kwarg(name='enabled', default=False),
 			Kwarg(name='save_plot', default=False),
+			Kwarg(name='display_results', default=True),
 			Kwarg(name='do_plot', default=True),
 			Kwarg(name='show_legend', default=True),
 			Kwarg(name='block_size', default=1024),
@@ -53,7 +54,6 @@ class Entropy(Module):
 	def init(self):
 		self.HEADER[-1] = "ENTROPY"
 		self.algorithm = self.shannon
-		self.display_results = True
 		self.max_description_length = 0
 		self.file_markers = {}
 
@@ -91,7 +91,7 @@ class Entropy(Module):
 			if self.display_results:
 				self.footer()
 	
-		if not self.save_plot:	
+		if self.do_plot and not self.save_plot:	
 			QtGui.QApplication.instance().exec_()
 
 	def calculate_file_entropy(self, fp):

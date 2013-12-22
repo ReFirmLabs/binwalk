@@ -13,7 +13,7 @@ class Configuration(Module):
 	TITLE = "General"
 	ORDER = 0
 
-	DEPENDS = {}
+	DEPENDS = []
 		
 	CLI = [
 		Option(long='length',
