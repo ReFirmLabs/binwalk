@@ -101,10 +101,16 @@ class HeuristicCompressionAnalyzer(Module):
 				   long='heuristic',
 				   kwargs={'enabled' : True},
 				   description='Heuristically classify high entropy data'),
+			Option(short='a',
+				   long='trigger',
+				   kwargs={'trigger_level' : 0},
+				   type=float,
+				   description='Set the entropy trigger level (0.0 - 1.0)'),
 	]
 
 	KWARGS = [
 			Kwarg(name='enabled', default=False),
+			Kwarg(name='trigger_level', default=ENTROPY_TRIGGER),
 	]
 
 	def init(self):
@@ -112,13 +118,18 @@ class HeuristicCompressionAnalyzer(Module):
 
 		self.HEADER[-1] = "HEURISTIC ENTROPY ANALYSIS"
 
+		if self.config.block:
+			self.block_size = self.config.block
+		else:
+			self.block_size = self.BLOCK_SIZE
+
 		for result in self.entropy.results:
 			if not has_key(self.blocks, result.file.name):
 				self.blocks[result.file.name] = []
 
-			if result.entropy >= self.ENTROPY_TRIGGER and (not self.blocks[result.file.name] or self.blocks[result.file.name][-1].end is not None):
+			if result.entropy >= self.trigger_level and (not self.blocks[result.file.name] or self.blocks[result.file.name][-1].end is not None):
 				self.blocks[result.file.name].append(EntropicBlock(start=result.offset + self.BLOCK_OFFSET))
-			elif result.entropy < self.ENTROPY_TRIGGER and self.blocks[result.file.name] and self.blocks[result.file.name][-1].end is None:
+			elif result.entropy < self.trigger_level and self.blocks[result.file.name] and self.blocks[result.file.name][-1].end is None:
 				self.blocks[result.file.name][-1].end = result.offset - self.BLOCK_OFFSET
 
 	def run(self):
@@ -160,8 +171,8 @@ class HeuristicCompressionAnalyzer(Module):
 			while j < dlen:
 				chi.reset()
 
-				data = d[j:j+self.BLOCK_SIZE]
-				if len(data) < self.BLOCK_SIZE:
+				data = d[j:j+self.block_size]
+				if len(data) < self.block_size:
 					break
 
 				chi.update(data)
@@ -169,7 +180,7 @@ class HeuristicCompressionAnalyzer(Module):
 				if chi.chisq() >= self.CHI_CUTOFF:
 					num_error += 1
 				
-				j += self.BLOCK_SIZE
+				j += self.block_size
 
 				if (j + i) > block.length:
 					break
