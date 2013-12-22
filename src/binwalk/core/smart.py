@@ -1,7 +1,7 @@
 import re
 import binwalk.core.module
 from binwalk.core.compat import *
-from binwalk.core.common import str2int, get_quoted_strings, MathExpression
+from binwalk.core.common import get_quoted_strings, MathExpression
 
 class SmartSignature:
 	'''
@@ -93,21 +93,21 @@ class SmartSignature:
 			# when extraction is enabled. If not specified, everything to the end of the file will be
 			# extracted (see Binwalk.scan).
 			try:
-				results['size'] = str2int(self._get_math_arg(data, 'filesize'))
+				results['size'] = int(self._get_math_arg(data, 'filesize'), 0)
 			except KeyboardInterrupt as e:
 				raise e
 			except Exception:
 				pass
 
 			try:
-				results['year'] = str2int(self._get_keyword_arg(data, 'year'))
+				results['year'] = int(self._get_keyword_arg(data, 'year'), 0)
 			except KeyboardInterrupt as e:
 				raise e
 			except Exception:
 				pass
 			
 			try:
-				results['epoch'] = str2int(self._get_keyword_arg(data, 'epoch'))
+				results['epoch'] = int(self._get_keyword_arg(data, 'epoch'), 0)
 			except KeyboardInterrupt as e:
 				raise e
 			except Exception:
@@ -233,7 +233,7 @@ class SmartSignature:
 		offset_str = self._get_keyword_arg(data, 'jump')
 		if offset_str:
 			try:
-				offset = str2int(offset_str)
+				offset = int(offset_str, 0)
 			except KeyboardInterrupt as e:
 				raise e
 			except Exception:
@@ -281,7 +281,7 @@ class SmartSignature:
 					# Also strip out everything after the raw-string keyword, including the keyword itself.
 					# Failure to do so may (will) result in non-printable characters and this string will be 
 					# marked as invalid when it shouldn't be.
-					data = data[:data.find(self.KEYWORDS['raw-string'])].replace(self.KEYWORDS['raw-replace'], '"' + raw_string[:str2int(raw_size)] + '"')
+					data = data[:data.find(self.KEYWORDS['raw-string'])].replace(self.KEYWORDS['raw-replace'], '"' + raw_string[:int(raw_size, 0)] + '"')
 		return data
 		
 	def _parse_string_len(self, data):

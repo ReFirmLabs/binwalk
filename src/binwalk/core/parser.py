@@ -3,7 +3,6 @@ import re
 import os.path
 import tempfile
 from binwalk.core.compat import *
-from binwalk.core.common import str2int
 
 class MagicParser:
 	'''
@@ -223,7 +222,7 @@ class MagicParser:
 		# We've already verified that the first character in this line is a number, so this *shouldn't*
 		# throw an exception, but let's catch it just in case...
 		try:
-			entry['offset'] = str2int(entry['offset'])
+			entry['offset'] = int(entry['offset'], 0)
 		except KeyboardInterrupt as e:
 			raise e
 		except Exception as e:
@@ -245,7 +244,7 @@ class MagicParser:
 			# for more advanced conditions for the first line of a signature, 
 			# but needing that is rare.
 			try:
-				intval = str2int(entry['condition'].strip('L'))
+				intval = int(entry['condition'].strip('L'), 0)
 			except KeyboardInterrupt as e:
 				raise e
 			except Exception as e:

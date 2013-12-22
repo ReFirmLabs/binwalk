@@ -48,22 +48,6 @@ def file_size(filename):
 	finally:
 		os.close(fd)
 
-def str2int(string):
-	'''
-	Attempts to convert string to a base 10 integer; if that fails, then base 16.
-
-	@string - String to convert to an integer.
-
-	Returns the integer value on success.
-	Throws an exception if the string cannot be converted into either a base 10 or base 16 integer value.
-	'''
-	try:
-		return int(string)
-	except KeyboardInterrupt as e:
-		raise e
-	except Exception:
-		return int(string, 16)
-
 def strip_quoted_strings(string):
 	'''
 	Strips out data in between double quotes.
