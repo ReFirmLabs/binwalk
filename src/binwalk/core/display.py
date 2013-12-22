@@ -62,16 +62,15 @@ class Display(object):
 				self.log("", [file_name, md5sum, timestamp])
 
 			self._fprint("%s", "\n", csv=False)
-			self._fprint("Scan Time:     %s\n", [timestamp], csv=False)
-			self._fprint("Target File:   %s\n", [file_name], csv=False)
-			self._fprint("MD5 Checksum:  %s\n", [md5sum], csv=False)
+			self._fprint("Scan Time:     %s\n", [timestamp], csv=False, filter=False)
+			self._fprint("Target File:   %s\n", [file_name], csv=False, filter=False)
+			self._fprint("MD5 Checksum:  %s\n", [md5sum], csv=False, filter=False)
 			if self.custom_verbose_format and self.custom_verbose_args:
-				#self._pprint("Signatures:    %d\n" % self.binwalk.parser.signature_count, nolog=nolog)
-				self._fprint(self.custom_verbose_format, self.custom_verbose_args, csv=False)
+				self._fprint(self.custom_verbose_format, self.custom_verbose_args, csv=False, filter=False)
 
-		self._fprint("%s", "\n", csv=False)
-		self._fprint(self.header_format, args)
-		self._fprint("%s", ["-" * self.HEADER_WIDTH + "\n"], csv=False)
+		self._fprint("%s", "\n", csv=False, filter=False)
+		self._fprint(self.header_format, args, filter=False)
+		self._fprint("%s", ["-" * self.HEADER_WIDTH + "\n"], csv=False, filter=False)
 
 	def result(self, *args):
 		# Convert to list for item assignment
@@ -87,12 +86,12 @@ class Display(object):
 		self._fprint(self.result_format, tuple(args))
 
 	def footer(self):
-		self._fprint("%s", "\n", csv=False)
+		self._fprint("%s", "\n", csv=False, filter=False)
 
-	def _fprint(self, fmt, columns, csv=True, stdout=True):
+	def _fprint(self, fmt, columns, csv=True, stdout=True, filter=True):
 		line = fmt % tuple(columns)
 		
-		if filter and self.filter.valid_result(line):
+		if not filter or self.filter.valid_result(line):
 			if not self.quiet and stdout:
 				sys.stdout.write(self._format_line(line.strip()) + "\n")
 
