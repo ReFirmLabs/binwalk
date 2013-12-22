@@ -52,6 +52,7 @@ class HexDiff(Module):
 			Kwarg(name='show_blue', default=True),
 			Kwarg(name='show_green', default=True),
 			Kwarg(name='terse', default=False),
+			Kwarg(name='enabled', default=False),
 	]
 
 	HEADER_FORMAT = "\n%s\n"
@@ -154,10 +155,11 @@ class HexDiff(Module):
 		if offset < 0:
 			size = offset * -1
 
-		if common.BlockFile.READ_BLOCK_SIZE < block:
-			read_block_size = block
-		else:
-			read_block_size = common.BlockFile.READ_BLOCK_SIZE
+		#if common.BlockFile.READ_BLOCK_SIZE < block:
+		#	read_block_size = block
+		#else:
+		#	read_block_size = common.BlockFile.READ_BLOCK_SIZE
+		read_block_size = common.BlockFile.DEFAULT_BLOCK_READ_SIZE
 
 		# BlockFile handles calculation of negative offsets, if one was specified
 		offset = self.config.target_files[0].offset

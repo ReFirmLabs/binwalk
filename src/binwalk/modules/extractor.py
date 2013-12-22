@@ -94,7 +94,6 @@ class Extractor(Module):
 		except KeyboardInterrupt as e:
 			pass
 		except Exception as e:
-			print e
 			return
 
 		if not r.size:

@@ -38,6 +38,7 @@ class Plotter(Module):
 			Kwarg(name='axis', default=3),
 			Kwarg(name='max_points', default=0),
 			Kwarg(name='show_grids', default=False),
+			Kwarg(name='enabled', default=False),
 	]
 
 	# There isn't really any useful data to print to console. Disable header and result output.
