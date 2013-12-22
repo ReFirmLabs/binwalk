@@ -1,5 +1,6 @@
 import ctypes
 import ctypes.util
+from binwalk.core.compat import str2bytes
 from binwalk.core.common import BlockFile
 
 class Plugin(object):
@@ -23,9 +24,9 @@ class Plugin(object):
 		# If this result is a zlib signature match, try to decompress the data
 		if self.tinfl and result.file and result.description.lower().startswith('zlib'):
 			# Seek to and read the suspected zlib data
-			fd = self.module.config.open_file(result.file.name, offset=result.offset)
-			#BlockFile(result.file.name, offset=result.offset, swap=self.module.config.swap_size)
-			data = fd.read(self.MAX_DATA_SIZE)
+			fd = self.module.config.open_file(result.file.name, offset=result.offset, length=self.MAX_DATA_SIZE)
+			# Python3 ctypes needs a bytes object, not a str
+			data = str2bytes(fd.read(self.MAX_DATA_SIZE))
 			fd.close()
 
 			# Check if this is valid zlib data

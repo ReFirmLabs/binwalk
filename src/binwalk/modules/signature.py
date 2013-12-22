@@ -48,8 +48,8 @@ class Signature(Module):
 	VERBOSE_HEADER_FORMAT = "%s    %d"
 
 	def init(self):
-		# Create SmartSignature and MagicParser class instances. These are mostly for internal use.
-		self.smart = binwalk.core.smart.SmartSignature(self.config.filter, ignore_smart_signatures=self.dumb_scan)
+		# Create Signature and MagicParser class instances. These are mostly for internal use.
+		self.smart = binwalk.core.smart.Signature(self.config.filter, ignore_smart_signatures=self.dumb_scan)
 		self.parser = binwalk.core.parser.MagicParser(self.config.filter, self.smart)
 
 		# If a raw byte sequence was specified, build a magic file from that instead of using the default magic files

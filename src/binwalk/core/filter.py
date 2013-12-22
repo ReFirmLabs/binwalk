@@ -1,6 +1,6 @@
 import re
 import binwalk.core.common as common
-from binwalk.core.smart import SmartSignature
+from binwalk.core.smart import Signature
 from binwalk.core.compat import *
 
 class Filter:
@@ -32,7 +32,7 @@ class Filter:
 		self.grep_filters = []
 		self.show_invalid_results = show_invalid_results
 		self.exclusive_filter = False
-		self.smart = SmartSignature(self)
+		self.smart = Signature(self)
 
 	def include(self, match, exclusive=True):
 		'''
@@ -134,7 +134,7 @@ class Filter:
 
 		# Don't include quoted strings or keyword arguments in this search, as 
 		# strings from the target file may legitimately contain the INVALID_RESULT text.
-		if self.INVALID_RESULT in common.strip_quoted_strings(self.smart._strip_tags(data)):
+		if self.INVALID_RESULT in common.strip_quoted_strings(self.smart.strip_tags(data)):
 			return False
 
 		# There should be no non-printable characters in any of the data

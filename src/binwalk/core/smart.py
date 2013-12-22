@@ -3,7 +3,36 @@ import binwalk.core.module
 from binwalk.core.compat import *
 from binwalk.core.common import get_quoted_strings, MathExpression
 
-class SmartSignature:
+class Tag(object):
+	
+	TAG_DELIM_START = "{"
+	TAG_DELIM_END = "}"
+	TAG_ARG_SEPERATOR = ":"
+
+	def __init__(self, **kwargs):
+		self.name = None
+		self.keyword = None
+		self.type = None
+		self.handler = None
+		self.tag = None
+
+		for (k,v) in iterator(kwargs):
+			setattr(self, k, v)
+
+		if self.keyword is not None:
+			self.tag = self.TAG_DELIM_START + self.keyword
+			if self.type is None:
+				self.tag += self.TAG_DELIM_END
+			else:
+				self.tag += self.TAG_ARG_SEPERATOR
+
+		if self.handler is None:
+			if self.type == int:
+				self.handler = 'get_math_arg'
+			elif self.type == str:
+				self.handler = 'get_keyword_arg'
+
+class Signature(object):
 	'''
 	Class for parsing smart signature tags in libmagic result strings.
 
@@ -12,29 +41,28 @@ class SmartSignature:
 
 		from binwalk import SmartSignature
 
-		for (i, keyword) in SmartSignature().KEYWORDS.iteritems():
-			print keyword
+		for tag in SmartSignature.TAGS:
+			print tag.keyword
 	'''
 
-	KEYWORD_DELIM_START = "{"
-	KEYWORD_DELIM_END = "}"
-	KEYWORDS = {
-		'jump'					: '%sjump-to-offset:' % KEYWORD_DELIM_START,
-		'filename'				: '%sfile-name:' % KEYWORD_DELIM_START,
-		'filesize'				: '%sfile-size:' % KEYWORD_DELIM_START,
-		'raw-string'			: '%sraw-string:' % KEYWORD_DELIM_START,	# This one is special and must come last in a signature block
-		'string-len'			: '%sstring-len:' % KEYWORD_DELIM_START,	# This one is special and must come last in a signature block
-		'raw-size'				: '%sraw-string-length:' % KEYWORD_DELIM_START,
-		'adjust'				: '%soffset-adjust:' % KEYWORD_DELIM_START,
-		'delay'					: '%sextract-delay:' % KEYWORD_DELIM_START,
-		'year'					: '%sfile-year:' % KEYWORD_DELIM_START,
-		'epoch'					: '%sfile-epoch:' % KEYWORD_DELIM_START,
-		'math'					: '%smath:' % KEYWORD_DELIM_START,
+	TAGS = [
+		Tag(name='raw-string', keyword='raw-string', handler='parse_raw_string'),
+		Tag(name='string-len', keyword='string-len', handler='parse_string_len'),
+		Tag(name='math', keyword='math', handler='parse_math'),
+		Tag(name='one-of-many', keyword='one-of-many', handler='one_of_many'),
 
-		'raw-replace'			: '%sraw-replace%s' % (KEYWORD_DELIM_START, KEYWORD_DELIM_END),
-		'one-of-many'			: '%sone-of-many%s' % (KEYWORD_DELIM_START, KEYWORD_DELIM_END),
-		'string-len-replace'	: '%sstring-len%s' % (KEYWORD_DELIM_START, KEYWORD_DELIM_END),
-	}
+		Tag(name='jump', keyword='jump-to-offset', type=int),
+		Tag(name='name', keyword='file-name', type=str),
+		Tag(name='size', keyword='file-size', type=int),
+		Tag(name='adjust', keyword='offset-adjust', type=int),
+		Tag(name='delay', keyword='extract-delay', type=str),
+		Tag(name='year', keyword='file-year', type=str),
+		Tag(name='epoch', keyword='file-epoch', type=int),
+		
+		Tag(name='raw-size', keyword='raw-string-length'),
+		Tag(name='raw-replace', keyword='raw-replace'),
+		Tag(name='string-len-replace', keyword='string-len'),
+	]
 
 	def __init__(self, filter, ignore_smart_signatures=False):
 		'''
@@ -58,20 +86,7 @@ class SmartSignature:
 
 		Returns a dictionary of parsed values.
 		'''
-		results = {
-			'offset'		: '',		# Offset where the match was found, filled in by Binwalk.single_scan.
-			'description'	: '',		# The libmagic data string, stripped of all keywords
-			'name'			: '',		# The original name of the file, if known
-			'delay'			: '',		# Extract delay description
-			'extract'		: '',		# Name of the extracted file, filled in by Binwalk.single_scan.
-			'jump'			: 0,		# The relative offset to resume the scan from
-			'size'			: 0,		# The size of the file, if known
-			'adjust'		: 0,		# The relative offset to add to the reported offset
-			'year'			: 0,		# The file's creation/modification year, if reported in the signature
-			'epoch'			: 0,		# The file's creation/modification epoch time, if reported in the signature
-			'valid'			: True,		# Set to False if parsed numerical values appear invalid
-		}
-
+		results = {}
 		self.valid = True
 
 		# If smart signatures are disabled, or the result data is not valid (i.e., potentially malicious), 
@@ -79,57 +94,28 @@ class SmartSignature:
 		if self.ignore_smart_signatures:
 			results['description'] = data
 		else:
-			# Calculate and replace special keywords/values
-			data = self._parse_raw_strings(data)
-			data = self._parse_string_len(data)
-			data = self._replace_maths(data)
+			for tag in self.TAGS:
+				if tag.handler is not None:
+					(data, arg) = getattr(self, tag.handler)(data, tag)
 
-			# Parse the offset-adjust value. This is used to adjust the reported offset at which 
-			# a signature was located due to the fact that MagicParser.match expects all signatures
-			# to be located at offset 0, which some wil not be.
-			results['adjust'] = self._get_math_arg(data, 'adjust')
+					if isinstance(arg, type(False)) and arg == False:
+						self.valid = False
+					elif tag.type is not None:
+						results[tag.name] = arg
 
-			# Parse the file-size value. This is used to determine how many bytes should be extracted
-			# when extraction is enabled. If not specified, everything to the end of the file will be
-			# extracted (see Binwalk.scan).
-			try:
-				results['size'] = int(self._get_math_arg(data, 'filesize'), 0)
-			except KeyboardInterrupt as e:
-				raise e
-			except Exception:
-				pass
-
-			try:
-				results['year'] = int(self._get_keyword_arg(data, 'year'), 0)
-			except KeyboardInterrupt as e:
-				raise e
-			except Exception:
-				pass
+			results['description'] = self.strip_tags(data)
 			
-			try:
-				results['epoch'] = int(self._get_keyword_arg(data, 'epoch'), 0)
-			except KeyboardInterrupt as e:
-				raise e
-			except Exception:
-				pass
-
-			results['delay'] = self._get_keyword_arg(data, 'delay')
-
-			# Parse the string for the jump-to-offset keyword.
-			# This keyword is honored, even if this string result is one of many.
-			results['jump'] = self._get_math_arg(data, 'jump')
-
-			# If this is one of many, don't do anything and leave description as a blank string.
-			# Else, strip all keyword tags from the string and process additional keywords as necessary.
-			if not self._one_of_many(data):
-				results['name'] = self._get_keyword_arg(data, 'filename').strip('"')
-				results['description'] = self._strip_tags(data)
-
 		results['valid'] = self.valid
 
 		return binwalk.core.module.Result(**results)
 
-	def _is_valid(self, data):
+	def tag_lookup(self, keyword):
+		for tag in self.TAGS:
+			if tag.keyword == keyword:
+				return tag
+		return None
+
+	def is_valid(self, data):
 		'''
 		Validates that result data does not contain smart keywords in file-supplied strings.
 
@@ -144,15 +130,15 @@ class SmartSignature:
 		quoted_data = get_quoted_strings(data)
 
 		# Check to see if there was any quoted data, and if so, if it contained the keyword starting delimiter
-		if quoted_data and self.KEYWORD_DELIM_START in quoted_data:
+		if quoted_data and Tag.TAG_DELIM_START in quoted_data:
 			# If so, check to see if the quoted data contains any of our keywords.
 			# If any keywords are found inside of quoted data, consider the keywords invalid.
-			for (name, keyword) in iterator(self.KEYWORDS):
-				if keyword in quoted_data:
+			for tag in self.TAGS:
+				if tag.tag in quoted_data:
 					return False
 		return True
 
-	def _safe_string(self, data):
+	def safe_string(self, data):
 		'''
 		Strips out quoted data (i.e., data taken directly from a file).
 		'''
@@ -161,28 +147,28 @@ class SmartSignature:
 			data = data.replace(quoted_string, "")
 		return data
 
-	def _one_of_many(self, data):
+	def one_of_many(self, data, tag):
 		'''
 		Determines if a given data string is one result of many.
 
 		@data - String result data.
 
-		Returns True if the string result is one of many.
-		Returns False if the string result is not one of many.
+		Returns False if the string result is one of many and should not be displayed.
+		Returns True if the string result is not one of many and should be displayed.
 		'''
 		if self.filter.valid_result(data):
 			if self.last_one_of_many is not None and data.startswith(self.last_one_of_many):
-				return True
+				return (data, False)
 		
-			if self.KEYWORDS['one-of-many'] in data:
-				# Only match on the data before the first comma, as that is typically unique and static
-				self.last_one_of_many = data.split(',')[0]
-			else:
-				self.last_one_of_many = None
+		if tag.tag in data:
+			# Only match on the data before the first comma, as that is typically unique and static
+			self.last_one_of_many = data.split(',')[0]
+		else:
+			self.last_one_of_many = None
 			
-		return False
+		return (data, True)
 
-	def _get_keyword_arg(self, data, keyword):
+	def get_keyword_arg(self, data, tag):
 		'''
 		Retrieves the argument for keywords that specify arguments.
 
@@ -193,14 +179,14 @@ class SmartSignature:
 		Returns a blank string on failure.
 		'''
 		arg = ''
-		data = self._safe_string(data)
+		data = self.safe_string(data)
 
-		if has_key(self.KEYWORDS, keyword) and self.KEYWORDS[keyword] in data:
-			arg = data.split(self.KEYWORDS[keyword])[1].split(self.KEYWORD_DELIM_END)[0]
+		if tag.tag in data:
+			arg = data.split(tag.tag)[1].split(tag.TAG_DELIM_END)[0]
 			
-		return arg
+		return (data, arg)
 
-	def _get_math_arg(self, data, keyword):
+	def get_math_arg(self, data, tag):
 		'''
 		Retrieves the argument for keywords that specifiy mathematical expressions as arguments.
 
@@ -211,37 +197,16 @@ class SmartSignature:
 		'''
 		value = 0
 
-		arg = self._get_keyword_arg(data, keyword)
+		(data, arg) = self.get_keyword_arg(data, tag)
 		if arg:
 			value = MathExpression(arg).value
 			if value is None:
 				value = 0
 				self.valid = False
 
-		return value
+		return (data, value)
 
-	def _jump(self, data):
-		'''
-		Obtains the jump-to-offset value of a signature, if any.
-
-		@data - String result data.
-
-		Returns the offset to jump to.
-		'''
-		offset = 0
-
-		offset_str = self._get_keyword_arg(data, 'jump')
-		if offset_str:
-			try:
-				offset = int(offset_str, 0)
-			except KeyboardInterrupt as e:
-				raise e
-			except Exception:
-				pass
-
-		return offset
-
-	def _replace_maths(self, data):
+	def parse_math(self, data, tag):
 		'''
 		Replace math keywords with the requested values.
 			
@@ -249,15 +214,15 @@ class SmartSignature:
 
 		Returns the modified string result data.
 		'''
-		while self.KEYWORDS['math'] in data:
-			arg = self._get_keyword_arg(data, 'math')
-			v = '%s%s%s' % (self.KEYWORDS['math'], arg, self.KEYWORD_DELIM_END)
-			math_value = "%d" % self._get_math_arg(data, 'math')
+		while tag.keyword in data:
+			(data, arg) = self.get_keyword_arg(data, tag.name)
+			v = '%s%s%s' % (tag.keyword, arg, self.TAG_DELIM_END)
+			math_value = "%d" % self.get_math_arg(data, tag.name)
 			data = data.replace(v, math_value)
 
-		return data
+		return (data, None)
 
-	def _parse_raw_strings(self, data):
+	def parse_raw_string(self, data, raw_str_tag):
 		'''
 		Process strings that aren't NULL byte terminated, but for which we know the string length.
 		This should be called prior to any other smart parsing functions.
@@ -266,25 +231,27 @@ class SmartSignature:
 
 		Returns a parsed string.
 		'''
-		if not self.ignore_smart_signatures and self._is_valid(data):
-			# Get the raw string  keyword arg
-			raw_string = self._get_keyword_arg(data, 'raw-string')
+		if not self.ignore_smart_signatures and self.is_valid(data):
+			raw_size_tag = self.tag_lookup('raw-size')
+			raw_replace_tag = self.tag_lookup('raw-replace')
 
-			# Was a raw string  keyword specified?
+			# Get the raw string  keyword arg
+			(data, raw_string) = self.get_keyword_arg(data, raw_str_tag)
+
+			# Was a raw string keyword specified?
 			if raw_string:
 				# Get the raw string length arg
-				raw_size = self._get_keyword_arg(data, 'raw-size')
+				(data, raw_size) = self.get_math_arg(data, raw_size_tag)
 	
-				# Is the raw string  length arg is a numeric value?
-				if re.match('^-?[0-9]+$', raw_size):
-					# Replace all instances of raw-replace in data with raw_string[:raw_size]
-					# Also strip out everything after the raw-string keyword, including the keyword itself.
-					# Failure to do so may (will) result in non-printable characters and this string will be 
-					# marked as invalid when it shouldn't be.
-					data = data[:data.find(self.KEYWORDS['raw-string'])].replace(self.KEYWORDS['raw-replace'], '"' + raw_string[:int(raw_size, 0)] + '"')
-		return data
+				# Replace all instances of raw-replace in data with raw_string[:raw_size]
+				# Also strip out everything after the raw-string keyword, including the keyword itself.
+				# Failure to do so may (will) result in non-printable characters and this string will be 
+				# marked as invalid when it shouldn't be.
+				data = data[:data.find(raw_str_tag.tag)].replace(raw_replace_tag.tag, '"' + raw_string[:raw_size] + '"')
+
+		return (data, True)
 		
-	def _parse_string_len(self, data):
+	def parse_string_len(self, data, str_len_tag):
 		'''
 		Process {string-len} macros. 
 
@@ -292,14 +259,16 @@ class SmartSignature:
 
 		Returns parsed data string.
 		'''
-		if not self.ignore_smart_signatures and self._is_valid(data):
+		if not self.ignore_smart_signatures and self.is_valid(data):
+
+			str_len_replace_tag = self.tag_lookup('string-len-replace')
 
 			# Get the raw string  keyword arg
-			raw_string = self._get_keyword_arg(data, 'string-len')
+			(data, raw_string) = self.get_keyword_arg(data, str_len_tag)
 
 			# Was a string-len  keyword specified?
 			if raw_string:
-				# Convert the string to an integer as a sanity check
+				# Get the string length
 				try:
 					string_length = '%d' % len(raw_string)
 				except KeyboardInterrupt as e:
@@ -309,10 +278,11 @@ class SmartSignature:
 
 				# Strip out *everything* after the string-len keyword, including the keyword itself.
 				# Failure to do so can potentially allow keyword injection from a maliciously created file.
-				data = data.split(self.KEYWORDS['string-len'])[0].replace(self.KEYWORDS['string-len-replace'], string_length)
-		return data
+				data = data.split(str_len_tag.tag)[0].replace(str_len_replace_tag.tag, string_length)
 
-	def _strip_tags(self, data):
+		return (data, True)
+
+	def strip_tags(self, data):
 		'''
 		Strips the smart tags from a result string.
 
@@ -321,10 +291,10 @@ class SmartSignature:
 		Returns a sanitized string.
 		'''
 		if not self.ignore_smart_signatures:
-			for (name, keyword) in iterator(self.KEYWORDS):
-				start = data.find(keyword)
+			for tag in self.TAGS:
+				start = data.find(tag.tag)
 				if start != -1:
-					end = data[start:].find(self.KEYWORD_DELIM_END)
+					end = data[start:].find(tag.TAG_DELIM_END)
 					if end != -1:
 						data = data.replace(data[start:start+end+1], "")
 		return data

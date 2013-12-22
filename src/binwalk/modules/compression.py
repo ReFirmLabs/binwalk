@@ -3,6 +3,7 @@
 import os
 import ctypes
 import ctypes.util
+from binwalk.core.compat import str2bytes
 from binwalk.core.module import Option, Kwarg, Module
 
 class Deflate(object):
@@ -46,7 +47,7 @@ class Deflate(object):
 	def decompress(self, data):
 		description = None
 
-		decomp_size = self.tinfl.is_deflated(data, len(data), 0)
+		decomp_size = self.tinfl.is_deflated(str2bytes(data), len(data), 0)
 		if decomp_size >= self.MIN_DECOMP_SIZE:
 			description = self.DESCRIPTION + ', uncompressed size >= %d' % decomp_size
 
