@@ -76,13 +76,13 @@ class SmartSignature:
 
 		# If smart signatures are disabled, or the result data is not valid (i.e., potentially malicious), 
 		# don't parse anything, just return the raw data as the description.
-		if self.ignore_smart_signatures or not self._is_valid(data):
+		if self.ignore_smart_signatures:
 			results['description'] = data
 		else:
 			# Calculate and replace special keywords/values
-			data = self._replace_maths(data)
 			data = self._parse_raw_strings(data)
 			data = self._parse_string_len(data)
+			data = self._replace_maths(data)
 
 			# Parse the offset-adjust value. This is used to adjust the reported offset at which 
 			# a signature was located due to the fact that MagicParser.match expects all signatures
@@ -152,6 +152,15 @@ class SmartSignature:
 					return False
 		return True
 
+	def _safe_string(self, data):
+		'''
+		Strips out quoted data (i.e., data taken directly from a file).
+		'''
+		quoted_string = get_quoted_strings(data)
+		if quoted_string:
+			data = data.replace(quoted_string, "")
+		return data
+
 	def _one_of_many(self, data):
 		'''
 		Determines if a given data string is one result of many.
@@ -184,6 +193,7 @@ class SmartSignature:
 		Returns a blank string on failure.
 		'''
 		arg = ''
+		data = self._safe_string(data)
 
 		if has_key(self.KEYWORDS, keyword) and self.KEYWORDS[keyword] in data:
 			arg = data.split(self.KEYWORDS[keyword])[1].split(self.KEYWORD_DELIM_END)[0]

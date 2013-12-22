@@ -115,10 +115,11 @@ class Signature(Module):
 			
 				# Pass the data to libmagic, and split out multiple results into a list
 				magic_result = self.magic.buffer(candidate_data)
+					
+				# The smart filter parser returns a binwalk.core.module.Result object
+				r = self.smart.parse(magic_result)
 
-				if self.config.filter.valid_result(magic_result):
-					# The smart filter parser returns a binwalk.core.module.Result object
-					r = self.smart.parse(magic_result)
+				if self.config.filter.valid_result(r.description):
 
 					# Set the absolute offset inside the target file
 					r.offset = block_start + candidate_offset + r.adjust

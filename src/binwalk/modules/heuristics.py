@@ -64,7 +64,7 @@ class ChiSquare(object):
 
 		return self.xc2
 
-class EntropicBlock(object):
+class EntropyBlock(object):
 
 	def __init__(self, **kwargs):
 		self.start = None
@@ -95,8 +95,6 @@ class HeuristicCompressionAnalyzer(Module):
 					   kwargs={'enabled' : True, 'do_plot' : False, 'display_results' : False, 'block_size' : ENTROPY_BLOCK_SIZE}),
 	]
 	
-	{'config' : 'Configuration', 'entropy' : 'Entropy'}
-
 	CLI = [
 			Option(short='H',
 				   long='heuristic',
@@ -129,7 +127,7 @@ class HeuristicCompressionAnalyzer(Module):
 				self.blocks[result.file.name] = []
 
 			if result.entropy >= self.trigger_level and (not self.blocks[result.file.name] or self.blocks[result.file.name][-1].end is not None):
-				self.blocks[result.file.name].append(EntropicBlock(start=result.offset + self.BLOCK_OFFSET))
+				self.blocks[result.file.name].append(EntropyBlock(start=result.offset + self.BLOCK_OFFSET))
 			elif result.entropy < self.trigger_level and self.blocks[result.file.name] and self.blocks[result.file.name][-1].end is None:
 				self.blocks[result.file.name][-1].end = result.offset - self.BLOCK_OFFSET
 
