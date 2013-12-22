@@ -8,7 +8,7 @@ import binwalk.core.settings
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg, show_help
 
-class Configuration(Module):
+class General(Module):
 
 	TITLE = "General"
 	ORDER = 0

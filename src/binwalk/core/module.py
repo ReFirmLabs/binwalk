@@ -136,33 +136,28 @@ class Module(object):
 	# A list of binwalk.core.module.ModuleKwargs accepted by __init__
 	KWARGS = []
 
-	# A dictionary of module dependencies; all modules depend on binwalk.modules.configuration.Configuration
-	#DEPENDS = {'config' : 'Configuration', 'extractor' : 'Extractor'}
+	# A dictionary of module dependencies; all modules depend on binwalk.modules.general.General
 	DEPENDS = [
-			Dependency(name='Configuration',
+			Dependency(name='General',
 					   attribute='config'),
 			Dependency(name='Extractor',
 					   attribute='extractor'),
 	]
 
 	# Format string for printing the header during a scan
-	#HEADER_FORMAT = "%s\n"
 	HEADER_FORMAT = "%-12s  %-12s    %s\n"
 
 	# Format string for printing each result during a scan 
-	#RESULT_FORMAT = "%.8d      %s\n"
 	RESULT_FORMAT = "%-12d  0x%-12X  %s\n"
 
 	# The header to print during a scan.
 	# Set to None to not print a header.
 	# Note that this will be formatted per the HEADER_FORMAT format string.
-	#HEADER = ["OFFSET      DESCRIPTION"]
 	HEADER = ["DECIMAL", "HEX", "DESCRIPTION"]
 
 	# The attribute names to print during a scan, as provided to the self.results method.
 	# Set to None to not print any results.
 	# Note that these will be formatted per the RESULT_FORMAT format string.
-	#RESULT = ['offset', 'description']
 	RESULT = ["offset", "offset", "description"]
 
 	VERBOSE_HEADER_FORMAT = ""

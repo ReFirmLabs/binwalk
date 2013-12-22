@@ -88,7 +88,7 @@ class HeuristicCompressionAnalyzer(Module):
 	TITLE = "Heuristic Compression"
 
 	DEPENDS = [
-			Dependency(name='Configuration',
+			Dependency(name='General',
 					   attribute='config'),
 			Dependency(name='Entropy',
 					   attribute='entropy',
