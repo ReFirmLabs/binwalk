@@ -204,13 +204,13 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
 	# Passing the entire remaining buffer to libmagic is resource intensive and will
 	# significantly slow the scan; this value represents a reasonable buffer size to
 	# pass to libmagic which will not drastically affect scan time.
-	MAX_TRAILING_SIZE = 8 * 1024
+	DEFAULT_BLOCK_PEEK_SIZE = 8 * 1024
 
 	# Max number of bytes to process at one time. This needs to be large enough to 
 	# limit disk I/O, but small enough to limit the size of processed data blocks.
-	READ_BLOCK_SIZE = 1 * 1024 * 1024
+	DEFAULT_BLOCK_READ_SIZE = 1 * 1024 * 1024
 
-	def __init__(self, fname, mode='r', length=0, offset=0, block=READ_BLOCK_SIZE, trail=MAX_TRAILING_SIZE, swap=0):
+	def __init__(self, fname, mode='r', length=0, offset=0, block=DEFAULT_BLOCK_READ_SIZE, peek=DEFAULT_BLOCK_PEEK_SIZE, swap=0):
 		'''
 		Class constructor.
 
@@ -219,17 +219,19 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
 		@length - Maximum number of bytes to read from the file via self.block_read().
 		@offset - Offset at which to start reading from the file.
 		@block  - Size of data block to read (excluding any trailing size),
-		@trail  - Size of trailing data to append to the end of each block.
+		@peek   - Size of trailing data to append to the end of each block.
 		@swap   - Swap every n bytes of data.
 
 		Returns None.
 		'''
 		self.total_read = 0
 		self.swap_size = swap
+		self.block_read_size = self.DEFAULT_BLOCK_READ_SIZE
+		self.block_peek_size = self.DEFAULT_BLOCK_PEEK_SIZE
 
 		# Python 2.6 doesn't like modes like 'rb' or 'wb'
 		mode = mode.replace('b', '')
-		
+
 		try:
 			self.size = file_size(fname)
 		except KeyboardInterrupt as e:
@@ -259,13 +261,13 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
 		elif self.length > self.size:
 			self.length = self.size
 
-		if block > 0:
-			self.READ_BLOCK_SIZE = block
-		self.base_block_size = self.READ_BLOCK_SIZE
+		if block is not None:
+			self.block_read_size = block
+		self.base_block_size = self.block_read_size
 			
-		if trail > 0:
-			self.MAX_TRAILING_SIZE = trail
-		self.base_trail_size = self.MAX_TRAILING_SIZE
+		if peek is not None:
+			self.block_peek_size = peek
+		self.base_peek_size = self.block_peek_size
 
 		super(self.__class__, self).__init__(fname, mode)
 
@@ -276,7 +278,6 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
 			self._name = fname
 
 		self.seek(self.offset)
-		print self.name, self.offset, self.length, self.total_read
 
 	def _swap_data_block(self, block):
 		'''
@@ -300,14 +301,14 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
 		return data
 
 	def reset(self):
-		self.set_block_size(block=self.base_trail_size, trail=self.base_trail_size)
+		self.set_block_size(block=self.base_block_size, peek=self.base_peek_size)
 		self.seek(self.offset)
 
-	def set_block_size(self, block=None, trail=None):
+	def set_block_size(self, block=None, peek=None):
 		if block is not None:
-			self.READ_BLOCK_SIZE = block
-		if trail is not None:
-			self.MAX_TRAILING_SIZE = trail
+			self.block_read_size = block
+		if peek is not None:
+			self.block_peek_size = peek
 
 	def write(self, data):
 		'''
@@ -357,13 +358,13 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
 
 		return self._swap_data_block(bytes2str(data))
 
-	def _internal_read(self, n=-1):
+	def peek(self, n=-1):
 		'''
-		Same as self.read, but doesn't increment self.total_read.
-		For use by self.read_block.
+		Peeks at data in file.
 		'''
+		pos = self.tell()
 		data = self.read(n)
-		self.total_read -= len(data)
+		self.seek(pos)
 		return data
 
 	def seek(self, n, whence=os.SEEK_SET):
@@ -382,32 +383,9 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
 
 		Returns a tuple of (str(file block data), block data length).
 		'''
-		dlen = 0
-		data = None
-		rsize = self.READ_BLOCK_SIZE + self.MAX_TRAILING_SIZE
-
-		# Do the read. Must use self._internal_read so that the total_read value is untouched (we update this ourselves later)
-		data = self._internal_read(rsize)
-
-		if data:
-
-			# Get the actual length of the read in data
-			dlen = len(data)
-				
-			# Calculate how far back we need to seek to pick up at the self.READ_BLOCK_SIZE offset
-			seek_offset = dlen - self.READ_BLOCK_SIZE
-			# If the actual read size was less than self.READ_BLOCK_SIZE seek backwards zero bytes
-			if seek_offset < 0:
-				seek_offset = 0
-
-			# Read in READ_BLOCK_SIZE plus MAX_TRAILING_SIZE bytes, but return a max dlen value
-			# Return a max dlen value of READ_BLOCK_SIZE. This ensures that there is a MAX_TRAILING_SIZE
-			# buffer at the end of the returned data in case a signature is found at or near data[READ_BLOCK_SIZE].
-			if dlen == rsize:
-				dlen = self.READ_BLOCK_SIZE
-
-			# Seek to the self.total_read offset so the next read can pick up where this one left off.
-			self.seek(self.tell() - seek_offset)
+		data = self.read(self.block_read_size)
+		dlen = len(data)
+		data += self.peek(self.block_peek_size)
 
 		return (data, dlen)
 

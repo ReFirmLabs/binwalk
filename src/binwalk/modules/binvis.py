@@ -165,7 +165,7 @@ class Plotter(Module):
 		self._print("Generating data points for %s" % fp.name)
 
 		# We don't need any extra data from BlockFile
-		fp.MAX_TRAILING_SIZE = 0
+		fp.set_block_size(peek=0)
 
 		while True:
 			(data, dlen) = fp.read_block()
@@ -247,7 +247,7 @@ class Plotter(Module):
 			ygrid.scale(12.8, 12.8, 12.8)
 			zgrid.scale(12.8, 12.8, 12.8)
 
-		for fd in self.config.target_files:
+		for fd in iter(self.next_file, None):
 			data_points = self._generate_data_points(fd)
 
 			self._print("Generating plot points from %d data points" % len(data_points))

@@ -33,7 +33,7 @@ class Plugin(object):
 			fp_out = BlockFile(out_name, 'w')
 			# Use self.module.config.open_file here to ensure that other config settings (such as byte-swapping) are honored
 			fp_in = self.module.config.open_file(fname, offset=0, length=0)
-			fp_in.MAX_TRAILING_SIZE = 0
+			fp_in.set_block_size(peek=0)
 			i = 0
 
 			while i < fp_in.length:

@@ -31,8 +31,8 @@ class Deflate(object):
 	def pre_scan(self, fp):
 		if self.tinfl:
 			# Make sure we'll be getting enough data for a good decompression test
-			if fp.MAX_TRAILING_SIZE < self.SIZE:
-				fp.MAX_TRAILING_SIZE = self.SIZE
+			if fp.block_read_size < self.SIZE:
+				fp.set_block_size(peek=self.SIZE)
 
 			self._deflate_scan(fp)
 
@@ -61,7 +61,7 @@ class RawCompression(Module):
 	TITLE = 'Raw Compression'
 
 	CLI = [
-			Option(short='T',
+			Option(short='X',
 				   long='deflate',
 				   kwargs={'enabled' : True, 'decompressor_class' : 'deflate'},
 				   description='Scan for raw deflate compression streams'),
@@ -78,7 +78,7 @@ class RawCompression(Module):
 	def run(self):
 		for fp in iter(self.next_file, None):
 
-			fp.set_block_size(trail=self.decompressor.BLOCK_SIZE)
+			fp.set_block_size(peek=self.decompressor.BLOCK_SIZE)
 
 			self.header()
 
@@ -90,9 +90,9 @@ class RawCompression(Module):
 				for i in range(0, dlen):
 					description = self.decompressor.decompress(data[i:i+self.decompressor.BLOCK_SIZE])
 					if description:
-						self.result(description=description, file=fp, offset=fp.offset+fp.tell()-dlen+i)
+						self.result(description=description, file=fp, offset=fp.tell()-dlen+i)
 
-				self.status.completed = fp.tell()
+				self.status.completed = fp.tell() - fp.offset
 
 			self.footer()
 

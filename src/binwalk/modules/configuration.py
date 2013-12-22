@@ -154,7 +154,7 @@ class Configuration(Module):
 		if len(self.target_files) > 1 and not self.verbose:
 			self.verbose = True
 
-	def open_file(self, fname, length=None, offset=None, swap=None, block=0, trail=0):
+	def open_file(self, fname, length=None, offset=None, swap=None, block=None, peek=None):
 		'''
 		Opens the specified file with all pertinent configuration settings.
 		'''
@@ -165,7 +165,7 @@ class Configuration(Module):
 		if swap is None:
 			swap = self.swap_size
 
-		return binwalk.core.common.BlockFile(fname, length=length, offset=offset, swap=swap, block=block, trail=trail)
+		return binwalk.core.common.BlockFile(fname, length=length, offset=offset, swap=swap, block=block, peek=peek)
 
 	def _open_target_files(self):
 		'''

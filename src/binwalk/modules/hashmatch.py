@@ -332,12 +332,12 @@ class HashMatch(Module):
 		'''
 		Main module method.
 		'''
-		needle = self.config.target_files[0].name
+		needle = self.next_file().name
 		haystack = []
 
 		self.header()
 				
-		for fp in self.config.target_files[1:]:
+		for fp in iter(self.next_file, None):
 			haystack.append(fp.name)
 
 		if os.path.isfile(needle):

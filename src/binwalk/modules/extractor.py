@@ -485,7 +485,7 @@ class Extractor(Module):
 			
 		try:
 			# Open the target file and seek to the offset
-			fdin = BlockFile(file_name, 'r', length=size, offset=offset)
+			fdin = self.config.open_file(file_name, length=size, offset=offset)
 			
 			# Open the output file
 			try:

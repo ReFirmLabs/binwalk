@@ -132,7 +132,7 @@ class HeuristicCompressionAnalyzer(Module):
 				self.blocks[result.file.name][-1].end = result.offset - self.BLOCK_OFFSET
 
 	def run(self):
-		for fp in self.config.target_files:
+		for fp in iter(self.next_file, None):
 			
 			if has_key(self.blocks, fp.name):
 

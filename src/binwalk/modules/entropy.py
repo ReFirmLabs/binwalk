@@ -86,7 +86,7 @@ class Entropy(Module):
 	def run(self):
 		from pyqtgraph.Qt import QtGui
 
-		for fp in self.config.target_files:
+		for fp in iter(self.next_file, None):
 
 			if self.display_results:
 				self.header()

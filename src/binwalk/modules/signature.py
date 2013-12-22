@@ -98,7 +98,7 @@ class Signature(Module):
 				break
 
 			current_block_offset = 0
-			block_start = fp.offset + fp.tell() - dlen
+			block_start = fp.tell() - dlen
 			self.status.completed = block_start - fp.offset
 
 			for candidate_offset in self.parser.find_signature_candidates(data, dlen):
@@ -111,7 +111,7 @@ class Signature(Module):
 					continue
 
 				# In python3 we need a bytes object to pass to magic.buffer
-				candidate_data = str2bytes(data[candidate_offset:candidate_offset+fp.MAX_TRAILING_SIZE])
+				candidate_data = str2bytes(data[candidate_offset:candidate_offset+fp.block_peek_size])
 			
 				# Pass the data to libmagic, and split out multiple results into a list
 				magic_result = self.magic.buffer(candidate_data)
