@@ -1,5 +1,8 @@
 import sys
 import csv as pycsv
+import datetime
+import binwalk.core.common
+from binwalk.core.compat import *
 
 class Display(object):
 
@@ -15,6 +18,8 @@ class Display(object):
 		self.fp = None
 		self.csv = None
 		self.num_columns = 0
+		self.custom_verbose_format = ""
+		self.custom_verbose_args = []
 
 		self._configure_formatting()
 
@@ -37,8 +42,33 @@ class Display(object):
 			else:
 				self.fp.write(fmt % tuple(columns))
 
-	def header(self, *args):
+	def add_custom_header(self, fmt, args):
+		self.custom_verbose_format = fmt
+		self.custom_verbose_args = args
+
+	def header(self, *args, **kwargs):
+		file_name = None
 		self.num_columns = len(args)
+
+		if has_key(kwargs, 'file_name'):
+			file_name = kwargs['file_name']
+
+		if self.verbose and file_name:
+			md5sum = binwalk.core.common.file_md5(file_name)
+			timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+			if self.csv:
+				self.log("", ["FILE", "MD5SUM", "TIMESTAMP"])
+				self.log("", [file_name, md5sum, timestamp])
+
+			self._fprint("%s", "\n", csv=False)
+			self._fprint("Scan Time:     %s\n", [timestamp], csv=False)
+			self._fprint("Target File:   %s\n", [file_name], csv=False)
+			self._fprint("MD5 Checksum:  %s\n", [md5sum], csv=False)
+			if self.custom_verbose_format and self.custom_verbose_args:
+				#self._pprint("Signatures:    %d\n" % self.binwalk.parser.signature_count, nolog=nolog)
+				self._fprint(self.custom_verbose_format, self.custom_verbose_args, csv=False)
+
 		self._fprint("%s", "\n", csv=False)
 		self._fprint(self.header_format, args)
 		self._fprint("%s", ["-" * self.HEADER_WIDTH + "\n"], csv=False)
@@ -59,14 +89,15 @@ class Display(object):
 	def footer(self):
 		self._fprint("%s", "\n", csv=False)
 
-	def _fprint(self, fmt, columns, csv=True):
-		if not self.quiet:
-			line = fmt % tuple(columns)
-			if filter and self.filter.valid_result(line):
+	def _fprint(self, fmt, columns, csv=True, stdout=True):
+		line = fmt % tuple(columns)
+		
+		if filter and self.filter.valid_result(line):
+			if not self.quiet and stdout:
 				sys.stdout.write(self._format_line(line.strip()) + "\n")
 
-		if self.fp and not (self.csv and not csv):
-			self.log(fmt, columns)
+			if self.fp and not (self.csv and not csv):
+				self.log(fmt, columns)
 
 	def _append_to_data_parts(self, data, start, end):
 		'''

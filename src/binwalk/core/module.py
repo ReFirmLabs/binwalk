@@ -165,6 +165,9 @@ class Module(object):
 	#RESULT = ['offset', 'description']
 	RESULT = ["offset", "offset", "description"]
 
+	VERBOSE_HEADER_FORMAT = ""
+	VERBOSE_HEADER_ARGS = []
+
 	# If set to True, the progress status will be automatically updated for each result
 	# containing a valid file attribute.
 	AUTO_UPDATE_STATUS = True
@@ -184,6 +187,7 @@ class Module(object):
 		self.target_file_list = []
 		self.status = None
 		self.enabled = False
+		self.current_target_file_name = None
 		self.name = self.__class__.__name__
 		self.plugins = binwalk.core.plugin.Plugins(self)
 
@@ -303,7 +307,12 @@ class Module(object):
 			fp = self.target_file_list.pop(0)
 			self.status.clear()
 			self.status.total = fp.length
-		
+
+		if fp is not None:
+			self.current_target_file_name = fp.name	
+		else:
+			self.current_target_file_name = None
+
 		return fp
 
 	def clear(self, results=True, errors=True):
@@ -382,10 +391,12 @@ class Module(object):
 
 	def header(self):
 		self.config.display.format_strings(self.HEADER_FORMAT, self.RESULT_FORMAT)
+		self.config.display.add_custom_header(self.VERBOSE_HEADER_FORMAT, self.VERBOSE_HEADER_ARGS)
+
 		if type(self.HEADER) == type([]):
-			self.config.display.header(*self.HEADER)
+			self.config.display.header(*self.HEADER, file_name=self.current_target_file_name)
 		elif self.HEADER:
-			self.config.display.header(self.HEADER)
+			self.config.display.header(self.HEADER, file_name=self.current_target_file_name)
 	
 	def footer(self):
 		self.config.display.footer()

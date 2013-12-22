@@ -45,6 +45,8 @@ class Signature(Module):
 
 	MAGIC_FLAGS = magic.MAGIC_NO_CHECK_TEXT | magic.MAGIC_NO_CHECK_ENCODING | magic.MAGIC_NO_CHECK_APPTYPE | magic.MAGIC_NO_CHECK_TOKENS
 
+	VERBOSE_HEADER_FORMAT = "%s    %d"
+
 	def init(self):
 		# Create SmartSignature and MagicParser class instances. These are mostly for internal use.
 		self.smart = binwalk.core.smart.SmartSignature(self.config.filter, ignore_smart_signatures=self.dumb_scan)
@@ -75,6 +77,8 @@ class Signature(Module):
 		
 		# Once the temporary magic files are loaded into libmagic, we don't need them anymore; delete the temp files
 		self.parser.rm_magic_files()
+
+		self.VERBOSE_HEADER_ARGS = ["Signatures:", self.parser.signature_count]
 
 	def validate(self, r):
 		'''

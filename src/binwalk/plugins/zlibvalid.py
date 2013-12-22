@@ -23,7 +23,8 @@ class Plugin(object):
 		# If this result is a zlib signature match, try to decompress the data
 		if self.tinfl and result.file and result.description.lower().startswith('zlib'):
 			# Seek to and read the suspected zlib data
-			fd = BlockFile(result.file.name, offset=result.offset, swap=self.module.config.swap_size)
+			fd = self.module.config.open_file(result.file.name, offset=result.offset)
+			#BlockFile(result.file.name, offset=result.offset, swap=self.module.config.swap_size)
 			data = fd.read(self.MAX_DATA_SIZE)
 			fd.close()
 

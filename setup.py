@@ -30,8 +30,11 @@ def cleanup_module_directory():
 					remove_tree(path + os.path.sep + "*")
 				except OSError as e:
 					pass
-		except ImportError:
+		except KeyboardInterrupt as e:
+			raise e
+		except Exception:
 			pass
+
 
 # Change to the binwalk src directory
 def warning(lines, terminate=True, prompt=True):
