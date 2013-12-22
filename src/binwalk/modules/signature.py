@@ -98,7 +98,7 @@ class Signature(Module):
 				break
 
 			current_block_offset = 0
-			block_start = fp.offset + fp.total_read - dlen
+			block_start = fp.offset + fp.tell() - dlen
 			self.status.completed = block_start - fp.offset
 
 			for candidate_offset in self.parser.find_signature_candidates(data, dlen):

@@ -543,8 +543,6 @@ class Modules(object):
 		# If the module is not being loaded as a dependency, add it to the loaded modules dictionary
 		if not dependency:
 			self.loaded_modules[module] = obj
-		if not kwargs and not has_key(self.default_dependency_modules, module):
-			self.default_dependency_modules[module] = obj
 
 		return obj
 			
@@ -572,18 +570,14 @@ class Modules(object):
 				if dependency.module == module:
 					continue
 
-				# Only honor custom kwargs from modules that are enabled, else madness ensues.
+				# Only load dependencies with custom kwargs from modules that are enabled, else madness ensues.
 				# Example: Heursitic module depends on entropy module, and sets entropy kwargs to contain 'enabled' : True.
 				#          Without this check, an entropy scan would always be run, even if -H or -E weren't specified!
-				if module_enabled:
-					kwargs = dependency.kwargs
-				else:
-					kwargs = {}
-				
-				if not kwargs and has_key(self.default_dependency_modules, dependency.module):
-					depobj = self.default_dependency_modules[dependency.module]
-				else:
-					depobj = self.run(dependency.module, dependency=True, kwargs=kwargs)
+				#
+				# Modules that are not enabled (e.g., extraction module) can load any dependency as long as they don't
+				# set any custom kwargs for those dependencies.
+				if module_enabled or not dependency.kwargs:
+					depobj = self.run(dependency.module, dependency=True, kwargs=dependency.kwargs)
 			
 				# If a dependency failed, consider this a non-recoverable error and raise an exception
 				if depobj.errors:

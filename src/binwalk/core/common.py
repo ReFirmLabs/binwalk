@@ -261,9 +261,11 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
 
 		if block > 0:
 			self.READ_BLOCK_SIZE = block
-	
+		self.base_block_size = self.READ_BLOCK_SIZE
+			
 		if trail > 0:
 			self.MAX_TRAILING_SIZE = trail
+		self.base_trail_size = self.MAX_TRAILING_SIZE
 
 		super(self.__class__, self).__init__(fname, mode)
 
@@ -297,7 +299,14 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
 		return data
 
 	def reset(self):
+		self.set_block_size(block=self.base_trail_size, trail=self.base_trail_size)
 		self.seek(self.offset)
+
+	def set_block_size(self, block=0, trail=0):
+		if block is not None:
+			self.READ_BLOCK_SIZE = block
+		if trail is not None:
+			self.MAX_TRAILING_SIZE = trail
 
 	def write(self, data):
 		'''
