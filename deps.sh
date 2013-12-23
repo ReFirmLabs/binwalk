@@ -35,37 +35,27 @@ function fmk
 	cd -
 }
 
-function libmagic
-{
-	SITE="ftp://ftp.astron.com/pub/file/"
-	VERSION="5.11"
-	OUTFILE="file-$VERSION.tar.gz"
-	URL="$SITE$OUTFILE"
-
-	echo "Downloading '$URL'..."
-	wget "$URL"
-
-	if [ -e "$OUTFILE" ]
-	then
-		echo "Installing libmagic / python-magic..."
-		tar -zxvf "$OUTFILE"
-		cd "file-$VERSION" && ./configure && make && $SUDO make install && cd python && $SUDO python ./setup.py install && cd ../..
-		$SUDO rm -rf "file-$VERSION" "$OUTFILE"
-	else
-		echo "ERROR: Failed to download '$URL'!"
-		echo "libmagic not installed."
-	fi
-}
-
-function libfuzzy
-{
-	VERSION="ssdeep-2.10"
-	cd ./C
-	tar -zxvf $VERSION.tar.gz && cd $VERSION && ./configure && make && $SUDO make install
-	cd ..
-	rm -rf $VERSION
-	cd ..
-}
+#function libmagic
+#{
+#	SITE="ftp://ftp.astron.com/pub/file/"
+#	VERSION="5.11"
+#	OUTFILE="file-$VERSION.tar.gz"
+#	URL="$SITE$OUTFILE"
+#
+#	echo "Downloading '$URL'..."
+#	wget "$URL"
+#
+#	if [ -e "$OUTFILE" ]
+#	then
+#		echo "Installing libmagic / python-magic..."
+#		tar -zxvf "$OUTFILE"
+#		cd "file-$VERSION" && ./configure && make && $SUDO make install && cd python && $SUDO python ./setup.py install && cd ../..
+#		$SUDO rm -rf "file-$VERSION" "$OUTFILE"
+#	else
+#		echo "ERROR: Failed to download '$URL'!"
+#		echo "libmagic not installed."
+#	fi
+#}
 
 function pyqtgraph
 {
@@ -186,27 +176,18 @@ case $DISTRO in
 		exit 1
 esac
 
-if [ "$(python -c 'import magic; print (magic.MAGIC_NO_CHECK_TEXT)' 2>/dev/null)" == "" ]
-then
-	echo "python-magic not installed, or wrong version; building from source..."
-	libmagic
-fi
+#if [ "$(python -c 'import magic; print (magic.MAGIC_NO_CHECK_TEXT)' 2>/dev/null)" == "" ]
+#then
+#	echo "python-magic not installed, or wrong version; building from source..."
+#	libmagic
+#fi
+
+# Get and build the firmware mod kit
+fmk
 
 if [ "$(python -c 'import pyqtgraph; print (pyqtgraph.__file__)' 2>/dev/null)" == "" ]
 then
 	echo "pyqtgraph not installed; building from source..."
 	pyqtgraph
 fi
-
-#if [ "$(python -c 'import ctypes.util; print (ctypes.util.find_library("fuzzy"))')" == "None" ]
-#then
-#	echo "libfuzzy not installed; building from source..."
-#	libfuzzy
-#fi
-
-# Get and build the firmware mod kit
-fmk
-
-# Install binwalk
-$SUDO python setup.py install
 

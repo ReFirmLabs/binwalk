@@ -1,0 +1,29 @@
+PYTHON="python"
+SRC_C_DIR="./src/C"
+
+.PHONY: all install build dependencies clean uninstall
+
+all: install
+
+install: build
+	make -c $(SRC_C_DIR) install
+	$(PYTHON) ./setup.py install
+
+build:
+	make -C $(SRC_C_DIR)
+	$(PYTHON) ./setup.py build
+
+dependencies:
+	./deps.sh
+
+clean:
+	make -C $(SRC_C_DIR) clean
+	$(PYTHON) ./setup.py clean
+
+distclean: clean
+	make -C $(SRC_C_DIR) distclean
+	rm -f Makefile
+
+uninstall:
+	make -C $(SRC_C_DIR) uninstall
+	$(PYTHON) ./setup.py uninstall

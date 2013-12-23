@@ -1,0 +1,3 @@
+#!/bin/sh
+
+cd ./src/C/ && ./configure && cd - && cp Makefile.in Makefile
