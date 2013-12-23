@@ -64,6 +64,9 @@ class Kwarg(object):
 			self.description = description
 
 class Dependency(object):
+	'''
+	A container class for declaring module dependencies.
+	'''
 
 	def __init__(self, attribute="", name="", kwargs={}):
 		self.attribute = attribute
@@ -89,6 +92,7 @@ class Result(object):
 		@display     - Set to True to display the result to the user, False to hide it.
 		@extract     - Set to True to flag this result for extraction.
 		@plot        - Set to Flase to exclude this result from entropy plots.
+		@name        - Name of the result found (None if not applicable or unknown).
 
 		Provide additional kwargs as necessary.
 		Returns None.
@@ -130,13 +134,15 @@ class Module(object):
 	# The module title, as displayed in help output
 	TITLE = ""
 
-	# A list of binwalk.core.module.ModuleOption command line options
+	# A list of binwalk.core.module.Option command line options
 	CLI = []
 
-	# A list of binwalk.core.module.ModuleKwargs accepted by __init__
+	# A list of binwalk.core.module.Kwargs accepted by __init__
 	KWARGS = []
 
-	# A dictionary of module dependencies; all modules depend on binwalk.modules.general.General
+	# A dictionary of module dependencies; all modules depend on the General and Extractor modules.
+	# Note that if overriding these default DEPENDS for a module, you MUST include these default
+	# dependencies, with the same attribute values.
 	DEPENDS = [
 			Dependency(name='General',
 					   attribute='config'),
@@ -144,27 +150,37 @@ class Module(object):
 					   attribute='extractor'),
 	]
 
-	# Format string for printing the header during a scan
+	# Format string for printing the header during a scan.
+	# Must be set prior to calling self.header.
 	HEADER_FORMAT = "%-12s  %-12s    %s\n"
 
-	# Format string for printing each result during a scan 
+	# Format string for printing each result during a scan. 
+	# Must be set prior to calling self.result.
 	RESULT_FORMAT = "%-12d  0x%-12X  %s\n"
+
+	# Format string for printing custom information in the verbose header output.
+	# Must be set prior to calling self.header.
+	VERBOSE_FORMAT = ""
 
 	# The header to print during a scan.
 	# Set to None to not print a header.
 	# Note that this will be formatted per the HEADER_FORMAT format string.
+	# Must be set prior to calling self.header.
 	HEADER = ["DECIMAL", "HEX", "DESCRIPTION"]
 
-	# The attribute names to print during a scan, as provided to the self.results method.
+	# The Result attribute names to print during a scan, as provided to the self.results method.
 	# Set to None to not print any results.
 	# Note that these will be formatted per the RESULT_FORMAT format string.
+	# Must be set prior to calling self.result.
 	RESULT = ["offset", "offset", "description"]
 
-	VERBOSE_HEADER_FORMAT = ""
-	VERBOSE_HEADER_ARGS = []
+	# The custom data to print in the verbose header output.
+	# Note that these will be formatted per the VERBOSE_FORMAT format string.
+	# Must be set prior to calling self.header.
+	VERBOSE = []
 
 	# If set to True, the progress status will be automatically updated for each result
-	# containing a valid file attribute.
+	# containing valid file and offset attributes.
 	AUTO_UPDATE_STATUS = True
 
 	# Modules with higher priorities are executed first
@@ -173,7 +189,7 @@ class Module(object):
 	# Modules with a higher order are displayed first in help output
 	ORDER = 5
 
-	# Set to False if this is not a primary module
+	# Set to False if this is not a primary module (e.g., General, Extractor modules)
 	PRIMARY = True
 
 	def __init__(self, **kwargs):
@@ -291,6 +307,7 @@ class Module(object):
 		'''
 		Gets the next file to be scanned (including pending extracted files, if applicable).
 		Also re/initializes self.status.
+		All modules should access the target file list through this method.
 		'''
 		fp = None
 
@@ -357,6 +374,7 @@ class Module(object):
 			if r.display:
 				display_args = self._build_display_args(r)
 				if display_args:
+					self.config.display.format_strings(self.HEADER_FORMAT, self.RESULT_FORMAT)
 					self.config.display.result(*display_args)
 
 		return r
@@ -386,7 +404,7 @@ class Module(object):
 
 	def header(self):
 		self.config.display.format_strings(self.HEADER_FORMAT, self.RESULT_FORMAT)
-		self.config.display.add_custom_header(self.VERBOSE_HEADER_FORMAT, self.VERBOSE_HEADER_ARGS)
+		self.config.display.add_custom_header(self.VERBOSE_FORMAT, self.VERBOSE)
 
 		if type(self.HEADER) == type([]):
 			self.config.display.header(*self.HEADER, file_name=self.current_target_file_name)
@@ -454,6 +472,10 @@ class Status(object):
 			setattr(self, k, v)
 
 class ModuleException(Exception):
+	'''
+	Module exception class.
+	Nothing special here except the name.
+	'''
 	pass
 
 class Modules(object):
@@ -518,6 +540,11 @@ class Modules(object):
 		return sorted(modules, key=modules.get, reverse=True)
 
 	def help(self):
+		'''
+		Generates formatted help output.
+
+		Returns the help string.
+		'''
 		modules = {}
 		help_string = "\nBinwalk v%s\nCraig Heffner, http://www.binwalk.org\n" % binwalk.core.settings.Settings.VERSION
 
@@ -550,6 +577,11 @@ class Modules(object):
 		return help_string + "\n"
 
 	def execute(self, *args, **kwargs):
+		'''
+		Executes all appropriate modules according to the options specified in args/kwargs.
+
+		Returns a list of executed module objects.
+		'''
 		run_modules = []
 		orig_arguments = self.arguments
 
@@ -571,6 +603,9 @@ class Modules(object):
 		return run_modules
 
 	def run(self, module, dependency=False, kwargs={}):
+		'''
+		Runs a specific module.
+		'''
 		obj = self.load(module, kwargs)
 
 		if isinstance(obj, binwalk.core.module.Module) and obj.enabled:
@@ -700,29 +735,29 @@ class Modules(object):
 
 		return kwargs
 	
-	def kwargs(self, module, kwargs):
+	def kwargs(self, obj, kwargs):
 		'''
 		Processes a module's kwargs. All modules should use this for kwarg processing.
 
-		@module - An instance of the module (e.g., self)
+		@obj    - An instance of the module (e.g., self)
 		@kwargs - The kwargs passed to the module
 
 		Returns None.
 		'''
-		if hasattr(module, "KWARGS"):
-			for module_argument in module.KWARGS:
+		if hasattr(obj, "KWARGS"):
+			for module_argument in obj.KWARGS:
 				if has_key(kwargs, module_argument.name):
 					arg_value = kwargs[module_argument.name]
 				else:
 					arg_value = module_argument.default
 
-				setattr(module, module_argument.name, arg_value)
+				setattr(obj, module_argument.name, arg_value)
 
 			for (k, v) in iterator(kwargs):
-				if not hasattr(module, k):
-					setattr(module, k, v)
+				if not hasattr(obj, k):
+					setattr(obj, k, v)
 		else:
-			raise Exception("binwalk.core.module.Modules.process_kwargs: %s has no attribute 'KWARGS'" % str(module))
+			raise Exception("binwalk.core.module.Modules.process_kwargs: %s has no attribute 'KWARGS'" % str(obj))
 
 
 def process_kwargs(obj, kwargs):

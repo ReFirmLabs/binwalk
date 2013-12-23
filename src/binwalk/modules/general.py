@@ -184,7 +184,3 @@ class General(Module):
 				except Exception as e:
 					self.error(description="Cannot open file : %s" % str(e))
 		
-		# If no files could be opened, quit permaturely
-		#if len(self.target_files) == 0:
-		#	raise Exception("Failed to open any files for scanning")
-
