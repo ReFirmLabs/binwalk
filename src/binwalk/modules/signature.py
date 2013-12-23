@@ -1,7 +1,6 @@
-import magic
-import binwalk.core.parser
+import binwalk.core.magic
 import binwalk.core.smart
-from binwalk.core.compat import *
+import binwalk.core.parser
 from binwalk.core.module import Module, Option, Kwarg
 
 class Signature(Module):
@@ -43,8 +42,6 @@ class Signature(Module):
 			Kwarg(name='magic_files', default=[]),
 	]
 
-	MAGIC_FLAGS = magic.MAGIC_NO_CHECK_TEXT | magic.MAGIC_NO_CHECK_ENCODING | magic.MAGIC_NO_CHECK_APPTYPE | magic.MAGIC_NO_CHECK_TOKENS
-
 	VERBOSE_FORMAT = "%s    %d"
 
 	def init(self):
@@ -72,8 +69,7 @@ class Signature(Module):
 
 		# Parse the magic file(s) and initialize libmagic
 		self.mfile = self.parser.parse(self.magic_files)
-		self.magic = magic.open(self.MAGIC_FLAGS)
-		self.magic.load(str2bytes(self.mfile))
+		self.magic = binwalk.core.magic.Magic(self.mfile)
 		
 		# Once the temporary magic files are loaded into libmagic, we don't need them anymore; delete the temp files
 		self.parser.rm_magic_files()
@@ -114,11 +110,8 @@ class Signature(Module):
 				if candidate_offset < current_block_offset:
 					continue
 
-				# In python3 we need a bytes object to pass to magic.buffer
-				candidate_data = str2bytes(data[candidate_offset:candidate_offset+fp.block_peek_size])
-			
 				# Pass the data to libmagic for parsing
-				magic_result = self.magic.buffer(candidate_data)
+				magic_result = self.magic.buffer(data[candidate_offset:candidate_offset+fp.block_peek_size])
 				if not magic_result:
 					continue
 				
