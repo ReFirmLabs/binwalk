@@ -1,9 +1,8 @@
 import os
 import re
-import magic
-import fnmatch
 import ctypes
-import ctypes.util
+import fnmatch
+import binwalk.core.C
 import binwalk.core.common
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg
@@ -69,14 +68,18 @@ class HashMatch(Module):
 		Kwarg(name='name', default=False),
 		Kwarg(name='max_results', default=None),
 		Kwarg(name='abspath', default=False),
-		Kwarg(name='matches', default={}),
-		Kwarg(name='types', default={}),
 		Kwarg(name='filter_by_name', default=False),
 		Kwarg(name='symlinks', default=False),
+		Kwarg(name='enabled', default=False),
 	]
 
 	# Requires libfuzzy.so
 	LIBRARY_NAME = "fuzzy"
+	LIBRARY_FUNCTIONS = [
+			binwalk.core.C.Function(name="fuzzy_hash_buf", type=int),
+			binwalk.core.C.Function(name="fuzzy_hash_filename", type=int),
+			binwalk.core.C.Function(name="fuzzy_compare", type=int),
+	]
 
 	# Max result is 148 (http://ssdeep.sourceforge.net/api/html/fuzzy_8h.html)
 	FUZZY_MAX_RESULT = 150
@@ -93,14 +96,7 @@ class HashMatch(Module):
 		self.last_file1 = HashResult(None)
 		self.last_file2 = HashResult(None)
 
-		self.magic = magic.open(0)
-		self.magic.load()
-
-		self.lib = ctypes.cdll.LoadLibrary(ctypes.util.find_library(self.LIBRARY_NAME))
-
-		for k in get_keys(self.types):
-			for i in range(0, len(self.types[k])):
-				self.types[k][i] = re.compile(self.types[k][i])
+		self.lib = binwalk.core.C.Library(self.LIBRARY_NAME, self.LIBRARY_FUNCTIONS)
 
 	def _get_strings(self, fname):
 		return ''.join(list(binwalk.core.common.strings(fname, minimum=10)))
@@ -159,23 +155,23 @@ class HashMatch(Module):
 							if file1_dup:
 								hash1 = self.last_file1.hash
 							else:
-								status |= self.lib.fuzzy_hash_buf(str2bytes(file1_strings), len(file1_strings), hash1)
+								status |= self.lib.fuzzy_hash_buf(file1_strings, len(file1_strings), hash1)
 
 							if file2_dup:
 								hash2 = self.last_file2.hash
 							else:
-								status |= self.lib.fuzzy_hash_buf(str2bytes(file2_strings), len(file2_strings), hash2)
+								status |= self.lib.fuzzy_hash_buf(file2_strings, len(file2_strings), hash2)
 						
 					else:
 						if file1_dup:
 							hash1 = self.last_file1.hash
 						else:
-							status |= self.lib.fuzzy_hash_filename(str2bytes(file1), hash1)
+							status |= self.lib.fuzzy_hash_filename(file1, hash1)
 							
 						if file2_dup:
 							hash2 = self.last_file2.hash
 						else:
-							status |= self.lib.fuzzy_hash_filename(str2bytes(file2), hash2)
+							status |= self.lib.fuzzy_hash_filename(file2, hash2)
 				
 					if status == 0:
 						if not file1_dup:
@@ -201,7 +197,7 @@ class HashMatch(Module):
 
 	def _get_file_list(self, directory):
 		'''
-		Generates a directory tree, including/excluding files as specified in self.matches and self.types.
+		Generates a directory tree.
 
 		@directory - The root directory to start from.
 
@@ -219,38 +215,7 @@ class HashMatch(Module):
 			# Get a list of files, with or without symlinks as specified during __init__
 			files = [os.path.join(root, f) for f in files if self.symlinks or not os.path.islink(f)]
 
-			# If no filters were specified, return all files
-			if not self.types and not self.matches:
-				file_list += files
-			else:
-				# Filter based on the file type, as reported by libmagic
-				if self.types:
-					for f in files:
-						for (include, regex_list) in iterator(self.types):
-							for regex in regex_list:
-								try:
-									magic_result = self.magic.file(os.path.join(directory, f)).lower()
-								except Exception as e:
-									magic_result = ''
-
-								match = regex.match(magic_result)
-
-								# If this matched an include filter, or didn't match an exclude filter
-								if (match and include) or (not match and not include):
-									file_list.append(f)
-
-				# Filter based on file name
-				if self.matches:
-					for (include, file_filter_list) in iterator(self.matches):
-						for file_filter in file_filter_list:
-							matching_files = fnmatch.filter(files, file_filter)
-	
-							# If this is an include filter, add all matching files to the list
-							if include:
-								file_list += matching_files
-							# Else, this add all files except those that matched to the list
-							else:
-								file_list += list(set(files) - set(matching_files))
+			file_list += files
 			
 		return set(file_list)
 

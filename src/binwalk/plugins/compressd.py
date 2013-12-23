@@ -1,5 +1,4 @@
-import ctypes
-import ctypes.util
+import binwalk.core.C
 from binwalk.core.common import *
 
 class Plugin(object):
@@ -9,23 +8,26 @@ class Plugin(object):
 
 	READ_SIZE = 64
 
+	COMPRESS42 = "compress42"
+	COMPRESS42_FUNCTIONS = [
+		binwalk.core.C.Function(name="is_compressed", type=bool),
+	]
+
 	def __init__(self, module):
 		self.fd = None
 		self.comp = None
 
 		if module.name == 'Signature':
-			self.comp = ctypes.cdll.LoadLibrary(ctypes.util.find_library("compress42"))
+			self.comp = binwalk.core.C.Library(self.COMPRESS42, self.COMPRESS42_FUNCTIONS)
 
 	def scan(self, result):
 		if self.comp:
 			if result.file and result.description.lower().startswith("compress'd data"):
-				fd = BlockFile(result.file.name, "r")
-				fd.seek(result.offset)
-
+				fd = BlockFile(result.file.name, "r", offset=result.offset, length=self.READ_SIZE)
 				compressed_data = fd.read(self.READ_SIZE)
+				fd.close()
                         
 				if not self.comp.is_compressed(compressed_data, len(compressed_data)):
 					result.valid = False
 
-				fd.close()
 

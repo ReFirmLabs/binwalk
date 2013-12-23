@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
 import os
-import ctypes
-import ctypes.util
-from binwalk.core.compat import str2bytes
+import binwalk.core.C
 from binwalk.core.module import Option, Kwarg, Module
 
 class Deflate(object):
@@ -17,37 +15,31 @@ class Deflate(object):
 	MIN_DECOMP_SIZE = 32*1024
 	DESCRIPTION = "Raw deflate compression stream"
 
+	TINFL_NAME = "tinfl"
+
+	TINFL_FUNCTIONS = [
+			binwalk.core.C.Function(name="is_deflated", type=int),
+			binwalk.core.C.Function(name="inflate_raw_file", type=None),
+	]
+
 	def __init__(self, module):
 		self.module = module
 
 		# The tinfl library is built and installed with binwalk
-		self.tinfl = ctypes.cdll.LoadLibrary(ctypes.util.find_library("tinfl"))
-		if not self.tinfl:
-			raise Exception("Failed to load the tinfl library")
+		self.tinfl = binwalk.core.C.Library(self.TINFL_NAME, self.TINFL_FUNCTIONS)
 		
 		# Add an extraction rule
 		if self.module.extractor.enabled:
 			self.module.extractor.add_rule(regex='^%s' % self.DESCRIPTION.lower(), extension="deflate", cmd=self._extractor)
 
-	def pre_scan(self, fp):
-		if self.tinfl:
-			# Make sure we'll be getting enough data for a good decompression test
-			if fp.block_read_size < self.SIZE:
-				fp.set_block_size(peek=self.SIZE)
-
-			self._deflate_scan(fp)
-
-			return PLUGIN_TERMINATE
-
 	def _extractor(self, file_name):
-		if self.tinfl:
-			out_file = os.path.splitext(file_name)[0]
-			self.tinfl.inflate_raw_file(file_name, out_file)
+		out_file = os.path.splitext(file_name)[0]
+		self.tinfl.inflate_raw_file(file_name, out_file)
 
 	def decompress(self, data):
 		description = None
 
-		decomp_size = self.tinfl.is_deflated(str2bytes(data), len(data), 0)
+		decomp_size = self.tinfl.is_deflated(data, len(data), 0)
 		if decomp_size >= self.MIN_DECOMP_SIZE:
 			description = self.DESCRIPTION + ', uncompressed size >= %d' % decomp_size
 
