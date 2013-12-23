@@ -7,7 +7,7 @@ export exec_prefix=@exec_prefix@
 export LIBDIR=@libdir@
 export INSTALL_OPTIONS=@INSTALL_OPTIONS@
 
-.PHONY: all install clean distclean
+.PHONY: all install clean distclean uninstall
 
 all:
 	make -C miniz
@@ -29,3 +29,8 @@ distclean:
 	make -C compress distclean
 	make -C fuzzy distclean
 	rm -rf *.cache config.* Makefile
+
+uninstall:
+	make -C miniz uninstall
+	make -C compress uninstall
+	make -C fuzzy uninstall

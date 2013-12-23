@@ -122,7 +122,7 @@ if "install" in sys.argv:
 	print("checking pre-requisites")
 	try:
 		import pyqtgraph
-		import QtPyWhatever
+		from pyqtgraph.Qt import QtCore, QtGui, QtOpenGL
 	except ImportError as e:
 		msg = ["Pre-requisite check warning: " + str(e),
 			   "To take advantage of this %s's graphing capabilities, please install this module." % MODULE_NAME,

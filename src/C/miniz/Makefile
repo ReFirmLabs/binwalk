@@ -11,6 +11,9 @@ tinfl.o:
 install:
 	install $(INSTALL_OPTIONS) $(LIBNAME) $(DESTDIR)$(LIBDIR)/$(LIBNAME)
 
+uninstall:
+	rm -rf $(DESTDIR)$(LIBDIR)/$(LIBNAME)
+
 .PHONY: clean distclean
 
 clean:

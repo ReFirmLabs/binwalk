@@ -66,3 +66,12 @@ and placed in the /opt/firmware-mod-kit directory:
 	$ git clone https://code.google.com/p/firmware-mod-kit /opt/firmware-mod-kit/
 	$ cd /opt/firmware-mod-kit/src && ./configure && make
 
+
+
+UNINSTALL
+----------------------------------
+
+The following command will remove all installed libraries and modules (except for the extraction/optional dependencies):
+
+	$ sudo make uninstall
+
