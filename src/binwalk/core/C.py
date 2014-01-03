@@ -22,8 +22,8 @@ class FunctionHandler(object):
 	'''
 	PY2CTYPES = {
 			bytes	: ctypes.c_char_p,
-			str		: ctypes.c_char_p,
-			int		: ctypes.c_int,
+			str	: ctypes.c_char_p,
+			int	: ctypes.c_int,
 			float	: ctypes.c_float,
 			bool	: ctypes.c_int,
 			None	: ctypes.c_int,
@@ -106,12 +106,14 @@ class Library(object):
 		'''
 		lib_path = None
 		system_paths = {
-			'linux'  : ['/usr/local/lib/lib%s.so' % library],
-			'darwin' : ['/opt/local/lib/lib%s.dylib' % library,
+			'linux'   : ['/usr/local/lib/lib%s.so' % library],
+			'linux2'  : ['/usr/local/lib/lib%s.so' % library],
+			'linux3'  : ['/usr/local/lib/lib%s.so' % library],
+			'darwin'  : ['/opt/local/lib/lib%s.dylib' % library,
 						'/usr/local/lib/lib%s.dylib' % library,
 					   ] + glob.glob('/usr/local/Cellar/lib%s/*/lib/lib%s.dylib' % (library, library)),
 
-			'win32'  : ['%s.dll' % library]
+			'win32'   : ['%s.dll' % library]
 		}
 
 		lib_path = ctypes.util.find_library(library)
