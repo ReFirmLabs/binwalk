@@ -455,3 +455,11 @@
 0       string	Cobalt\ Networks\ Inc.\nFirmware\ v	Paged Sun/COBALT boot rom,
 >38     string	x        				version: "%.4s"
 
+# Simple eCos string signatures
+0		string	ecos					eCos RTOS string reference:
+>0		string	x						"%s"
+0		string	eCos					eCos RTOS string reference:
+>0		string	x						"%s"
+0		string	ECOS					eCos RTOS string reference:
+>0		string	x						"%s"
+
