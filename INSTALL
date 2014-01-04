@@ -1,7 +1,8 @@
 BEFORE YOU START
 ----------------------------------
 
-Binwalk supports Python 2.7 - 3.x.
+Binwalk supports Python 2.7 - 3.x. Although binwalk is slightly faster in Python 3, the Python OpenGL bindings
+are still experimental for Python 3, so Python 2.7 is recommended.
 
 The following installation procedures assume that you are installing binwalk to be run using Python 2.7.
 If you want to use binwalk in Python 3, some package names and installation procedures may differ slightly.
@@ -16,33 +17,46 @@ INSTALLATION
 Installation follows the typical configure/make process:
 
 	$ ./configure
+	$ make deps          # Skip this if you don't want extraction utilities and dependencies auto-installed
 	$ make
 	$ sudo make install
 
 You can also install optional dependencies and extraction utilities (works on most Debian/RedHat based systems):
 
-	$ make dependencies
+	$ make deps
 
-Or see below for manaully installing optional dependencies / extraction utilities.
+Note that 'make deps' should work on most Debian/RedHat based systems. If this does not work for your system, 
+see below for manaully installing dependencies / extraction utilities.
 
 
 
-INSTALLING OPTIONAL DEPENDENCIES
+INSTALLING DEPENDENCIES
 ----------------------------------
 
-Binwalk has one (optional) dependency, used for generating graphs and plots:
+Most binwalk features will work out of the box without any additional dependencies. However, to take full advantage
+of binwalk's capabilities, you need to install:
 
 	o pyqtgraph
+	o libfuzzy
 
 You'll need to install the dependencies for pyqtgraph (you may also need to install OpenGL drivers for your video card):
 	
-	$ sudo apt-get install python-opengl python-qt4 python-qt4-gl python-numpy python-scipy
+	$ sudo apt-get install libqt4-opengl python-opengl python-qt4 python-qt4-gl python-numpy python-scipy
 
-Most distros don't have pyqtgraph in their default repositories, so it's best to build it from source:
+Most distros don't have pyqtgraph in their default repositories, so it's best to install it from source:
 
 	$ wget http://www.pyqtgraph.org/downloads/pyqtgraph-0.9.8.tar.gz
 	$ tar -zxvf pyqtgraph-0.9.8.tar.gz
 	$ cd pyqtgraph-0.9.8 && sudo ./setup.py install
+
+For most Debian based distros, libfuzzy can be installed via apt-get:
+
+	$ sudo apt-get install libfuzzy2
+
+To install libfuzzy from source, download the gzipped tarball from http://ssdeep.sourceforge.net/#download, then run:
+
+	$ tar -zxvf ssdeep-2.10.tar.gz
+	$ cd ssdeep-2.10 && ./configure && make && sudo make install
 
 
 
@@ -71,7 +85,7 @@ and placed in the /opt/firmware-mod-kit directory:
 UNINSTALL
 ----------------------------------
 
-The following command will remove all installed libraries and modules (except for the extraction/optional dependencies):
+The following command will remove binwalk from your system (note that this does *not* include dependencies installed via 'make deps'):
 
 	$ sudo make uninstall
 
