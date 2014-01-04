@@ -298,6 +298,14 @@
 >48	lelong		x		image size: %d,
 >64	string		x		firmware version: "%s"
 
+# Simple VxWorks reference strings
+0	string		VxWorks		VxWorks string referece:
+>0	string		x			"%s"
+0	string		vxworks		VxWorks string referece:
+>0	string		x			"%s"
+0	string		VXWORKS		VxWorks string referece:
+>0	string		x			"%s"
+
 # Firmware header used by some TV's
 0	string		FNIB		ZBOOT firmware header, header size: 32 bytes,
 >8	lelong		x		load address: 0x%.8X,

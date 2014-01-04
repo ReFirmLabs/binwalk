@@ -166,7 +166,7 @@ class Module(object):
 	# Set to None to not print a header.
 	# Note that this will be formatted per the HEADER_FORMAT format string.
 	# Must be set prior to calling self.header.
-	HEADER = ["DECIMAL", "HEX", "DESCRIPTION"]
+	HEADER = ["DECIMAL", "HEXADECIMAL", "DESCRIPTION"]
 
 	# The Result attribute names to print during a scan, as provided to the self.results method.
 	# Set to None to not print any results.
