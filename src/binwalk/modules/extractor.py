@@ -41,6 +41,11 @@ class Extractor(Module):
 				   long='matryoshka',
 				   kwargs={'matryoshka' : 8},
 				   description='Recursively scan extracted files'),
+			Option(short='d',
+				   long='depth',
+				   type=int,
+				   kwargs={'matryoshka' : 0},
+				   description='Limit extraction recursion depth (default: 8 levels deep)'),
 			Option(short='j',
 				   long='max-size',
 				   type=int,
@@ -276,7 +281,7 @@ class Extractor(Module):
 		'''
 		# If we have not already created an output directory for this target file, create one now
 		if not has_key(self.extraction_directories, path):
-			output_directory = unique_file_name('_' + os.path.basename(path), extension='extracted')
+			output_directory = os.path.join(os.path.dirname(path), unique_file_name('_' + os.path.basename(path), extension='extracted'))
 
 			if not os.path.exists(output_directory):
 				os.mkdir(output_directory)
