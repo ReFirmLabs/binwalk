@@ -45,7 +45,7 @@ class Extractor(Module):
 				   long='depth',
 				   type=int,
 				   kwargs={'matryoshka' : 0},
-				   description='Limit extraction recursion depth (default: 8 levels deep)'),
+				   description='Limit matryoshka recursion depth (default: 8 levels deep)'),
 			Option(short='j',
 				   long='max-size',
 				   type=int,
