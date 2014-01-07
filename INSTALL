@@ -36,8 +36,32 @@ INSTALLING DEPENDENCIES
 Most binwalk features will work out of the box without any additional dependencies. However, to take full advantage
 of binwalk's capabilities, you need to install:
 
-	o pyqtgraph
+	o libmagic
 	o libfuzzy
+	o pyqtgraph
+
+
+Most Unix systems will already have libmagic installed (it is used by the Unix 'file' utility). If not, you can install
+it via your system's package manager:
+
+	$ sudo apt-get install libmagic1
+
+Or install it from source:
+
+	$ wget ftp://ftp.astron.com/pub/file/file-5.14.tar.gz
+	$ tar -zxvf file-5.14.tar.gz
+	$ cd file-5.14 && ./configure && make && sudo make install
+
+
+For most Debian based distros, libfuzzy can be installed via apt-get:
+
+	$ sudo apt-get install libfuzzy2
+
+To install libfuzzy from source, download the gzipped tarball from http://ssdeep.sourceforge.net/#download, then run:
+
+	$ tar -zxvf ssdeep-2.10.tar.gz
+	$ cd ssdeep-2.10 && ./configure && make && sudo make install
+
 
 You'll need to install the dependencies for pyqtgraph (you may also need to install OpenGL drivers for your video card):
 	
@@ -48,15 +72,6 @@ Most distros don't have pyqtgraph in their default repositories, so it's best to
 	$ wget http://www.pyqtgraph.org/downloads/pyqtgraph-0.9.8.tar.gz
 	$ tar -zxvf pyqtgraph-0.9.8.tar.gz
 	$ cd pyqtgraph-0.9.8 && sudo ./setup.py install
-
-For most Debian based distros, libfuzzy can be installed via apt-get:
-
-	$ sudo apt-get install libfuzzy2
-
-To install libfuzzy from source, download the gzipped tarball from http://ssdeep.sourceforge.net/#download, then run:
-
-	$ tar -zxvf ssdeep-2.10.tar.gz
-	$ cd ssdeep-2.10 && ./configure && make && sudo make install
 
 
 
