@@ -226,11 +226,11 @@ class Signature(object):
 
         Returns the modified string result data.
         '''
-        while tag.keyword in data:
-            (data, arg) = self.get_keyword_arg(data, tag.name)
-            v = '%s%s%s' % (tag.keyword, arg, self.TAG_DELIM_END)
-            math_value = "%d" % self.get_math_arg(data, tag.name)
-            data = data.replace(v, math_value)
+        while tag.tag in self.safe_string(data):
+            (data, arg) = self.get_keyword_arg(data, tag)
+            v = '%s%s%s' % (tag.tag, arg, tag.TAG_DELIM_END)
+            (data, math_value) = self.get_math_arg(data, tag)
+            data = data.replace(v, "%d" % math_value)
 
         return (data, None)
 
