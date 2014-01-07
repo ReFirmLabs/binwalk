@@ -4920,12 +4920,12 @@
 # snaplen, or other information from the first SHB may be misleading.
 #
 0	string		\x0a\x0d\x0d\x0a\x1a\x2b\x3c\x4d	Pcap-ng capture file, big-endian,
->>12    beshort         x               			version %d
->>14    beshort         x               			\b.%d
+>12    beshort         x               			version %d
+>14    beshort         x               			\b.%d
 
 0	string		\x0a\x0d\x0d\x0a\x4d\x3c\x2b\x1a	Pcap-ng capture file, little-endian,
->>12    leshort         x               			version %d
->>14    leshort         x               			\b.%d
+>12    leshort         x               			version %d
+>14    leshort         x               			\b.%d
 
 #
 # "libpcap" capture files.

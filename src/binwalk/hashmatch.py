@@ -83,7 +83,10 @@ class HashMatch(object):
 		self.magic = magic.open(0)
 		self.magic.load()
 
-		self.lib = ctypes.cdll.LoadLibrary(ctypes.util.find_library(self.LIBRARY_NAME))
+		lib_path = ctypes.util.find_library(self.LIBRARY_NAME)
+		if lib_path is None:
+			raise Exception('Could not find the hash matching library. Please install libfuzzy from ssdeep.')
+		self.lib = ctypes.cdll.LoadLibrary(lib_path)
 
 		if self.cutoff is None:
 			self.cutoff = self.DEFAULT_CUTOFF
