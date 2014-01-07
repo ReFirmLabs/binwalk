@@ -140,15 +140,17 @@ class Module(object):
 	# A list of binwalk.core.module.Kwargs accepted by __init__
 	KWARGS = []
 
-	# A dictionary of module dependencies; all modules depend on the General and Extractor modules.
-	# Note that if overriding these default DEPENDS for a module, you MUST include these default
-	# dependencies, with the same attribute values.
-	DEPENDS = [
+	# A list of default dependencies for all modules; do not override this unless you
+	# understand the consequences of doing so.
+	DEFAULT_DEPENDS = [
 			Dependency(name='General',
 					   attribute='config'),
 			Dependency(name='Extractor',
 					   attribute='extractor'),
 	]
+	
+	# A list of dependencies that can be filled in as needed by each individual module.
+	DEPENDS = []
 
 	# Format string for printing the header during a scan.
 	# Must be set prior to calling self.header.
@@ -195,12 +197,14 @@ class Module(object):
 	def __init__(self, **kwargs):
 		self.errors = []
 		self.results = []
+
 		self.target_file_list = []
 		self.status = None
 		self.enabled = False
 		self.current_target_file_name = None
 		self.name = self.__class__.__name__
 		self.plugins = binwalk.core.plugin.Plugins(self)
+		self.dependencies = self.DEFAULT_DEPENDS + self.DEPENDS
 
 		process_kwargs(self, kwargs)
 		
@@ -357,7 +361,7 @@ class Module(object):
 		self.validate(r)
 		self._plugins_result(r)
 
-		for dependency in self.DEPENDS:
+		for dependency in self.dependencies:
 			try:
 				getattr(self, dependency.attribute).callback(r)
 			except AttributeError:
@@ -424,7 +428,7 @@ class Module(object):
 		self.modules = parent.loaded_modules
 
 		# Reset all dependency modules
-		for dependency in self.DEPENDS:
+		for dependency in self.dependencies:
 			if hasattr(self, dependency.attribute):
 				getattr(self, dependency.attribute).reset()
 
@@ -628,34 +632,32 @@ class Modules(object):
 		import binwalk.modules
 		attributes = {}
 
-		if hasattr(module, "DEPENDS"):
+		for dependency in module.DEFAULT_DEPENDS+module.DEPENDS:
 
-			for dependency in module.DEPENDS:
-
-				# The dependency module must be imported by binwalk.modules.__init__.py
-				if hasattr(binwalk.modules, dependency.name):
-					dependency.module = getattr(binwalk.modules, dependency.name)
-				else:
-					raise ModuleException("%s depends on %s which was not found in binwalk.modules.__init__.py\n" % (str(module), dependency.name))
+			# The dependency module must be imported by binwalk.modules.__init__.py
+			if hasattr(binwalk.modules, dependency.name):
+				dependency.module = getattr(binwalk.modules, dependency.name)
+			else:
+				raise ModuleException("%s depends on %s which was not found in binwalk.modules.__init__.py\n" % (str(module), dependency.name))
 				
-				# No recursive dependencies, thanks
-				if dependency.module == module:
-					continue
+			# No recursive dependencies, thanks
+			if dependency.module == module:
+				continue
 
-				# Only load dependencies with custom kwargs from modules that are enabled, else madness ensues.
-				# Example: Heursitic module depends on entropy module, and sets entropy kwargs to contain 'enabled' : True.
-				#          Without this check, an entropy scan would always be run, even if -H or -E weren't specified!
-				#
-				# Modules that are not enabled (e.g., extraction module) can load any dependency as long as they don't
-				# set any custom kwargs for those dependencies.
-				if module_enabled or not dependency.kwargs:
-					depobj = self.run(dependency.module, dependency=True, kwargs=dependency.kwargs)
+			# Only load dependencies with custom kwargs from modules that are enabled, else madness ensues.
+			# Example: Heursitic module depends on entropy module, and sets entropy kwargs to contain 'enabled' : True.
+			#          Without this check, an entropy scan would always be run, even if -H or -E weren't specified!
+			#
+			# Modules that are not enabled (e.g., extraction module) can load any dependency as long as they don't
+			# set any custom kwargs for those dependencies.
+			if module_enabled or not dependency.kwargs:
+				depobj = self.run(dependency.module, dependency=True, kwargs=dependency.kwargs)
 			
-				# If a dependency failed, consider this a non-recoverable error and raise an exception
-				if depobj.errors:
-					raise ModuleException("Failed to load " + dependency.name)
-				else:
-					attributes[dependency.attribute] = depobj
+			# If a dependency failed, consider this a non-recoverable error and raise an exception
+			if depobj.errors:
+				raise ModuleException("Failed to load " + dependency.name)
+			else:
+				attributes[dependency.attribute] = depobj
 
 		return attributes
 

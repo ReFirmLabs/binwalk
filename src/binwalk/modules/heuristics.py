@@ -88,8 +88,6 @@ class HeuristicCompressionAnalyzer(Module):
 	TITLE = "Heuristic Compression"
 
 	DEPENDS = [
-			Dependency(name='General',
-					   attribute='config'),
 			Dependency(name='Entropy',
 					   attribute='entropy',
 					   kwargs={'enabled' : True, 'do_plot' : False, 'display_results' : False, 'block_size' : ENTROPY_BLOCK_SIZE}),
