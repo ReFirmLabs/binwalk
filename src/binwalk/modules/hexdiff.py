@@ -9,12 +9,6 @@ from binwalk.core.module import Module, Option, Kwarg
 
 class HexDiff(Module):
 
-    ALL_SAME = 0
-    ALL_DIFF = 1
-    SOME_DIFF = 2
-
-    DEFAULT_DIFF_SIZE = 0x100
-    DEFAULT_BLOCK_SIZE = 16
 
     COLORS = {
         'red'   : '31',
@@ -23,6 +17,7 @@ class HexDiff(Module):
     }
 
     SEPERATORS = ['\\', '/']
+    DEFAULT_BLOCK_SIZE = 16
 
     TITLE = "Binary Diffing"
 

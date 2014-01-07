@@ -8,6 +8,7 @@ class Magic(object):
 
     LIBMAGIC_FUNCTIONS = [
             binwalk.core.C.Function(name="magic_open", type=int),
+            binwalk.core.C.Function(name="magic_close", type=None),
             binwalk.core.C.Function(name="magic_load", type=int),
             binwalk.core.C.Function(name="magic_buffer", type=str),
     ]
@@ -31,6 +32,12 @@ class Magic(object):
         self.magic_cookie = self.libmagic.magic_open(self.MAGIC_FLAGS | flags)
         self.libmagic.magic_load(self.magic_cookie, self.magic_file)
 
+    def close(self):
+        if self.magic_cookie:
+            self.libmagic.magic_close(self.magic_cookie)
+            self.magic_cookie = None
+
     def buffer(self, data):
-        return self.libmagic.magic_buffer(self.magic_cookie, str2bytes(data), len(data))
+        if self.magic_cookie:
+            return self.libmagic.magic_buffer(self.magic_cookie, str2bytes(data), len(data))
 

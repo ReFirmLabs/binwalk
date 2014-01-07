@@ -21,10 +21,10 @@ class FunctionHandler(object):
     Class for abstracting function calls via ctypes and handling Python 2/3 compatibility issues.
     '''
     PY2CTYPES = {
-            bytes    : ctypes.c_char_p,
-            str    : ctypes.c_char_p,
-            int    : ctypes.c_int,
-            float    : ctypes.c_float,
+            bytes   : ctypes.c_char_p,
+            str    	: ctypes.c_char_p,
+            int    	: ctypes.c_int,
+            float   : ctypes.c_float,
             bool    : ctypes.c_int,
             None    : ctypes.c_int,
     }
@@ -32,10 +32,10 @@ class FunctionHandler(object):
     RETVAL_CONVERTERS = {
             None    : int,
             int     : int,
-            float    : float,
+            float   : float,
             bool    : bool,
             str     : bytes2str,
-            bytes    : str2bytes,
+            bytes   : str2bytes,
     }
         
     def __init__(self, library, function):

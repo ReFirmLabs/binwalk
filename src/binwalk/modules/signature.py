@@ -11,8 +11,8 @@ class Signature(Module):
     CLI = [
             Option(short='B',
                    long='signature',
-                   kwargs={'enabled' : True},
-                   description='Scan target file(s) for file signatures'),
+                   kwargs={'enabled' : True, 'force_default_scan' : True},
+                   description='Scan target file(s) for common file signatures'),
             Option(short='R',
                    long='raw-bytes',
                    kwargs={'raw_bytes' : None},
@@ -44,6 +44,7 @@ class Signature(Module):
             Kwarg(name='search_for_opcodes', default=False),
             Kwarg(name='cast_data_types', default=False),
             Kwarg(name='dumb_scan', default=False),
+			Kwarg(name='force_default_scan', default=False),
             Kwarg(name='magic_files', default=[]),
     ]
 
@@ -56,26 +57,27 @@ class Signature(Module):
 
         # If a raw byte sequence was specified, build a magic file from that instead of using the default magic files
         if self.raw_bytes is not None:
-            self.magic_files = [self.parser.file_from_string(self.raw_bytes)]
+            self.magic_files.append(self.parser.file_from_string(self.raw_bytes))
 
-        # Use the system default magic file if no other was specified
         # Append the user's magic file first so that those signatures take precedence
-        if not self.magic_files:
-            if self.search_for_opcodes:
-                self.magic_files = [
+        if self.search_for_opcodes:
+            self.magic_files += [
                     self.config.settings.paths['user'][self.config.settings.BINARCH_MAGIC_FILE],
                     self.config.settings.paths['system'][self.config.settings.BINARCH_MAGIC_FILE],
-                ]
-            elif self.cast_data_types:
-                self.magic_files = [
+            ]
+
+        if self.cast_data_types:
+            self.magic_files += [
                     self.config.settings.paths['user'][self.config.settings.BINCAST_MAGIC_FILE],
                     self.config.settings.paths['system'][self.config.settings.BINCAST_MAGIC_FILE],
-                ]
-            else:
-                self.magic_files = [
+            ]
+
+        # Use the system default magic file if no other was specified, or if -B was explicitly specified
+        if not self.magic_files or self.force_default_scan:
+            self.magic_files += [
                     self.config.settings.paths['user'][self.config.settings.BINWALK_MAGIC_FILE],
                     self.config.settings.paths['system'][self.config.settings.BINWALK_MAGIC_FILE],
-                ]
+            ]
 
         # Parse the magic file(s) and initialize libmagic
         self.mfile = self.parser.parse(self.magic_files)

@@ -84,8 +84,6 @@ class Entropy(Module):
                 self.block_size = self.DEFAULT_BLOCK_SIZE
 
     def run(self):
-        from pyqtgraph.Qt import QtGui
-
         for fp in iter(self.next_file, None):
 
             if self.display_results:
@@ -97,6 +95,7 @@ class Entropy(Module):
                 self.footer()
     
         if self.do_plot and not self.save_plot:    
+            from pyqtgraph.Qt import QtGui
             QtGui.QApplication.instance().exec_()
 
     def calculate_file_entropy(self, fp):
