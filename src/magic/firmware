@@ -481,3 +481,19 @@
 0		string	ECOS					eCos RTOS string reference:
 >0		string	x						"%s"
 
+# ZyXEL config signatures
+0		string	dbgarea					ZyXEL rom-0 configuration block, name: "%s",{offset-adjust:-6}
+>16		beshort	x						compressed size: %d,
+>14		beshort	x						uncompressed size: %d,
+>18		beshort	x						data offset from start of block: {math:16+%d}
+
+0		string	spt.dat					ZyXEL rom-0 configuration block, name: "%s",{offset-adjust:-6}
+>16		beshort	x						compressed size: %d,
+>14		beshort	x						uncompressed size: %d,
+>18		beshort	x						data offset from start of block: {math:16+%d}
+
+0		string	autoexec.net			ZyXEL rom-0 configuration block, name: "%s",{offset-adjust:-6}
+>16		beshort	x						compressed size: %d,
+>14		beshort	x						uncompressed size: %d,
+>18		beshort	x						data offset from start of block: {math:16+%d}
+
