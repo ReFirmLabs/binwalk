@@ -1,4 +1,5 @@
-# Common functions.
+# Common functions used throughout various parts of binwalk code.
+
 import io
 import os
 import re

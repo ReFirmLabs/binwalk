@@ -6,47 +6,48 @@ from threading import Thread
 from binwalk.core.compat import user_input
 
 def display_status(m):
-	# Display the current scan progress when the enter key is pressed.
-	while True:
-		try:
-			user_input()
-			sys.stderr.write("Progress: %.2f%% (%d / %d)\n\n" % (((float(m.status.completed) / float(m.status.total)) * 100), m.status.completed, m.status.total))
-		except KeyboardInterrupt as e:
-			raise e
-		except Exception:
-			pass
+    # Display the current scan progress when the enter key is pressed.
+    while True:
+        try:
+            user_input()
+            sys.stderr.write("Progress: %.2f%% (%d / %d)\n\n" % (((float(m.status.completed) / float(m.status.total)) * 100), m.status.completed, m.status.total))
+        except KeyboardInterrupt as e:
+            raise e
+        except Exception:
+            pass
 
 def usage(modules):
-	sys.stderr.write(modules.help())
-	sys.exit(1)
+    sys.stderr.write(modules.help())
+    sys.exit(1)
 
 def main():
-	modules = binwalk.Modules()
+    modules = binwalk.Modules()
 
-	# Start the display_status function as a daemon thread.
-	t = Thread(target=display_status, args=(modules,))
-	t.setDaemon(True)
-	t.start()
+    # Start the display_status function as a daemon thread.
+    t = Thread(target=display_status, args=(modules,))
+    t.setDaemon(True)
+    t.start()
 
-	try:
-		if len(sys.argv) == 1:
-			usage(modules)
-		elif not modules.execute():
-			modules.execute(*sys.argv[1:], signature=True)
-	except binwalk.ModuleException as e:
-		sys.exit(1)
+    try:
+        if len(sys.argv) == 1:
+            usage(modules)
+        elif not modules.execute():
+            modules.execute(*sys.argv[1:], signature=True)
+    except binwalk.ModuleException as e:
+        sys.stderr.write(str(e) + '\n')
+        sys.exit(1)
 
 if __name__ == '__main__':
-	try:
-		# Special options for profiling the code. For debug use only.
-		if '--profile' in sys.argv:
-			import cProfile
-			sys.argv.pop(sys.argv.index('--profile'))
-			cProfile.run('main()')
-		else:
-			main()
-	except IOError:
-		pass
-	except KeyboardInterrupt:
-		sys.stdout.write("\n")
+    try:
+        # Special options for profiling the code. For debug use only.
+        if '--profile' in sys.argv:
+            import cProfile
+            sys.argv.pop(sys.argv.index('--profile'))
+            cProfile.run('main()')
+        else:
+            main()
+    except IOError:
+        pass
+    except KeyboardInterrupt:
+        sys.stdout.write("\n")
 

@@ -149,7 +149,7 @@ class Module(object):
                        attribute='extractor'),
     ]
     
-    # A list of dependencies that can be filled in as needed by each individual module.
+    # A list of binwalk.core.module.Dependency instances that can be filled in as needed by each individual module.
     DEPENDS = []
 
     # Format string for printing the header during a scan.
@@ -407,6 +407,11 @@ class Module(object):
             sys.stderr.write("\n" + e.module + " Error: " + e.description + "\n\n")
 
     def header(self):
+        '''
+        Displays the scan header, as defined by self.HEADER and self.HEADER_FORMAT.
+
+        Returns None.
+        '''
         self.config.display.format_strings(self.HEADER_FORMAT, self.RESULT_FORMAT)
         self.config.display.add_custom_header(self.VERBOSE_FORMAT, self.VERBOSE)
 
@@ -416,6 +421,11 @@ class Module(object):
             self.config.display.header(self.HEADER, file_name=self.current_target_file_name)
     
     def footer(self):
+        '''
+        Displays the scan footer.
+
+        Returns None.
+        '''
         self.config.display.footer()
             
     def main(self, parent):
@@ -720,20 +730,25 @@ class Modules(object):
                         last_priority[name] = module_option.priority
 
                         # Do this manually as argparse doesn't seem to be able to handle hexadecimal values
-                        if module_option.type == int:
-                            kwargs[name] = int(value, 0)
-                        elif module_option.type == float:
-                            kwargs[name] = float(value)
-                        elif module_option.type == dict:
-                            if not has_key(kwargs, name):
-                                kwargs[name] = {}
-                            kwargs[name][len(kwargs[name])] = value
-                        elif module_option.type == list:
-                            if not has_key(kwargs, name):
-                                kwargs[name] = []
-                            kwargs[name].append(value)
-                        else:
-                            kwargs[name] = value
+                        try:
+                            if module_option.type == int:
+                                kwargs[name] = int(value, 0)
+                            elif module_option.type == float:
+                                kwargs[name] = float(value)
+                            elif module_option.type == dict:
+                                if not has_key(kwargs, name):
+                                    kwargs[name] = {}
+                                kwargs[name][len(kwargs[name])] = value
+                            elif module_option.type == list:
+                                if not has_key(kwargs, name):
+                                    kwargs[name] = []
+                                kwargs[name].append(value)
+                            else:
+                                kwargs[name] = value
+                        except KeyboardInterrupt as e:
+                            raise e
+                        except Exception as e:
+                            raise ModuleException("Invalid usage: %s" % str(e))
 
         return kwargs
     

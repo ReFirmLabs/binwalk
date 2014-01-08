@@ -5,7 +5,10 @@ import binwalk.core.common
 from binwalk.core.compat import *
 
 class Display(object):
-
+    '''
+    Class to handle display of output and writing to log files.
+    This class is instantiated for all modules implicitly and should not need to be invoked directly by most modules.
+    '''
     SCREEN_WIDTH = 0
     HEADER_WIDTH = 150
     DEFAULT_FORMAT = "%s\n"

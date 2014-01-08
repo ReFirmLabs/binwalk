@@ -74,9 +74,8 @@ Most distros don't have pyqtgraph in their default repositories, so it's best to
 MANUALLY INSTALLING EXTRACTION UTILITIES
 -------------------------------------------
 
-Binwalk can automatically invoke external extraction utilities to extract various types of files that it
-may find during a scan. These utilities are optional, but recommended if you plan on using binwalk's
-extraction features.
+Binwalk can automatically invoke external extraction utilities to extract various types of files that it may find during 
+a scan. These utilities are optional, but recommended if you plan on using binwalk's extraction features.
 
 Most utilities can be installed from your distro's repositories (package names may vary slightly based
 on your particular distro):
