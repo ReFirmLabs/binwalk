@@ -144,7 +144,7 @@ class Filter(object):
             return False
 
         # If showing invalid results, just return True without further checking.
-        if callable(self.show_invalid_results) and self.show_invalid_results():
+        if self.show_invalid_results:
             return True
 
         # Don't include quoted strings or keyword arguments in this search, as 
