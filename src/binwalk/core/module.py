@@ -561,6 +561,7 @@ class Modules(object):
         '''
         modules = {}
         help_string = "\nBinwalk v%s\nCraig Heffner, http://www.binwalk.org\n" % binwalk.core.settings.Settings.VERSION
+        help_string += "\nUsage: binwalk [OPTIONS] [FILE1] [FILE2] [FILE3] ...\n"
 
         # Build a dictionary of modules and their ORDER attributes.
         # This makes it easy to sort modules by their ORDER attribute for display.

@@ -19,7 +19,7 @@ class Entropy(Module):
 
     DEFAULT_BLOCK_SIZE = 1024
 
-    TITLE = "Entropy"
+    TITLE = "Entropy Analysis"
     ORDER = 8
     
     CLI = [
