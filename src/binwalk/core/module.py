@@ -721,6 +721,9 @@ class Modules(object):
 
             elif has_key(args, module_option.long) and args[module_option.long] not in [None, False]:
 
+                # TODO: There is one module_option.type for many module_option.kwargs. This means that
+                # all kwargs must be of the same type, else errors can happen in the below processing.
+                # Fix to check the defined type of each kwarg, and make the module_option.type obsolete.
                 for (name, value) in iterator(module_option.kwargs):
                     if not has_key(last_priority, name) or last_priority[name] <= module_option.priority:
 
@@ -742,7 +745,9 @@ class Modules(object):
                             elif module_option.type == list:
                                 if not has_key(kwargs, name):
                                     kwargs[name] = []
-                                kwargs[name].append(value)
+                                # HACK. Fix the above TODO and this check is no longer necessary
+                                if type(kwargs[name]) == list:
+                                    kwargs[name].append(value)
                             else:
                                 kwargs[name] = value
                         except KeyboardInterrupt as e:

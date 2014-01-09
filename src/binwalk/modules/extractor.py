@@ -33,7 +33,7 @@ class Extractor(Module):
                    description='Automatically extract known file types'),
             Option(short='D',
                    long='dd',
-                   type=[],
+                   type=list,
                    dtype='type:ext:cmd',
                    kwargs={'manual_rules' : [], 'enabled' : True},
                    description='Extract <type> signatures, give the files an extension of <ext>, and execute <cmd>'),
