@@ -2,7 +2,7 @@ import binwalk.core.C
 import binwalk.core.plugin
 from binwalk.core.common import BlockFile
 
-class Plugin(binwalk.core.plugin.Plugin):
+class ZlibPlugin(binwalk.core.plugin.Plugin):
     '''
     Searches for and validates zlib compressed data.
     '''

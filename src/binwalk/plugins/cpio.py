@@ -1,6 +1,6 @@
 import binwalk.core.plugin
 
-class Plugin(binwalk.core.plugin.Plugin):
+class CPIOPlugin(binwalk.core.plugin.Plugin):
     '''
     Ensures that ASCII CPIO archive entries only get extracted once.    
     '''

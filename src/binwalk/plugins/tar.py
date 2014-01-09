@@ -2,7 +2,7 @@ import time
 import math
 import binwalk.core.plugin
 
-class Plugin(binwalk.core.plugin.Plugin):
+class TarPlugin(binwalk.core.plugin.Plugin):
 
     MODULES = ['Signature']
 

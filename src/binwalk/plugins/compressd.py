@@ -1,8 +1,8 @@
 import binwalk.core.C
-from binwalk.core.common import *
 import binwalk.core.plugin
+from binwalk.core.common import *
 
-class Plugin(binwalk.core.plugin.Plugin):
+class CompressdPlugin(binwalk.core.plugin.Plugin):
     '''
     Searches for and validates compress'd data.
     '''

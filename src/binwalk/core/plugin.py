@@ -1,6 +1,7 @@
 import os
 import sys
 import imp
+import inspect
 import binwalk.core.settings
 from binwalk.core.compat import *
 
@@ -95,7 +96,6 @@ class Plugins(object):
     SCAN = 'scan'
     PRESCAN = 'pre_scan'
     POSTSCAN = 'post_scan'
-    PLUGIN = 'Plugin'
     MODULE_EXTENSION = '.py'
 
     def __init__(self, parent=None):
@@ -126,6 +126,12 @@ class Plugins(object):
             except Exception as e:
                 sys.stderr.write("WARNING: %s.%s failed: %s\n" % (callback.__module__, callback.__name__, e))
 
+    def _find_plugin_class(self, plugin):
+        for (name, klass) in inspect.getmembers(plugin, inspect.isclass):
+            if issubclass(klass, Plugin) and klass != Plugin:
+                return klass
+        raise Exception("Failed to locate Plugin class in " + plugin)
+
     def list_plugins(self):
         '''
         Obtain a list of all user and system plugin modules.
@@ -150,16 +156,16 @@ class Plugins(object):
 
         plugins = {
             'user'   : {
-                    'modules'     : [],
-                    'descriptions'    : {},
+                    'modules'       : [],
+                    'descriptions'  : {},
                     'enabled'       : {},
-                    'path'        : None,
+                    'path'          : None,
             },
             'system' : {
-                    'modules'     : [],
-                    'descriptions'    : {},
+                    'modules'       : [],
+                    'descriptions'  : {},
                     'enabled'       : {},
-                    'path'        : None,
+                    'path'          : None,
             }
         }
 
@@ -172,7 +178,7 @@ class Plugins(object):
                     
                     try:    
                         plugin = imp.load_source(module, os.path.join(plugins[key]['path'], file_name))
-                        plugin_class = getattr(plugin, self.PLUGIN)
+                        plugin_class = self._find_plugin_class(plugin)
 
                         plugins[key]['enabled'][module] = True
                         plugins[key]['modules'].append(module)
@@ -201,7 +207,7 @@ class Plugins(object):
 
             try:
                 plugin = imp.load_source(module, file_path)
-                plugin_class = getattr(plugin, self.PLUGIN)
+                plugin_class = self._find_plugin_class(plugin)
 
                 class_instance = plugin_class(self.parent)
                 if not class_instance._enabled:
