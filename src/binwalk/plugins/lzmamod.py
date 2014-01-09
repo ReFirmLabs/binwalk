@@ -20,7 +20,7 @@ class LZMAModPlugin(binwalk.core.plugin.Plugin):
         # Replace the existing LZMA extraction command with our own
         rules = self.module.extractor.get_rules()
         for i in range(0, len(rules)):
-            if rules[i]['regex'].match(self.SIGNATURE):
+            if rules[i]['regex'].match(self.SIGNATURE) and rules[i]['cmd']:
                 self.original_cmd = rules[i]['cmd']
                 rules[i]['cmd'] = self.lzma_cable_extractor
                 break

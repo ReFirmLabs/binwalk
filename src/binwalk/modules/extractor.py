@@ -538,7 +538,7 @@ class Extractor(Module):
                 except KeyboardInterrupt as e:
                     raise e
                 except Exception as e:
-                    sys.stderr.write("WARNING: Extractor.execute failed to run '%s': %s\n" % (str(cmd), str(e)))
+                    sys.stderr.write("WARNING: Extractor.execute failed to run internal extractor '%s': %s\n" % (str(cmd), str(e)))
             else:
                 # If not in verbose mode, create a temporary file to redirect stdout and stderr to
                 if not self.config.verbose:
@@ -556,8 +556,8 @@ class Extractor(Module):
             # Silently ignore no such file or directory errors. Why? Because these will inevitably be raised when
             # making the switch to the new firmware mod kit directory structure. We handle this elsewhere, but it's
             # annoying to see this spammed out to the console every time.
-            if e.errno != 2:
-                sys.stderr.write("WARNING: Extractor.execute failed to run '%s': %s\n" % (str(cmd), str(e)))
+            if not hasattr(e, 'errno') or e.errno != 2:
+                sys.stderr.write("WARNING: Extractor.execute failed to run external extrator '%s': %s\n" % (str(cmd), str(e)))
             retval = False
         
         if tmp is not None:
