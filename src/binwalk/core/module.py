@@ -492,6 +492,27 @@ class ModuleException(Exception):
     '''
     pass
 
+class ListActionParser(argparse.Action):
+    '''
+    Class to handle dictionary argument types.
+    '''
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        option = option_string.strip('-')
+        if has_key(parser.short_to_long, option):
+            option = parser.short_to_long[option]
+
+        if hasattr(namespace, option):
+            current_values = getattr(namespace, option)
+            try:
+                current_values.extend(values)
+            except AttributeError:
+                current_values = values
+        else:
+            current_values = values
+
+        setattr(namespace, option, current_values)
+
 class Modules(object):
     '''
     Main class used for running and managing modules.
@@ -686,6 +707,9 @@ class Modules(object):
         longs = []
         shorts = ""
         parser = argparse.ArgumentParser(add_help=False)
+        # Hack: This allows the ListActionParser class to correllate short options to long options.
+        #       There is probably a built-in way to do this in the argparse.ArgumentParser class?
+        parser.short_to_long = {}
 
         # Must build arguments from all modules so that:
         #
@@ -694,18 +718,26 @@ class Modules(object):
         for m in self.list(attribute="CLI"):
 
             for module_option in m.CLI:
+
+                parser_args = []
+                parser_kwargs = {}
+
                 if not module_option.long:
                     continue
 
-                if module_option.type is None:
-                    action = 'store_true'
-                else:
-                    action = None
-
                 if module_option.short:
-                    parser.add_argument('-' + module_option.short, '--' + module_option.long, action=action, dest=module_option.long)
-                else:
-                    parser.add_argument('--' + module_option.long, action=action, dest=module_option.long)
+                    parser_args.append('-' + module_option.short)
+                parser_args.append('--' + module_option.long)
+                parser_kwargs['dest'] = module_option.long
+
+                if module_option.type is None:
+                    parser_kwargs['action'] = 'store_true'
+                elif module_option.type is list:
+                    parser_kwargs['action'] = ListActionParser
+                    parser.short_to_long[module_option.short] = module_option.long
+                    parser_kwargs['nargs'] = '+'
+
+                parser.add_argument(*parser_args, **parser_kwargs)
 
         args, unknown = parser.parse_known_args(argv)
         args = args.__dict__
@@ -749,14 +781,6 @@ class Modules(object):
                                     kwargs[name] = int(value, 0)
                                 elif module_option.type == float:
                                     kwargs[name] = float(value)
-                                elif module_option.type == dict:
-                                    if not has_key(kwargs, name):
-                                        kwargs[name] = {}
-                                    kwargs[name][len(kwargs[name])] = value
-                                elif module_option.type == list:
-                                    if not has_key(kwargs, name):
-                                        kwargs[name] = []
-                                    kwargs[name].append(value)
                                 else:
                                     kwargs[name] = value
                             else:
