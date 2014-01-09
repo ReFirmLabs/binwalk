@@ -721,33 +721,43 @@ class Modules(object):
 
             elif has_key(args, module_option.long) and args[module_option.long] not in [None, False]:
 
-                # TODO: There is one module_option.type for many module_option.kwargs. This means that
-                # all kwargs must be of the same type, else errors can happen in the below processing.
-                # Fix to check the defined type of each kwarg, and make the module_option.type obsolete.
-                for (name, value) in iterator(module_option.kwargs):
+                # Loop through all the kwargs for this command line option
+                for (name, default_value) in iterator(module_option.kwargs):
+                    
+                    # If this kwarg has not been previously processed, or if its priority is equal to or
+                    # greater than the previously processed kwarg's priority, then let's process it.
                     if not has_key(last_priority, name) or last_priority[name] <= module_option.priority:
 
-                        if module_option.type is not None:
-                            value = args[module_option.long]
-
+                        # Track the priority for future iterations that may process the same kwarg name
                         last_priority[name] = module_option.priority
 
-                        # Do this manually as argparse doesn't seem to be able to handle hexadecimal values
+                        # If the specified type for these kwargs is None, just set the kwarg to its specified default value.
+                        # Else, set it to the value specified from the user.
+                        if module_option.type is not None:
+                            value = args[module_option.long]
+                        else:
+                            value = default_value
+
+                        # Convert the user-supplied value into the type specified in module_option.type. 
+                        # Do this manually as argparse doesn't seem to be able to handle hexadecimal values.
                         try:
-                            if module_option.type == int:
-                                kwargs[name] = int(value, 0)
-                            elif module_option.type == float:
-                                kwargs[name] = float(value)
-                            elif module_option.type == dict:
-                                if not has_key(kwargs, name):
-                                    kwargs[name] = {}
-                                kwargs[name][len(kwargs[name])] = value
-                            elif module_option.type == list:
-                                if not has_key(kwargs, name):
-                                    kwargs[name] = []
-                                # HACK. Fix the above TODO and this check is no longer necessary
-                                if type(kwargs[name]) == list:
+                            # Only convert the user-supplied value to a specific type if this kwarg's default
+                            # type is the same as the type specified for the module option.
+                            if value != default_value and type(default_value) == module_option.type:
+                                if module_option.type == int:
+                                    kwargs[name] = int(value, 0)
+                                elif module_option.type == float:
+                                    kwargs[name] = float(value)
+                                elif module_option.type == dict:
+                                    if not has_key(kwargs, name):
+                                        kwargs[name] = {}
+                                    kwargs[name][len(kwargs[name])] = value
+                                elif module_option.type == list:
+                                    if not has_key(kwargs, name):
+                                        kwargs[name] = []
                                     kwargs[name].append(value)
+                                else:
+                                    kwargs[name] = value
                             else:
                                 kwargs[name] = value
                         except KeyboardInterrupt as e:
