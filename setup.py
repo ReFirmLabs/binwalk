@@ -127,8 +127,8 @@ class CleanCommand(Command):
         except Exception:
             pass
 
-# Check pre-requisite Python modules during an install
-if "install" in sys.argv:
+# Check pre-requisite Python modules during a build
+if "build" in sys.argv:
     print("checking pre-requisites")
     try:
         import pyqtgraph
@@ -140,6 +140,7 @@ if "install" in sys.argv:
    
         warning(msg, prompt=True)
 
+if "install" in sys.argv:
     # If an older version of binwalk is currently installed, completely remove it to prevent conflicts
     existing_binwalk_modules = find_binwalk_module_paths()
     if existing_binwalk_modules and not os.path.exists(os.path.join(existing_binwalk_modules[0], "core")):
