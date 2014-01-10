@@ -18,6 +18,7 @@ class LZMAModPlugin(binwalk.core.plugin.Plugin):
         self.original_cmd = ''
 
         # Replace the existing LZMA extraction command with our own
+		# Note that this assumes that there is *one* LZMA extraction command...
         rules = self.module.extractor.get_rules()
         for i in range(0, len(rules)):
             if rules[i]['regex'].match(self.SIGNATURE) and rules[i]['cmd']:
