@@ -119,7 +119,7 @@
 # separate signatures must be created for each one.
 
 # Netgear KWGR614 ROME image
-0	string		G614		Realtek firmware header (ROME bootloader),
+0	string		G614		Realtek firmware header, ROME bootloader,
 >4	beshort		0xd92f		image type: KFS,
 >4	beshort		0xb162		image type: RDIR,
 >4	beshort		0xea43		image type: BOOT,
