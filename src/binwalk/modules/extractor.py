@@ -106,8 +106,8 @@ class Extractor(Module):
         else:
             size = r.size
 
-        # Only extract valid results    
-        if r.valid:
+        # Only extract valid results marked for extraction    
+        if r.valid and r.extract:
             # Do the extraction
             (extraction_directory, dd_file) = self.extract(r.offset, r.description, r.file.name, size, r.name)
 

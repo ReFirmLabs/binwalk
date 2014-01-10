@@ -24,7 +24,8 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
                 elif 'TRAILER!!!' in result.description:
                     # This is the last entry, un-set found_archive.
                     self.found_archive = False
-    
-                # The first entry has already been found and this is the last entry, or the last entry 
-                # has not yet been found. Don't extract.
-                result.extract = False
+                    result.extract = False
+                else:
+                    # The first entry has already been found and this is not the last entry, or the last entry 
+                    # has not yet been found. Don't extract.
+                    result.extract = False
