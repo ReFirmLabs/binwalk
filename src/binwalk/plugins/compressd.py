@@ -23,7 +23,7 @@ class CompressdPlugin(binwalk.core.plugin.Plugin):
 
     def scan(self, result):
         if result.file and result.description.lower().startswith("compress'd data"):
-            fd = BlockFile(result.file.name, "r", offset=result.offset, length=self.READ_SIZE)
+            fd = self.module.config.open_file(result.file.name, offset=result.offset, length=self.READ_SIZE)
             compressed_data = fd.read(self.READ_SIZE)
             fd.close()
                         
