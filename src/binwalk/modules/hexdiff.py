@@ -19,6 +19,9 @@ class HexDiff(Module):
     SEPERATORS = ['\\', '/']
     DEFAULT_BLOCK_SIZE = 16
 
+    SKIPPED_LINE = "*"
+    CUSTOM_DISPLAY_FORMAT = "0x%.8X    %s"
+
     TITLE = "Binary Diffing"
 
     CLI = [
@@ -52,8 +55,8 @@ class HexDiff(Module):
             Kwarg(name='enabled', default=False),
     ]
 
-    RESULT_FORMAT = "0x%.8X    %s\n"
-    RESULT = ['offset', 'description']
+    RESULT_FORMAT = "%s\n"
+    RESULT = ['display']
     
     def _no_colorize(self, c, color="red", bold=True):
         return c
@@ -113,13 +116,15 @@ class HexDiff(Module):
         return (hexbyte, asciibyte)
 
     def diff_files(self, target_files):
+        last_line = None
         loop_count = 0
+        sep_count = 0
 
         while True:
             line = ""
             done_files = 0
             block_data = {}
-            seperator = self.SEPERATORS[loop_count % 2]
+            seperator = self.SEPERATORS[sep_count % 2]
 
             for fp in target_files:
                 block_data[fp] = fp.read(self.block)
@@ -152,7 +157,18 @@ class HexDiff(Module):
                 if fp != target_files[-1]:
                     line += " %s " % seperator
 
-            self.result(offset=(fp.offset + (self.block * loop_count)), description=line)
+            offset = fp.offset + (self.block * loop_count)
+
+            if not self._color_filter(line):
+                display = line = self.SKIPPED_LINE
+            else:
+                display = self.CUSTOM_DISPLAY_FORMAT % (offset, line)
+                sep_count += 1
+            
+            if line != self.SKIPPED_LINE or last_line != line:
+                self.result(offset=offset, description=line, display=display)
+
+            last_line = line
             loop_count += 1
                 
     def init(self):
@@ -190,9 +206,6 @@ class HexDiff(Module):
             self.colorize = self._colorize
         else:
             self.colorize = self._no_colorize
-
-    def validate(self, result):
-        result.valid = self._color_filter(result.description)
 
     def run(self):
         if self.hex_target_files:
