@@ -373,7 +373,7 @@ class Extractor(Module):
                         extract_ok = True
 
                     # Only clean up files if remove_after_execute was specified                
-                    if extract_ok and self.remove_after_execute:
+                    if extract_ok == True and self.remove_after_execute:
 
                         # Remove the original file that we extracted
                         try:
@@ -394,7 +394,7 @@ class Extractor(Module):
                                 pass
                     
                     # If the command executed OK, don't try any more rules
-                    if extract_ok:
+                    if extract_ok == True:
                         break
                     # Else, remove the extracted file if this isn't the last rule in the list.
                     # If it is the last rule, leave the file on disk for the user to examine.
@@ -527,7 +527,7 @@ class Extractor(Module):
         @cmd   - Command to execute.
         @fname - File to run command against.
 
-        Returns True on success, False on failure.
+        Returns True on success, False on failure, or None if the external extraction utility could not be found.
         '''
         tmp = None
         retval = True
@@ -549,7 +549,9 @@ class Extractor(Module):
                 cmd = cmd.replace(self.FILE_NAME_PLACEHOLDER, fname)
     
                 # Execute.
-                if subprocess.call(shlex.split(cmd), stdout=tmp, stderr=tmp) != 0:
+                if subprocess.call(shlex.split(cmd), stdout=tmp, stderr=tmp) == 0:
+                    retval = True
+                else:
                     retval = False
         except KeyboardInterrupt as e:
             raise e
@@ -559,7 +561,7 @@ class Extractor(Module):
             # annoying to see this spammed out to the console every time.
             if not hasattr(e, 'errno') or e.errno != 2:
                 sys.stderr.write("WARNING: Extractor.execute failed to run external extrator '%s': %s\n" % (str(cmd), str(e)))
-            retval = False
+            retval = None
         
         if tmp is not None:
             tmp.close()

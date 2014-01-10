@@ -18,7 +18,7 @@ class LZMAModPlugin(binwalk.core.plugin.Plugin):
         self.original_cmd = ''
 
         # Replace the existing LZMA extraction command with our own
-		# Note that this assumes that there is *one* LZMA extraction command...
+        # Note that this assumes that there is *one* LZMA extraction command...
         rules = self.module.extractor.get_rules()
         for i in range(0, len(rules)):
             if rules[i]['regex'].match(self.SIGNATURE) and rules[i]['cmd']:
@@ -28,7 +28,10 @@ class LZMAModPlugin(binwalk.core.plugin.Plugin):
 
     def lzma_cable_extractor(self, fname):
         # Try extracting the LZMA file without modification first
-        if not self.module.extractor.execute(self.original_cmd, fname):
+        result = self.module.extractor.execute(self.original_cmd, fname)
+        
+        # If the external extractor was successul (True) or didn't exist (None), don't do anything.
+        if result not in [True, None]:
             out_name = os.path.splitext(fname)[0] + '-patched' + os.path.splitext(fname)[1]
             fp_out = BlockFile(out_name, 'w')
             # Use self.module.config.open_file here to ensure that other config settings (such as byte-swapping) are honored
