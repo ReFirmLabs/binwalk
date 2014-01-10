@@ -44,7 +44,7 @@ class Signature(Module):
             Kwarg(name='search_for_opcodes', default=False),
             Kwarg(name='cast_data_types', default=False),
             Kwarg(name='dumb_scan', default=False),
-			Kwarg(name='force_default_scan', default=False),
+            Kwarg(name='force_default_scan', default=False),
             Kwarg(name='magic_files', default=[]),
     ]
 
@@ -100,7 +100,7 @@ class Signature(Module):
 
         if r.jump and (r.jump + r.offset) > r.file.size:
             r.valid = False
-                
+
         r.valid = self.config.filter.valid_result(r.description)
 
     def scan_file(self, fp):
@@ -131,7 +131,6 @@ class Signature(Module):
                 
                 # The smart filter parser returns a binwalk.core.module.Result object
                 r = self.smart.parse(magic_result)
-
 
                 # Set the absolute offset inside the target file
                 r.offset = block_start + candidate_offset + r.adjust

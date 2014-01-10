@@ -80,7 +80,6 @@ class Signature(object):
         Returns None.
         '''
         self.filter = filter
-        self.valid = True
         self.last_one_of_many = None
         self.ignore_smart_signatures = ignore_smart_signatures
 
@@ -94,6 +93,7 @@ class Signature(object):
         '''
         results = {}
         self.valid = True
+        self.display = True
 
         if data:
             for tag in self.TAGS:
@@ -118,6 +118,7 @@ class Signature(object):
             self.valid = False
             
         results['valid'] = self.valid
+        results['display'] = self.display
 
         return binwalk.core.module.Result(**results)
 
@@ -170,13 +171,12 @@ class Signature(object):
         '''
         if self.filter.valid_result(data):
             if self.last_one_of_many is not None and data.startswith(self.last_one_of_many):
-                return (data, False)
-        
-        if tag.tag in data:
-            # Only match on the data before the first comma, as that is typically unique and static
-            self.last_one_of_many = data.split(',')[0]
-        else:
-            self.last_one_of_many = None
+                self.display = False
+            elif tag.tag in data:
+                # Only match on the data before the first comma, as that is typically unique and static
+                self.last_one_of_many = data.split(',')[0]
+            else:
+                self.last_one_of_many = None
             
         return (data, True)
 
