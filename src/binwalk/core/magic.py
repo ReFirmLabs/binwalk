@@ -1,4 +1,5 @@
 import binwalk.core.C
+import binwalk.core.common
 from binwalk.core.compat import *
 
 class Magic(object):
@@ -26,11 +27,15 @@ class Magic(object):
             self.magic_file = str2bytes(magic_file)
         else:
             self.magic_file = None
-
+        
         self.libmagic = binwalk.core.C.Library("magic", self.LIBMAGIC_FUNCTIONS)
 
+        binwalk.core.common.debug("libmagic.magic_open(0x%X)" % (self.MAGIC_FLAGS | flags))
         self.magic_cookie = self.libmagic.magic_open(self.MAGIC_FLAGS | flags)
+
+        binwalk.core.common.debug("libmagic.magic_load(0x%X, %s)" % (self.magic_cookie, self.magic_file))
         self.libmagic.magic_load(self.magic_cookie, self.magic_file)
+        binwalk.core.common.debug("libmagic loaded OK!")
 
     def close(self):
         if self.magic_cookie:

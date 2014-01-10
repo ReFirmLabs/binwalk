@@ -3,6 +3,7 @@
 import io
 import os
 import re
+import sys
 import ast
 import hashlib
 import operator as op
@@ -13,6 +14,16 @@ if has_key(__builtins__, 'BLOCK_FILE_PARENT_CLASS'):
     BLOCK_FILE_PARENT_CLASS = __builtins__['BLOCK_FILE_PARENT_CLASS']
 else:
     BLOCK_FILE_PARENT_CLASS = io.FileIO
+
+def debug(msg):
+    '''
+    Displays debug messages to stderr only if the Python interpreter was invoked with the -O flag.
+    '''
+    # The __debug__ value is a bit backwards; by default it is set to True, but
+    # then set to False if the Python interpreter is run with the -O option.
+    if not __debug__:
+        sys.stderr.write("DEBUG: " + msg + "\n")
+        sys.stderr.flush()
 
 def file_md5(file_name):
     '''

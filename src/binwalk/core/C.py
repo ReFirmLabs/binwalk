@@ -22,8 +22,8 @@ class FunctionHandler(object):
     '''
     PY2CTYPES = {
             bytes   : ctypes.c_char_p,
-            str    	: ctypes.c_char_p,
-            int    	: ctypes.c_int,
+            str     : ctypes.c_char_p,
+            int     : ctypes.c_int,
             float   : ctypes.c_float,
             bool    : ctypes.c_int,
             None    : ctypes.c_int,
@@ -47,8 +47,9 @@ class FunctionHandler(object):
 
         Returns None.
         '''
+        self.name = function.name
         self.retype = function.type
-        self.function = getattr(library, function.name)
+        self.function = getattr(library, self.name)
 
         if has_key(self.PY2CTYPES, self.retype):
             self.function.restype = self.PY2CTYPES[self.retype]
