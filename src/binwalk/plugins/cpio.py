@@ -21,7 +21,7 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
                     # This is the first entry. Set found_archive and allow the scan to continue normally.
                     self.found_archive = True
                     result.extract = True
-                elif 'TRAILER!!!' in results['description']:
+                elif 'TRAILER!!!' in result.description:
                     # This is the last entry, un-set found_archive.
                     self.found_archive = False
     

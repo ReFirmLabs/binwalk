@@ -139,7 +139,7 @@
 >23	byte		x		header checksum: 0x%X
 
 # Linksys WRT54GX ROME image
-0	belong		0x59a0e842	Realtek firmware header (ROME bootloader)
+0		belong			0x59a0e842		Realtek firmware header, ROME bootloader,
 >4      beshort         0xd92f          image type: KFS,
 >4      beshort         0xb162          image type: RDIR,
 >4      beshort         0xea43          image type: BOOT,
