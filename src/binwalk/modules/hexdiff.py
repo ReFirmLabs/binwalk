@@ -82,21 +82,26 @@ class HexDiff(Module):
         return False
 
     def hexascii(self, target_data, byte, offset):
-        diff_count = 0
+        color = "green"
 
-        for (fp, data) in iterator(target_data):
-            try:
-                if data[offset] != byte:
+        for (fp_i, data_i) in iterator(target_data):
+            diff_count = 0
+
+            for (fp_j, data_j) in iterator(target_data):
+                if fp_i == fp_j:
+                    continue
+
+                try:
+                    if data_i[offset] != data_j[offset]:
+                        diff_count += 1
+                except IndexError as e:
                     diff_count += 1
-            except IndexError as e:
-                diff_count += 1
 
-        if diff_count == len(target_data)-1:
-            color = "red"
-        elif diff_count > 0:
-            color = "blue"
-        else:
-            color = "green"
+            if diff_count == len(target_data)-1:
+                color = "red"
+            elif diff_count > 0:
+                color = "blue"
+                break
 
         hexbyte = self.colorize("%.2X" % ord(byte), color)
         
