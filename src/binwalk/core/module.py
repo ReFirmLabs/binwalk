@@ -48,8 +48,6 @@ class Option(object):
     def convert(self, value):
         if self.type and (self.type.__name__ == self.dtype):
             return self.type(value)
-        elif self.type == list:
-            return [value]
         else:
             return value
 
@@ -501,27 +499,6 @@ class ModuleException(Exception):
     '''
     pass
 
-class ListActionParser(argparse.Action):
-    '''
-    Class to handle dictionary argument types.
-    '''
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        option = option_string.strip('-')
-        if has_key(parser.short_to_long, option):
-            option = parser.short_to_long[option]
-
-        if hasattr(namespace, option):
-            current_values = getattr(namespace, option)
-            try:
-                current_values.extend(values)
-            except AttributeError:
-                current_values = values
-        else:
-            current_values = values
-
-        setattr(namespace, option, current_values)
-
 class Modules(object):
     '''
     Main class used for running and managing modules.
@@ -741,9 +718,8 @@ class Modules(object):
                 if module_option.type is None:
                     parser_kwargs['action'] = 'store_true'
                 elif module_option.type is list:
-                    parser_kwargs['action'] = ListActionParser
+                    parser_kwargs['action'] = 'append'
                     parser.short_to_long[module_option.short] = module_option.long
-                    #parser_kwargs['nargs'] = '+'
 
                 parser.add_argument(*parser_args, **parser_kwargs)
 
@@ -772,37 +748,12 @@ class Modules(object):
                         # Track the priority for future iterations that may process the same kwarg name
                         last_priority[name] = module_option.priority
 
-                        # If the specified type for these kwargs is None, just set the kwarg to its specified default value.
-                        # Else, set it to the value specified from the user.
-                        #if module_option.type is not None:
                         try:
                             kwargs[name] = module_option.convert(args[module_option.long])
                         except KeyboardInterrupt as e:
                             raise e
                         except Exception as e:
                             raise ModuleException("Invalid usage: %s" % str(e))
-
-                        #else:
-                            #value = default_value
-
-                        # Convert the user-supplied value into the type specified in module_option.type. 
-                        # Do this manually as argparse doesn't seem to be able to handle hexadecimal values.
-                        #try:
-                            # Only convert the user-supplied value to a specific type if this kwarg's default
-                            # type is the same as the type specified for the module option.
-                        #    if value != default_value and type(default_value) == module_option.type:
-                        #        if module_option.type == int:
-                        #            kwargs[name] = int(value, 0)
-                        #        elif module_option.type == float:
-                        #            kwargs[name] = float(value)
-                        #        else:
-                        #            kwargs[name] = value
-                        #    else:
-                        #        kwargs[name] = value
-                        #except KeyboardInterrupt as e:
-                        #    raise e
-                        #except Exception as e:
-                        #    raise ModuleException("Invalid usage: %s" % str(e))
 
         return kwargs
     

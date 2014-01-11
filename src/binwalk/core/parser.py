@@ -70,6 +70,7 @@ class MagicParser(object):
         self.smart = smart
         self.raw_fd = None
         self.signature_count = 0
+        self.signature_set = set()
 
     def __del__(self):
         try:
