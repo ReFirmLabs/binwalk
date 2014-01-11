@@ -25,6 +25,18 @@ def debug(msg):
         sys.stderr.write("DEBUG: " + msg + "\n")
         sys.stderr.flush()
 
+def warning(msg):
+    '''
+    Prints warning messages to stderr
+    '''
+    sys.stderr.write("\nWARNING: " + msg + "\n\n")
+
+def error(msg):
+    '''
+    Prints error messages to stderr
+    '''
+    sys.stderr.write("\nERROR: " + msg + "\n\n")
+
 def file_md5(file_name):
     '''
     Generate an MD5 hash of the specified file.

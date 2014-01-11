@@ -190,7 +190,7 @@ class HashMatch(Module):
                         else:
                             return self.lib.fuzzy_compare(hash1, hash2)
                 except Exception as e:
-                    print ("WARNING: Exception while doing fuzzy hash: %s" % e)
+                    binwalk.core.common.warning("Exception while doing fuzzy hash: %s" % str(e))
 
         return None
 

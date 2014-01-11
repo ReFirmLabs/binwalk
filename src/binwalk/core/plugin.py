@@ -2,6 +2,7 @@ import os
 import sys
 import imp
 import inspect
+import binwalk.core.common
 import binwalk.core.settings
 from binwalk.core.compat import *
 
@@ -124,7 +125,7 @@ class Plugins(object):
             except KeyboardInterrupt as e:
                 raise e
             except Exception as e:
-                sys.stderr.write("WARNING: %s.%s failed: %s\n" % (callback.__module__, callback.__name__, e))
+                binwalk.common.core.warning("%s.%s failed: %s" % (callback.__module__, callback.__name__, e))
 
     def _find_plugin_class(self, plugin):
         for (name, klass) in inspect.getmembers(plugin, inspect.isclass):
@@ -186,7 +187,7 @@ class Plugins(object):
                         except KeyboardInterrupt as e:
                             raise e
                         except Exception as e:
-                            sys.stderr.write("WARNING: Error loading plugin '%s': %s\n" % (file_name, str(e)))
+                            binwalk.common.core.warning("Error loading plugin '%s': %s" % (file_name, str(e)))
                             plugins[key]['enabled'][module] = False
                         
                         try:
@@ -243,7 +244,7 @@ class Plugins(object):
             except KeyboardInterrupt as e:
                 raise e
             except Exception as e:
-                sys.stderr.write("WARNING: Failed to load plugin module '%s': %s\n" % (module, str(e)))
+                binwalk.common.core.warning("Failed to load plugin module '%s': %s" % (module, str(e)))
 
     def pre_scan_callbacks(self, obj):
         return self._call_plugins(self.pre_scan, None)

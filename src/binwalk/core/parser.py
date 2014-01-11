@@ -2,6 +2,7 @@ import io
 import re
 import os.path
 import tempfile
+import binwalk.core.common
 from binwalk.core.compat import *
 from binwalk.core.filter import FilterType
 
@@ -150,7 +151,7 @@ class MagicParser(object):
                 if os.path.exists(fname):
                     self.parse_file(fname)
                 else:
-                    sys.stdout.write("WARNING: Magic file '%s' does not exist!\n" % fname)
+                    binwalk.core.common.warning("Magic file '%s' does not exist!" % fname)
 
         self.fd.seek(0)
         return self.fd.name

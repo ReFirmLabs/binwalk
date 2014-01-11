@@ -4,6 +4,7 @@ import sys
 import shlex
 import tempfile
 import subprocess
+import binwalk.core.common
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg
 from binwalk.core.common import file_size, unique_file_name, BlockFile
@@ -539,7 +540,7 @@ class Extractor(Module):
                 except KeyboardInterrupt as e:
                     raise e
                 except Exception as e:
-                    sys.stderr.write("WARNING: Extractor.execute failed to run internal extractor '%s': %s\n" % (str(cmd), str(e)))
+                    binwalk.core.common.warning("Extractor.execute failed to run internal extractor '%s': %s" % (str(cmd), str(e)))
             else:
                 # If not in verbose mode, create a temporary file to redirect stdout and stderr to
                 if not self.config.verbose:
@@ -560,7 +561,7 @@ class Extractor(Module):
             # making the switch to the new firmware mod kit directory structure. We handle this elsewhere, but it's
             # annoying to see this spammed out to the console every time.
             if self.config.verbose or (not hasattr(e, 'errno') or e.errno != 2):
-                sys.stderr.write("WARNING: Extractor.execute failed to run external extrator '%s': %s\n" % (str(cmd), str(e)))
+                binwalk.core.common.warning("Extractor.execute failed to run external extrator '%s': %s" % (str(cmd), str(e)))
             retval = None
         
         if tmp is not None:
