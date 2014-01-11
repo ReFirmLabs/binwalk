@@ -28,7 +28,7 @@ class Signature(Module):
                    description='Cast offsets as a given data type (use -y to specify the data type / endianess)'),
             Option(short='m',
                    long='magic',
-                   kwargs={'magic_files' : []},
+                   kwargs={'enabled' : True, 'magic_files' : []},
                    type=list,
                    dtype='file',
                    description='Specify a custom magic file to use'),

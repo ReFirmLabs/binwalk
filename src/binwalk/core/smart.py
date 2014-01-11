@@ -157,7 +157,7 @@ class Signature(object):
         '''
         quoted_string = get_quoted_strings(data)
         if quoted_string:
-            data = data.replace(quoted_string, "")
+            data = data.replace('"' + quoted_string + '"', "")
         return data
 
     def one_of_many(self, data, tag):
@@ -195,7 +195,7 @@ class Signature(object):
 
         if tag.tag in safe_data:
             arg = safe_data.split(tag.tag)[1].split(tag.TAG_DELIM_END)[0]
-            
+        
         return (data, arg)
 
     def get_math_arg(self, data, tag):
