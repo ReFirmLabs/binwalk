@@ -40,7 +40,7 @@ class Filter(object):
 
     # If the result returned by libmagic is "data" or contains the text
     # 'invalid' or a backslash are known to be invalid/false positives.
-    DATA_RESULT = "data"
+    UNKNOWN_RESULTS = ["data", "very short file (no magic)"]
     INVALID_RESULTS = ["invalid", "\\"]
     INVALID_RESULT = "invalid"
     NON_PRINTABLE_RESULT = "\\"
@@ -136,7 +136,7 @@ class Filter(object):
         Returns True if data is valid, False if invalid.
         '''
         # A result of 'data' is never ever valid (for libmagic results)
-        if data == self.DATA_RESULT:
+        if data in self.UNKNOWN_RESULTS:
             return False
 
         # Make sure this result wasn't filtered

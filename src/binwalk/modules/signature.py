@@ -25,7 +25,7 @@ class Signature(Module):
             Option(short='C',
                    long='cast',
                    kwargs={'enabled' : True, 'cast_data_types' : True},
-                   description='Cast offsets as various data types'),
+                   description='Cast offsets as a given data type (use -y to specify the data type / endianess)'),
             Option(short='m',
                    long='magic',
                    kwargs={'magic_files' : []},
@@ -50,8 +50,6 @@ class Signature(Module):
     VERBOSE_FORMAT = "%s    %d"
 
     def init(self):
-        flags = 0
-
         # Create Signature and MagicParser class instances. These are mostly for internal use.
         self.smart = binwalk.core.smart.Signature(self.config.filter, ignore_smart_signatures=self.dumb_scan)
         self.parser = binwalk.core.parser.MagicParser(self.config.filter, self.smart)
@@ -64,8 +62,6 @@ class Signature(Module):
         # Append the user's magic file first so that those signatures take precedence
         if not self.magic_files:
             if self.search_for_opcodes:
-                flags |= binwalk.core.magic.Magic.MAGIC_CONTINUE
-
                 self.magic_files = [
                     self.config.settings.paths['user'][self.config.settings.BINARCH_MAGIC_FILE],
                     self.config.settings.paths['system'][self.config.settings.BINARCH_MAGIC_FILE],
@@ -83,7 +79,7 @@ class Signature(Module):
 
         # Parse the magic file(s) and initialize libmagic
         self.mfile = self.parser.parse(self.magic_files)
-        self.magic = binwalk.core.magic.Magic(self.mfile, flags)
+        self.magic = binwalk.core.magic.Magic(self.mfile)
         
         # Once the temporary magic files are loaded into libmagic, we don't need them anymore; delete the temp files
         self.parser.rm_magic_files()
@@ -142,7 +138,7 @@ class Signature(Module):
         
                     # Register the result for futher processing/display
                     self.result(r=r)
-                
+       
                     # Is this a valid result and did it specify a jump-to-offset keyword?
                     if r.valid and r.jump > 0:
                         absolute_jump_offset = r.offset + r.jump
