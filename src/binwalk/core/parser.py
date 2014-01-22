@@ -168,7 +168,8 @@ class MagicParser(object):
         line_count = 0
 
         try:
-            for line in open(file_name, 'r').readlines():
+            for line in open(file_name, 'rb').readlines():
+                line = bytes2str(line)
                 line_count += 1
 
                 # Check if this is the first line of a signature entry

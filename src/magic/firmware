@@ -419,20 +419,30 @@
 >8	lelong		x		size: %d
 
 0	belong		0x4D544443	NSP firmware header, big endian,
+>16 belong      <1      invalid
 >16	belong		x		header size: %d,
+>20 belong      <1      invalid
 >20	belong		x		image size: %d,
+>20 belong      x       {file-size:%d}
+>4  belong      <1      invalid
 >4	belong		x		kernel offset: %d,
+>12 belong      <1      invalid
 >12	belong		x		header version: %d,
 
 0	lelong		0x4D544443	NSP firmware header, little endian,
+>16 lelong      <1      invalid
 >16	lelong		x		header size: %d,
+>20 lelong      <1      invalid
 >20	lelong		x		image size: %d,
+>20 lelong      x       {file-size:%d}
+>4  lelong      <1      invalid
 >4	lelong		x		kernel offset: %d,
+>12 lelong      <1      invalid
 >12	lelong		x		header version: %d,
 
 # http://www.openwiz.org/wiki/Firmware_Layout#Beyonwiz_.wrp_header_structure
 0	string		WizFwPkgl	Beyonwiz firmware header,
->20	string		x		version: "%s"
+>20	string		x		    version: "%s"
 
 0	string		BLI223WJ0	Thompson/Alcatel encoded firmware,
 >32	byte		x		version: %d.

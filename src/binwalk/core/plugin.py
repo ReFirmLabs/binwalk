@@ -117,7 +117,10 @@ class Plugins(object):
     def _call_plugins(self, callback_list, arg):
         for callback in callback_list:
             try:
-                callback(arg)
+                if arg:
+                    callback(arg)
+                else:
+                    callback()
             except KeyboardInterrupt as e:
                 raise e
             except Exception as e:
@@ -231,10 +234,10 @@ class Plugins(object):
                 sys.stderr.write("WARNING: Failed to load plugin module '%s': %s\n" % (module, str(e)))
 
     def pre_scan_callbacks(self, obj):
-        return self._call_plugins(self.pre_scan, obj)
+        return self._call_plugins(self.pre_scan, None)
 
     def post_scan_callbacks(self, obj):
-        return self._call_plugins(self.post_scan, obj)
+        return self._call_plugins(self.post_scan, None)
 
     def scan_callbacks(self, obj):
         return self._call_plugins(self.scan, obj)
