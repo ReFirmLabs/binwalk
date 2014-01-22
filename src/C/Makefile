@@ -1,12 +1,3 @@
-export CC=@CC@
-export CFLAGS=@CFLAGS@
-export SONAME=@SONAME@
-export SOEXT=@SOEXT@
-export prefix=@prefix@
-export exec_prefix=@exec_prefix@
-export LIBDIR=@libdir@
-export INSTALL_OPTIONS=@INSTALL_OPTIONS@
-
 .PHONY: all install clean distclean uninstall
 
 all:
@@ -24,7 +15,6 @@ clean:
 distclean:
 	make -C miniz distclean
 	make -C compress distclean
-	rm -rf *.cache config.* Makefile
 
 uninstall:
 	make -C miniz uninstall

@@ -1,3 +1,12 @@
+export CC=@CC@
+export CFLAGS=@CFLAGS@
+export SONAME=@SONAME@
+export SOEXT=@SOEXT@
+export prefix=@prefix@
+export exec_prefix=@exec_prefix@
+export LIBDIR=@libdir@
+export INSTALL_OPTIONS=@INSTALL_OPTIONS@
+
 PYTHON=python
 SRC_C_DIR="./src/C"
 
@@ -22,7 +31,7 @@ clean:
 
 distclean: clean
 	make -C $(SRC_C_DIR) distclean
-	rm -f Makefile
+	rm -rf Makefile config.* *.cache
 
 uninstall:
 	make -C $(SRC_C_DIR) uninstall
