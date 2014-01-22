@@ -45,11 +45,11 @@ class Filter(object):
     INVALID_RESULT = "invalid"
     NON_PRINTABLE_RESULT = "\\"
 
-    def __init__(self, show_invalid_results=False):
+    def __init__(self, show_invalid_results=None):
         '''
         Class constructor.
 
-        @show_invalid_results - Set to True to display results marked as invalid.
+        @show_invalid_results - A function to call that will return True to display results marked as invalid.
 
         Returns None.
         '''
@@ -144,7 +144,7 @@ class Filter(object):
             return False
 
         # If showing invalid results, just return True without further checking.
-        if self.show_invalid_results:
+        if callable(self.show_invalid_results) and self.show_invalid_results():
             return True
 
         # Don't include quoted strings or keyword arguments in this search, as 

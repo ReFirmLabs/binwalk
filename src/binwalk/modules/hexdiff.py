@@ -1,12 +1,12 @@
 import os
 import sys
 import curses
+import string
 import platform
 import binwalk.core.common as common
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg
 
-# TODO: This code is an effing mess.
 class HexDiff(Module):
 
     ALL_SAME = 0
@@ -17,10 +17,12 @@ class HexDiff(Module):
     DEFAULT_BLOCK_SIZE = 16
 
     COLORS = {
-        'red'    : '31',
-        'green'    : '32',
-        'blue'    : '34',
+        'red'   : '31',
+        'green' : '32',
+        'blue'  : '34',
     }
+
+    SEPERATORS = ['\\', '/']
 
     TITLE = "Binary Diffing"
 
@@ -55,9 +57,8 @@ class HexDiff(Module):
             Kwarg(name='enabled', default=False),
     ]
 
-    HEADER_FORMAT = "\n%s\n"
-    RESULT_FORMAT = "%s\n"
-    RESULT = ['description']
+    RESULT_FORMAT = "0x%.8X    %s\n"
+    RESULT = ['offset', 'description']
     
     def _no_colorize(self, c, color="red", bold=True):
         return c
@@ -78,31 +79,121 @@ class HexDiff(Module):
 
         if self.show_blue and blue in data:
             return True
-        if self.show_green and green in data:
+        elif self.show_green and green in data:
             return True
-        if self.show_red and red in data:
+        elif self.show_red and red in data:
             return True
+
         return False
 
-    def init(self):
-        block = self.config.block
-        if not block:
-            block = self.DEFAULT_BLOCK_SIZE
+    def hexascii(self, target_data, byte, offset):
+        diff_count = 0
 
-        if self.terse:
-            header_files = self.config.target_files[:1]
+        for (fp, data) in iterator(target_data):
+            try:
+                if data[offset] != byte:
+                    diff_count += 1
+            except IndexError as e:
+                diff_count += 1
+
+        if diff_count == len(target_data)-1:
+            color = "red"
+        elif diff_count > 0:
+            color = "blue"
         else:
-            header_files = self.config.target_files
+            color = "green"
 
-        self.HEADER = self._build_header(header_files, block)
+        hexbyte = self.colorize("%.2X" % ord(byte), color)
+        
+        if byte not in string.printable or byte in string.whitespace:
+            byte = "."
+        
+        asciibyte = self.colorize(byte, color)
 
+        return (hexbyte, asciibyte)
+
+    def diff_files(self, target_files):
+        loop_count = 0
+
+        while True:
+            line = ""
+            done_files = 0
+            block_data = {}
+            seperator = self.SEPERATORS[loop_count % 2]
+
+            for fp in target_files:
+                block_data[fp] = fp.read(self.block)
+                if not block_data[fp]:
+                    done_files += 1
+
+            # No more data from any of the target files? Done.
+            if done_files == len(target_files):
+                break
+
+            for fp in target_files:
+                hexline = ""
+                asciiline = ""
+
+                for i in range(0, self.block):
+                    if i >= len(block_data[fp]):
+                        hexbyte = "XX"
+                        asciibyte = "."
+                    else:
+                        (hexbyte, asciibyte) = self.hexascii(block_data, block_data[fp][i], i)
+
+                    hexline += "%s " % hexbyte
+                    asciiline += "%s" % asciibyte
+
+                line += "%s |%s|" % (hexline, asciiline)
+
+                if self.terse:
+                    break
+
+                if fp != target_files[-1]:
+                    line += " %s " % seperator
+
+            self.result(offset=(fp.offset + (self.block * loop_count)), description=line)
+            loop_count += 1
+                
+    def init(self):
+        # Disable the invalid description auto-filtering feature.
+        # This will not affect our own validation.
+        self.config.show_invalid = True
+
+        # Set the block size (aka, hexdump line size)
+        self.block = self.config.block
+        if not self.block:
+            self.block = self.DEFAULT_BLOCK_SIZE
+
+        # Build a list of files to hexdiff
+        self.hex_target_files = [x for x in iter(self.next_file, None)]
+
+        # Build the header format string
+        header_width = (self.block * 4) + 2
+        if self.terse:
+            file_count = 1
+        else:
+            file_count = len(self.hex_target_files)
+        self.HEADER_FORMAT = "OFFSET        " + ("%%-%ds   " % header_width) * file_count
+
+        # Build the header argument list
+        self.HEADER = [fp.name for fp in self.hex_target_files]
+        if self.terse and len(self.HEADER) > 1:
+            self.HEADER = self.HEADER[0]
+
+        # Set up the tty for colorization, if it is supported
         if hasattr(sys.stderr, 'isatty') and sys.stderr.isatty() and platform.system() != 'Windows':
             curses.setupterm()
             self.colorize = self._colorize
         else:
             self.colorize = self._no_colorize
 
+    def validate(self, result):
+        result.valid = self._color_filter(result.description)
+
     def run(self):
-        
-        return True
+        if self.hex_target_files:
+            self.header()
+            self.diff_files(self.hex_target_files)
+            self.footer()
 

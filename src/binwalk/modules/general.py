@@ -109,7 +109,7 @@ class General(Module):
         self._open_target_files()
         self._set_verbosity()
 
-        self.filter = binwalk.core.filter.Filter(self.show_invalid)
+        self.filter = binwalk.core.filter.Filter(self._display_invalid)
         
         # Set any specified include/exclude filters
         for regex in self.exclude_filters:
@@ -184,3 +184,5 @@ class General(Module):
                 except Exception as e:
                     self.error(description="Cannot open file : %s" % str(e))
         
+    def _display_invalid(self):
+        return self.show_invalid
