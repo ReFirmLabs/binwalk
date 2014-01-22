@@ -43,6 +43,7 @@
 >22		lelong		!0
 >>22	lelong		<0				invalid
 >>22	lelong		x				uncompressed size: %d,{extract-delay:End of Zip archive}
+>30     byte        0               invalid
 >30		string		x				name: {raw-replace}
 >26		leshort		x				{raw-string-length:%d}
 >30		string		x				{raw-string:%s

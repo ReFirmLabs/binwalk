@@ -1,4 +1,4 @@
-PYTHON="python"
+PYTHON=python
 SRC_C_DIR="./src/C"
 
 .PHONY: all install build dependencies clean uninstall

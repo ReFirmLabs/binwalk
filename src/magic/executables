@@ -226,15 +226,15 @@
 >>7	byte		255		(embedded)
 
 # Some simple Microsoft executable signatures
-0 		string 		MZ\0\0\0\0\0\0		Microsoft
->0x3c		lelong		<4			invalid
->(0x3c.l)       string          !PE\0\0     		MS-DOS executable
->(0x3c.l)       string          PE\0\0      		portable executable
+0 		    string 		MZ\0\0\0\0\0\0		Microsoft
+>0x3c		lelong		<4			        invalid
+>(0x3c.l)   string      !PE\0\0     		MS-DOS executable
+>(0x3c.l)   string      PE\0\0      		portable executable
 
-0               string          MZ      		Microsoft
->0x3c		lelong		<4			invalid
->(0x3c.l)       string          !PE\0\0     		invalid
->(0x3c.l)       string          PE\0\0      		portable executable
+0           string      MZ                  Microsoft
+>0x3c		lelong		<4			        invalid
+>(0x3c.l)   string      !PE\0\0             invalid
+>(0x3c.l)   string      PE\0\0              portable executable
 
 
 #------------------------------------------------------------------------------
