@@ -569,3 +569,12 @@
 >980	byte		!0
 >>980	string		x				\b, last mounted on: "%s"
 
+# Simple file system found in Foscam camera firmware
+0   beshort 0xbd9a  Foscam WebUI filesystem,
+>2  leshort x       checksum: 0x%X,
+>16 lelong  <1      invalid first file name length,
+>20 byte    0       invalid first file name,
+>20 byte    x       first file name: {raw-replace}
+>16 lelong  x       {raw-string-length:%d}
+>20 string  x       {raw-string:%s}
+
