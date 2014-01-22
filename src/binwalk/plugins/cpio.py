@@ -1,18 +1,18 @@
-class Plugin(object):
+import binwalk.core.plugin
+
+class Plugin(binwalk.core.plugin.Plugin):
     '''
     Ensures that ASCII CPIO archive entries only get extracted once.    
     '''
 
-    def __init__(self, module):
-        self.found_archive = False
-        self.enabled = (module.name == 'Signature')
-        
-    def pre_scan(self, module):
+    MODULES = ['Signature']
+
+    def pre_scan(self):
         # Be sure to re-set this at the beginning of every scan
         self.found_archive = False
 
     def scan(self, result):
-        if self.enabled and result.valid:
+        if result.valid:
             # ASCII CPIO archives consist of multiple entries, ending with an entry named 'TRAILER!!!'.
             # Displaying each entry is useful, as it shows what files are contained in the archive,
             # but we only want to extract the archive when the first entry is found.

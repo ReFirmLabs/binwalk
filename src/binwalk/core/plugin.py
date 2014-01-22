@@ -4,7 +4,56 @@ import imp
 import binwalk.core.settings
 from binwalk.core.compat import *
 
-class Plugins:
+class Plugin(object):
+    '''
+    Class from which all plugin classes are based.
+    '''
+    # A list of case-sensitive module names for which this plugin should be loaded.
+    # If no module names are specified, the plugin will be loaded for all modules.
+    MODULES = []
+
+    def __init__(self, module):
+        '''
+        Class constructor.
+
+        @module - A handle to the current module that this plugin is loaded for.
+
+        Returns None.
+        '''
+        self.module = module
+        
+        if not self.MODULES or self.module.name in self.MODULES:
+            self._enabled = True
+            self.init()
+        else:
+            self._enabled = False
+
+    def init(self):
+        '''
+        Child class should override this if needed.
+        Invoked during plugin initialization.
+        '''
+        pass
+
+    def pre_scan(self):
+        '''
+        Child class should override this if needed.
+        '''
+        pass
+
+    def scan(self, result):
+        '''
+        Child class should override this if needed.
+        '''
+        pass
+
+    def post_scan(self):
+        '''
+        Child class should override this if needed.
+        '''
+        pass
+
+class Plugins(object):
     '''
     Class to load and call plugin callback functions, handled automatically by Binwalk.scan / Binwalk.single_scan.
     An instance of this class is available during a scan via the Binwalk.plugins object.
@@ -117,12 +166,18 @@ class Plugins:
             for file_name in os.listdir(plugins[key]['path']):
                 if file_name.endswith(self.MODULE_EXTENSION):
                     module = file_name[:-len(self.MODULE_EXTENSION)]
-                        
-                    plugin = imp.load_source(module, os.path.join(plugins[key]['path'], file_name))
-                    plugin_class = getattr(plugin, self.PLUGIN)
+                    
+                    try:    
+                        plugin = imp.load_source(module, os.path.join(plugins[key]['path'], file_name))
+                        plugin_class = getattr(plugin, self.PLUGIN)
 
-                    plugins[key]['enabled'][module] = True
-                    plugins[key]['modules'].append(module)
+                        plugins[key]['enabled'][module] = True
+                        plugins[key]['modules'].append(module)
+                    except KeyboardInterrupt as e:
+                        raise e
+                    except Exception as e:
+                        sys.stderr.write("WARNING: Error loading plugin '%s': %s\n" % (file_name, str(e)))
+                        plugins[key]['enabled'][module] = False
                         
                     try:
                         plugins[key]['descriptions'][module] = plugin_class.__doc__.strip().split('\n')[0]
@@ -146,6 +201,8 @@ class Plugins:
                 plugin_class = getattr(plugin, self.PLUGIN)
 
                 class_instance = plugin_class(self.parent)
+                if not class_instance._enabled:
+                    continue
 
                 try:
                     self.scan.append(getattr(class_instance, self.SCAN))

@@ -1,10 +1,12 @@
 import binwalk.core.C
+import binwalk.core.plugin
 from binwalk.core.common import BlockFile
 
-class Plugin(object):
+class Plugin(binwalk.core.plugin.Plugin):
     '''
     Searches for and validates zlib compressed data.
     '''
+    MODULES = ['Signature']
 
     MIN_DECOMP_SIZE = 16 * 1024
     MAX_DATA_SIZE = 33 * 1024
@@ -14,18 +16,13 @@ class Plugin(object):
         binwalk.core.C.Function(name="is_deflated", type=int),
     ]
 
-    def __init__(self, module):
-        self.tinfl = None
-        self.module = module
-
-        # Only initialize this plugin if this is a signature scan
-        if module.name == 'Signature':
-            # Load libtinfl.so
-            self.tinfl = binwalk.core.C.Library(self.TINFL, self.TINFL_FUNCTIONS)
+    def init(self):
+        # Load libtinfl.so
+        self.tinfl = binwalk.core.C.Library(self.TINFL, self.TINFL_FUNCTIONS)
 
     def scan(self, result):
         # If this result is a zlib signature match, try to decompress the data
-        if self.tinfl and result.file and result.description.lower().startswith('zlib'):
+        if result.file and result.description.lower().startswith('zlib'):
             # Seek to and read the suspected zlib data
             fd = self.module.config.open_file(result.file.name, offset=result.offset, length=self.MAX_DATA_SIZE)
             data = fd.read(self.MAX_DATA_SIZE)
