@@ -98,6 +98,8 @@ class Signature(Module):
 
         if r.jump and (r.jump + r.offset) > r.file.size:
             r.valid = False
+                
+        r.valid = self.config.filter.valid_result(r.description)
 
     def scan_file(self, fp):
         current_file_offset = 0
@@ -128,27 +130,27 @@ class Signature(Module):
                 # The smart filter parser returns a binwalk.core.module.Result object
                 r = self.smart.parse(magic_result)
 
-                if self.config.filter.valid_result(r.description):
 
-                    # Set the absolute offset inside the target file
-                    r.offset = block_start + candidate_offset + r.adjust
+                # Set the absolute offset inside the target file
+                r.offset = block_start + candidate_offset + r.adjust
 
-                    # Provide an instance of the current file object
-                    r.file = fp
+                # Provide an instance of the current file object
+                r.file = fp
         
-                    # Register the result for futher processing/display
-                    self.result(r=r)
+                # Register the result for futher processing/display
+                # self.result automatically calls self.validate for result validation
+                self.result(r=r)
        
-                    # Is this a valid result and did it specify a jump-to-offset keyword?
-                    if r.valid and r.jump > 0:
-                        absolute_jump_offset = r.offset + r.jump
-                        current_block_offset = candidate_offset + r.jump
+                # Is this a valid result and did it specify a jump-to-offset keyword?
+                if r.valid and r.jump > 0:
+                    absolute_jump_offset = r.offset + r.jump
+                    current_block_offset = candidate_offset + r.jump
 
-                        # If the jump-to-offset is beyond the confines of the current block, seek the file to
-                        # that offset and quit processing this block of data.
-                        if absolute_jump_offset >= fp.tell():
-                            fp.seek(r.offset + r.jump)
-                            break
+                    # If the jump-to-offset is beyond the confines of the current block, seek the file to
+                    # that offset and quit processing this block of data.
+                    if absolute_jump_offset >= fp.tell():
+                        fp.seek(r.offset + r.jump)
+                        break
 
     def run(self):
         for fp in iter(self.next_file, None):
