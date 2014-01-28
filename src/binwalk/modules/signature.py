@@ -15,7 +15,7 @@ class Signature(Module):
                    description='Scan target file(s) for common file signatures'),
             Option(short='R',
                    long='raw-bytes',
-                   kwargs={'raw_bytes' : None},
+                   kwargs={'enabled' : True, 'raw_bytes' : ''},
                    type=str,
                    description='Scan target file(s) for the specified sequence of bytes'),
             Option(short='A',
@@ -57,7 +57,7 @@ class Signature(Module):
 
         # If a raw byte sequence was specified, build a magic file from that instead of using the default magic files
         if self.raw_bytes is not None:
-            self.magic_files.append(self.parser.file_from_string(self.raw_bytes))
+            self.magic_files = [self.parser.file_from_string(self.raw_bytes)]
 
         # Append the user's magic file first so that those signatures take precedence
         if self.search_for_opcodes:
