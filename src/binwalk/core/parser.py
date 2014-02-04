@@ -145,10 +145,11 @@ class MagicParser(object):
             files = [file_name]
 
         for fname in files:
-            if os.path.exists(fname):
-                self.parse_file(fname)
-            else:
-                sys.stdout.write("WARNING: Magic file '%s' does not exist!\n" % fname)
+            if fname:
+                if os.path.exists(fname):
+                    self.parse_file(fname)
+                else:
+                    sys.stdout.write("WARNING: Magic file '%s' does not exist!\n" % fname)
 
         self.fd.seek(0)
         return self.fd.name

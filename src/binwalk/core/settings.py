@@ -41,7 +41,7 @@ class Settings:
 
         # Dictionary of all absolute user/system file paths
         self.paths = {
-            'user'        : {},
+            'user'      : {},
             'system'    : {},
         }
 
@@ -58,6 +58,19 @@ class Settings:
         self.paths['system'][self.BINCAST_MAGIC_FILE] = self._system_path(self.BINWALK_MAGIC_DIR, self.BINCAST_MAGIC_FILE)
         self.paths['system'][self.EXTRACT_FILE] = self._system_path(self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE)
         self.paths['system'][self.PLUGINS] = self._system_path(self.BINWALK_PLUGINS_DIR)
+
+    def get_file_path(self, usersys, fname):
+        '''
+        Retrieves the specified file path from self.paths.
+
+        @usersys - One of: 'user', 'system'.
+        @fname   - The file name (e.g., self.BINWALK_MAGIC_FILE, self.PLUGINS, etc)
+
+        Returns the path, if it exists; returns None otherwise.
+        '''
+        if self.paths.has_key(usersys) and has_key(self.paths[usersys], fname) and self.paths[usersys][fname]:
+            return self.paths[usersys][fname]
+        return None
 
     def find_magic_file(self, fname, system_only=False, user_only=False):
         '''
@@ -149,7 +162,12 @@ class Settings:
 
         Returns the full path to the 'subdir/basename' file.
         '''
-        return self._file_path(os.path.join(self.user_dir, self.BINWALK_USER_DIR, subdir), basename)
+        try:
+            return self._file_path(os.path.join(self.user_dir, self.BINWALK_USER_DIR, subdir), basename)
+        except KeyboardInterrupt as e :
+            raise e
+        except Exception:
+            return None
 
     def _system_path(self, subdir, basename=''):
         '''
@@ -160,5 +178,10 @@ class Settings:
         
         Returns the full path to the 'subdir/basename' file.
         '''
-        return self._file_path(os.path.join(self.system_dir, subdir), basename)
+        try:
+            return self._file_path(os.path.join(self.system_dir, subdir), basename)
+        except KeyboardInterrupt as e :
+            raise e
+        except Exception:
+            return None
 

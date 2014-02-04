@@ -258,18 +258,19 @@ class Extractor(Module):
         '''
         # Load the user extract file first to ensure its rules take precedence.
         extract_files = [
-            self.config.settings.paths['user'][self.config.settings.EXTRACT_FILE],
-            self.config.settings.paths['system'][self.config.settings.EXTRACT_FILE],
+            self.config.settings.get_file_path('user', self.config.settings.EXTRACT_FILE),
+            self.config.settings.get_file_path('system', self.config.settings.EXTRACT_FILE),
         ]
 
         for extract_file in extract_files:
-            try:
-                self.load_from_file(extract_file)
-            except KeyboardInterrupt as e:
-                raise e
-            except Exception as e:
-                if self.config.verbose:
-                    raise Exception("Extractor.load_defaults failed to load file '%s': %s" % (extract_file, str(e)))
+            if extract_file:
+                try:
+                    self.load_from_file(extract_file)
+                except KeyboardInterrupt as e:
+                    raise e
+                except Exception as e:
+                    if self.config.verbose:
+                        raise Exception("Extractor.load_defaults failed to load file '%s': %s" % (extract_file, str(e)))
 
     def build_output_directory(self, path):
         '''

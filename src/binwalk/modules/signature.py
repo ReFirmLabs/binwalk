@@ -62,21 +62,21 @@ class Signature(Module):
         # Append the user's magic file first so that those signatures take precedence
         if self.search_for_opcodes:
             self.magic_files += [
-                    self.config.settings.paths['user'][self.config.settings.BINARCH_MAGIC_FILE],
-                    self.config.settings.paths['system'][self.config.settings.BINARCH_MAGIC_FILE],
+                    self.config.settings.get_file_path('user', self.config.settings.BINARCH_MAGIC_FILE),
+                    self.config.settings.get_file_path('system', self.config.settings.BINARCH_MAGIC_FILE),
             ]
 
         if self.cast_data_types:
             self.magic_files += [
-                    self.config.settings.paths['user'][self.config.settings.BINCAST_MAGIC_FILE],
-                    self.config.settings.paths['system'][self.config.settings.BINCAST_MAGIC_FILE],
+                    self.config.settings.get_file_path('user', self.config.settings.BINCAST_MAGIC_FILE),
+                    self.config.settings.get_file_path('system', self.config.settings.BINCAST_MAGIC_FILE),
             ]
 
         # Use the system default magic file if no other was specified, or if -B was explicitly specified
         if not self.magic_files or self.force_default_scan:
             self.magic_files += [
-                    self.config.settings.paths['user'][self.config.settings.BINWALK_MAGIC_FILE],
-                    self.config.settings.paths['system'][self.config.settings.BINWALK_MAGIC_FILE],
+                    self.config.settings.get_file_path('user', self.config.settings.BINWALK_MAGIC_FILE),
+                    self.config.settings.get_file_path('system', self.config.settings.BINWALK_MAGIC_FILE),
             ]
 
         # Parse the magic file(s) and initialize libmagic
