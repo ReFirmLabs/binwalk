@@ -170,30 +170,31 @@ class Plugins(object):
         }
 
         for key in plugins.keys():
-            plugins[key]['path'] = self.settings.paths[key][self.settings.PLUGINS]
+            plugins[key]['path'] = self.settings.get_file_path(key, self.settings.PLUGINS)
 
-            for file_name in os.listdir(plugins[key]['path']):
-                if file_name.endswith(self.MODULE_EXTENSION):
-                    module = file_name[:-len(self.MODULE_EXTENSION)]
+            if plugins[key]['path']:
+                for file_name in os.listdir(plugins[key]['path']):
+                    if file_name.endswith(self.MODULE_EXTENSION):
+                        module = file_name[:-len(self.MODULE_EXTENSION)]
                     
-                    try:    
-                        plugin = imp.load_source(module, os.path.join(plugins[key]['path'], file_name))
-                        plugin_class = self._find_plugin_class(plugin)
+                        try:    
+                            plugin = imp.load_source(module, os.path.join(plugins[key]['path'], file_name))
+                            plugin_class = self._find_plugin_class(plugin)
 
-                        plugins[key]['enabled'][module] = True
-                        plugins[key]['modules'].append(module)
-                    except KeyboardInterrupt as e:
-                        raise e
-                    except Exception as e:
-                        sys.stderr.write("WARNING: Error loading plugin '%s': %s\n" % (file_name, str(e)))
-                        plugins[key]['enabled'][module] = False
+                            plugins[key]['enabled'][module] = True
+                            plugins[key]['modules'].append(module)
+                        except KeyboardInterrupt as e:
+                            raise e
+                        except Exception as e:
+                            sys.stderr.write("WARNING: Error loading plugin '%s': %s\n" % (file_name, str(e)))
+                            plugins[key]['enabled'][module] = False
                         
-                    try:
-                        plugins[key]['descriptions'][module] = plugin_class.__doc__.strip().split('\n')[0]
-                    except KeyboardInterrupt as e:
-                        raise e
-                    except Exception as e:
-                        plugins[key]['descriptions'][module] = 'No description'
+                        try:
+                            plugins[key]['descriptions'][module] = plugin_class.__doc__.strip().split('\n')[0]
+                        except KeyboardInterrupt as e:
+                            raise e
+                        except Exception as e:
+                            plugins[key]['descriptions'][module] = 'No description'
         return plugins
 
     def load_plugins(self):
@@ -203,7 +204,12 @@ class Plugins(object):
 
     def _load_plugin_modules(self, plugins):
         for module in plugins['modules']:
-            file_path = os.path.join(plugins['path'], module + self.MODULE_EXTENSION)
+            try:
+                file_path = os.path.join(plugins['path'], module + self.MODULE_EXTENSION)
+            except KeyboardInterrupt as e:
+                raise e
+            except Exception:
+                continue
 
             try:
                 plugin = imp.load_source(module, file_path)
