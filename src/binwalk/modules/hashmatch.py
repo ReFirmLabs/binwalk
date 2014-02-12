@@ -276,15 +276,15 @@ class HashMatch(Module):
 
         for directory in haystack:
             dir_files = self._get_file_list(directory)
-        
-            for f in source_files:
-                if f in dir_files:
-                    file1 = os.path.join(needle, f)
-                    file2 = os.path.join(directory, f)
+
+            for source_file in source_files:
+                for dir_file in dir_files:
+                    file1 = os.path.join(needle, source_file)
+                    file2 = os.path.join(directory, dir_file)
 
                     m = self._compare_files(file1, file2)
                     if m is not None and self.is_match(m):
-                        self._show_result(m, file2)
+                        self._show_result(m, "%s => %s" % (file1, file2))
 
                         self.total += 1
                         if self.max_results and self.total >= self.max_results:
@@ -297,14 +297,13 @@ class HashMatch(Module):
         '''
         Main module method.
         '''
-        needle = self.next_file().name
-        haystack = []
+        # Access the raw self.config.files list directly here, since we accept both
+        # files and directories and self.next_file only works for files.
+        needle = self.config.files[0]
+        haystack = self.config.files[1:]
 
         self.header()
                 
-        for fp in iter(self.next_file, None):
-            haystack.append(fp.name)
-
         if os.path.isfile(needle):
             if os.path.isfile(haystack[0]):
                 self.hash_files(needle, haystack)
