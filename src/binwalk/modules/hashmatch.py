@@ -87,7 +87,7 @@ class HashMatch(Module):
     FUZZY_MIN_FILE_SIZE = 4096
 
     HEADER_FORMAT = "\n%s" + " " * 11 + "%s\n" 
-    RESULT_FORMAT = "%4d%%" + " " * 16 + "%s\n"
+    RESULT_FORMAT = "%.3d%%" + " " * 17 + "%s\n"
     HEADER = ["SIMILARITY", "FILE NAME"]
     RESULT = ["percentage", "description"]
 
