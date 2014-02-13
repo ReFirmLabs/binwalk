@@ -65,7 +65,6 @@ class HashMatch(Module):
         Kwarg(name='strings', default=False),
         Kwarg(name='same', default=True),
         Kwarg(name='symlinks', default=False),
-        Kwarg(name='name', default=False),
         Kwarg(name='max_results', default=None),
         Kwarg(name='abspath', default=False),
         Kwarg(name='filter_by_name', default=False),
