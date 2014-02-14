@@ -86,7 +86,7 @@ class HashMatch(Module):
     FUZZY_MIN_FILE_SIZE = 4096
 
     HEADER_FORMAT = "\n%s" + " " * 11 + "%s\n" 
-    RESULT_FORMAT = "%.3d%%" + " " * 17 + "%s\n"
+    RESULT_FORMAT = "%d%%" + " " * 17 + "%s\n"
     HEADER = ["SIMILARITY", "FILE NAME"]
     RESULT = ["percentage", "description"]
 
@@ -103,6 +103,13 @@ class HashMatch(Module):
     def _show_result(self, match, fname):
         if self.abspath:
             fname = os.path.abspath(fname)
+
+        # Add description string padding for alignment
+        if match < 100:
+            fname = ' ' + fname
+        if match < 10:
+            fname = ' ' + fname
+
         self.result(percentage=match, description=fname)
 
     def _compare_files(self, file1, file2):
