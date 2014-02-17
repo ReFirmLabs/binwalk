@@ -177,7 +177,7 @@ class Plugins(object):
                     if file_name.endswith(self.MODULE_EXTENSION):
                         module = file_name[:-len(self.MODULE_EXTENSION)]
                     
-                        try:    
+                        try: 
                             plugin = imp.load_source(module, os.path.join(plugins[key]['path'], file_name))
                             plugin_class = self._find_plugin_class(plugin)
 
