@@ -559,7 +559,7 @@ class Extractor(Module):
             # Silently ignore no such file or directory errors. Why? Because these will inevitably be raised when
             # making the switch to the new firmware mod kit directory structure. We handle this elsewhere, but it's
             # annoying to see this spammed out to the console every time.
-            if not hasattr(e, 'errno') or e.errno != 2:
+            if self.config.verbose or (not hasattr(e, 'errno') or e.errno != 2):
                 sys.stderr.write("WARNING: Extractor.execute failed to run external extrator '%s': %s\n" % (str(cmd), str(e)))
             retval = None
         
