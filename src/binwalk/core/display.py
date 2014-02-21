@@ -131,29 +131,45 @@ class Display(object):
         Formats a line of text to fit in the terminal window.
         For Tim.
         '''
-        offset = 0
-        space_offset = 0
-        self.string_parts = []
         delim = '\n'
+        offset = 0
+        self.string_parts = []
 
         if self.fit_to_screen and len(line) > self.SCREEN_WIDTH:
+            # Split the line into an array of columns, e.g., ['0', '0x00000000', 'Some description here']
             line_columns = line.split(None, self.num_columns-1)
+            # Find where the start of the last column (description) starts in the line of text.
+            # All line wraps need to be aligned to this offset.
+            offset = line.rfind(line_columns[-1])
+            # The delimiter will be a newline followed by spaces padding out the line wrap to the alignment offset.
+            delim += ' ' * offset
+            # Calculate the maximum length that each wrapped line can be
+            max_line_wrap_length = self.SCREEN_WIDTH - offset
 
-            if line_columns:
-                delim = '\n' + ' ' * line.rfind(line_columns[-1])
+            # Append all but the last column to formatted_line
+            formatted_line = line[:offset]
 
-                while len(line[offset:]) > self.SCREEN_WIDTH:
-                    space_offset = line[offset:offset+self.HEADER_WIDTH].rfind(' ')
-                    if space_offset == -1 or space_offset == 0:
-                        space_offset = self.SCREEN_WIDTH
+            # Loop to split up line into multiple max_line_wrap_length pieces
+            while len(line[offset:]) > max_line_wrap_length:
+                # Find the nearest space to wrap the line at (so we don't split a word across two lines)
+                split_offset = line[offset:offset+max_line_wrap_length].rfind(' ')
+                # If there were no good places to split the line, just truncate it at max_line_wrap_length
+                if split_offset < 1:
+                    split_offset = max_line_wrap_length
 
-                    self._append_to_data_parts(line, offset, offset+space_offset)
+                self._append_to_data_parts(line, offset, offset+split_offset)
+                offset += split_offset
 
-                    offset += space_offset
+            # Add any remaining data (guarunteed to be max_line_wrap_length long or shorter) to self.string_parts
+            self._append_to_data_parts(line, offset, offset+len(line[offset:]))
 
-        self._append_to_data_parts(line, offset, offset+len(line[offset:]))
+            # Append self.string_parts to formatted_line; each part seperated by delim
+            formatted_line += delim.join(self.string_parts)
+        else:
+            # Line fits on screen as-is, no need to format it
+            formatted_line = line
 
-        return delim.join(self.string_parts)
+        return formatted_line
 
     def _configure_formatting(self):
         '''
