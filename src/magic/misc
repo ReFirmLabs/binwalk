@@ -41,3 +41,6 @@
 # CodeGate 2011 http://nopsrus.blogspot.com/2013/05/codegate-ctf-2011-binary-100-points.html
 0    string    \x23\x40\x7e\x5e    Windows Script Encoded Data (screnc.exe)
 
+0   string     /home/              Unix home path string:
+>0  string     x                   "%s"
+
