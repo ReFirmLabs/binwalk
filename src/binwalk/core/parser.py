@@ -148,7 +148,7 @@ class MagicParser(object):
 
         for fname in files:
             if fname:
-                if os.path.exists(fname):
+                if os.path.exists(fname) and os.path.isfile(fname):
                     self.parse_file(fname)
                 else:
                     binwalk.core.common.warning("Magic file '%s' does not exist!" % fname)
