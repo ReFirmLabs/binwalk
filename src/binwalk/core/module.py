@@ -672,7 +672,7 @@ class Modules(object):
             
             # If a dependency failed, consider this a non-recoverable error and raise an exception
             if depobj.errors:
-                raise ModuleException("Failed to load " + dependency.name)
+                raise ModuleException("Failed to load " + dependency.name + " module")
             else:
                 attributes[dependency.attribute] = depobj
 

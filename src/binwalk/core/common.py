@@ -29,13 +29,13 @@ def warning(msg):
     '''
     Prints warning messages to stderr
     '''
-    sys.stderr.write("\nWARNING: " + msg + "\n\n")
+    sys.stderr.write("\nWARNING: " + msg + "\n")
 
 def error(msg):
     '''
     Prints error messages to stderr
     '''
-    sys.stderr.write("\nERROR: " + msg + "\n\n")
+    sys.stderr.write("\nERROR: " + msg + "\n")
 
 def file_md5(file_name):
     '''
