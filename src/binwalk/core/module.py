@@ -52,23 +52,23 @@ class Option(object):
             return value
 
 class Kwarg(object):
-        '''
-        A container class allowing modules to specify their expected __init__ kwarg(s).
-        '''
+    '''
+    A container class allowing modules to specify their expected __init__ kwarg(s).
+    '''
 
-        def __init__(self, name="", default=None, description=""):
-            '''
-            Class constructor.
+    def __init__(self, name="", default=None, description=""):
+        '''
+        Class constructor.
     
-            @name        - Kwarg name.
-            @default     - Default kwarg value.
-            @description - Description string.
+        @name        - Kwarg name.
+        @default     - Default kwarg value.
+        @description - Description string.
 
-            Return None.
-            '''
-            self.name = name
-            self.default = default
-            self.description = description
+        Return None.
+        '''
+        self.name = name
+        self.default = default
+        self.description = description
 
 class Dependency(object):
     '''
