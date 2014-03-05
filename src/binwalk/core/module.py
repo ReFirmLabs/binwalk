@@ -42,7 +42,16 @@ class Option(object):
             elif self.type in [int, float, str]:
                 self.dtype = self.type.__name__
             else:
+                self.type = str
                 self.dtype = str.__name__
+
+    def convert(self, value):
+        if self.type and (self.type.__name__ == self.dtype):
+            return self.type(value)
+        elif self.type == list:
+            return [value]
+        else:
+            return value
 
 class Kwarg(object):
         '''
@@ -734,7 +743,7 @@ class Modules(object):
                 elif module_option.type is list:
                     parser_kwargs['action'] = ListActionParser
                     parser.short_to_long[module_option.short] = module_option.long
-                    parser_kwargs['nargs'] = '+'
+                    #parser_kwargs['nargs'] = '+'
 
                 parser.add_argument(*parser_args, **parser_kwargs)
 
@@ -765,29 +774,35 @@ class Modules(object):
 
                         # If the specified type for these kwargs is None, just set the kwarg to its specified default value.
                         # Else, set it to the value specified from the user.
-                        if module_option.type is not None:
-                            value = args[module_option.long]
-                        else:
-                            value = default_value
-
-                        # Convert the user-supplied value into the type specified in module_option.type. 
-                        # Do this manually as argparse doesn't seem to be able to handle hexadecimal values.
+                        #if module_option.type is not None:
                         try:
-                            # Only convert the user-supplied value to a specific type if this kwarg's default
-                            # type is the same as the type specified for the module option.
-                            if value != default_value and type(default_value) == module_option.type:
-                                if module_option.type == int:
-                                    kwargs[name] = int(value, 0)
-                                elif module_option.type == float:
-                                    kwargs[name] = float(value)
-                                else:
-                                    kwargs[name] = value
-                            else:
-                                kwargs[name] = value
+                            kwargs[name] = module_option.convert(args[module_option.long])
                         except KeyboardInterrupt as e:
                             raise e
                         except Exception as e:
                             raise ModuleException("Invalid usage: %s" % str(e))
+
+                        #else:
+                            #value = default_value
+
+                        # Convert the user-supplied value into the type specified in module_option.type. 
+                        # Do this manually as argparse doesn't seem to be able to handle hexadecimal values.
+                        #try:
+                            # Only convert the user-supplied value to a specific type if this kwarg's default
+                            # type is the same as the type specified for the module option.
+                        #    if value != default_value and type(default_value) == module_option.type:
+                        #        if module_option.type == int:
+                        #            kwargs[name] = int(value, 0)
+                        #        elif module_option.type == float:
+                        #            kwargs[name] = float(value)
+                        #        else:
+                        #            kwargs[name] = value
+                        #    else:
+                        #        kwargs[name] = value
+                        #except KeyboardInterrupt as e:
+                        #    raise e
+                        #except Exception as e:
+                        #    raise ModuleException("Invalid usage: %s" % str(e))
 
         return kwargs
     
