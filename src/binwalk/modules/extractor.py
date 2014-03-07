@@ -518,7 +518,8 @@ class Extractor(Module):
             raise e
         except Exception as e:
             raise Exception("Extractor.dd failed to extract data from '%s' to '%s': %s" % (file_name, fname, str(e)))
-        
+       
+        binwalk.core.common.debug("Carved data block 0x%X - 0x%X from '%s' to '%s'" % (offset, offset+size, file_name, fname)) 
         return fname
 
     def execute(self, cmd, fname):
@@ -550,10 +551,13 @@ class Extractor(Module):
                 cmd = cmd.replace(self.FILE_NAME_PLACEHOLDER, fname)
     
                 # Execute.
-                if subprocess.call(shlex.split(cmd), stdout=tmp, stderr=tmp) == 0:
+                rval = subprocess.call(shlex.split(cmd), stdout=tmp, stderr=tmp)
+                if rval == 0:
                     retval = True
                 else:
                     retval = False
+
+                binwalk.core.common.debug('External extractor command "%s" completed with return code %d' % (cmd, rval))
         except KeyboardInterrupt as e:
             raise e
         except Exception as e:
