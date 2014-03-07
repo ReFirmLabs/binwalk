@@ -52,8 +52,10 @@ class Option(object):
                 return self.type(value, 0)
             else:
                 return self.type(value)
-        else:
+        elif default_value:
             return default_value
+        else:
+            return value
 
 class Kwarg(object):
     '''
