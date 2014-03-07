@@ -45,7 +45,7 @@ class Option(object):
                 self.type = str
                 self.dtype = str.__name__
 
-    def convert(self, value):
+    def convert(self, value, default_value):
         if self.type and (self.type.__name__ == self.dtype):
             # Be sure to specify a base of 0 for int() so that the base is auto-detected
             if self.type == int:
@@ -53,7 +53,7 @@ class Option(object):
             else:
                 return self.type(value)
         else:
-            return value
+            return default_value
 
 class Kwarg(object):
     '''
@@ -753,7 +753,7 @@ class Modules(object):
                         last_priority[name] = module_option.priority
 
                         try:
-                            kwargs[name] = module_option.convert(args[module_option.long])
+                            kwargs[name] = module_option.convert(args[module_option.long], default_value)
                         except KeyboardInterrupt as e:
                             raise e
                         except Exception as e:
