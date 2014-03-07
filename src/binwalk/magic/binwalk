@@ -1263,10 +1263,16 @@
 >>20    beshort >4      \binvalid,
 >28     beshort <3
 >>8     belong  x       size: %d bytes,
+>>8	    belong	x	\b{jump-to-offset:%d}
+>>8	    belong	x	\b{file-size:%d}
 >28     beshort 3
 >>63    bequad x        size: %lld bytes,
+>>63	bequad	x	\b{jump-to-offset:%lld}
+>>63	bequad	x	\b{file-size:%lld}
 >28     beshort >3
 >>40    bequad  x       size: %lld bytes,
+>>40	bequad	x	\b{jump-to-offset:%lld}
+>>40	bequad	x	\b{file-size:%lld}
 >4      belong  x       %d inodes,
 >28     beshort >3
 >>12    belong          blocksize: %d bytes,
@@ -1282,12 +1288,6 @@
 >>39    bedate  x       created: %s
 >28     beshort >3
 >>8     bedate x        created: %s
->28	beshort <3
->>8	belong	x	{jump-to-offset:%d}
->28	beshort	3	
->>63	bequad	x	{jump-to-offset:%lld}
->28	beshort	>3
->>40	bequad	x	{jump-to-offset:%lld}
 
 # Squashfs, little endian
 0       string  hsqs    Squashfs filesystem, little endian,

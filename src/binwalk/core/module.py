@@ -47,7 +47,11 @@ class Option(object):
 
     def convert(self, value):
         if self.type and (self.type.__name__ == self.dtype):
-            return self.type(value)
+            # Be sure to specify a base of 0 for int() so that the base is auto-detected
+            if self.type == int:
+                return self.type(value, 0)
+            else:
+                return self.type(value)
         else:
             return value
 
