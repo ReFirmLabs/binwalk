@@ -17,6 +17,7 @@ all: build
 install: build
 	make -C $(SRC_C_DIR) install
 	$(PYTHON) ./setup.py install
+	ldconfig || true
 
 build:
 	make -C $(SRC_C_DIR)
