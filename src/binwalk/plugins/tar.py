@@ -25,13 +25,13 @@ class TarPlugin(binwalk.core.plugin.Plugin):
         """
         # There are two possible encodings for a number field, see
         # itn() below.
-        if s[0] != chr(0200):
+        if s[0] != chr(0x80):
             try:
                 n = int(self.nts(s) or "0", 8)
             except ValueError:
                 raise ValueError("invalid tar header")
         else:
-            n = 0L
+            n = 0
             for i in xrange(len(s) - 1):
                 n <<= 8
                 n += ord(s[i + 1])

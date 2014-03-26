@@ -274,7 +274,7 @@ class Extractor(Module):
                 except KeyboardInterrupt as e:
                     raise e
                 except Exception as e:
-                    if self.config.verbose:
+                    if binwalk.core.common.DEBUG:
                         raise Exception("Extractor.load_defaults failed to load file '%s': %s" % (extract_file, str(e)))
 
     def build_output_directory(self, path):
@@ -547,8 +547,8 @@ class Extractor(Module):
                 except Exception as e:
                     binwalk.core.common.warning("Extractor.execute failed to run internal extractor '%s': %s" % (str(cmd), str(e)))
             else:
-                # If not in verbose mode, create a temporary file to redirect stdout and stderr to
-                if not self.config.verbose:
+                # If not in debug mode, create a temporary file to redirect stdout and stderr to
+                if not binwalk.core.common.DEBUG:
                     tmp = tempfile.TemporaryFile()
 
                 # Replace all instances of FILE_NAME_PLACEHOLDER in the command with fname
@@ -568,7 +568,7 @@ class Extractor(Module):
             # Silently ignore no such file or directory errors. Why? Because these will inevitably be raised when
             # making the switch to the new firmware mod kit directory structure. We handle this elsewhere, but it's
             # annoying to see this spammed out to the console every time.
-            if self.config.verbose or (not hasattr(e, 'errno') or e.errno != 2):
+            if binwalk.core.common.DEBUG or (not hasattr(e, 'errno') or e.errno != 2):
                 binwalk.core.common.warning("Extractor.execute failed to run external extrator '%s': %s" % (str(cmd), str(e)))
             retval = None
         

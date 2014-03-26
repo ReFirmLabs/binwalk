@@ -70,7 +70,7 @@ class Settings:
 
         Returns the path, if it exists; returns None otherwise.
         '''
-        if self.paths.has_key(usersys) and has_key(self.paths[usersys], fname) and self.paths[usersys][fname]:
+        if has_key(self.paths, usersys) and has_key(self.paths[usersys], fname) and self.paths[usersys][fname]:
             return self.paths[usersys][fname]
         return None
 

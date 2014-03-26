@@ -7,16 +7,16 @@ export exec_prefix=@exec_prefix@
 export LIBDIR=@libdir@
 export INSTALL_OPTIONS=@INSTALL_OPTIONS@
 
-PYTHON=python
+PYTHON=python3
 SRC_C_DIR="./src/C"
 
 .PHONY: all install build deps clean uninstall
 
 all: build
 
-install: build
+install:
 	make -C $(SRC_C_DIR) install
-	$(PYTHON) ./setup.py install
+	$(PYTHON) ./setup.py install --yes
 	ldconfig || true
 
 build:

@@ -15,13 +15,18 @@ if has_key(__builtins__, 'BLOCK_FILE_PARENT_CLASS'):
 else:
     BLOCK_FILE_PARENT_CLASS = io.FileIO
 
+# The __debug__ value is a bit backwards; by default it is set to True, but
+# then set to False if the Python interpreter is run with the -O option.
+if not __debug__:
+    DEBUG = True
+else:
+    DEBUG = False
+
 def debug(msg):
     '''
     Displays debug messages to stderr only if the Python interpreter was invoked with the -O flag.
     '''
-    # The __debug__ value is a bit backwards; by default it is set to True, but
-    # then set to False if the Python interpreter is run with the -O option.
-    if not __debug__:
+    if DEBUG:
         sys.stderr.write("DEBUG: " + msg + "\n")
         sys.stderr.flush()
 

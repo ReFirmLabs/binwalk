@@ -51,7 +51,7 @@ def warning(lines, terminate=True, prompt=True):
         print("*" * WIDTH, "\n")
 
         if prompt:
-            if raw_input('Continue installation anyway (Y/n)? ').lower().startswith('n'):
+            if raw_input('Continue anyway (Y/n)? ').lower().startswith('n'):
                 terminate = True
             else:
                 terminate = False
