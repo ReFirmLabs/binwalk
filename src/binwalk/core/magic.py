@@ -1,3 +1,7 @@
+# Python wrapper for the libmagic library.
+# Although libmagic comes with its own wrapper, there are compatibility issues with older libmagic versions
+# as well as unofficial libmagic Python wrappers, so it's easier to just have our own wrapper.
+
 import binwalk.core.C
 import binwalk.core.common
 from binwalk.core.compat import *

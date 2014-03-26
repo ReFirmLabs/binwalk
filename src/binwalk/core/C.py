@@ -119,6 +119,7 @@ class Library(object):
 
         lib_path = ctypes.util.find_library(library)
 
+        # If ctypes failed to find the library, check the common paths listed in system_paths
         if not lib_path:
             for path in system_paths[sys.platform]:
                 if os.path.exists(path):

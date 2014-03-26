@@ -1,3 +1,7 @@
+# "Smart" parser for handling libmagic signature results. Specifically, this implements
+# support for binwalk's custom libmagic signature extensions (keyword tags, string processing,
+# false positive detection, etc).
+
 import re
 import binwalk.core.module
 from binwalk.core.compat import *

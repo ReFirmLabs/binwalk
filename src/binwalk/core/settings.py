@@ -1,3 +1,5 @@
+# Code for loading and accessing binwalk settings (extraction rules, signature files, etc).
+
 import os
 import binwalk.core.common as common
 from binwalk.core.compat import *

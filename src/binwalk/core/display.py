@@ -1,3 +1,6 @@
+# Code to handle displaying and logging of results.
+# Anything in binwalk that prints results to screen should use this class.
+
 import sys
 import csv as pycsv
 import datetime

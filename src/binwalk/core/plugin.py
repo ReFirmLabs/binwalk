@@ -1,3 +1,5 @@
+# Core code for supporting and managing plugins.
+
 import os
 import sys
 import imp
@@ -140,17 +142,17 @@ class Plugins(object):
         Returns a dictionary of:
 
             {
-                'user'        : {
-                            'modules'     : [list, of, module, names],
-                            'descriptions'    : {'module_name' : 'module pydoc string'},
+                'user'      : {
+                            'modules'       : [list, of, module, names],
+                            'descriptions'  : {'module_name' : 'module pydoc string'},
                             'enabled'       : {'module_name' : True},
-                            'path'        : "path/to/module/plugin/directory"
+                            'path'          : "path/to/module/plugin/directory"
                 },
                 'system'    : {
-                            'modules'     : [list, of, module, names],
-                            'descriptions'    : {'module_name' : 'module pydoc string'},
+                            'modules'       : [list, of, module, names],
+                            'descriptions'  : {'module_name' : 'module pydoc string'},
                             'enabled'       : {'module_name' : True},
-                            'path'        : "path/to/module/plugin/directory"
+                            'path'          : "path/to/module/plugin/directory"
                 }
             }
         '''

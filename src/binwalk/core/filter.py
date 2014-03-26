@@ -1,3 +1,5 @@
+# Code for filtering of results (e.g., removing invalid results)
+
 import re
 import binwalk.core.common as common
 from binwalk.core.smart import Signature
@@ -34,7 +36,6 @@ class FilterExclude(FilterType):
 class Filter(object):
     '''
     Class to filter results based on include/exclude rules and false positive detection.
-    An instance of this class is available via the Binwalk.filter object.
     Note that all filter strings should be in lower case.
     '''
 

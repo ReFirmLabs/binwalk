@@ -1,3 +1,8 @@
+# Core code relating to binwalk modules and supporting classes.
+# In particular, the Module class (base class for all binwalk modules)
+# and the Modules class (main class for managing and executing binwalk modules)
+# are most critical.
+
 import io
 import os
 import sys

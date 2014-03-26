@@ -1,3 +1,10 @@
+# Code for performing minimal parsing of libmagic-compatible signature files.
+# This allows for building a single signature file from multiple other signature files,
+# and for parsing out the initial magic signature bytes for each signature (used for
+# pre-processing of data to limit the number of actual calls into libmagic).
+# 
+# Also performs splitting/formatting of libmagic result text.
+
 import io
 import re
 import os.path
