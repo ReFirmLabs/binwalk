@@ -41,6 +41,8 @@ BINWALK SCRIPTING
 
         o All command line switches passed via args must be preceeded by hyphens (not required for kwargs)
         o All file names must be passed via args, not kwargs
+        o Python does not allow keyword arguments to contain hyphens, so 'save-plot=True' is invalid syntax.
+          You can instead use the corresponding short keyword option ('J=True').
 
 ACCESSING SCAN RESULTS
 
