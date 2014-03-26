@@ -164,7 +164,7 @@ install_data_files = ["magic/*", "config/*", "plugins/*", "modules/*", "core/*"]
 
 # Install the module, script, and support files
 setup(name = MODULE_NAME,
-      version = "2.0.0 beta",
+      version = "2.0.0",
       description = "Firmware analysis tool",
       author = "Craig Heffner",
       url = "https://github.com/devttys0/%s" % MODULE_NAME,
