@@ -7,7 +7,7 @@ export exec_prefix=@exec_prefix@
 export LIBDIR=@libdir@
 export INSTALL_OPTIONS=@INSTALL_OPTIONS@
 
-PYTHON=python3
+PYTHON=python
 SRC_C_DIR="./src/C"
 
 .PHONY: all install build deps clean uninstall
