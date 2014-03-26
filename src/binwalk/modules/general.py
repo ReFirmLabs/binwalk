@@ -1,3 +1,5 @@
+# Module to process general user input options (scan length, starting offset, etc).
+
 import os
 import sys
 import argparse

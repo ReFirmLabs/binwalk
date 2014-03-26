@@ -1,3 +1,5 @@
+# Generates 3D visualizations of input files.
+
 import os
 from binwalk.core.compat import *
 from binwalk.core.common import BlockFile
@@ -135,7 +137,9 @@ class Plotter(Module):
 
         for point in sorted(data_points, key=data_points.get, reverse=True):
             plot_points[point] = data_points[point]
-            self.result(point=point)
+            # Register this as a result in case future modules need access to the raw point information,
+            # but mark plot as False to prevent the entropy module from attempting to overlay this data on its graph.
+            self.result(point=point, plot=False)
             total += 1
             if total >= self.max_points:
                 break

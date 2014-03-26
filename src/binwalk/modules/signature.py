@@ -1,3 +1,5 @@
+# Basic signature scan module. This is the default (and primary) feature of binwalk.
+
 import binwalk.core.magic
 import binwalk.core.smart
 import binwalk.core.parser

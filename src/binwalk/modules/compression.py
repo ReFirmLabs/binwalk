@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# Performs raw decompression of various compression algorithms (currently, only deflate).
 
 import os
 import binwalk.core.C

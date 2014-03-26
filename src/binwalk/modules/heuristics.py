@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# Routines to perform Monte Carlo Pi approximation and Chi Squared tests. 
+# Routines to perform Chi Squared tests. 
 # Used for fingerprinting unknown areas of high entropy (e.g., is this block of high entropy data compressed or encrypted?).
 # Inspired by people who actually know what they're doing: http://www.fourmilab.ch/random/
 

@@ -1,3 +1,5 @@
+# Calculates and optionally plots the entropy of input files.
+
 import os
 import math
 import binwalk.core.common

@@ -1,3 +1,9 @@
+# Performs fuzzy hashing against files/directories.
+# Unlike other scans, this doesn't produce any file offsets, so its results are not applicable to 
+# some other scans, such as the entropy scan.
+# Additionally, this module currently doesn't support certian general options (length, offset, swap, etc),
+# as the libfuzzy C library is responsible for opening and scanning the specified files.
+
 import os
 import re
 import ctypes
@@ -110,7 +116,7 @@ class HashMatch(Module):
         if match < 10:
             fname = ' ' + fname
 
-        self.result(percentage=match, description=fname)
+        self.result(percentage=match, description=fname, plot=False)
 
     def _compare_files(self, file1, file2):
         '''

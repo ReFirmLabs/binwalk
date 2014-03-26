@@ -1,3 +1,7 @@
+# Performs extraction of data that matches extraction rules.
+# This is automatically invoked by core.module code if extraction has been
+# enabled by the user; other modules need not reference this module directly.
+
 import os
 import re
 import sys
