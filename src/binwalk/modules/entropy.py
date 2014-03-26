@@ -62,7 +62,7 @@ class Entropy(Module):
         # Get a list of all other module's results to mark on the entropy graph
         for (module, obj) in iterator(self.modules):
             for result in obj.results:
-                if result.file and result.description:
+                if result.plot and result.file and result.description:
                     description = result.description.split(',')[0]
 
                     if not has_key(self.file_markers, result.file.name):
