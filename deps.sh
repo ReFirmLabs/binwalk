@@ -21,7 +21,8 @@ function fmk
 	if [ ! -e /opt/firmware-mod-kit ]
 	then
 		$SUDO mkdir -p /opt/firmware-mod-kit
-		$SUDO chmod a+rwx /opt/firmware-mod-kit
+        $SUDO chown $USER /opt/firmware-mod-kit
+		$SUDO chmod o+rwx /opt/firmware-mod-kit
 	fi
 
 	if [ ! -e /opt/firmware-mod-kit/.git ]
