@@ -277,7 +277,10 @@
 0       string          ISc(            InstallShield Cabinet archive data
 # TODO: Version number checks should be made more specific for false positive filtering
 >5      byte&0xf0       =0x60           version 6,
->5      byte&0xf0       !0x60           version 4/5,
+>5      byte&0xf0       <0x60           version 4/5,
+>5      byte&0xf0       >0x60           invalid version,
+>12     lelong          <0              invalid offset,
+>12     lelong          >100000         invalid offset,
 >(12.l+40)      lelong  x               %u files
 
 # Windows CE package files
