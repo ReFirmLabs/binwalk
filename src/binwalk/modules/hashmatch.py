@@ -78,8 +78,8 @@ class HashMatch(Module):
         Kwarg(name='enabled', default=False),
     ]
 
-    # Requires libfuzzy.so
-    LIBRARY_NAME = "fuzzy"
+    # Requires libfuzzybinwalk.so
+    LIBRARY_NAME = "fuzzybinwalk"
     LIBRARY_FUNCTIONS = [
             binwalk.core.C.Function(name="fuzzy_hash_buf", type=int),
             binwalk.core.C.Function(name="fuzzy_hash_filename", type=int),
