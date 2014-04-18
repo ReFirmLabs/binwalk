@@ -1,0 +1,38 @@
+
+#------------------------------------------------------------------------------
+# $File: xilinx,v 1.5 2013/01/08 03:06:50 christos Exp $
+# This is Aaron's attempt at a MAGIC file for Xilinx .bit files.
+# Xilinx-Magic@RevRagnarok.com
+# Got the info from FPGA-FAQ 0026
+#
+# First there is the sync header and its length
+0	beshort 0x0009
+>2 	belong	=0x0ff00ff0
+>>&0	belong  =0x0ff00ff0
+>>>&0	beshort =0x0000	
+>>>>&0	pstring	a	Xilinx BIT data
+# Next is a Pascal-style string with the NCD name. We want to capture that.
+>>>>0x0F	pstring	x	- from %s
+# It is followed by a NUL
+>>>>>&1	byte	0x00
+# And then 'b'
+>>>>>&2	string b
+# With the part number:
+#>>>>>&5 string	4v	(Virtex4)
+#>>>>>&5 string  2v	(Virtex II
+#>>>>>>&0	string	!p	\b)
+#>>>>>>&0	string	p	Pro)
+>>>>>&4	pstring x	- for %s
+# And then NUL / 'c' / Build Data / NUL / 'd' / Date / NUL / 'e' / Data Length
+>>>>>>&1	byte	0x00
+>>>>>>&2	string	c
+>>>>>>&4	pstring	x	- built %s
+>>>>>>>&1	byte	0x00
+>>>>>>>&2	string	d
+>>>>>>>&4	pstring	x	\b(%s)
+>>>>>>>>&1	byte	0x00
+>>>>>>>>&2	string	e
+>>>>>>>>&4	belong	x	- data length 0x%lx
+# Raw bitstream files
+0	long	0xffffffff	
+>&0	belong	0xaa995566	Xilinx RAW bitstream (.BIN)

@@ -1,0 +1,6 @@
+# GEDCOM Genealogy file
+
+0       string/c        0\ HEAD         GEDCOM genealogy data
+>&0     search          1\ GEDC
+>>&0    search          2\ VERS         version
+>>>&1   string          >\0             %s

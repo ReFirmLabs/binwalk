@@ -1,0 +1,99 @@
+
+#------------------------------------------------------------------------------
+# $File: palm,v 1.9 2012/01/16 15:16:43 christos Exp $
+# palm:	 file(1) magic for PalmOS {.prc,.pdb}: applications, docfiles, and hacks
+#
+# Brian Lalor <blalor@hcirisc.cs.binghamton.edu>
+
+# These are weak, byte 59 is not guaranteed to be 0 and there are
+# 8 character identifiers at byte 60, one I found for appl is BIGb.
+# What are the possibilities and where is this documented?
+
+# appl
+#59	byte			\0
+#>60	string			appl		PalmOS application
+#>0	string			>\0		"%s"
+# TEXt
+#59	byte			\0
+#>60	belong			TEXt		AportisDoc file
+#>0	string			>\0		"%s"
+# HACK
+#59	byte			\0
+#>60	string			HACK		HackMaster hack
+#>0	string			>\0		"%s"
+
+# Variety of PalmOS document types
+# Michael-John Turner <mj@debian.org>
+# Thanks to Hasan Umit Ezerce <humit@tr-net.net.tr> for his DocType
+60	string			BVokBDIC	BDicty PalmOS document
+>0	string			>\0		"%s"
+60	string			DB99DBOS	DB PalmOS document
+>0	string			>\0		"%s"
+60	string			vIMGView	FireViewer/ImageViewer PalmOS document
+>0	string			>\0		"%s"
+60	string			PmDBPmDB	HanDBase PalmOS document
+>0	string			>\0		"%s"
+60	string			InfoINDB	InfoView PalmOS document
+>0	string			>\0		"%s"
+60	string			ToGoToGo	iSilo PalmOS document
+>0	string			>\0		"%s"
+60	string			JfDbJBas	JFile PalmOS document
+>0	string			>\0		"%s"
+60	string			JfDbJFil	JFile Pro PalmOS document
+>0	string			>\0		"%s"
+60	string			DATALSdb	List PalmOS document
+>0	string			>\0		"%s"
+60	string			Mdb1Mdb1	MobileDB PalmOS document
+>0	string			>\0		"%s"
+60	string			PNRdPPrs	PeanutPress PalmOS document
+>0	string			>\0		"%s"
+60	string			DataPlkr	Plucker PalmOS document
+>0	string			>\0		"%s"
+60	string			DataSprd	QuickSheet PalmOS document
+>0	string			>\0		"%s"
+60	string			SM01SMem	SuperMemo PalmOS document
+>0	string			>\0		"%s"
+60	string			TEXtTlDc	TealDoc PalmOS document
+>0	string			>\0		"%s"
+60	string			InfoTlIf	TealInfo PalmOS document
+>0	string			>\0		"%s"
+60	string			DataTlMl	TealMeal PalmOS document
+>0	string			>\0		"%s"
+60	string			DataTlPt	TealPaint PalmOS document
+>0	string			>\0		"%s"
+60	string			dataTDBP	ThinkDB PalmOS document
+>0	string			>\0		"%s"
+60	string			TdatTide	Tides PalmOS document
+>0	string			>\0		"%s"
+60	string			ToRaTRPW	TomeRaider PalmOS document
+>0	string			>\0		"%s"
+
+# A GutenPalm zTXT etext for use on Palm Pilots (http://gutenpalm.sf.net)
+# For version 1.xx zTXTs, outputs version and numbers of bookmarks and
+#   annotations.
+# For other versions, just outputs version.
+#
+60		string		zTXT		A GutenPalm zTXT e-book
+>0		string		>\0		"%s"
+>(0x4E.L)	byte		0
+>>(0x4E.L+1)	byte		x		(v0.%02d)
+>(0x4E.L)	byte		1
+>>(0x4E.L+1)	byte		x		(v1.%02d)
+>>>(0x4E.L+10)	beshort		>0
+>>>>(0x4E.L+10) beshort		<2		- 1 bookmark
+>>>>(0x4E.L+10) beshort		>1		- %d bookmarks
+>>>(0x4E.L+14)	beshort		>0
+>>>>(0x4E.L+14) beshort		<2		- 1 annotation
+>>>>(0x4E.L+14) beshort		>1		- %d annotations
+>(0x4E.L)	byte		>1		(v%d.
+>>(0x4E.L+1)	byte		x		%02d)
+
+# Palm OS .prc file types
+60		string		libr		Palm OS dynamic library data
+>0		string		>\0		"%s"
+60		string		ptch		Palm OS operating system patch data
+>0		string		>\0		"%s"
+
+# Mobipocket (www.mobipocket.com), donated by Carl Witty
+60	string			BOOKMOBI	Mobipocket E-book
+>0	string			>\0		"%s"

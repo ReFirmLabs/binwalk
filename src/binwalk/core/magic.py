@@ -32,7 +32,7 @@ class Magic(object):
         else:
             self.magic_file = None
         
-        self.libmagic = binwalk.core.C.Library("magic", self.LIBMAGIC_FUNCTIONS)
+        self.libmagic = binwalk.core.C.Library("magicbinwalk", self.LIBMAGIC_FUNCTIONS)
 
         binwalk.core.common.debug("libmagic.magic_open(0x%X)" % (self.MAGIC_FLAGS | flags))
         self.magic_cookie = self.libmagic.magic_open(self.MAGIC_FLAGS | flags)

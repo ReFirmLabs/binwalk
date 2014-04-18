@@ -1,0 +1,165 @@
+
+#------------------------------------------------------------------------------
+# $File: windows,v 1.5 2012/04/03 22:25:07 christos Exp $
+# windows:  file(1) magic for Microsoft Windows
+#
+# This file is mainly reserved for files where programs
+# using them are run almost always on MS Windows 3.x or
+# above, or files only used exclusively in Windows OS,
+# where there is no better category to allocate for.
+# For example, even though WinZIP almost run on Windows
+# only, it is better to treat them as "archive" instead.
+# For format usable in DOS, such as generic executable
+# format, please specify under "msdos" file.
+#
+
+
+# Summary: Outlook Express DBX file
+# Extension: .dbx
+# Created by: Christophe Monniez
+0	string	\xCF\xAD\x12\xFE	MS Outlook Express DBX file
+>4	byte	=0xC5			\b, message database
+>4	byte	=0xC6			\b, folder database
+>4	byte	=0xC7			\b, account information
+>4	byte	=0x30			\b, offline database
+
+
+# Summary: Windows crash dump
+# Extension: .dmp
+# Created by: Andreas Schuster (http://computer.forensikblog.de/)
+# Reference (1): http://computer.forensikblog.de/en/2008/02/64bit_magic.html
+# Modified by (1): Abel Cheung (Avoid match with first 4 bytes only)
+0	string		PAGE		
+>4	string		DUMP		MS Windows 32bit crash dump
+>>0x05c	byte            0		\b, no PAE
+>>0x05c	byte            1		\b, PAE
+>>0xf88	lelong		1		\b, full dump
+>>0xf88	lelong		2		\b, kernel dump
+>>0xf88	lelong		3		\b, small dump
+>>0x068	lelong		x		\b, %ld pages
+>4	string		DU64		MS Windows 64bit crash dump
+>>0xf98	lelong		1		\b, full dump
+>>0xf98	lelong		2		\b, kernel dump
+>>0xf98	lelong		3		\b, small dump
+>>0x090	lequad		x		\b, %lld pages
+
+
+# Summary: Vista Event Log
+# Extension: .evtx
+# Created by: Andreas Schuster (http://computer.forensikblog.de/)
+# Reference (1): http://computer.forensikblog.de/en/2007/05/some_magic.html
+0	string		ElfFile\0	MS Windows Vista Event Log
+>0x2a	leshort		x		\b, %d chunks
+>>0x10	lelong		x		\b (no. %d in use)
+>0x18	lelong		>1		\b, next record no. %d
+>0x18	lelong		=1		\b, empty
+>0x78	lelong		&1		\b, DIRTY
+>0x78	lelong		&2		\b, FULL
+
+
+# Summary: Windows 3.1 group files
+# Extension: .grp
+# Created by: unknown
+0	string		\120\115\103\103	MS Windows 3.1 group files
+
+
+# Summary: Old format help files
+# Extension: .hlp
+# Created by: Dirk Jagdmann <doj@cubic.org>
+0	lelong		0x00035f3f		MS Windows 3.x help file
+
+
+# Summary: Hyper terminal
+# Extension: .ht
+# Created by: unknown
+0	string		HyperTerminal\ 
+>15	string		1.0\ --\ HyperTerminal\ data\ file	MS Windows HyperTerminal profile
+
+# http://ithreats.files.wordpress.com/2009/05/\
+# lnk_the_windows_shortcut_file_format.pdf
+# Summary: Windows shortcut
+# Extension: .lnk
+# Created by: unknown
+# 'L' + GUUID
+0	string		\114\0\0\0\001\024\002\0\0\0\0\0\300\0\0\0\0\0\0\106	MS Windows shortcut
+>20	lelong&1	1	\b, Item id list present
+>20	lelong&2	2	\b, Points to a file or directory
+>20	lelong&4	4	\b, Has Description string
+>20	lelong&8	8	\b, Has Relative path
+>20	lelong&16	16	\b, Has Working directory
+>20	lelong&32	32	\b, Has command line arguments
+>20	lelong&64	64	\b, Icon
+>>56	lelong			\b number=%d
+>24	lelong&1	1	\b, Read-Only
+>24	lelong&2	2	\b, Hidden
+>24	lelong&4	4	\b, System
+>24	lelong&8	8	\b, Volume Label
+>24	lelong&16	16	\b, Directory
+>24	lelong&32	32	\b, Archive
+>24	lelong&64	64	\b, Encrypted
+>24	lelong&128	128	\b, Normal
+>24	lelong&256	256	\b, Temporary
+>24	lelong&512	512	\b, Sparse
+>24	lelong&1024	1024	\b, Reparse point
+>24	lelong&2048	2048	\b, Compressed
+>24	lelong&4096	4096	\b, Offline
+>28	leqwdate	x	\b, ctime=%s
+>36	leqwdate	x	\b, mtime=%s
+>44	leqwdate	x	\b, atime=%s
+>52	lelong		x	\b, length=%u, window=
+>60	lelong&1	1	\bhide
+>60	lelong&2	2	\bnormal
+>60	lelong&4	4	\bshowminimized
+>60	lelong&8	8	\bshowmaximized
+>60	lelong&16	16	\bshownoactivate
+>60	lelong&32	32	\bminimize
+>60	lelong&64	64	\bshowminnoactive
+>60	lelong&128	128	\bshowna
+>60	lelong&256	256	\brestore
+>60	lelong&512	512	\bshowdefault
+#>20	lelong&1	0
+#>>20	lelong&2	2
+#>>>(72.l-64)	pstring/h	x	\b [%s]
+#>20	lelong&1	1
+#>>20	lelong&2	2
+#>>>(72.s)	leshort	x
+#>>>&75	pstring/h	x	\b [%s]
+
+# Summary: Outlook Personal Folders
+# Created by: unknown
+0	lelong		0x4E444221	Microsoft Outlook email folder
+>10	leshort		0x0e		(<=2002)
+>10	leshort		0x17		(>=2003)
+
+
+# Summary: Windows help cache
+# Created by: unknown
+0	string		\164\146\115\122\012\000\000\000\001\000\000\000	MS Windows help cache
+
+
+# Summary: IE cache file
+# Created by: Christophe Monniez
+0	string	Client\ UrlCache\ MMF 	Internet Explorer cache file
+>20	string	>\0			version %s
+
+
+# Summary: Registry files
+# Created by: unknown
+# Modified by (1): Joerg Jenderek
+0	string		regf		MS Windows registry file, NT/2000 or above
+0	string		CREG		MS Windows 95/98/ME registry file
+0	string		SHCC3		MS Windows 3.1 registry file
+
+
+# Summary: Windows Registry text
+# Extension: .reg
+# Submitted by: Abel Cheung <abelcheung@gmail.com>
+0	string		REGEDIT4\r\n\r\n	Windows Registry text (Win95 or above)
+0	string		Windows\ Registry\ Editor\ 
+>&0	string		Version\ 5.00\r\n\r\n	Windows Registry text (Win2K or above)
+
+
+# From: Pal Tamas <folti@balabit.hu>
+# Autorun File
+0       string/c          [autorun]\r\n   Microsoft Windows Autorun file.
+!:mime	application/x-setupscript. 

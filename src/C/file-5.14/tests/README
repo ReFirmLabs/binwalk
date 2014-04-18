@@ -1,0 +1,17 @@
+file tests
+==========
+
+This directory contains tests for file. It is highly encouraged to add
+one each time a bug is found, and each time new magic is added. Each
+test consists of three files:
+
+  TEST.magic
+  TEST.testfile
+  TEST.result
+
+where TEST is the base name of the test, TEST.magic contains the magic
+used, TEST.testfile is the input, and TEST.result is the desired
+output from file.
+
+It suffices to add a triplet of test files to the directory to have
+them included in "make check".
