@@ -1,9 +1,9 @@
 FILE_VERSION="5.14"
 SSDEEP_VERSION="2.10"
 
-.PHONY: all install clean distclean uninstall file_src_configure file_make_prep ssdeep_src_configure ssdeep_make_prep
+.PHONY: all install clean distclean uninstall file_make_prep ssdeep_make_prep
 
-all: ssdeep_src_configure ssdeep_make_prep file_src_configure file_make_prep
+all: ssdeep_make_prep file_make_prep
 	make -C miniz
 	make -C compress
 	make -C ssdeep-$(SSDEEP_VERSION) libfuzzybinwalk.la
@@ -34,15 +34,9 @@ uninstall:
 	make -C ssdeep-$(SSDEEP_VERSION) uninstall-libLTLIBRARIES
 	make -C file-$(FILE_VERSION)/src uninstall-libLTLIBRARIES
 
-file_src_configure:
-	if [ ! -e ./file-$(FILE_VERSION)/Makefile ]; then cd ./file-$(FILE_VERSION) && ./configure; fi
-
 file_make_prep:
 	sed -e s/libmagic/libmagicbinwalk/g < ./file-$(FILE_VERSION)/src/Makefile >./file-$(FILE_VERSION)/src/mktmp
 	mv ./file-$(FILE_VERSION)/src/mktmp ./file-$(FILE_VERSION)/src/Makefile
-
-ssdeep_src_configure:
-	if [ ! -e ./file-ssdeep-2.10/Makefile ]; then cd ./ssdeep-2.10 && ./configure; fi
 
 ssdeep_make_prep:
 	sed -e s/libfuzzy/libfuzzybinwalk/g < ./ssdeep-$(SSDEEP_VERSION)/Makefile >./ssdeep-$(SSDEEP_VERSION)/mktmp

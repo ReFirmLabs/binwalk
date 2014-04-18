@@ -20,6 +20,11 @@ else
 	INSTALL_OPTIONS="-D -m644"
 fi
 
+cd ./src/C/file-*/ && ./configure || exit 1
+cd -
+cd ./src/C/ssdeep-*/ && ./configure || exit 1
+cd -
+
 AC_SUBST(SONAME, $SONAME)
 AC_SUBST(SOEXT, $SOEXT)
 AC_SUBST(INSTALL_OPTIONS, $INSTALL_OPTIONS)
