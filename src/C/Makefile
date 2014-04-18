@@ -7,6 +7,7 @@ all: ssdeep_src_configure ssdeep_make_prep file_src_configure file_make_prep
 	make -C miniz
 	make -C compress
 	make -C ssdeep-$(SSDEEP_VERSION) libfuzzybinwalk.la
+	make -C file-$(FILE_VERSION)/src magic.h # This must be done first for OSX, else MAGIC_VERSION is undefined
 	make -C file-$(FILE_VERSION)/src libmagicbinwalk.la
 
 install:
