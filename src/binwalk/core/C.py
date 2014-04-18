@@ -3,6 +3,7 @@ import sys
 import glob
 import ctypes
 import ctypes.util
+import binwalk.core.common
 from binwalk.core.compat import *
 
 class Function(object):
@@ -129,5 +130,6 @@ class Library(object):
         if not lib_path:
             raise Exception("Failed to locate library '%s'" % library)
 
+        binwalk.core.common.debug("Found library: " + lib_path)
         return lib_path
 
