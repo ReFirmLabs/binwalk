@@ -6,8 +6,8 @@ SSDEEP_VERSION="2.10"
 all: ssdeep_src_configure ssdeep_make_prep file_src_configure file_make_prep
 	make -C miniz
 	make -C compress
-	make -C ssdeep-$(SSDEEP_VERSION)
-	make -C file-$(FILE_VERSION)
+	make -C ssdeep-$(SSDEEP_VERSION) libfuzzybinwalk.la
+	make -C file-$(FILE_VERSION)/src libmagicbinwalk.la
 
 install:
 	make -C miniz install
