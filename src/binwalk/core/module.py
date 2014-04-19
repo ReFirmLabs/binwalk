@@ -57,7 +57,7 @@ class Option(object):
                 t = self.type(value, 0)
             else:
                 t = self.type(value)
-        elif default_value is not None:
+        elif default_value or default_value is False:
             t = default_value
         else:
             t = value
