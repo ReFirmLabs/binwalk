@@ -538,6 +538,8 @@ class Modules(object):
             k = self._parse_api_opt(k)
             argv.append(k)
             if v not in [True, False, None]:
+                if not isinstance(v, str):
+                    v = str(bytes2str(v))
                 argv.append(v)
 
         if not argv and not self.arguments:

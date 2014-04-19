@@ -129,7 +129,7 @@ class MagicParser(object):
         Returns the name of the generated temporary magic file.
         '''
         self.raw_fd = tempfile.NamedTemporaryFile()
-        self.raw_fd.write(self.MAGIC_STRING_FORMAT % (offset, signature_string, display_name))
+        self.raw_fd.write(str2bytes(self.MAGIC_STRING_FORMAT % (offset, signature_string, display_name)))
         self.raw_fd.seek(0)
         return self.raw_fd.name
 
@@ -178,7 +178,8 @@ class MagicParser(object):
         line_count = 0
 
         try:
-            for line in open(file_name, 'rb').readlines():
+            fp = open(file_name, 'rb')
+            for line in fp.readlines():
                 line = bytes2str(line)
                 line_count += 1
 
@@ -205,6 +206,7 @@ class MagicParser(object):
                 if include:
                     self.fd.write(str2bytes(line))
 
+            fp.close()
             self.build_signature_set()
         except KeyboardInterrupt as e:
             raise e
