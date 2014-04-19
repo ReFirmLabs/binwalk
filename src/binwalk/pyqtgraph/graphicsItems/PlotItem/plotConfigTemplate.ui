@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>481</width>
+    <height>840</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QGroupBox" name="averageGroup">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>640</y>
+     <width>242</width>
+     <height>182</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Display averages of the curves displayed in this plot. The parameter list allows you to choose parameters to average over (if any are available).</string>
+   </property>
+   <property name="title">
+    <string>Average</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_5">
+    <property name="margin">
+     <number>0</number>
+    </property>
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QListWidget" name="avgParamList"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QFrame" name="decimateGroup">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>140</y>
+     <width>191</width>
+     <height>171</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_4">
+    <property name="margin">
+     <number>0</number>
+    </property>
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <item row="7" column="0" colspan="3">
+     <widget class="QCheckBox" name="clipToViewCheck">
+      <property name="toolTip">
+       <string>Plot only the portion of each curve that is visible. This assumes X values are uniformly spaced.</string>
+      </property>
+      <property name="text">
+       <string>Clip to View</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="0" colspan="2">
+     <widget class="QCheckBox" name="maxTracesCheck">
+      <property name="toolTip">
+       <string>If multiple curves are displayed in this plot, check this box to limit the number of traces that are displayed.</string>
+      </property>
+      <property name="text">
+       <string>Max Traces:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" colspan="3">
+     <widget class="QCheckBox" name="downsampleCheck">
+      <property name="text">
+       <string>Downsample</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="1" colspan="2">
+     <widget class="QRadioButton" name="peakRadio">
+      <property name="toolTip">
+       <string>Downsample by drawing a saw wave that follows the min and max of the original data. This method produces the best visual representation of the data but is slower.</string>
+      </property>
+      <property name="text">
+       <string>Peak</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="2">
+     <widget class="QSpinBox" name="maxTracesSpin">
+      <property name="toolTip">
+       <string>If multiple curves are displayed in this plot, check &quot;Max Traces&quot; and set this value to limit the number of traces that are displayed.</string>
+      </property>
+     </widget>
+    </item>
+    <item row="9" column="0" colspan="3">
+     <widget class="QCheckBox" name="forgetTracesCheck">
+      <property name="toolTip">
+       <string>If MaxTraces is checked, remove curves from memory after they are hidden (saves memory, but traces can not be un-hidden).</string>
+      </property>
+      <property name="text">
+       <string>Forget hidden traces</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1" colspan="2">
+     <widget class="QRadioButton" name="meanRadio">
+      <property name="toolTip">
+       <string>Downsample by taking the mean of N samples.</string>
+      </property>
+      <property name="text">
+       <string>Mean</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1" colspan="2">
+     <widget class="QRadioButton" name="subsampleRadio">
+      <property name="toolTip">
+       <string>Downsample by taking the first of N samples. This method is fastest and least accurate.</string>
+      </property>
+      <property name="text">
+       <string>Subsample</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QCheckBox" name="autoDownsampleCheck">
+      <property name="toolTip">
+       <string>Automatically downsample data based on the visible range. This assumes X values are uniformly spaced.</string>
+      </property>
+      <property name="text">
+       <string>Auto</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Maximum</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>30</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="1" column="1">
+     <widget class="QSpinBox" name="downsampleSpin">
+      <property name="toolTip">
+       <string>Downsample data before plotting. (plot every Nth sample)</string>
+      </property>
+      <property name="suffix">
+       <string>x</string>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>100000</number>
+      </property>
+      <property name="value">
+       <number>1</number>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QFrame" name="transformGroup">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>154</width>
+     <height>79</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QCheckBox" name="fftCheck">
+      <property name="text">
+       <string>Power Spectrum (FFT)</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QCheckBox" name="logXCheck">
+      <property name="text">
+       <string>Log X</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QCheckBox" name="logYCheck">
+      <property name="text">
+       <string>Log Y</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QGroupBox" name="pointsGroup">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>550</y>
+     <width>234</width>
+     <height>58</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Points</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_5">
+    <item>
+     <widget class="QCheckBox" name="autoPointsCheck">
+      <property name="text">
+       <string>Auto</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QFrame" name="gridGroup">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>460</y>
+     <width>221</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0" colspan="2">
+     <widget class="QCheckBox" name="xGridCheck">
+      <property name="text">
+       <string>Show X Grid</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0" colspan="2">
+     <widget class="QCheckBox" name="yGridCheck">
+      <property name="text">
+       <string>Show Y Grid</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QSlider" name="gridAlphaSlider">
+      <property name="maximum">
+       <number>255</number>
+      </property>
+      <property name="value">
+       <number>128</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Opacity</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QGroupBox" name="alphaGroup">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>390</y>
+     <width>234</width>
+     <height>60</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Alpha</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QCheckBox" name="autoAlphaCheck">
+      <property name="text">
+       <string>Auto</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QSlider" name="alphaSlider">
+      <property name="maximum">
+       <number>1000</number>
+      </property>
+      <property name="value">
+       <number>1000</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

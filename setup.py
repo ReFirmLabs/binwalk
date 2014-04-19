@@ -160,7 +160,16 @@ if "install" in sys.argv or "build" in sys.argv:
     fd.close()
 
 # The data files to install along with the module
-install_data_files = ["magic/*", "config/*", "plugins/*", "modules/*", "core/*"]
+install_data_files = [os.path.join("pyqtgraph", "*.py")]
+data_dirs = ["magic", "config", "plugins", "modules", "core"]
+
+for data_dir in data_dirs:
+    install_data_files.append("%s%s*" % (data_dir, os.path.sep))
+
+for (root, dirs, files) in os.walk(os.path.join(MODULE_NAME, "pyqtgraph")):
+    if dirs:
+        for directory in dirs:
+            install_data_files.append(os.path.join(os.path.sep.join(root.split(os.path.sep)[1:]), os.path.join(directory, "*.py")))
 
 # Install the module, script, and support files
 setup(name = MODULE_NAME,
@@ -169,7 +178,7 @@ setup(name = MODULE_NAME,
       author = "Craig Heffner",
       url = "https://github.com/devttys0/%s" % MODULE_NAME,
 
-      requires = ["magic", "pyqtgraph"],
+      requires = [],
       packages = [MODULE_NAME],
       package_data = {MODULE_NAME : install_data_files},
       scripts = [os.path.join("scripts", MODULE_NAME)],

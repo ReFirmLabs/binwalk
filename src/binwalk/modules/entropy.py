@@ -97,7 +97,7 @@ class Entropy(Module):
                 self.footer()
     
         if self.do_plot and not self.save_plot:    
-            from pyqtgraph.Qt import QtGui
+            from binwalk.pyqtgraph.Qt import QtGui
             QtGui.QApplication.instance().exec_()
 
     def calculate_file_entropy(self, fp):
@@ -155,7 +155,7 @@ class Entropy(Module):
 
     def plot_entropy(self, fname):
         import numpy as np
-        import pyqtgraph as pg
+        import binwalk.pyqtgraph as pg
 
         i = 0
         x = []

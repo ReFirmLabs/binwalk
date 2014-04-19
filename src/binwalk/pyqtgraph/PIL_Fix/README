@@ -1,0 +1,11 @@
+The file Image.py is a drop-in replacement for the same file in PIL 1.1.6.
+It adds support for reading 16-bit TIFF files and converting then to numpy arrays.
+(I submitted the changes to the PIL folks long ago, but to my knowledge the code
+is not being used by them.) 
+
+To use, copy this file into
+  /usr/lib/python2.6/dist-packages/PIL/
+or 
+  C:\Python26\lib\site-packages\PIL\
+
+..or wherever your system keeps its python modules.
