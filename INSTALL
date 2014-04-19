@@ -29,18 +29,11 @@ see below for manaully installing dependencies / extraction utilities.
 MANUALLY INSTALLING DEPENDENCIES
 -----------------------------------------
 
-Most binwalk features will work out of the box without any additional dependencies. However, to take full advantage
-of binwalk's graphing capabilities, you need to install the pyqtgraph Python module.
-
-You'll need to install the dependencies for pyqtgraph (you may also need to install OpenGL drivers for your video card):
+Most binwalk features will work out of the box without any additional dependencies. However, to take advantage
+of binwalk's graphing capabilities, you need to install the following dependencies (you may also need to install 
+OpenGL drivers for your video card):
     
     $ sudo apt-get install libqt4-opengl python-opengl python-qt4 python-qt4-gl python-numpy python-scipy
-
-Most distros don't have pyqtgraph in their default repositories, so it's best to install it from source:
-
-    $ wget http://www.pyqtgraph.org/downloads/pyqtgraph-0.9.8.tar.gz
-    $ tar -zxvf pyqtgraph-0.9.8.tar.gz
-    $ cd pyqtgraph-0.9.8 && sudo ./setup.py install
 
 
 

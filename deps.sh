@@ -53,33 +53,6 @@ function fmk
 	cd -
 }
 
-function pyqtgraph
-{
-	SITE="http://www.pyqtgraph.org/downloads/"
-	VERSION="0.9.8"
-	OUTFILE="pyqtgraph-$VERSION.tar.gz"
-	URL="$SITE$OUTFILE"
-
-	pyopengl
-	
-	echo "Downloading '$URL'..."
-	wget "$URL"
-
-	if [ -e "$OUTFILE" ]
-	then
-		echo "Installing pyqtgraph..."
-		tar -zxvf "$OUTFILE"
-		cd "pyqtgraph-$VERSION" && $SUDO python ./setup.py install && cd ..
-		if [ "$(which python3)" != "" ]
-		then
-			cd "pyqtgraph-$VERSION" && $SUDO python3 ./setup.py install && cd ..
-		fi
-		$SUDO rm -rf "pyqtgraph-$VERSION" "$OUTFILE"
-	else
-		echo "ERROR: Failed to download '$URL'!"
-		echo "pyqtgraph not installed."
-	fi
-}
 
 function debian
 {
@@ -98,8 +71,6 @@ function debian
 	then
 		$SUDO apt-get -y install python3-pyqt4 python3-numpy python3-scipy
 	fi
-
-	pyqtgraph
 }
 
 function redhat
@@ -111,8 +82,6 @@ function redhat
 	then
 		$SUDO yum -y install python3-pyqt4 python3-numpy python3-scipy
 	fi
-	
-	pyqtgraph
 }
 
 if [ "$1" == "" ] || [ "$1" == "--sumount" ]
