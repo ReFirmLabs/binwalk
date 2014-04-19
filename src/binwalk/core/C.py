@@ -56,7 +56,9 @@ class FunctionHandler(object):
             self.function.restype = self.PY2CTYPES[self.retype]
             self.retval_converter = self.RETVAL_CONVERTERS[self.retype]
         else:
-            raise Exception("Unknown return type: '%s'" % self.retype)
+            self.function.restype = self.retype
+            self.retval_converter = None
+            #raise Exception("Unknown return type: '%s'" % self.retype)
 
     def run(self, *args):
         '''
@@ -74,7 +76,11 @@ class FunctionHandler(object):
             if isinstance(args[i], str):
                 args[i] = str2bytes(args[i])
 
-        return self.retval_converter(self.function(*args))
+        retval = self.function(*args)
+        if self.retval_converter is not None:
+            retval = self.retval_converter(retval)
+
+        return retval
         
 class Library(object):
     '''

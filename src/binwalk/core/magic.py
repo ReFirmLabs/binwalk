@@ -5,6 +5,12 @@
 import binwalk.core.C
 import binwalk.core.common
 from binwalk.core.compat import *
+from ctypes import *
+
+class magic_set(Structure):
+    pass
+magic_set._fields_ = []
+magic_t = POINTER(magic_set)
 
 class Magic(object):
     '''
@@ -12,8 +18,8 @@ class Magic(object):
     '''
 
     LIBMAGIC_FUNCTIONS = [
-            binwalk.core.C.Function(name="magic_open", type=int),
-            binwalk.core.C.Function(name="magic_close", type=None),
+            binwalk.core.C.Function(name="magic_open", type=magic_t),
+            binwalk.core.C.Function(name="magic_close", type=int),
             binwalk.core.C.Function(name="magic_load", type=int),
             binwalk.core.C.Function(name="magic_buffer", type=str),
     ]
@@ -37,7 +43,7 @@ class Magic(object):
         binwalk.core.common.debug("libmagic.magic_open(0x%X)" % (self.MAGIC_FLAGS | flags))
         self.magic_cookie = self.libmagic.magic_open(self.MAGIC_FLAGS | flags)
 
-        binwalk.core.common.debug("libmagic.magic_load(0x%X, %s)" % (self.magic_cookie, self.magic_file))
+        binwalk.core.common.debug("libmagic.magic_load(%s, %s)" % (type(self.magic_cookie), self.magic_file))
         self.libmagic.magic_load(self.magic_cookie, self.magic_file)
         binwalk.core.common.debug("libmagic loaded OK!")
 
