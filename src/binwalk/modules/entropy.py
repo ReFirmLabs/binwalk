@@ -156,6 +156,7 @@ class Entropy(Module):
     def plot_entropy(self, fname):
         import numpy as np
         import binwalk.pyqtgraph as pg
+        import binwalk.pyqtgraph.exporters as exporters
 
         i = 0
         x = []
@@ -195,7 +196,7 @@ class Entropy(Module):
 
         # TODO: legend is not displayed properly when saving plots to disk
         if self.save_plot:
-            exporter = pg.exporters.ImageExporter.ImageExporter(plt.plotItem)
+            exporter = exporters.ImageExporter.ImageExporter(plt.plotItem)
             exporter.parameters()['width'] = self.FILE_WIDTH
             exporter.export(binwalk.core.common.unique_file_name(os.path.basename(fname), self.FILE_FORMAT))
         else:

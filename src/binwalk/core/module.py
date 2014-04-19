@@ -54,13 +54,15 @@ class Option(object):
         if self.type and (self.type.__name__ == self.dtype):
             # Be sure to specify a base of 0 for int() so that the base is auto-detected
             if self.type == int:
-                return self.type(value, 0)
+                t = self.type(value, 0)
             else:
-                return self.type(value)
-        elif default_value:
-            return default_value
+                t = self.type(value)
+        elif default_value is not None:
+            t = default_value
         else:
-            return value
+            t = value
+
+        return t
 
 class Kwarg(object):
     '''
@@ -766,6 +768,7 @@ class Modules(object):
                         except Exception as e:
                             raise ModuleException("Invalid usage: %s" % str(e))
 
+        binwalk.core.common.debug("%s :: %s => %s" % (module.TITLE, str(argv), str(kwargs)))
         return kwargs
     
     def kwargs(self, obj, kwargs):
