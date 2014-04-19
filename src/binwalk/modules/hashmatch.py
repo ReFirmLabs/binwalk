@@ -79,7 +79,7 @@ class HashMatch(Module):
     ]
 
     # Requires libfuzzybinwalk.so
-    LIBRARY_NAME = "fuzzybinwalk"
+    LIBRARY_NAME = "infuzzy"
     LIBRARY_FUNCTIONS = [
             binwalk.core.C.Function(name="fuzzy_hash_buf", type=int),
             binwalk.core.C.Function(name="fuzzy_hash_filename", type=int),

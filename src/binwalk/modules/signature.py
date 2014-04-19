@@ -161,3 +161,6 @@ class Signature(Module):
             self.scan_file(fp)
             self.footer()
 
+        if hasattr(self, "magic") and self.magic:
+            self.magic.close()
+

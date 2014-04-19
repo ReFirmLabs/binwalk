@@ -1,8 +1,0 @@
-# Type:	OpenSSH key files
-# From:	Nicolas Collignon <tsointsoin@gmail.com>
-
-0	string	SSH\ PRIVATE\ KEY	OpenSSH RSA1 private key,
->28	string	>\0			version %s
-
-0	string	ssh-dss\ 		OpenSSH DSA public key
-0	string	ssh-rsa\ 		OpenSSH RSA public key

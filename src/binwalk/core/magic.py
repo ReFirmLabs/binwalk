@@ -4,8 +4,8 @@
 
 import binwalk.core.C
 import binwalk.core.common
-from binwalk.core.compat import *
 from ctypes import *
+from binwalk.core.compat import *
 
 class magic_set(Structure):
     pass
@@ -37,8 +37,8 @@ class Magic(object):
             self.magic_file = str2bytes(magic_file)
         else:
             self.magic_file = None
-        
-        self.libmagic = binwalk.core.C.Library("magicbinwalk", self.LIBMAGIC_FUNCTIONS)
+
+        self.libmagic = binwalk.core.C.Library("inmagic", self.LIBMAGIC_FUNCTIONS)
 
         binwalk.core.common.debug("libmagic.magic_open(0x%X)" % (self.MAGIC_FLAGS | flags))
         self.magic_cookie = self.libmagic.magic_open(self.MAGIC_FLAGS | flags)
@@ -50,6 +50,7 @@ class Magic(object):
     def close(self):
         if self.magic_cookie:
             self.libmagic.magic_close(self.magic_cookie)
+            del self.magic_cookie
             self.magic_cookie = None
 
     def buffer(self, data):
