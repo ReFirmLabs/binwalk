@@ -15,13 +15,6 @@ try:
 except NameError:
     raw_input = input
 
-# This is super hacky.
-if "--yes" in sys.argv:
-    sys.argv.pop(sys.argv.index("--yes"))
-    IGNORE_WARNINGS = True
-else:
-    IGNORE_WARNINGS = False
-
 # cd into the src directory, no matter where setup.py was invoked from
 os.chdir(os.path.join(os.path.dirname(os.path.realpath(__file__)), "src"))
 
@@ -40,24 +33,6 @@ def which(command):
         location = usr_local_bin
 
     return location
-
-def warning(lines, terminate=True, prompt=True):
-    WIDTH = 115
-
-    if not IGNORE_WARNINGS:
-        print("\n" + "*" * WIDTH)
-        for line in lines:
-            print(line)
-        print("*" * WIDTH, "\n")
-
-        if prompt:
-            if raw_input('Continue anyway (Y/n)? ').lower().startswith('n'):
-                terminate = True
-            else:
-                terminate = False
-
-        if terminate:
-            sys.exit(1)
 
 def find_binwalk_module_paths():
     paths = []
@@ -126,19 +101,6 @@ class CleanCommand(Command):
             raise e
         except Exception:
             pass
-
-# Check pre-requisite Python modules during a build
-if "build" in sys.argv:
-    print("checking pre-requisites")
-    try:
-        import pyqtgraph
-        from pyqtgraph.Qt import QtCore, QtGui, QtOpenGL
-    except ImportError as e:
-        msg = ["Pre-requisite warning: " + str(e),
-               "To take advantage of %s's graphing capabilities, please install this module." % MODULE_NAME,
-        ]
-   
-        warning(msg, prompt=True)
 
 if "install" in sys.argv:
     # If an older version of binwalk is currently installed, completely remove it to prevent conflicts

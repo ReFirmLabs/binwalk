@@ -39,7 +39,7 @@ class General(Module):
                kwargs={'swap_size' : 0},
                description='Reverse every n bytes before scanning'),
         Option(short='I',
-               long='show-invalid',
+               long='invalid',
                kwargs={'show_invalid' : True},
                description='Show results marked as invalid'),
         Option(short='x',

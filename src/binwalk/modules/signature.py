@@ -16,7 +16,7 @@ class Signature(Module):
                    kwargs={'enabled' : True, 'force_default_scan' : True},
                    description='Scan target file(s) for common file signatures'),
             Option(short='R',
-                   long='raw-bytes',
+                   long='raw',
                    kwargs={'enabled' : True, 'raw_bytes' : ''},
                    type=str,
                    description='Scan target file(s) for the specified sequence of bytes'),

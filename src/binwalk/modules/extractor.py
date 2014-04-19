@@ -52,7 +52,7 @@ class Extractor(Module):
                    kwargs={'matryoshka' : 0},
                    description='Limit matryoshka recursion depth (default: 8 levels deep)'),
             Option(short='j',
-                   long='max-size',
+                   long='size',
                    type=int,
                    kwargs={'max_size' : 0},
                    description='Limit the size of each extracted file'),
