@@ -13,7 +13,7 @@ class Signature(Module):
     CLI = [
             Option(short='B',
                    long='signature',
-                   kwargs={'enabled' : True, 'force_default_scan' : True},
+                   kwargs={'enabled' : True},
                    description='Scan target file(s) for common file signatures'),
             Option(short='R',
                    long='raw',
@@ -46,7 +46,6 @@ class Signature(Module):
             Kwarg(name='search_for_opcodes', default=False),
             Kwarg(name='cast_data_types', default=False),
             Kwarg(name='dumb_scan', default=False),
-            Kwarg(name='force_default_scan', default=False),
             Kwarg(name='magic_files', default=[]),
     ]
 
@@ -75,7 +74,7 @@ class Signature(Module):
             ]
 
         # Use the system default magic file if no other was specified, or if -B was explicitly specified
-        elif not self.magic_files or self.force_default_scan:
+        elif not self.magic_files:
             self.magic_files = [
                     self.config.settings.get_file_path('user', self.config.settings.BINWALK_MAGIC_FILE),
                     self.config.settings.get_file_path('system', self.config.settings.BINWALK_MAGIC_FILE),
