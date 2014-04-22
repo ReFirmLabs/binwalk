@@ -30,7 +30,7 @@ class Display(object):
         self._configure_formatting()
 
         if log:
-            self.fp = open(log, "w")
+            self.fp = open(log, "a")
             if csv:
                 self.csv = pycsv.writer(self.fp)
 
@@ -47,6 +47,8 @@ class Display(object):
                 self.csv.writerow(columns)
             else:
                 self.fp.write(fmt % tuple(columns))
+
+            self.fp.flush()
 
     def add_custom_header(self, fmt, args):
         self.custom_verbose_format = fmt
