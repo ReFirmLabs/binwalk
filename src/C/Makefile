@@ -1,5 +1,5 @@
-FILE_VERSION="5.18"
-SSDEEP_VERSION="2.10"
+FILE_VERSION=5.18
+SSDEEP_VERSION=2.10
 
 .PHONY: all install clean distclean uninstall file_make_prep ssdeep_make_prep
 
