@@ -536,11 +536,16 @@ class Modules(object):
     def _set_arguments(self, argv=[], kargv={}):
         for (k,v) in iterator(kargv):
             k = self._parse_api_opt(k)
-            argv.append(k)
             if v not in [True, False, None]:
-                if not isinstance(v, str):
-                    v = str(bytes2str(v))
-                argv.append(v)
+                if not isinstance(v, list):
+                    v = [v]
+                for value in v:
+                    if not isinstance(value, str):
+                        value = str(bytes2str(value))
+                    argv.append(k)
+                    argv.append(value)
+            else:
+                argv.append(k)
 
         if not argv and not self.arguments:
             self.arguments = sys.argv[1:]
