@@ -412,10 +412,12 @@
 
 0	belong		0x5EA3A417	SEAMA firmware header, big endian,
 >6	beshort		x		meta size: %d,
+>8  belong      <1      invalid
 >8	belong		x		size: %d
 
 0	lelong		0x5EA3A417	SEAMA firmware header, little endian,
 >6	leshort		x		meta size: %d,
+>8  lelong      <1      invalid
 >8	lelong		x		size: %d
 
 0	belong		0x4D544443	NSP firmware header, big endian,
