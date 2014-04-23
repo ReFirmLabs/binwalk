@@ -7,7 +7,7 @@ are still experimental for Python 3, so Python 2.7 is recommended.
 The following installation procedures assume that you are installing binwalk to be run using Python 2.7.
 If you want to use binwalk in Python 3, some package names and installation procedures may differ slightly.
 
-You will also need to have a C compiler installed to build the supporting C libraries.
+You will also need to have gcc, libtool and autoconf installed to build the supporting C libraries.
 
 
 

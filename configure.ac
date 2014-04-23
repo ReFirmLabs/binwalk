@@ -20,8 +20,8 @@ else
 	INSTALL_OPTIONS="-D -m644"
 fi
 
-(cd ./src/C/file-*/ && autoreconf -v && ./configure) || (echo "libmagic configure failed"; exit 1)
-(cd ./src/C/ssdeep-*/ && autoreconf -v && ./configure) || (echo "libfuzzy configure failed"; exit 1)
+(cd ./src/C/file-*/ && autoreconf -v && ./configure) || exit 1
+(cd ./src/C/ssdeep-*/ && autoreconf -v && ./configure) || exit 1
 
 AC_SUBST(SONAME, $SONAME)
 AC_SUBST(SOEXT, $SOEXT)
