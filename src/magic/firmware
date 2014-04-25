@@ -386,22 +386,31 @@
 >(48.l+121)	string		x			\b%s"
 
 # Ubiquiti firmware signatures
-0	string		UBNT		Ubiquiti firmware header,
->0x104	belong		x		~CRC32: 0x%X,
->4	string		x		version: "%s"
+0       string		UBNT		Ubiquiti firmware header, header size: 264 bytes,
+>0x108  belong      !0          invalid,
+>0x104	belong		x           ~CRC32: 0x%X,
+>4      byte        0           invalid,
+>4      string		x           version: "%s"
 
-0	string		GEOS		Ubiquiti firmware header,
->0x104	belong		x		~CRC32: 0x%X,
->4	string		x		version: "%s"
+0       string		GEOS	    Ubiquiti firmware header, header size: 264 bytes,
+>0x108  belong      !0          invalid,
+>0x104	belong		x		    ~CRC32: 0x%X,
+>4      byte        0           invalid,
+>4	    string		x		    version: "%s"
 
-# Too many false positives...
-#0	string		OPEN		Ubiquiti firmware header, third party,
-#>0x104	belong		x		~CRC32: 0x%X,
-#>4	string		x		version: "%s"
+0       string		OPEN		Ubiquiti firmware header, third party,
+>0x108  belong      !0          invalid,
+>0x104	belong		x		    ~CRC32: 0x%X,
+>4      byte        0           invalid,
+>4	    string		x		    version: "%s"
 
-0	string		PARTkernel	Ubiquiti firmware kernel partition
-0	string		PARTcramfs	Ubiquiti firmware CramFS partition
-0	string		PARTrootfs	Ubiquiti firmware rootfs partition
+0   string      \x00\x00\x00\x00PART    Ubiquiti partition header,{offset-adjust:4}
+>0  byte        x                       header size: 56 bytes,
+>8  byte        0                       invalid
+>8  string      x                       name: "%s",
+>44 belong      x                       base address: 0x%.8X,
+>52 belong      x                       data size: %d bytes
+>52 belong      x                       {file-size:%d}
 
 # Found in DIR-100 firmware
 0       string  	AIH0N   	AIH0N firmware header, header size: 48,
