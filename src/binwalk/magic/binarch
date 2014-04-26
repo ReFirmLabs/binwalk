@@ -56,7 +56,7 @@
 # PowerPC prologue
 # mflr r0
 0	belong 0x7C0802A6	PowerPC big endian instructions, function prologue
-0	lelong 0x7C0802A6	PowerPC little endian instructions, funciton prologue
+0	lelong 0x7C0802A6	PowerPC little endian instructions, function prologue
 
 # PowerPC epilogue
 # blr
