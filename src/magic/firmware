@@ -299,12 +299,12 @@
 >64	string		x		firmware version: "%s"
 
 # Simple VxWorks reference strings
-0	string		VxWorks		VxWorks string referece:
->0	string		x			"%s"
-0	string		vxworks		VxWorks string referece:
->0	string		x			"%s"
-0	string		VXWORKS		VxWorks string referece:
->0	string		x			"%s"
+#0	string		VxWorks		VxWorks string referece:
+#>0	string		x			"%s"
+#0	string		vxworks		VxWorks string referece:
+#>0	string		x			"%s"
+#0	string		VXWORKS		VxWorks string referece:
+#>0	string		x			"%s"
 
 # Firmware header used by some TV's
 0	string		FNIB		ZBOOT firmware header, header size: 32 bytes,
@@ -411,6 +411,11 @@
 >44 belong      x                       base address: 0x%.8X,
 >52 belong      x                       data size: %d bytes
 >52 belong      x                       {file-size:%d}
+
+0   string      \x00\x00\x00\x00END\x2e Ubiquiti end header,{offset-adjust:4}
+>12 belong      !0                      invalid,
+>8  belong      x                       cumulative ~CRC32: 0x%.8X
+
 
 # Found in DIR-100 firmware
 0       string  	AIH0N   	AIH0N firmware header, header size: 48,
