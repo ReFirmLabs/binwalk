@@ -381,6 +381,9 @@
 0       string          LZIP            lzip compressed data
 >4      byte            x               \b, version: %d
 
+# lrzip
+0       string          LRZI            lrzip compressed data
+
 # LZO
 0	string		\211LZO\000\015\012\032\012	LZO compressed data
 
