@@ -462,6 +462,10 @@ class Module(object):
             if hasattr(self, dependency.attribute):
                 getattr(self, dependency.attribute).reset()
 
+        if not self.config.files:
+            binwalk.core.common.debug("No target files specified, module %s terminated" % self.name)
+            return False
+
         try:
             self.init()
         except KeyboardInterrupt as e:
