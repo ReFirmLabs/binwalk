@@ -193,7 +193,7 @@ class HexDiff(Module):
             file_count = 1
         else:
             file_count = len(self.hex_target_files)
-        self.HEADER_FORMAT = "OFFSET        " + ("%%-%ds   " % header_width) * file_count
+        self.HEADER_FORMAT = "OFFSET      " + (("%%-%ds   " % header_width) * file_count) + "\n"
 
         # Build the header argument list
         self.HEADER = [fp.name for fp in self.hex_target_files]

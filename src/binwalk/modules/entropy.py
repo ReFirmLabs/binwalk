@@ -34,7 +34,7 @@ class Entropy(Module):
                    kwargs={'save_plot' : True},
                    description='Save plot as a PNG'),
             Option(short='N',
-                   long='plot',
+                   long='nplot',
                    kwargs={'do_plot' : False},
                    description='Do not generate an entropy plot graph'),
             Option(short='Q',
