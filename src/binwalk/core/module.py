@@ -457,6 +457,11 @@ class Module(object):
         self.status = parent.status
         self.modules = parent.loaded_modules
 
+        # A special exception for the extractor module, which should be allowed to
+        # override the verbose setting, e.g., if --matryoshka has been specified
+        if hasattr(self, "extractor") and self.extractor.config.verbose:
+            self.config.verbose = self.config.display.verbose = True
+
         # Reset all dependency modules
         for dependency in self.dependencies:
             if hasattr(self, dependency.attribute):

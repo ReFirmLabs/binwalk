@@ -86,6 +86,9 @@ class Extractor(Module):
         for manual_rule in self.manual_rules:
             self.add_rule(manual_rule)
 
+        if self.matryoshka:
+            self.config.verbose = True
+
     def reset(self):
         # Holds a list of pending files that should be scanned; only populated if self.matryoshka == True
         self.pending = []
