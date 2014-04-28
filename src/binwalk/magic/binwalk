@@ -2113,7 +2113,7 @@
 >52 belong      x                       data size: %d bytes
 >52 belong      x                       {file-size:%d}
 
-0   string      \x00\x00\x00\x00END\x2e Ubiquiti end header,{offset-adjust:4}
+0   string      \x00\x00\x00\x00END\x2e Ubiquiti end header, header size: 12 bytes,{offset-adjust:4}
 >12 belong      !0                      invalid,
 >8  belong      x                       cumulative ~CRC32: 0x%.8X
 
