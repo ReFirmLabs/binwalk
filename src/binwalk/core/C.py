@@ -124,15 +124,19 @@ class Library(object):
             'win32'   : ['%s.dll' % library]
         }
 
-        lib_path = ctypes.util.find_library(library)
+        # Search the common install directories first; these are usually not in the library search path
+        # Search these *first*, since a) they are the most likely locations and b) there may be a
+        # discrepency between where ctypes.util.find_library and ctypes.cdll.LoadLibrary search for libs.
+        for path in system_paths[sys.platform]:
+            if os.path.exists(path):
+                lib_path = path
+                break
 
-        # If ctypes failed to find the library, check the common paths listed in system_paths
+        # If we failed to find the library, check the standard library search paths
         if not lib_path:
-            for path in system_paths[sys.platform]:
-                if os.path.exists(path):
-                    lib_path = path
-                    break
+            lib_path = ctypes.util.find_library(library)
 
+        # If we still couldn't find the library, error out
         if not lib_path:
             raise Exception("Failed to locate library '%s'" % library)
 
