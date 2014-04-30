@@ -602,6 +602,8 @@ ac_subst_vars='LTLIBOBJS
 INSTALL_OPTIONS
 SOEXT
 SONAME
+PYTHON
+BUILD_C_LIBS
 LIBOBJS
 EGREP
 GREP
@@ -654,6 +656,8 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+with_python
+enable_clibs
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1268,6 +1272,18 @@ fi
 if test -n "$ac_init_help"; then
 
   cat <<\_ACEOF
+
+Optional Features:
+  --disable-option-checking  ignore unrecognized --enable/--with options
+  --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
+  --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --disable-clibs         do not build/install dependent c libraries
+
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-python=python    explicitly install using the specified python
+                          interpreter (python2, python3, etc)
 
 Some influential environment variables:
   CC          C compiler command
@@ -3274,6 +3290,23 @@ fi
 
 
 
+
+# Check whether --with-python was given.
+if test "${with_python+set}" = set; then :
+  withval=$with_python; PYTHON=$withval
+else
+  PYTHON=python
+fi
+
+
+# Check whether --enable-clibs was given.
+if test "${enable_clibs+set}" = set; then :
+  enableval=$enable_clibs; BUILD_C_LIBS=0
+else
+  BUILD_C_LIBS=1
+fi
+
+
 CFLAGS="-Wall -fPIC $CFLAGS"
 
 if test "$(uname)" == "Darwin"
@@ -3287,8 +3320,15 @@ else
 	INSTALL_OPTIONS="-D -m644"
 fi
 
-(cd ./src/C/file-*/ && autoreconf -v && ./configure) || exit 1
-(cd ./src/C/ssdeep-*/ && autoreconf -v && ./configure) || exit 1
+if test "$BUILD_C_LIBS" != "0"
+then
+    (cd ./src/C/file-*/ && autoreconf -v && ./configure) || exit 1
+    (cd ./src/C/ssdeep-*/ && autoreconf -v && ./configure) || exit 1
+fi
+
+BUILD_C_LIBS=$BUILD_C_LIBS
+
+PYTHON=$PYTHON
 
 SONAME=$SONAME
 
