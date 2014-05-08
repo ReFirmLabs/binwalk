@@ -10,6 +10,7 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
     def pre_scan(self):
         # Be sure to re-set this at the beginning of every scan
         self.found_archive = False
+        self.found_archive_in_file = None
 
     def scan(self, result):
         if result.valid:
@@ -17,8 +18,9 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
             # Displaying each entry is useful, as it shows what files are contained in the archive,
             # but we only want to extract the archive when the first entry is found.
             if result.description.startswith('ASCII cpio archive'):
-                if not self.found_archive:
+                if not self.found_archive or self.found_archive_in_file != result.file.name:
                     # This is the first entry. Set found_archive and allow the scan to continue normally.
+                    self.found_archive_in_file = result.file.name
                     self.found_archive = True
                     result.extract = True
                 elif 'TRAILER!!!' in result.description:
@@ -29,3 +31,9 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
                     # The first entry has already been found and this is not the last entry, or the last entry 
                     # has not yet been found. Don't extract.
                     result.extract = False
+            else:
+                # If this was a valid non-CPIO archive result, reset these values; else, a previous
+                # false positive CPIO result could leave these set, causing a subsequent valid CPIO
+                # result to not be extracted.
+                self.found_archive = False
+                self.found_archive_in_file = None

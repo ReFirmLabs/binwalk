@@ -38,7 +38,7 @@ class Entropy(Module):
                    kwargs={'do_plot' : False},
                    description='Do not generate an entropy plot graph'),
             Option(short='Q',
-                   long='legend',
+                   long='nlegend',
                    kwargs={'show_legend' : False},
                    description='Omit the legend from the entropy plot graph'),
     ]

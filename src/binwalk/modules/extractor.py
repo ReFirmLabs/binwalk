@@ -114,9 +114,15 @@ class Extractor(Module):
         else:
             size = r.size
 
+        if r.valid:
+            binwalk.core.common.debug("Extractor callback for %s:%d [%s & %s & %s]" % (r.file.name, r.offset, str(r.valid), str(r.display), str(r.extract)))
+        
         # Only extract valid results displayed to the user and marked for extraction
+        # TODO: Results excluded via -x/-y options should be marked as invalid; filtering on r.display means that
+        #       with -q specified, nothing gets extracted!
         if r.valid and r.display and r.extract:
             # Do the extraction
+            binwalk.core.common.debug("Attempting extraction...")
             (extraction_directory, dd_file) = self.extract(r.offset, r.description, r.file.name, size, r.name)
 
             # If the extraction was successful, self.extract will have returned the output directory and name of the dd'd file
@@ -540,6 +546,8 @@ class Extractor(Module):
         '''
         tmp = None
         retval = True
+
+        binwalk.core.common.debug("Running extractor '%s'" % str(cmd))
 
         try:
             if callable(cmd):
