@@ -400,6 +400,12 @@ class Module(object):
                 if display_args:
                     self.config.display.format_strings(self.HEADER_FORMAT, self.RESULT_FORMAT)
                     self.config.display.result(*display_args)
+            else:
+                # If this specific result has been marked to not be displayed to the user (e.g., 
+                # it has been excluded via a -x or -y option), then disable extraction as well.
+                # Note that this does not effect results that are not displayed globally (i.e.,
+                # if --quiet was specified).
+                r.extract = False
 
         return r
 
