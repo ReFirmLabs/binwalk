@@ -543,6 +543,7 @@ class Extractor(Module):
         Returns True on success, False on failure, or None if the external extraction utility could not be found.
         '''
         tmp = None
+        rval = 0
         retval = True
 
         binwalk.core.common.debug("Running extractor '%s'" % str(cmd))
@@ -560,17 +561,21 @@ class Extractor(Module):
                 if not binwalk.core.common.DEBUG:
                     tmp = tempfile.TemporaryFile()
 
-                # Replace all instances of FILE_NAME_PLACEHOLDER in the command with fname
-                cmd = cmd.replace(self.FILE_NAME_PLACEHOLDER, fname)
-    
                 # Execute.
-                rval = subprocess.call(shlex.split(cmd), stdout=tmp, stderr=tmp)
-                if rval == 0:
-                    retval = True
-                else:
-                    retval = False
+                for command in cmd.split("&&"):
+                    # Replace all instances of FILE_NAME_PLACEHOLDER in the command with fname
+                    command = command.strip().replace(self.FILE_NAME_PLACEHOLDER, fname)
 
-                binwalk.core.common.debug('External extractor command "%s" completed with return code %d' % (cmd, rval))
+                    binwalk.core.common.debug("subprocess.call(%s, stdout=%s, stderr=%s)" % (command, str(tmp), str(tmp)))    
+                    rval = subprocess.call(shlex.split(command), stdout=tmp, stderr=tmp)
+                    binwalk.core.common.debug('External extractor command "%s" completed with return code %d' % (cmd, rval))
+                    
+                    if rval == 0:
+                        retval = True
+                    else:
+                        retval = False
+                        break
+
         except KeyboardInterrupt as e:
             raise e
         except Exception as e:
