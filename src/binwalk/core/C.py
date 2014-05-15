@@ -121,6 +121,7 @@ class Library(object):
                         '/usr/local/lib/lib%s.dylib' % library,
                        ] + glob.glob('/usr/local/Cellar/lib%s/*/lib/lib%s.dylib' % (library, library)),
 
+            'cygwin'  : ['/usr/local/lib/lib%s.so' % library],
             'win32'   : ['%s.dll' % library]
         }
 

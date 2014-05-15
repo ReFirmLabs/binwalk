@@ -4,6 +4,7 @@ all: clean $(LIBNAME)
 
 $(LIBNAME): tinfl.o
 	$(CC) $(CFLAGS) -shared -Wl,$(SONAME),$(LIBNAME) tinfl.o -o $(LIBNAME) $(LDFLAGS)
+	chmod +x $(LIBNAME)
 
 tinfl.o:
 	$(CC) $(CFLAGS) -c tinfl.c

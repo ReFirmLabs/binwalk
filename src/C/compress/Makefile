@@ -4,6 +4,7 @@ all: clean $(LIBNAME)
 
 $(LIBNAME): compress42.o
 	$(CC) $(CFLAGS) -shared -Wl,$(SONAME),$(LIBNAME) compress42.o -o $(LIBNAME) $(LDFLAGS)
+	chmod +x $(LIBNAME)
 
 compress42.o:
 	$(CC) $(CFLAGS) compress42.c -c
