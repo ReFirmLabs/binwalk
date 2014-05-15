@@ -1,0 +1,6 @@
+Note regarding Cygwin.
+----------------------
+
+You will need to press ENTER a few times on the console to progress extraction through to completion.
+From a brief look at the binwalk main() code I presume this is because of some subtlety in console 
+I/O interaction between Cygwin and Python and threading on Windows.
