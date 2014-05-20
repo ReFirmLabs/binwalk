@@ -48,8 +48,8 @@ class Plotter(Module):
     RESULT = None
 
     def init(self):
-        import binwalk.pyqtgraph.opengl as gl
-        from binwalk.pyqtgraph.Qt import QtGui
+        import pyqtgraph.opengl as gl
+        from pyqtgraph.Qt import QtGui
 
         self.verbose = self.config.verbose
         self.offset = self.config.offset
@@ -190,7 +190,7 @@ class Plotter(Module):
 
     def _generate_plot(self, plot_points):
         import numpy as np
-        import binwalk.pyqtgraph.opengl as gl
+        import pyqtgraph.opengl as gl
         
         nitems = float(len(plot_points))
 
@@ -230,7 +230,7 @@ class Plotter(Module):
         return scatter_plot
 
     def plot(self, wait=True):
-        import binwalk.pyqtgraph.opengl as gl
+        import pyqtgraph.opengl as gl
 
         self.window.show()
 
@@ -268,7 +268,7 @@ class Plotter(Module):
             self.wait()
 
     def wait(self):
-        from binwalk.pyqtgraph.Qt import QtCore, QtGui
+        from pyqtgraph.Qt import QtCore, QtGui
 
         t = QtCore.QTimer()
         t.start(50)
