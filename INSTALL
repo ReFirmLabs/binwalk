@@ -14,26 +14,23 @@ You will also need to have gcc, libtool and autoconf installed to build the supp
 INSTALLATION
 -----------------------------------------
 
+Most binwalk features will work out of the box without any additional dependencies. However, to take advantage
+of binwalk's graphing capabilities, you need to install the following packages (you may also need to install 
+OpenGL drivers for your video card):
+
+    $ sudo apt-get install libqt4-opengl python-opengl python-qt4 python-qt4-gl python-numpy python-scipy
+    $ wget -O - http://www.pyqtgraph.org/downloads/pyqtgraph-0.9.8.tar.gz | tar -zxv && cd pyqtgraph-0.9.8 && sudo python ./setup.py install
+
+
 Installation follows the typical configure/make process:
 
     $ ./configure
-    $ make deps          # Skip this if you don't want extraction utilities and dependencies auto-installed
+    $ make deps          # Skip this if you don't want extraction utilities auto-installed (large download(s))
     $ make
     $ sudo make install
 
 Note that 'make deps' should work on most Debian and RedHat based systems. If this does not work for your system, 
-see below for manaully installing dependencies / extraction utilities.
-
-
-
-MANUALLY INSTALLING DEPENDENCIES
------------------------------------------
-
-Most binwalk features will work out of the box without any additional dependencies. However, to take advantage
-of binwalk's graphing capabilities, you need to install the following dependencies (you may also need to install 
-OpenGL drivers for your video card):
-    
-    $ sudo apt-get install libqt4-opengl python-opengl python-qt4 python-qt4-gl python-numpy python-scipy
+see below for manaully installing extraction utilities.
 
 
 
@@ -61,7 +58,7 @@ and placed in the /opt/firmware-mod-kit directory:
 UNINSTALL
 -----------------------------------------
 
-The following command will remove binwalk from your system (note that this does *not* include dependencies installed via 'make deps'):
+The following command will remove binwalk from your system (note that this does *not* include utilities installed via 'make deps'):
 
     $ sudo make uninstall
 

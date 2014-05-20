@@ -1,8 +1,6 @@
 #!/bin/bash
-# Easy installer script for installing binwalk dependencies and extraction utilities on Debian/RedHat systems.
+# Easy installer script for installing binwalk extraction utilities on Debian/RedHat systems.
 # Normally invoked via 'make deps'.
-# TODO: PyOpenGL not installed for Python3. Python3 support is still experimental, so reliable installation across
-#       various distros is a PITA ATM.
 
 SUDO=$(which sudo)
 SUMOUNT="$1 $2"
