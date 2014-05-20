@@ -102,6 +102,7 @@ class Display(object):
         if not filter or self.filter.valid_result(line):
             if not self.quiet and stdout:
                 sys.stdout.write(self._format_line(line.strip()) + "\n")
+                sys.stdout.flush()
 
             if self.fp and not (self.csv and not csv):
                 self.log(fmt, columns)
