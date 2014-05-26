@@ -2222,6 +2222,11 @@
 >14		beshort	x						uncompressed size: %d,
 >18		beshort	x						data offset from start of block: {math:16+%d}
 
+# Obfuscated Arcadyan firmware, used on the WRT120N
+0       belong  0x04010920              Obfuscated Arcadyan firmware (WRT120N?),
+>0x68   belong  !0x00D50800             invalid
+>0x68   belong  0x00D50800              see https://github.com/devttys0/wrt120n
+
 # Tag Image File Format, from Daniel Quinlan (quinlan@yggdrasil.com)
 # The second word of TIFF files is the TIFF version number, 42, which has
 # never changed.  The TIFF specification recommends testing for it.
