@@ -13,7 +13,7 @@ class Signature(Module):
     CLI = [
             Option(short='B',
                    long='signature',
-                   kwargs={'enabled' : True},
+                   kwargs={'enabled' : True, 'explicit_signature_scan' : True},
                    description='Scan target file(s) for common file signatures'),
             Option(short='R',
                    long='raw',
@@ -44,6 +44,7 @@ class Signature(Module):
             Kwarg(name='enabled', default=False),
             Kwarg(name='raw_bytes', default=None),
             Kwarg(name='search_for_opcodes', default=False),
+            Kwarg(name='explicit_signature_scan', default=False),
             Kwarg(name='cast_data_types', default=False),
             Kwarg(name='dumb_scan', default=False),
             Kwarg(name='magic_files', default=[]),
@@ -74,13 +75,12 @@ class Signature(Module):
             ]
 
         # Use the system default magic file if no other was specified, or if -B was explicitly specified
-        elif not self.magic_files:
-            self.magic_files = [
-                    self.config.settings.get_file_path('user', self.config.settings.BINWALK_MAGIC_FILE),
-                    self.config.settings.get_file_path('system', self.config.settings.BINWALK_MAGIC_FILE),
-            ]
+        if (not self.magic_files) or (self.explicit_signature_scan and not self.cast_data_types):
+            self.magic_files.append(self.config.settings.get_file_path('user', self.config.settings.BINWALK_MAGIC_FILE))
+            self.magic_files.append(self.config.settings.get_file_path('system', self.config.settings.BINWALK_MAGIC_FILE))
 
         # Parse the magic file(s) and initialize libmagic
+        binwalk.core.common.debug("Loading magic files: %s" % str(self.magic_files))
         self.mfile = self.parser.parse(self.magic_files)
         self.magic = binwalk.core.magic.Magic(self.mfile)
         
