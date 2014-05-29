@@ -85,7 +85,7 @@ function redhat
 if [ "$1" == "" ] || [ "$1" == "--sumount" ]
 then
 	PLATFORM=$(python -c 'import platform; print (platform.system().lower())')
-	DISTRO=$(python -c 'import platform; print (platform.linux_distribution()[0].lower())')
+	DISTRO=$(python -c 'import platform; print (platform.linux_distribution()[0].strip("\"").split()[0].lower())')
 else
 	DISTRO="$1"
 fi
@@ -113,6 +113,9 @@ case $DISTRO in
 	aptosid)
 		debian
 		;;
+    elementary)
+        debian
+        ;;
 
 	redhat)
 		redhat
