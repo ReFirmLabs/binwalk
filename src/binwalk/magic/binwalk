@@ -1715,6 +1715,7 @@
 0	belong	0x27051956	uImage header, header size: 64 bytes,
 >4	belong	x		header CRC: 0x%X,
 >8	bedate	x		created: %s,
+>12 belong  <1      invalid
 >12	belong	x		image size: %d bytes,
 >16	belong	x		Data Address: 0x%X,
 >20	belong	x		Entry Point: 0x%X,
