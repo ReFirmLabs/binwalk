@@ -1,64 +1,70 @@
 BEFORE YOU START
 -----------------------------------------
 
-Binwalk supports Python 2.7 - 3.x. Although binwalk is slightly faster in Python 3, the Python OpenGL bindings
-are still experimental for Python 3, so Python 2.7 is recommended.
+Binwalk supports Python 2.7 - 3.x. Although binwalk is slightly faster in Python 3, 
+the Python OpenGL bindings are still experimental for Python 3, so Python 2.7 is 
+recommended.
 
-The following installation procedures assume that you are installing binwalk to be run using Python 2.7.
-If you want to use binwalk in Python 3, some package names and installation procedures may differ slightly.
-
-You will also need to have gcc, libtool and autoconf installed to build the supporting C libraries.
+The following installation procedures assume that you are installing binwalk to 
+be run using Python 2.7. If you want to use binwalk in Python 3, some package 
+names and installation procedures may differ slightly.
 
 
 
 INSTALLATION
 -----------------------------------------
 
-Most binwalk features will work out of the box without any additional dependencies. However, to take advantage
-of binwalk's graphing capabilities, you need to install the following packages (you may also need to install 
-OpenGL drivers for your video card):
+Binwalk's core features will work out of the box without any additional dependencies.
+However, to take advantage of binwalk's graphing and extraction capabilities, multiple
+supporting utilities/packages need to be installed.
 
-    $ sudo apt-get install libqt4-opengl python-opengl python-qt4 python-qt4-gl python-numpy python-scipy
-    $ wget -O - http://www.pyqtgraph.org/downloads/pyqtgraph-0.9.8.tar.gz | tar -zxv && cd pyqtgraph-0.9.8 && sudo python ./setup.py install
-
+To ease "dependency hell", a shell script named deps.sh is included which attempts to
+install all required dependencies for Debian and RedHat based systems. If you are 
+running a different system, or prefer to install these dependencies manually, see the
+DEPENDENCIES section below.
 
 Installation follows the typical configure/make process:
 
+    $ ./deps.sh         # Install optional dependencies (caution: many MB of downloads)
     $ ./configure
-    $ make deps          # Skip this if you don't want extraction utilities auto-installed (large download(s))
     $ make
     $ sudo make install
 
-Note that 'make deps' should work on most Debian and RedHat based systems. If this does not work for your system, 
-see below for manaully installing extraction utilities.
 
 
-
-MANUALLY INSTALLING EXTRACTION UTILITIES
+DEPENDENCIES
 -------------------------------------------
 
-Binwalk can automatically invoke external extraction utilities to extract various types of files that it may find during 
-a scan. These utilities are optional, but recommended if you plan on using binwalk's extraction features.
+The following dependencies are only required for optional binwalk features, such as
+file extraction and graphing capabilities. Unless otherwise specified, these
+dependencies are available from most Linux package managers:
 
-Most utilities can be installed from your distro's repositories (package names may vary slightly based
-on your particular distro):
-
-    $ sudo apt-get install git mtd-utils zlib1g-dev liblzma-dev ncompress gzip bzip2 tar arj p7zip p7zip-full openjdk-6-jdk
-
-However, the Firmware-Mod-Kit, which contains many file system extractors, needs to be built from source
-and placed in the /opt/firmware-mod-kit directory:
-
-    $ sudo mkdir -p /opt/firmware-mod-kit
-    $ sudo chmod -R a+rwx /opt/firmware-mod-kit
-    $ git clone https://code.google.com/p/firmware-mod-kit /opt/firmware-mod-kit/
-    $ cd /opt/firmware-mod-kit/src && ./configure && make
-
+    libqt4-opengl 
+    python-opengl 
+    python-qt4 
+    python-qt4-gl 
+    python-numpy 
+    python-scipy
+    pyqtgraph-0.9.8 [http://www.pyqtgraph.org/downloads/pyqtgraph-0.9.8.tar.gz]
+    mtd-utils 
+    zlib1g-dev 
+    liblzma-dev 
+    ncompress 
+    gzip 
+    bzip2 
+    tar 
+    arj 
+    p7zip 
+    p7zip-full 
+    openjdk-6-jdk
+    firmware-mod-kit [https://code.google.com/p/firmware-mod-kit]
 
 
 UNINSTALL
 -----------------------------------------
 
-The following command will remove binwalk from your system (note that this does *not* include utilities installed via 'make deps'):
+The following command will remove binwalk from your system. Note that this will *not* 
+remove utilities installed via deps.sh:
 
     $ sudo make uninstall
 

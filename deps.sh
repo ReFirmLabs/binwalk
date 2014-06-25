@@ -5,6 +5,16 @@
 SUDO=$(which sudo)
 SUMOUNT="$1 $2"
 
+function pyqtgraph
+{
+    # Get and install pyqtgraph
+    wget -O - http://www.pyqtgraph.org/downloads/pyqtgraph-0.9.8.tar.gz | tar -zxv 
+    if [ -e pyqtgraph-0.9.8 ]
+    then
+        cd pyqtgraph-0.9.8 && $SUDO python ./setup.py install && cd - && $SUDO rm -rf pyqtgraph-0.9.8
+    fi
+}
+
 function fmk
 {
 	# Get and build the firmware mod kit
@@ -54,6 +64,9 @@ function fmk
 
 function debian
 {
+    # First make sure the repos are up to date
+    $SUDO apt-get update
+
 	# The appropriate unrar package goes under different names in Debian vs Ubuntu
 	$SUDO apt-get -y install unrar
 	if [ "$?" != "0" ]
@@ -65,7 +78,7 @@ function debian
 	# Install binwalk/fmk pre-requisites and extraction tools
     # lha isn't in newer ubuntu repos, so install it separately in case it fails
     $SUDO apt-get -y install lha
-	$SUDO apt-get -y install git build-essential mtd-utils zlib1g-dev liblzma-dev ncompress gzip bzip2 tar arj p7zip p7zip-full openjdk-6-jdk
+	$SUDO apt-get -y install git build-essential libtool autoconf mtd-utils zlib1g-dev liblzma-dev ncompress gzip bzip2 tar arj p7zip p7zip-full openjdk-6-jdk
 	$SUDO apt-get -y install libqt4-opengl python-opengl python-qt4 python-qt4-gl python-numpy python-scipy
 	if [ "$(which python3)" != "" ]
 	then
@@ -76,7 +89,7 @@ function debian
 function redhat
 {
 	$SUDO yum groupinstall -y "Development Tools"
-	$SUDO yum install -y git mtd-utils unrar zlib1g-dev liblzma-dev xz-devel compress gzip bzip2 tar arj lha p7zip p7zip-full openjdk-6-jdk
+	$SUDO yum install -y git libtool autoconf mtd-utils unrar zlib1g-dev liblzma-dev xz-devel compress gzip bzip2 tar arj lha p7zip p7zip-full openjdk-6-jdk
 	$SUDO yum install -y libqt4-opengl python-opengl python-qt4 python-qt4-gl python-numpy python-scipy
 	if [ "$(which python3)" != "" ]
 	then
@@ -141,6 +154,9 @@ case $DISTRO in
 		echo ""
 		exit 1
 esac
+
+# Get and install pyqtgraph
+pyqtgraph
 
 # Get and build the firmware mod kit
 fmk
