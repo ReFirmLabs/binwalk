@@ -35,7 +35,7 @@ function fmk
 
 	if [ ! -e /opt/firmware-mod-kit/.git ]
 	then
-		git clone https://code.google.com/p/firmware-mod-kit /opt/firmware-mod-kit/
+		git clone http://code.google.com/p/firmware-mod-kit /opt/firmware-mod-kit/
 	fi
 
 	cd /opt/firmware-mod-kit/src
