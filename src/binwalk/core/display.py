@@ -13,7 +13,7 @@ class Display(object):
     This class is instantiated for all modules implicitly and should not need to be invoked directly by most modules.
     '''
     SCREEN_WIDTH = 0
-    HEADER_WIDTH = 150
+    HEADER_WIDTH = 80
     DEFAULT_FORMAT = "%s\n"
 
     def __init__(self, quiet=False, verbose=False, log=None, csv=False, fit_to_screen=False, filter=None):
