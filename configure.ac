@@ -27,7 +27,7 @@ then
 else
 	SONAME="-soname"
 	SOEXT="so"
-	INSTALL_OPTIONS="-D -m644"
+	INSTALL_OPTIONS="-m644"
 fi
 dnl AS_IF([test "x$enable_foo" != "xno"], [
 
