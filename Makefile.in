@@ -18,7 +18,11 @@ all: build
 
 install: build
 	if [ "$(BUILD_C_LIBS)" -eq "1" ]; then make -C $(SRC_C_DIR) install; fi
+ifeq ($(strip $(prefix)),)
 	$(PYTHON) ./setup.py install
+else
+	$(PYTHON) ./setup.py install --prefix=$(prefix)
+endif
 	if [ "$(BUILD_C_LIBS)" -eq "1" ] && [ "$(PLATFORM)" != "Cygwin" ]; then ldconfig || true; fi
 
 deps:
