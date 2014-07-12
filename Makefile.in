@@ -7,6 +7,8 @@ export exec_prefix=@exec_prefix@
 export LIBDIR=@libdir@
 export INSTALL_OPTIONS=@INSTALL_OPTIONS@
 export PLATFORM=@PLATFORM@
+export BUILD_MAGIC=@BUILD_MAGIC@
+export BUILD_FUZZY=@BUILD_FUZZY@
 
 BUILD_C_LIBS=@BUILD_C_LIBS@
 PYTHON=@PYTHON@

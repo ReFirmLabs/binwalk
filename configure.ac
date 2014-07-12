@@ -17,6 +17,16 @@ AC_ARG_ENABLE([clibs],
               [BUILD_C_LIBS=0],
               [BUILD_C_LIBS=1])
 
+AC_ARG_ENABLE([libmagic],
+              [AS_HELP_STRING([--disable-libmagic], [do not build/install the bundled libmagic library])],
+              [BUILD_MAGIC=0],
+              [BUILD_MAGIC=1])
+
+AC_ARG_ENABLE([libfuzzy],
+              [AS_HELP_STRING([--disable-libfuzzy], [do not build/install the bundled libfuzzy library])],
+              [BUILD_FUZZY=0],
+              [BUILD_FUZZY=1])
+
 CFLAGS="-Wall -fPIC $CFLAGS"
 INSTALL_OPTIONS="-m644"
 
@@ -28,15 +38,23 @@ else
 	SONAME="-soname"
 	SOEXT="so"
 fi
-dnl AS_IF([test "x$enable_foo" != "xno"], [
 
 if test "$BUILD_C_LIBS" != "0"
 then
-    (cd ./src/C/file-*/ && autoreconf -v && ./configure) || exit 1
-    (cd ./src/C/ssdeep-*/ && autoreconf -v && ./configure) || exit 1
+    if test "$BUILD_MAGIC" != "0"
+    then
+        (cd ./src/C/file-*/ && autoreconf -v && ./configure) || exit 1
+    fi
+
+    if test "$BUILD_FUZZY" != "0"
+    then
+        (cd ./src/C/ssdeep-*/ && autoreconf -v && ./configure) || exit 1
+    fi
 fi
 
 AC_SUBST(BUILD_C_LIBS, $BUILD_C_LIBS)
+AC_SUBST(BUILD_MAGIC, $BUILD_MAGIC)
+AC_SUBST(BUILD_FUZZY, $BUILD_FUZZY)
 AC_SUBST(PYTHON, $PYTHON)
 AC_SUBST(SONAME, $SONAME)
 AC_SUBST(SOEXT, $SOEXT)

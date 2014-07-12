@@ -604,6 +604,8 @@ PLATFORM
 SOEXT
 SONAME
 PYTHON
+BUILD_FUZZY
+BUILD_MAGIC
 BUILD_C_LIBS
 LIBOBJS
 EGREP
@@ -659,6 +661,8 @@ ac_user_opts='
 enable_option_checking
 with_python
 enable_clibs
+enable_libmagic
+enable_libfuzzy
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1279,6 +1283,8 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-clibs         do not build/install dependent c libraries
+  --disable-libmagic      do not build/install the bundled libmagic library
+  --disable-libfuzzy      do not build/install the bundled libfuzzy library
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -3308,26 +3314,52 @@ else
 fi
 
 
+# Check whether --enable-libmagic was given.
+if test "${enable_libmagic+set}" = set; then :
+  enableval=$enable_libmagic; BUILD_MAGIC=0
+else
+  BUILD_MAGIC=1
+fi
+
+
+# Check whether --enable-libfuzzy was given.
+if test "${enable_libfuzzy+set}" = set; then :
+  enableval=$enable_libfuzzy; BUILD_FUZZY=0
+else
+  BUILD_FUZZY=1
+fi
+
+
 CFLAGS="-Wall -fPIC $CFLAGS"
+INSTALL_OPTIONS="-m644"
 
 if test "$(uname)" == "Darwin"
 then
 	SONAME="-install_name"
 	SOEXT="dylib"
-	INSTALL_OPTIONS="-m644"
 else
 	SONAME="-soname"
 	SOEXT="so"
-	INSTALL_OPTIONS="-D -m644"
 fi
 
 if test "$BUILD_C_LIBS" != "0"
 then
-    (cd ./src/C/file-*/ && autoreconf -v && ./configure) || exit 1
-    (cd ./src/C/ssdeep-*/ && autoreconf -v && ./configure) || exit 1
+    if test "$BUILD_MAGIC" != "0"
+    then
+        (cd ./src/C/file-*/ && autoreconf -v && ./configure) || exit 1
+    fi
+
+    if test "$BUILD_FUZZY" != "0"
+    then
+        (cd ./src/C/ssdeep-*/ && autoreconf -v && ./configure) || exit 1
+    fi
 fi
 
 BUILD_C_LIBS=$BUILD_C_LIBS
+
+BUILD_MAGIC=$BUILD_MAGIC
+
+BUILD_FUZZY=$BUILD_FUZZY
 
 PYTHON=$PYTHON
 
@@ -3335,7 +3367,7 @@ SONAME=$SONAME
 
 SOEXT=$SOEXT
 
-PLATFORM=$(uname -o)
+PLATFORM=$(uname -s)
 
 INSTALL_OPTIONS=$INSTALL_OPTIONS
 
