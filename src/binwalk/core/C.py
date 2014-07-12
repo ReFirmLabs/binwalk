@@ -91,7 +91,7 @@ class Library(object):
         '''
         Class constructor.
 
-        @library   - Library name (e.g., 'magic' for libmagic).
+        @library   - Library name (e.g., 'magic' for libmagic), or a list of names.
         @functions - A dictionary of function names and their return types (e.g., {'magic_buffer' : str})
 
         Returns None.
@@ -104,43 +104,54 @@ class Library(object):
             f = FunctionHandler(self.library, function)
             setattr(self, function.name, f.run)
 
-    def find_library(self, library):
+    def find_library(self, libraries):
         '''
         Locates the specified library.
 
-        @library - Library name (e.g., 'magic' for libmagic).
+        @libraries - Library name (e.g., 'magic' for libmagic), or a list of names.
  
         Returns a string to be passed to ctypes.cdll.LoadLibrary.
         '''
         lib_path = None
-        system_paths = {
-            'linux'   : ['/usr/local/lib/lib%s.so' % library],
-            'linux2'  : ['/usr/local/lib/lib%s.so' % library],
-            'linux3'  : ['/usr/local/lib/lib%s.so' % library],
-            'darwin'  : ['/opt/local/lib/lib%s.dylib' % library,
-                        '/usr/local/lib/lib%s.dylib' % library,
-                       ] + glob.glob('/usr/local/Cellar/lib%s/*/lib/lib%s.dylib' % (library, library)),
 
-            'cygwin'  : ['/usr/local/lib/lib%s.so' % library],
-            'win32'   : ['%s.dll' % library]
-        }
+        if isinstance(libraries, str):
+            libraries = [libraries]
 
-        # Search the common install directories first; these are usually not in the library search path
-        # Search these *first*, since a) they are the most likely locations and b) there may be a
-        # discrepency between where ctypes.util.find_library and ctypes.cdll.LoadLibrary search for libs.
-        for path in system_paths[sys.platform]:
-            if os.path.exists(path):
-                lib_path = path
+        for library in libraries:
+            system_paths = {
+                'linux'   : ['/usr/local/lib/lib%s.so' % library],
+                'linux2'  : ['/usr/local/lib/lib%s.so' % library],
+                'linux3'  : ['/usr/local/lib/lib%s.so' % library],
+                'darwin'  : ['/opt/local/lib/lib%s.dylib' % library,
+                            '/usr/local/lib/lib%s.dylib' % library,
+                           ] + glob.glob('/usr/local/Cellar/lib%s/*/lib/lib%s.dylib' % (library, library)),
+
+                'cygwin'  : ['/usr/local/lib/lib%s.so' % library],
+                'win32'   : ['%s.dll' % library]
+            }
+
+            # Search the common install directories first; these are usually not in the library search path
+            # Search these *first*, since a) they are the most likely locations and b) there may be a
+            # discrepency between where ctypes.util.find_library and ctypes.cdll.LoadLibrary search for libs.
+            for path in system_paths[sys.platform]:
+                if os.path.exists(path):
+                    lib_path = path
+                    break
+
+            # If we failed to find the library, check the standard library search paths
+            if not lib_path:
+                lib_path = ctypes.util.find_library(library)
+
+            # Use the first library that we can find
+            if lib_path:
+                binwalk.core.common.debug("Found library '%s' at: %s" % (library, lib_path))
                 break
-
-        # If we failed to find the library, check the standard library search paths
-        if not lib_path:
-            lib_path = ctypes.util.find_library(library)
+            else:
+                binwalk.core.common.debug("Could not find library '%s'" % library)
 
         # If we still couldn't find the library, error out
         if not lib_path:
-            raise Exception("Failed to locate library '%s'" % library)
+            raise Exception("Failed to locate libraries '%s'" % str(libraries))
 
-        binwalk.core.common.debug("Found library: " + lib_path)
         return lib_path
 

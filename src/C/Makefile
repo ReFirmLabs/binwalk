@@ -36,9 +36,9 @@ uninstall:
 
 file_make_prep:
 	if [ "$(BUILD_MAGIC)" -eq "1" ]; then sed -e s/libmagic/libinmagic/g < ./file-$(FILE_VERSION)/src/Makefile >./file-$(FILE_VERSION)/src/mktmp; fi
-	if [ "$(BUILD_MAGIC)" -eq "1" ]; then mv ./file-$(FILE_VERSION)/src/mktmp ./file-$(FILE_VERSION)/src/Makefile; fi
+	if [ "$(BUILD_MAGIC)" -eq "1" ]; then mv -f ./file-$(FILE_VERSION)/src/mktmp ./file-$(FILE_VERSION)/src/Makefile; fi
 
 ssdeep_make_prep:
 	if [ "$(BUILD_FUZZY)" -eq "1" ]; then sed -e s/libfuzzy/libinfuzzy/g < ./ssdeep-$(SSDEEP_VERSION)/Makefile >./ssdeep-$(SSDEEP_VERSION)/mktmp; fi
-	if [ "$(BUILD_FUZZY)" -eq "1" ]; then mv ./ssdeep-$(SSDEEP_VERSION)/mktmp ./ssdeep-$(SSDEEP_VERSION)/Makefile; fi
+	if [ "$(BUILD_FUZZY)" -eq "1" ]; then mv -f ./ssdeep-$(SSDEEP_VERSION)/mktmp ./ssdeep-$(SSDEEP_VERSION)/Makefile; fi
 

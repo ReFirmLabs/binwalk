@@ -32,13 +32,16 @@ class Magic(object):
     
     MAGIC_FLAGS = MAGIC_NO_CHECK_TEXT | MAGIC_NO_CHECK_ENCODING | MAGIC_NO_CHECK_APPTYPE | MAGIC_NO_CHECK_TOKENS
 
+    # Look for libinmagic first, fall back on libmagic
+    LIBRARIES = ["inmagic", "magic"]
+
     def __init__(self, magic_file=None, flags=0):
         if magic_file:
             self.magic_file = str2bytes(magic_file)
         else:
             self.magic_file = None
 
-        self.libmagic = binwalk.core.C.Library("inmagic", self.LIBMAGIC_FUNCTIONS)
+        self.libmagic = binwalk.core.C.Library(self.LIBRARIES, self.LIBMAGIC_FUNCTIONS)
 
         binwalk.core.common.debug("libmagic.magic_open(0x%X)" % (self.MAGIC_FLAGS | flags))
         self.magic_cookie = self.libmagic.magic_open(self.MAGIC_FLAGS | flags)
