@@ -10,6 +10,7 @@ compress42.o:
 	$(CC) $(CFLAGS) compress42.c -c
 
 install:
+	mkdir -p $(DESTDIR)$(LIBDIR)
 	install $(INSTALL_OPTIONS) $(LIBNAME) $(DESTDIR)$(LIBDIR)/$(LIBNAME)
 
 uninstall:
