@@ -64,6 +64,18 @@ def remove_binwalk_module():
         except Exception as e:
             pass
 
+
+def add_user_paths(ldflags):
+    libpaths = open('binwalk/core/libpaths.py', 'w')
+    if ldflags:
+        libs = (' '+ldflags).split(' -L')
+        libs.pop(0)
+    else:
+        libs = []
+    libpaths.write('user_libs = ' + str(libs) + '\n')
+    libpaths.close()
+
+
 class UninstallCommand(Command):
     description = "Uninstalls the Python module"
     user_options = []
@@ -101,6 +113,10 @@ class CleanCommand(Command):
             raise e
         except Exception:
             pass
+if "LDFLAGS" in os.environ:
+    add_user_paths(os.environ['LDFLAGS'])
+else:
+    add_user_paths(None)
 
 if "install" in sys.argv:
     # If an older version of binwalk is currently installed, completely remove it to prevent conflicts

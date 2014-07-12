@@ -17,15 +17,6 @@ AC_ARG_ENABLE([clibs],
               [BUILD_C_LIBS=0],
               [BUILD_C_LIBS=1])
 
-AC_ARG_ENABLE([libmagic],
-              [AS_HELP_STRING([--disable-libmagic], [do not build/install the bundled libmagic library])],
-              [BUILD_MAGIC=0],
-              [BUILD_MAGIC=1])
-
-AC_ARG_ENABLE([libfuzzy],
-              [AS_HELP_STRING([--disable-libfuzzy], [do not build/install the bundled libfuzzy library])],
-              [BUILD_FUZZY=0],
-              [BUILD_FUZZY=1])
 
 CFLAGS="-Wall -fPIC $CFLAGS"
 INSTALL_OPTIONS="-m644"
@@ -39,22 +30,26 @@ else
 	SOEXT="so"
 fi
 
-if test "$BUILD_C_LIBS" != "0"
-then
-    if test "$BUILD_MAGIC" != "0"
-    then
-        (cd ./src/C/file-*/ && autoreconf -v && ./configure) || exit 1
-    fi
-
-    if test "$BUILD_FUZZY" != "0"
-    then
-        (cd ./src/C/ssdeep-*/ && autoreconf -v && ./configure) || exit 1
-    fi
+AC_CHECK_PROG(SSDEEP_CHECK,ssdeep,yes)
+if test x"$SSDEEP_CHECK" != x"yes" ; then
+    AC_MSG_ERROR([Cannot find ssdeep/libfuzzy.])
 fi
+AC_CHECK_LIB([fuzzy],[fuzzy_hash_buf], [], AC_MSG_ERROR([Cannot find libfuzzy (part of ssdeep).]))
+
+AC_MSG_CHECKING([checking ssdeep version...])
+SSDEEP_VERSION=`ssdeep -V`
+AC_MSG_RESULT([$SSDEEP_VERSION])
+AS_VERSION_COMPARE([$SSDEEP_VERSION], [2.10], AC_MSG_ERROR([binwalk needs ssdeep/libfuzzy version 2.10 or higher.]), [], [])
+
+
+AC_CHECK_LIB([magic],[magic_open], [], AC_MSG_ERROR([Cannot find libmagic.]))
+AC_MSG_CHECKING([checking libmagic version...])
+AC_COMPUTE_INT([ac_cv_decl_MAGIC_VERSION], [MAGIC_VERSION], [#include <magic.h>], AC_MSG_FAILURE([failed!]))
+AC_MSG_RESULT([$ac_cv_decl_MAGIC_VERSION])
+AS_VERSION_COMPARE([$ac_cv_decl_MAGIC_VERSION], [518], [], AC_MSG_ERROR([binwalk needs libmagic version 5.19 or higher. Please see http://bugs.gw.com/view.php?id=330.]), [])
+AS_VERSION_COMPARE([$ac_cv_decl_MAGIC_VERSION], [519], AC_MSG_ERROR([binwalk needs libmagic version 5.19 or higher.]), [], [])
 
 AC_SUBST(BUILD_C_LIBS, $BUILD_C_LIBS)
-AC_SUBST(BUILD_MAGIC, $BUILD_MAGIC)
-AC_SUBST(BUILD_FUZZY, $BUILD_FUZZY)
 AC_SUBST(PYTHON, $PYTHON)
 AC_SUBST(SONAME, $SONAME)
 AC_SUBST(SOEXT, $SOEXT)

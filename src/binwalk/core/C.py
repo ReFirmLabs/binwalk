@@ -1,9 +1,9 @@
 import os
 import sys
-import glob
 import ctypes
 import ctypes.util
 import binwalk.core.common
+import binwalk.core.libpaths
 from binwalk.core.compat import *
 
 class Function(object):
@@ -104,6 +104,33 @@ class Library(object):
             f = FunctionHandler(self.library, function)
             setattr(self, function.name, f.run)
 
+    def check_if_library_exists(self, base_path, library):
+        '''
+        Checks if a library file exists at base_path.
+
+        @base_path - Path to directory where library could be found.
+        @library - Library name (e.g., 'magic' for libmagic), or a list of names.
+
+        Returns a string containing the library path, or None.
+        '''
+        if sys.platform.startswith(('linux')) or sys.platform == 'cygwin':
+            libprefix = 'lib'
+            libext = '.so'
+        elif sys.platform == 'darwin':
+            libprefix = 'lib'
+            libext = '.dylib'
+        elif sys.platform == 'win32':
+            libprefix = ''
+            libext = '.dll'
+
+        path = (base_path + '/' + libprefix + library + libext)
+        binwalk.core.common.debug("Looking for library at %s" % path)
+        if os.path.exists(path):
+            return path
+        else:
+            return None
+
+
     def find_library(self, libraries):
         '''
         Locates the specified library.
@@ -118,25 +145,19 @@ class Library(object):
             libraries = [libraries]
 
         for library in libraries:
-            system_paths = {
-                'linux'   : ['/usr/local/lib/lib%s.so' % library],
-                'linux2'  : ['/usr/local/lib/lib%s.so' % library],
-                'linux3'  : ['/usr/local/lib/lib%s.so' % library],
-                'darwin'  : ['/opt/local/lib/lib%s.dylib' % library,
-                            '/usr/local/lib/lib%s.dylib' % library,
-                           ] + glob.glob('/usr/local/Cellar/lib%s/*/lib/lib%s.dylib' % (library, library)),
-
-                'cygwin'  : ['/usr/local/lib/lib%s.so' % library],
-                'win32'   : ['%s.dll' % library]
-            }
-
-            # Search the common install directories first; these are usually not in the library search path
-            # Search these *first*, since a) they are the most likely locations and b) there may be a
-            # discrepency between where ctypes.util.find_library and ctypes.cdll.LoadLibrary search for libs.
-            for path in system_paths[sys.platform]:
-                if os.path.exists(path):
-                    lib_path = path
+            # Search the compile-time specified paths first.
+            for base_path in binwalk.core.libpaths.user_libs:
+                lib_path = self.check_if_library_exists(base_path, library)
+                if lib_path:
                     break
+
+            # Search /usr/local/lib next if not on win32.
+            if not lib_path and not sys.platform == 'win32':
+                lib_path = self.check_if_library_exists('/usr/local/lib', library)
+
+            # search local dir if on win32.
+            if not lib_path and sys.platform == 'win32':
+                lib_path = self.check_if_library_exists('', library)
 
             # If we failed to find the library, check the standard library search paths
             if not lib_path:
