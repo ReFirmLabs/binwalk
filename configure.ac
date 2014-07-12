@@ -46,6 +46,7 @@ AC_CHECK_LIB([magic],[magic_open], [], AC_MSG_ERROR([Cannot find libmagic.]))
 AC_MSG_CHECKING([checking libmagic version...])
 AC_COMPUTE_INT([ac_cv_decl_MAGIC_VERSION], [MAGIC_VERSION], [#include <magic.h>], AC_MSG_FAILURE([failed!]))
 AC_MSG_RESULT([$ac_cv_decl_MAGIC_VERSION])
+AS_VERSION_COMPARE([$ac_cv_decl_MAGIC_VERSION], [518], [], AC_MSG_ERROR([binwalk needs libmagic version 5.19 or higher. Please see http://bugs.gw.com/view.php?id=330.]), [])
 AS_VERSION_COMPARE([$ac_cv_decl_MAGIC_VERSION], [519], AC_MSG_ERROR([binwalk needs libmagic version 5.19 or higher.]), [], [])
 
 AC_SUBST(BUILD_C_LIBS, $BUILD_C_LIBS)
