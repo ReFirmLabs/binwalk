@@ -247,7 +247,7 @@
 0       string          bFLT            BFLT executable
 >4	belong		<1		invalid
 >4	belong		>4		invalid
->4      belong          x               version %ld, 
+>4      belong          x               version %d, 
 >4      belong          4
 >8	belong		x		code offset: 0x%.8X, 
 >12	belong		x		data segment starts at: 0x%.8X, 
