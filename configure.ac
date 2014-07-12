@@ -18,16 +18,15 @@ AC_ARG_ENABLE([clibs],
               [BUILD_C_LIBS=1])
 
 CFLAGS="-Wall -fPIC $CFLAGS"
+INSTALL_OPTIONS="-m644"
 
 if test "$(uname)" == "Darwin"
 then
 	SONAME="-install_name"
 	SOEXT="dylib"
-	INSTALL_OPTIONS="-m644"
 else
 	SONAME="-soname"
 	SOEXT="so"
-	INSTALL_OPTIONS="-D -m644"
 fi
 dnl AS_IF([test "x$enable_foo" != "xno"], [
 

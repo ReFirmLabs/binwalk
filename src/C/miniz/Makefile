@@ -10,6 +10,7 @@ tinfl.o:
 	$(CC) $(CFLAGS) -c tinfl.c
 
 install:
+	mkdir -p $(DESTDIR)$(LIBDIR)
 	install $(INSTALL_OPTIONS) $(LIBNAME) $(DESTDIR)$(LIBDIR)/$(LIBNAME)
 
 uninstall:
