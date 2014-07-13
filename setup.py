@@ -47,18 +47,25 @@ def find_binwalk_module_paths():
 
     return paths
 
-def remove_binwalk_module():
-    for path in find_binwalk_module_paths():
+def remove_binwalk_module(pydir=None, pybin=None):
+    if pydir:
+        module_paths = [pydir]
+    else:
+        module_paths = find_binwalk_module_paths()
+
+    for path in module_paths:
         try:
             remove_tree(path)
         except OSError as e:
             pass
     
-    script_path = which(MODULE_NAME)
-    if script_path:
+    if not pybin:
+        pybin = which(MODULE_NAME)
+    
+    if pybin:
         try:
-            print("removing '%s'" % script_path)
-            os.unlink(script_path)
+            print("removing '%s'" % pybin)
+            os.unlink(pybin)
         except KeyboardInterrupt as e:
             pass
         except Exception as e:
@@ -66,16 +73,20 @@ def remove_binwalk_module():
 
 class UninstallCommand(Command):
     description = "Uninstalls the Python module"
-    user_options = []
+    user_options = [
+                    ('pydir=', None, 'Specify the path to the binwalk python module to be removed.'),
+                    ('pybin=', None, 'Specify the path to the binwalk executable to be removed.'),
+    ]
 
     def initialize_options(self):
-        pass
+        self.pydir = None
+        self.pybin = None
 
     def finalize_options(self):
         pass
 
     def run(self):
-        remove_binwalk_module()
+        remove_binwalk_module(self.pydir, self.pybin)
 
 class CleanCommand(Command):
     description = "Clean Python build directories"
