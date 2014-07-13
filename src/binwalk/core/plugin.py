@@ -173,7 +173,10 @@ class Plugins(object):
         }
 
         for key in plugins.keys():
-            plugins[key]['path'] = self.settings.get_file_path(key, self.settings.PLUGINS)
+            if key == 'user':
+                plugins[key]['path'] = self.settings.user.plugins
+            else:
+                plugins[key]['path'] = self.settings.system.plugins
 
             if plugins[key]['path']:
                 for file_name in os.listdir(plugins[key]['path']):

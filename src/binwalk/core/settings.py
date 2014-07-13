@@ -4,6 +4,12 @@ import os
 import binwalk.core.common as common
 from binwalk.core.compat import *
 
+class Container(object):
+
+    def __init__(self, **kwargs):
+        for (k,v) in iterator(kwargs):
+            setattr(self, k, v)
+
 class Settings:
     '''
     Binwalk settings class, used for accessing user and system file paths and general configuration settings.
@@ -27,6 +33,7 @@ class Settings:
 
     # File names
     PLUGINS = "plugins"
+    PREFIX_FILE = "prefix.conf"
     EXTRACT_FILE = "extract.conf"
     BINWALK_MAGIC_FILE = "binwalk"
     BINARCH_MAGIC_FILE = "binarch"
@@ -41,38 +48,21 @@ class Settings:
         # Path to the system wide binwalk directory
         self.system_dir = self._get_system_dir()
 
-        # Dictionary of all absolute user/system file paths
-        self.paths = {
-            'user'      : {},
-            'system'    : {},
-        }
-
         # Build the paths to all user-specific files
-        self.paths['user'][self.BINWALK_MAGIC_FILE] = self._user_path(self.BINWALK_MAGIC_DIR, self.BINWALK_MAGIC_FILE)
-        self.paths['user'][self.BINARCH_MAGIC_FILE] = self._user_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
-        self.paths['user'][self.BINCAST_MAGIC_FILE] = self._user_path(self.BINWALK_MAGIC_DIR, self.BINCAST_MAGIC_FILE)
-        self.paths['user'][self.EXTRACT_FILE] = self._user_path(self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE)
-        self.paths['user'][self.PLUGINS] = self._user_path(self.BINWALK_PLUGINS_DIR)
+        self.user = Container(binwalk=self._user_path(self.BINWALK_MAGIC_DIR, self.BINWALK_MAGIC_FILE),
+                              binarch=self._user_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE),
+                              bincast=self._user_path(self.BINWALK_MAGIC_DIR, self.BINCAST_MAGIC_FILE),
+                              extract=self._user_path(self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE),
+                              plugins=self._user_path(self.BINWALK_PLUGINS_DIR))
+
 
         # Build the paths to all system-wide files
-        self.paths['system'][self.BINWALK_MAGIC_FILE] = self._system_path(self.BINWALK_MAGIC_DIR, self.BINWALK_MAGIC_FILE)
-        self.paths['system'][self.BINARCH_MAGIC_FILE] = self._system_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
-        self.paths['system'][self.BINCAST_MAGIC_FILE] = self._system_path(self.BINWALK_MAGIC_DIR, self.BINCAST_MAGIC_FILE)
-        self.paths['system'][self.EXTRACT_FILE] = self._system_path(self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE)
-        self.paths['system'][self.PLUGINS] = self._system_path(self.BINWALK_PLUGINS_DIR)
-
-    def get_file_path(self, usersys, fname):
-        '''
-        Retrieves the specified file path from self.paths.
-
-        @usersys - One of: 'user', 'system'.
-        @fname   - The file name (e.g., self.BINWALK_MAGIC_FILE, self.PLUGINS, etc)
-
-        Returns the path, if it exists; returns None otherwise.
-        '''
-        if has_key(self.paths, usersys) and has_key(self.paths[usersys], fname) and self.paths[usersys][fname]:
-            return self.paths[usersys][fname]
-        return None
+        self.system = Container(binwalk=self._system_path(self.BINWALK_MAGIC_DIR, self.BINWALK_MAGIC_FILE),
+                                binarch=self._system_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE),
+                                bincast=self._system_path(self.BINWALK_MAGIC_DIR, self.BINCAST_MAGIC_FILE),
+                                extract=self._system_path(self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE),
+                                prefix=self._system_path(self.BINWALK_CONFIG_DIR, self.PREFIX_FILE),
+                                plugins=self._system_path(self.BINWALK_PLUGINS_DIR))
 
     def find_magic_file(self, fname, system_only=False, user_only=False):
         '''

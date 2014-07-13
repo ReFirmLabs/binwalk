@@ -64,20 +64,20 @@ class Signature(Module):
         # Append the user's magic file first so that those signatures take precedence
         elif self.search_for_opcodes:
             self.magic_files = [
-                    self.config.settings.get_file_path('user', self.config.settings.BINARCH_MAGIC_FILE),
-                    self.config.settings.get_file_path('system', self.config.settings.BINARCH_MAGIC_FILE),
+                    self.config.settings.user.binarch,
+                    self.config.settings.system.binarch,
             ]
 
         elif self.cast_data_types:
             self.magic_files = [
-                    self.config.settings.get_file_path('user', self.config.settings.BINCAST_MAGIC_FILE),
-                    self.config.settings.get_file_path('system', self.config.settings.BINCAST_MAGIC_FILE),
+                    self.config.settings.user.bincast,
+                    self.config.settings.system.bincast,
             ]
 
         # Use the system default magic file if no other was specified, or if -B was explicitly specified
         if (not self.magic_files) or (self.explicit_signature_scan and not self.cast_data_types):
-            self.magic_files.append(self.config.settings.get_file_path('user', self.config.settings.BINWALK_MAGIC_FILE))
-            self.magic_files.append(self.config.settings.get_file_path('system', self.config.settings.BINWALK_MAGIC_FILE))
+            self.magic_files.append(self.config.settings.user.binwalk)
+            self.magic_files.append(self.config.settings.system.binwalk)
 
         # Parse the magic file(s) and initialize libmagic
         binwalk.core.common.debug("Loading magic files: %s" % str(self.magic_files))

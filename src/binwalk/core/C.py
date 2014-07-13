@@ -96,6 +96,7 @@ class Library(object):
 
         Returns None.
         '''
+        self.settings = binwalk.core.settings.Settings()
         self.library = ctypes.cdll.LoadLibrary(self.find_library(library))
         if not self.library:
             raise Exception("Failed to load library '%s'" % library)
@@ -114,20 +115,25 @@ class Library(object):
         '''
         lib_path = None
 
+        try:
+            prefix = open(self.settings.system.prefix, 'r').read().strip()
+        except:
+            prefix = ''
+        
         if isinstance(libraries, str):
             libraries = [libraries]
 
         for library in libraries:
             system_paths = {
-                'linux'   : ['/usr/local/lib/lib%s.so' % library],
-                'linux2'  : ['/usr/local/lib/lib%s.so' % library],
-                'linux3'  : ['/usr/local/lib/lib%s.so' % library],
-                'darwin'  : ['/opt/local/lib/lib%s.dylib' % library,
+                'linux'   : [os.path.join(prefix, 'lib', 'lib%s.so' % library), '/usr/local/lib/lib%s.so' % library],
+                'linux2'  : [os.path.join(prefix, 'lib', 'lib%s.so' % library), '/usr/local/lib/lib%s.so' % library],
+                'linux3'  : [os.path.join(prefix, 'lib', 'lib%s.so' % library), '/usr/local/lib/lib%s.so' % library],
+                'darwin'  : [os.path.join(prefix, 'lib', 'lib%s.dylib' % library), '/opt/local/lib/lib%s.dylib' % library,
                             '/usr/local/lib/lib%s.dylib' % library,
                            ] + glob.glob('/usr/local/Cellar/lib%s/*/lib/lib%s.dylib' % (library, library)),
 
-                'cygwin'  : ['/usr/local/lib/lib%s.so' % library],
-                'win32'   : ['%s.dll' % library]
+                'cygwin'  : [os.path.join(prefix, 'lib', 'lib%s.so' % library), '/usr/local/lib/lib%s.so' % library],
+                'win32'   : [os.path.join(prefix, 'lib%s.dll' % library), '%s.dll' % library]
             }
 
             # Search the common install directories first; these are usually not in the library search path

@@ -13,6 +13,12 @@ export BUILD_FUZZY=@BUILD_FUZZY@
 BUILD_C_LIBS=@BUILD_C_LIBS@
 PYTHON=@PYTHON@
 SRC_C_DIR="./src/C"
+ifeq ($(strip $(prefix)),)
+	PREFIX=""
+else
+	PREFIX="--prefix=$(prefix)"
+endif
+START_SCRIPT="binwalk-start"
 
 .PHONY: all install build deps clean uninstall
 
@@ -20,16 +26,22 @@ all: build
 
 install: build
 	if [ "$(BUILD_C_LIBS)" -eq "1" ]; then make -C $(SRC_C_DIR) install; fi
-ifeq ($(strip $(prefix)),)
-	$(PYTHON) ./setup.py install
-else
-	$(PYTHON) ./setup.py install --prefix=$(prefix)
-endif
+	$(PYTHON) ./setup.py install $(PREFIX)
 	if [ "$(BUILD_C_LIBS)" -eq "1" ] && [ $(findstring "CYGWIN", $(PLATFORM)) ]; then ldconfig || true; fi
 
 build:
 	if [ "$(BUILD_C_LIBS)" -eq "1" ]; then make -C $(SRC_C_DIR); fi
+	echo "$(prefix)" > src/binwalk/config/prefix.conf
 	$(PYTHON) ./setup.py build
+
+start-script:
+	echo '#!/bin/sh' > $(START_SCRIPT)
+	echo "PREFIX=\"$(prefix)\"" >> $(START_SCRIPT)
+	echo 'PYVERSION=`python --version 2>&1 | cut -d' ' -f2 | cut -d'.' -f1,2`' >> $(START_SCRIPT)
+	echo 'export PYTHONPATH="\$PREFIX/lib/python$PYVERSION/site-packages"' >> $(START_SCRIPT)
+	echo '\$PREFIX/bin/binwalk "\$@"' >> $(START_SCRIPT)
+	chmod +x $(START_SCRIPT)
+
 
 clean:
 	if [ "$(BUILD_C_LIBS)" -eq "1" ]; then make -C $(SRC_C_DIR) clean; fi
@@ -37,8 +49,9 @@ clean:
 
 distclean: clean
 	if [ "$(BUILD_C_LIBS)" -eq "1" ]; then make -C $(SRC_C_DIR) distclean; fi
-	rm -rf Makefile config.* *.cache
+	rm -rf Makefile config.* *.cache $(START_SCRIPT)
 
 uninstall:
 	if [ "$(BUILD_C_LIBS)" -eq "1" ]; then make -C $(SRC_C_DIR) uninstall; fi
 	$(PYTHON) ./setup.py uninstall
+

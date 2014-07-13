@@ -270,8 +270,8 @@ class Extractor(Module):
         '''
         # Load the user extract file first to ensure its rules take precedence.
         extract_files = [
-            self.config.settings.get_file_path('user', self.config.settings.EXTRACT_FILE),
-            self.config.settings.get_file_path('system', self.config.settings.EXTRACT_FILE),
+            self.config.settings.user.extract,
+            self.config.settings.system.extract,
         ]
 
         for extract_file in extract_files:

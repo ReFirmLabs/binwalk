@@ -53,7 +53,7 @@ def remove_binwalk_module():
             remove_tree(path)
         except OSError as e:
             pass
-        
+    
     script_path = which(MODULE_NAME)
     if script_path:
         try:

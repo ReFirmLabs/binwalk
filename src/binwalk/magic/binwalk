@@ -859,7 +859,7 @@
 0       string          bFLT            BFLT executable
 >4	belong		<1		invalid
 >4	belong		>4		invalid
->4      belong          x               version %ld, 
+>4      belong          x               version %d, 
 >4      belong          4
 >8	belong		x		code offset: 0x%.8X, 
 >12	belong		x		data segment starts at: 0x%.8X, 
@@ -1191,34 +1191,34 @@
 0       lelong  0x28cd3d45      CramFS filesystem, little endian
 >4	lelong	<0		invalid
 >4	lelong	>1073741824	invalid
->4      lelong  x 		size %lu
+>4      lelong  x 		size %u
 >8      lelong  &1 		version #2
 >8      lelong  &2 		sorted_dirs
 >8      lelong  &4 		hole_support
 >32     lelong  x 		CRC 0x%x,
->36     lelong  x 		edition %lu,
+>36     lelong  x 		edition %u,
 >40	lelong	<0		invalid
->40     lelong  x 		%lu blocks,
+>40     lelong  x 		%u blocks,
 >44	lelong	<0		invalid
->44     lelong  x 		%lu files
->4      lelong  x 		{jump-to-offset:%lu}
->4      lelong  x 		{file-size:%lu}
+>44     lelong  x 		%u files
+>4      lelong  x 		{jump-to-offset:%u}
+>4      lelong  x 		{file-size:%u}
 
 0       belong  0x28cd3d45      CramFS filesystem, big endian
 >4	belong	<0		invalid
 >4	belong	>1073741824	invalid
->4      belong  x 		size %lu
+>4      belong  x 		size %u
 >8      belong  &1 		version #2
 >8      belong  &2 		sorted_dirs
 >8      belong  &4 		hole_support
 >32     belong  x 		CRC 0x%x,
->36     belong  x 		edition %lu,
+>36     belong  x 		edition %u,
 >40	belong	<0		invalid
->40     belong  x 		%lu blocks,
+>40     belong  x 		%u blocks,
 >44	belong	<0		invalid
->44     belong  x 		%lu files
->4      belong  x 		{jump-to-offset:%lu}
->4      belong  x 		{file-size:%lu}
+>44     belong  x 		%u files
+>4      belong  x 		{jump-to-offset:%u}
+>4      belong  x 		{file-size:%u}
 
 
 
@@ -2251,8 +2251,8 @@
 >16		belong			>10000			invalid
 >20		belong			<1				invalid
 >20		belong			>10000			invalid
->16     belong          x               \b, %ld x
->20     belong          x               %ld,
+>16     belong          x               \b, %d x
+>20     belong          x               %d,
 >24     byte            x               %d-bit
 >25     byte            0               grayscale,
 >25     byte            2               \b/color RGB,
@@ -2267,8 +2267,8 @@
 0       string          GIF8            GIF image data
 >4      string          7a              \b, version "8%s",
 >4      string          9a              \b, version "8%s",
->6      leshort         >0              %hd x
->8      leshort         >0              %hd
+>6      leshort         >0              %d x
+>8      leshort         >0              %d
 #>10    byte            &0x80           color mapped,
 #>10    byte&0x07       =0x00           2 colors
 #>10    byte&0x07       =0x01           4 colors
