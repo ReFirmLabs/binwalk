@@ -1282,7 +1282,7 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --disable-clibs         do not build/install dependent c libraries
+  --disable-clibs         do not build/install any c libraries
   --disable-libmagic      do not build/install the bundled libmagic library
   --disable-libfuzzy      do not build/install the bundled libfuzzy library
 
@@ -3335,12 +3335,11 @@ INSTALL_OPTIONS="-m644"
 
 if test "$prefix" != "NONE"
 then
+    echo "prefix: $prefix"
     CONFIGURE_PREFIX="--prefix=$prefix"
 else
     CONFIGURE_PREFIX=""
 fi
-
-echo "prefix: $prefix"
 
 if test "$(uname)" == "Darwin"
 then

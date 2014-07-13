@@ -13,7 +13,7 @@ AC_ARG_WITH([python],
             [PYTHON=python])
 
 AC_ARG_ENABLE([clibs],
-              [AS_HELP_STRING([--disable-clibs], [do not build/install dependent c libraries])],
+              [AS_HELP_STRING([--disable-clibs], [do not build/install any c libraries])],
               [BUILD_C_LIBS=0],
               [BUILD_C_LIBS=1])
 
@@ -32,12 +32,11 @@ INSTALL_OPTIONS="-m644"
 
 if test "$prefix" != "NONE"
 then
+    echo "prefix: $prefix"
     CONFIGURE_PREFIX="--prefix=$prefix"
 else
     CONFIGURE_PREFIX=""
 fi
-
-echo "prefix: $prefix"
 
 if test "$(uname)" == "Darwin"
 then
