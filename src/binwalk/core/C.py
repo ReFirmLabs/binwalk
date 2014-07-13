@@ -117,7 +117,9 @@ class Library(object):
 
         try:
             prefix = open(self.settings.system.prefix, 'r').read().strip()
-        except:
+        except KeyboardInterrupt as e:
+            raise e
+        except Exception:
             prefix = ''
         
         if isinstance(libraries, str):
@@ -126,15 +128,15 @@ class Library(object):
         for library in libraries:
             system_paths = {
                 'linux'   : [os.path.join(prefix, 'lib', 'lib%s.so' % library), '/usr/local/lib/lib%s.so' % library],
-                'linux2'  : [os.path.join(prefix, 'lib', 'lib%s.so' % library), '/usr/local/lib/lib%s.so' % library],
-                'linux3'  : [os.path.join(prefix, 'lib', 'lib%s.so' % library), '/usr/local/lib/lib%s.so' % library],
+                'cygwin'  : [os.path.join(prefix, 'lib', 'lib%s.so' % library), '/usr/local/lib/lib%s.so' % library],
+                'win32'   : [os.path.join(prefix, 'lib%s.dll' % library), '%s.dll' % library],
                 'darwin'  : [os.path.join(prefix, 'lib', 'lib%s.dylib' % library), '/opt/local/lib/lib%s.dylib' % library,
                             '/usr/local/lib/lib%s.dylib' % library,
                            ] + glob.glob('/usr/local/Cellar/lib%s/*/lib/lib%s.dylib' % (library, library)),
-
-                'cygwin'  : [os.path.join(prefix, 'lib', 'lib%s.so' % library), '/usr/local/lib/lib%s.so' % library],
-                'win32'   : [os.path.join(prefix, 'lib%s.dll' % library), '%s.dll' % library]
             }
+
+            for i in range(2, 4):
+                system_paths['linux%d' % i] = system_paths['linux']
 
             # Search the common install directories first; these are usually not in the library search path
             # Search these *first*, since a) they are the most likely locations and b) there may be a
