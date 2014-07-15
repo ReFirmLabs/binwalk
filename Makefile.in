@@ -29,16 +29,7 @@ install: build
 
 build:
 	if [ "$(BUILD_C_LIBS)" -eq "1" ]; then make -C $(SRC_C_DIR); fi
-	echo "$(prefix)" > src/binwalk/config/prefix.conf
 	$(PYTHON) ./setup.py build
-
-start-script:
-	echo '#\!/bin/sh' > $@
-	echo "PREFIX=\"$(prefix)\"" >> $@
-	echo 'PYVERSION=`python --version 2>&1 | cut -d" " -f2 | cut -d"." -f1,2`' >> $@
-	echo 'export PYTHONPATH="$$PREFIX/lib/python$$PYVERSION/site-packages"' >> $@
-	echo '$$PREFIX/bin/binwalk "$$@"' >> $@
-	chmod +x $@
 
 deps:
 	./deps.sh
@@ -49,7 +40,7 @@ clean:
 
 distclean: clean
 	if [ "$(BUILD_C_LIBS)" -eq "1" ]; then make -C $(SRC_C_DIR) distclean; fi
-	rm -rf Makefile config.* *.cache start-script
+	rm -rf Makefile config.* *.cache
 
 uninstall:
 	$(PYTHON) ./setup.py uninstall --pydir=`find $(prefix)/lib -name binwalk | head -1` --pybin=`find $(prefix)/bin -name binwalk | head -1`

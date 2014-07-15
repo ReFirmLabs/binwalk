@@ -45,7 +45,6 @@ dependencies are available from most Linux package managers:
     python-qt4-gl 
     python-numpy 
     python-scipy
-    pyqtgraph-0.9.8 [http://www.pyqtgraph.org/downloads/pyqtgraph-0.9.8.tar.gz]
     mtd-utils 
     zlib1g-dev 
     liblzma-dev 
