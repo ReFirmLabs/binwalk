@@ -27,6 +27,6 @@ clean: clean_libs
 distclean: clean_libs
 	make -C miniz distclean
 	make -C compress distclean
-	if [ "$(BUILD_FUZZY)" -eq "1" ]; then make -C ssdeep-$(SSDEEP_VERSION) distclean; fi
-	if [ "$(BUILD_MAGIC)" -eq "1" ]; then make -C file-$(FILE_VERSION) distclean; fi
+	if [ "$(BUILD_FUZZY)" -eq "1" ]; then rm -rf `ls ./ssdeep-*.tar.gz | sed -e 's/\.tar\.gz//'`; fi
+	if [ "$(BUILD_MAGIC)" -eq "1" ]; then rm -rf `ls ./file-*.tar.gz | sed -e 's/\.tar\.gz//'`; fi
 

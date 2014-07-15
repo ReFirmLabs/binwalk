@@ -48,12 +48,16 @@ if test "$BUILD_C_LIBS" != "0"
 then
     if test "$BUILD_MAGIC" != "0"
     then
+        rm -rf $(ls ./src/C/file-*.tar.gz | sed -e 's/\.tar\.gz//')
+        (cd ./src/C && tar -zxvf file-*.tar.gz > /dev/null)
         (cd ./src/C/file-*/ && autoreconf -v && ./configure) || exit 1
     fi
 
     if test "$BUILD_FUZZY" != "0"
     then
-        (cd ./src/C/ssdeep-*/ && autoreconf -v && ./configure) || exit 1
+        rm -rf $(ls ./src/C/ssdeep-*.tar.gz | sed -e 's/\.tar\.gz//')
+        (cd ./src/C && tar -zxvf ssdeep-*.tar.gz > /dev/null)
+        (cd ./src/C/ssdeep-*/ && mkdir -p m4 && autoreconf -v && ./configure) || exit 1
     fi
 fi
 
