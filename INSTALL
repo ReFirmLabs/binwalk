@@ -14,21 +14,24 @@ names and installation procedures may differ slightly.
 INSTALLATION
 -----------------------------------------
 
+Installation follows the typical configure/make process (python, gcc, libtool and autoconf
+must be installed in order to build):
+
+    $ ./configure
+    $ make
+    $ sudo make install
+
 Binwalk's core features will work out of the box without any additional dependencies.
 However, to take advantage of binwalk's graphing and extraction capabilities, multiple
 supporting utilities/packages need to be installed.
 
 To ease "dependency hell", a shell script named deps.sh is included which attempts to
-install all required dependencies for Debian and RedHat based systems. If you are 
-running a different system, or prefer to install these dependencies manually, see the
-DEPENDENCIES section below.
+install all required dependencies for Debian and RedHat based systems:
 
-Installation follows the typical configure/make process:
+    $ ./deps.sh
 
-    $ ./deps.sh         # Install optional dependencies (caution: many MB of downloads)
-    $ ./configure
-    $ make
-    $ sudo make install
+If you are running a different system, or prefer to install these dependencies manually,
+see the DEPENDENCIES section below.
 
 
 
@@ -45,6 +48,7 @@ dependencies are available from most Linux package managers:
     python-qt4-gl 
     python-numpy 
     python-scipy
+
     mtd-utils 
     zlib1g-dev 
     liblzma-dev 
