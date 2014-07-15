@@ -3335,7 +3335,7 @@ INSTALL_OPTIONS="-m644"
 
 if test "$prefix" != "NONE"
 then
-    echo "prefix: $prefix"
+    echo "install prefix: $prefix"
     CONFIGURE_PREFIX="--prefix=$prefix"
 else
     CONFIGURE_PREFIX=""

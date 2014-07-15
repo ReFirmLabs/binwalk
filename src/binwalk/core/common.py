@@ -42,6 +42,12 @@ def error(msg):
     '''
     sys.stderr.write("\nERROR: " + msg + "\n")
 
+def get_module_path():
+    root = __file__
+    if os.path.islink(root):
+        root = os.path.realpath(root)
+    return os.path.dirname(os.path.dirname(os.path.abspath(root)))
+
 def file_md5(file_name):
     '''
     Generate an MD5 hash of the specified file.

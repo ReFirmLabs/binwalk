@@ -46,7 +46,7 @@ class Settings:
         # Path to the user binwalk directory
         self.user_dir = self._get_user_dir()
         # Path to the system wide binwalk directory
-        self.system_dir = self._get_system_dir()
+        self.system_dir = common.get_module_path()
 
         # Build the paths to all user-specific files
         self.user = Container(binwalk=self._user_path(self.BINWALK_MAGIC_DIR, self.BINWALK_MAGIC_FILE),
@@ -90,20 +90,6 @@ class Settings:
 
         return fpath
     
-    def _get_system_dir(self):
-        '''
-        Find the directory where the binwalk module is installed on the system.
-        '''
-        try:
-            root = __file__
-            if os.path.islink(root):
-                root = os.path.realpath(root)
-            return os.path.dirname(os.path.dirname(os.path.abspath(root)))
-        except KeyboardInterrupt as e:
-            raise e
-        except Exception:
-            return ''
-
     def _get_user_dir(self):
         '''
         Get the user's home directory.
