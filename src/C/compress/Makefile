@@ -1,6 +1,6 @@
 LIBNAME=libcompress42.$(SOEXT)
 
-all: clean $(LIBNAME)
+all: $(LIBNAME)
 
 $(LIBNAME): compress42.o
 	$(CC) $(CFLAGS) -shared -Wl,$(SONAME),$(LIBNAME) compress42.o -o $(LIBNAME) $(LDFLAGS)
@@ -19,7 +19,6 @@ uninstall:
 .PHONY: clean distclean
 
 clean:
-	rm -f *.o
+	rm -f *.o $(LIBNAME)
 
 distclean: clean
-	rm -f $(LIBNAME)

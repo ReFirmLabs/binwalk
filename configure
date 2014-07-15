@@ -3353,14 +3353,14 @@ then
     then
         rm -rf $(ls ./src/C/file-*.tar.gz | sed -e 's/\.tar\.gz//')
         (cd ./src/C && tar -zxvf file-*.tar.gz > /dev/null)
-        (cd ./src/C/file-*/ && autoreconf -v && ./configure) || exit 1
+        (cd ./src/C/file-*/ && ./configure) || exit 1
     fi
 
     if test "$BUILD_FUZZY" != "0"
     then
         rm -rf $(ls ./src/C/ssdeep-*.tar.gz | sed -e 's/\.tar\.gz//')
         (cd ./src/C && tar -zxvf ssdeep-*.tar.gz > /dev/null)
-        (cd ./src/C/ssdeep-*/ && mkdir -p m4 && autoreconf -v && ./configure) || exit 1
+        (cd ./src/C/ssdeep-*/ && ./configure) || exit 1
     fi
 fi
 

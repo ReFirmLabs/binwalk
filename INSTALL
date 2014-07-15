@@ -14,8 +14,8 @@ names and installation procedures may differ slightly.
 INSTALLATION
 -----------------------------------------
 
-Installation follows the typical configure/make process (python, gcc, libtool and autoconf
-must be installed in order to build):
+Installation follows the typical configure/make process (standard development tools
+such as gcc, make, and Python must be installed in order to build):
 
     $ ./configure
     $ make

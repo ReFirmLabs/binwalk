@@ -144,7 +144,6 @@ for (root, dirs, files) in os.walk(os.path.join(MODULE_NAME, "libs", "pyqtgraph"
         for directory in dirs:
             install_data_files.append(os.path.join(os.path.sep.join(root.split(os.path.sep)[1:]), os.path.join(directory, "*.py")))
 
-print(install_data_files)
 # Install the module, script, and support files
 setup(name = MODULE_NAME,
       version = "2.0.0",
