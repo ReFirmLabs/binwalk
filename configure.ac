@@ -33,9 +33,6 @@ INSTALL_OPTIONS="-m644"
 if test "$prefix" != "NONE"
 then
     echo "install prefix: $prefix"
-    CONFIGURE_PREFIX="--prefix=$prefix"
-else
-    CONFIGURE_PREFIX=""
 fi
 
 if test "$(uname)" == "Darwin"
@@ -51,12 +48,12 @@ if test "$BUILD_C_LIBS" != "0"
 then
     if test "$BUILD_MAGIC" != "0"
     then
-        (cd ./src/C/file-*/ && autoreconf -v && ./configure $CONFIGURE_PREFIX) || exit 1
+        (cd ./src/C/file-*/ && autoreconf -v && ./configure) || exit 1
     fi
 
     if test "$BUILD_FUZZY" != "0"
     then
-        (cd ./src/C/ssdeep-*/ && autoreconf -v && ./configure $CONFIGURE_PREFIX) || exit 1
+        (cd ./src/C/ssdeep-*/ && autoreconf -v && ./configure) || exit 1
     fi
 fi
 

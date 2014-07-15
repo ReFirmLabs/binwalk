@@ -48,6 +48,9 @@ def get_module_path():
         root = os.path.realpath(root)
     return os.path.dirname(os.path.dirname(os.path.abspath(root)))
 
+def get_libs_path():
+    return os.path.join(get_module_path(), "libs")
+
 def file_md5(file_name):
     '''
     Generate an MD5 hash of the specified file.

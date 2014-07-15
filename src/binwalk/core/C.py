@@ -115,22 +115,17 @@ class Library(object):
         '''
         lib_path = None
 
-        try:
-            prefix = open(self.settings.system.prefix, 'r').read().strip()
-        except KeyboardInterrupt as e:
-            raise e
-        except Exception:
-            prefix = ''
+        prefix = binwalk.core.common.get_libs_path()
         
         if isinstance(libraries, str):
             libraries = [libraries]
 
         for library in libraries:
             system_paths = {
-                'linux'   : [os.path.join(prefix, 'lib', 'lib%s.so' % library), '/usr/local/lib/lib%s.so' % library],
-                'cygwin'  : [os.path.join(prefix, 'lib', 'lib%s.so' % library), '/usr/local/lib/lib%s.so' % library],
+                'linux'   : [os.path.join(prefix, 'lib%s.so' % library), '/usr/local/lib/lib%s.so' % library],
+                'cygwin'  : [os.path.join(prefix, 'lib%s.so' % library), '/usr/local/lib/lib%s.so' % library],
                 'win32'   : [os.path.join(prefix, 'lib%s.dll' % library), '%s.dll' % library],
-                'darwin'  : [os.path.join(prefix, 'lib', 'lib%s.dylib' % library), '/opt/local/lib/lib%s.dylib' % library,
+                'darwin'  : [os.path.join(prefix, 'lib%s.dylib' % library), '/opt/local/lib/lib%s.dylib' % library,
                             '/usr/local/lib/lib%s.dylib' % library,
                            ] + glob.glob('/usr/local/Cellar/lib%s/*/lib/lib%s.dylib' % (library, library)),
             }
@@ -142,6 +137,7 @@ class Library(object):
             # Search these *first*, since a) they are the most likely locations and b) there may be a
             # discrepency between where ctypes.util.find_library and ctypes.cdll.LoadLibrary search for libs.
             for path in system_paths[sys.platform]:
+                binwalk.core.common.debug("Searching for '%s'" % path)
                 if os.path.exists(path):
                     lib_path = path
                     break

@@ -78,8 +78,7 @@ class HashMatch(Module):
         Kwarg(name='enabled', default=False),
     ]
 
-    # Look for libinfuzzy first, fall back on libfuzzy
-    LIBRARY_NAMES = ["infuzzy", "fuzzy"]
+    LIBRARY_NAME = "fuzzy"
     LIBRARY_FUNCTIONS = [
             binwalk.core.C.Function(name="fuzzy_hash_buf", type=int),
             binwalk.core.C.Function(name="fuzzy_hash_filename", type=int),
@@ -101,7 +100,7 @@ class HashMatch(Module):
         self.last_file1 = HashResult(None)
         self.last_file2 = HashResult(None)
 
-        self.lib = binwalk.core.C.Library(self.LIBRARY_NAMES, self.LIBRARY_FUNCTIONS)
+        self.lib = binwalk.core.C.Library(self.LIBRARY_NAME, self.LIBRARY_FUNCTIONS)
 
     def _get_strings(self, fname):
         return ''.join(list(binwalk.core.common.strings(fname, minimum=10)))

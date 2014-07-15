@@ -1,7 +1,9 @@
+__all__ = ['Modules', 'ModuleException']
+
 import sys
 import binwalk.core.common
 
-# This is so the built-in pyqtgraph can find itself
-sys.path.append(binwalk.core.common.get_module_path())
+# This allows importing of the built-in pyqtgraph
+sys.path.append(binwalk.core.common.get_libs_path())
 
 from binwalk.core.module import Modules, ModuleException
