@@ -1,19 +1,8 @@
 #!/bin/bash
 # Easy installer script for installing binwalk extraction utilities on Debian/RedHat systems.
-# Normally invoked via 'make deps'.
 
 SUDO=$(which sudo)
 SUMOUNT="$1 $2"
-
-function pyqtgraph
-{
-    # Get and install pyqtgraph
-    wget -O - http://www.pyqtgraph.org/downloads/pyqtgraph-0.9.8.tar.gz | tar -zxv 
-    if [ -e pyqtgraph-0.9.8 ]
-    then
-        cd pyqtgraph-0.9.8 && $SUDO python ./setup.py install && cd - && $SUDO rm -rf pyqtgraph-0.9.8
-    fi
-}
 
 function fmk
 {
@@ -154,9 +143,6 @@ case $DISTRO in
 		echo ""
 		exit 1
 esac
-
-# Get and install pyqtgraph
-pyqtgraph
 
 # Get and build the firmware mod kit
 fmk
