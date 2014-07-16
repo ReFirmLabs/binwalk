@@ -1,21 +1,20 @@
 #!/usr/bin/env python
 
+import os
 import sys
 from threading import Thread
 
-try:
-    import binwalk
-except ImportError:
-    # If installed to a custom prefix directory, binwalk may not be in
-    # the default module search path(s). Try to resolve the prefix module
-    # path and add it to sys.path.
-    import os
-    module_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                               "lib",
-                               "python%d.%d" % (sys.version_info[0], sys.version_info[1]),
-                               "site-packages")
-    sys.path.append(module_path)
-    import binwalk
+# If installed to a custom prefix directory, binwalk may not be in
+# the default module search path(s). Try to resolve the prefix module
+# path and make it the first entry in sys.path.
+_module_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                            "lib",
+                            "python%d.%d" % (sys.version_info[0], sys.version_info[1]),
+                            "site-packages")
+if os.path.exists(_module_path) and _module_path not in sys.path:
+    sys.path = [_module_path] + sys.path
+
+import binwalk
 from binwalk.core.compat import user_input
 
 def display_status(m):
