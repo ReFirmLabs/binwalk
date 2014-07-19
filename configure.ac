@@ -27,6 +27,11 @@ AC_ARG_ENABLE([libfuzzy],
               [BUILD_FUZZY=0],
               [BUILD_FUZZY=1])
 
+AC_ARG_ENABLE([pyqtgraph],
+              [AS_HELP_STRING([--disable-pyqtgraph], [do not install the bundled pyqtgraph library])],
+              [BUILD_PYQTGRAPH=0],
+              [BUILD_PYQTGRAPH=1])
+
 CFLAGS="-Wall -fPIC $CFLAGS"
 INSTALL_OPTIONS="-m644"
 
@@ -64,6 +69,7 @@ fi
 AC_SUBST(BUILD_C_LIBS, $BUILD_C_LIBS)
 AC_SUBST(BUILD_MAGIC, $BUILD_MAGIC)
 AC_SUBST(BUILD_FUZZY, $BUILD_FUZZY)
+AC_SUBST(BUILD_PYQTGRAPH, $BUILD_PYQTGRAPH)
 AC_SUBST(PYTHON, $PYTHON)
 AC_SUBST(SONAME, $SONAME)
 AC_SUBST(SOEXT, $SOEXT)

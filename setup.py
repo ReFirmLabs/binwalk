@@ -133,16 +133,19 @@ if "install" in sys.argv or "build" in sys.argv:
     fd.close()
 
 # The data files to install along with the module
-install_data_files = [os.path.join("libs", "pyqtgraph", "*.py"), os.path.join("libs", "*.so")]
 data_dirs = ["magic", "config", "plugins", "modules", "core"]
+install_data_files = [os.path.join("libs", "*.so")]
 
 for data_dir in data_dirs:
     install_data_files.append("%s%s*" % (data_dir, os.path.sep))
 
-for (root, dirs, files) in os.walk(os.path.join(MODULE_NAME, "libs", "pyqtgraph")):
-    if dirs:
-        for directory in dirs:
-            install_data_files.append(os.path.join(os.path.sep.join(root.split(os.path.sep)[1:]), os.path.join(directory, "*.py")))
+if os.getenv("BUILD_PYQTGRAPH") == "1":
+    install_data_files.append(os.path.join("libs", "pyqtgraph", "*.py"))
+
+    for (root, dirs, files) in os.walk(os.path.join(MODULE_NAME, "libs", "pyqtgraph")):
+        if dirs:
+            for directory in dirs:
+                install_data_files.append(os.path.join(os.path.sep.join(root.split(os.path.sep)[1:]), os.path.join(directory, "*.py")))
 
 # Install the module, script, and support files
 setup(name = MODULE_NAME,

@@ -1,5 +1,5 @@
-FILE_VERSION=5.18
-SSDEEP_VERSION=2.10
+FILE_VERSION=`ls file-*.tar.gz | cut -d'-' -f2 | cut -d '.' -f1,2`
+SSDEEP_VERSION=`ls ssdeep-*.tar.gz | cut -d'-' -f2 | cut -d '.' -f1,2`
 LIB_DIR="../binwalk/libs/"
 
 .PHONY: all clean_libs clean distclean
