@@ -128,7 +128,7 @@ class Library(object):
                 'darwin'  : [os.path.join(prefix, 'lib%s.dylib' % library),
                              '/opt/local/lib/lib%s.dylib' % library,
                              '/usr/local/lib/lib%s.dylib' % library,
-                            ] + glob.glob('/usr/local/Cellar/*%s/*/lib/lib%s.dylib' % (library, library)),
+                            ] + glob.glob('/usr/local/Cellar/*%s*/*/lib/lib%s.dylib' % (library, library)),
             }
 
             for i in range(2, 4):
