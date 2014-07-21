@@ -18,9 +18,9 @@ For convenience, optional dependencies for automatic extraction and graphical vi
 
     $ ./deps.sh
 
-If your system is not supported by deps.sh, or if you wish to manually install dependencies, see INSTALL.md.
+If your system is not supported by `deps.sh`, or if you wish to manually install dependencies, see `INSTALL.md`.
 
-For advanced installation options, see INSTALL.md.
+For advanced installation options, see `INSTALL.md`.
 
 Usage
 =====
