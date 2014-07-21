@@ -14,11 +14,11 @@ Binwalk follows the standard Unix configure/make installation procedure:
     $ make
     $ sudo make install
 
-For convenience, optional dependancies for automatic extraction and graphical visualizations can be installed by running the included `deps.sh` script:
+For convenience, optional dependencies for automatic extraction and graphical visualizations can be installed by running the included `deps.sh` script:
 
     $ ./deps.sh
 
-If your system is not supported by deps.sh, or if you wish to manually install dependancies, see INSTALL.md.
+If your system is not supported by deps.sh, or if you wish to manually install dependencies, see INSTALL.md.
 
 For advanced installation options, see INSTALL.md.
 
