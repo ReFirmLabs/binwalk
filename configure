@@ -662,6 +662,7 @@ ac_user_opts='
 enable_option_checking
 with_python
 enable_clibs
+enable_bundles
 enable_libmagic
 enable_libfuzzy
 enable_pyqtgraph
@@ -1285,6 +1286,7 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-clibs         do not build/install any c libraries
+  --disable-bundles       do not install bundled software
   --disable-libmagic      do not build/install the bundled libmagic library
   --disable-libfuzzy      do not build/install the bundled libfuzzy library
   --disable-pyqtgraph     do not install the bundled pyqtgraph library
@@ -3317,6 +3319,14 @@ else
 fi
 
 
+# Check whether --enable-bundles was given.
+if test "${enable_bundles+set}" = set; then :
+  enableval=$enable_bundles; BUILD_BUNDLES=0
+else
+  BUILD_BUNDLES=1
+fi
+
+
 # Check whether --enable-libmagic was given.
 if test "${enable_libmagic+set}" = set; then :
   enableval=$enable_libmagic; BUILD_MAGIC=0
@@ -3356,6 +3366,13 @@ then
 else
 	SONAME="-soname"
 	SOEXT="so"
+fi
+
+if test "$BUILD_BUNDLES" == "0"
+then
+    BUILD_MAGIC=0
+    BUILD_FUZZY=0
+    BUILD_PYQTGRAPH=0
 fi
 
 if test "$BUILD_C_LIBS" != "0"

@@ -17,6 +17,11 @@ AC_ARG_ENABLE([clibs],
               [BUILD_C_LIBS=0],
               [BUILD_C_LIBS=1])
 
+AC_ARG_ENABLE([bundles],
+              [AS_HELP_STRING([--disable-bundles], [do not install bundled software])],
+              [BUILD_BUNDLES=0],
+              [BUILD_BUNDLES=1])
+
 AC_ARG_ENABLE([libmagic],
               [AS_HELP_STRING([--disable-libmagic], [do not build/install the bundled libmagic library])],
               [BUILD_MAGIC=0],
@@ -47,6 +52,13 @@ then
 else
 	SONAME="-soname"
 	SOEXT="so"
+fi
+
+if test "$BUILD_BUNDLES" == "0"
+then
+    BUILD_MAGIC=0
+    BUILD_FUZZY=0
+    BUILD_PYQTGRAPH=0
 fi
 
 if test "$BUILD_C_LIBS" != "0"
