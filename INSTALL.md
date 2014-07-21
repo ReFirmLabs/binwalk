@@ -51,8 +51,33 @@ Binwalk relies on multiple external utilties in order to automatically extract/d
     cabextract
     p7zip-full
     openjdk-6-jdk
-    [firmware-mod-kit](https://code.google.com/p/firmware-mod-kit)
+    firmware-mod-kit [https://code.google.com/p/firmware-mod-kit]
 
+Bundled Software
+================
+
+For convenience, the following libraries are bundled with binwalk:
+
+    libmagic
+    libfuzzy
+    pyqtgraph
+
+These libraries are installed as part of the binwalk Python module and will not conflict with system-wide libraries.
+
+Installation of any individual bundled library can be disabled at build time:
+
+    $ ./configure --disable-libmagic --disable-libfuzzy --disable-pyqtgraph
+
+Alternatively, installation of all bundled libraries can be disabled at build time:
+
+    $ ./configure --disable-bundles
+
+If a bundled library is disabled, the equivalent library must be installed to a standard system library location (e.g., `/usr/lib`, `/usr/local/lib`, etc) in order for binwalk to function properly.
+
+*Note:* if the bundled libmagic library is not used, be aware that minor version releases of libmagic are often not backwards compatible with each other and installation of the wrong version of libmagic may cause binwalk to fail to function properly. Conversely, updating libmagic to a version that works with binwalk may cause other utilities that rely on libmagic to fail. Currently, the following libmagic versions are known to work properly with binwalk:
+
+    5.18
+    5.19
 
 Uninstallation
 ==============
