@@ -56,13 +56,11 @@ Binwalk relies on multiple external utilties in order to automatically extract/d
 Bundled Software
 ================
 
-For convenience, the following libraries are bundled with binwalk:
+For convenience, the following libraries are bundled with binwalk and will not conflict with system-wide libraries:
 
     libmagic
     libfuzzy
     pyqtgraph
-
-These libraries are installed as part of the binwalk Python module and will not conflict with system-wide libraries.
 
 Installation of any individual bundled library can be disabled at build time:
 
