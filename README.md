@@ -1,5 +1,5 @@
-Binwalk
-=======
+Description
+===========
 
 Binwalk is a fast, easy to use tool for analyzing, reverse engineering, and extracting firmware images.
 
