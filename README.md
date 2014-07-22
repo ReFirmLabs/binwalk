@@ -29,4 +29,4 @@ Basic usage is simple:
 
     $ binwalk firmware.bin
 
-For additional examples and desriptions of advanced options, see the [wiki](http://binwalk.org/binwiki/).
+For additional examples and desriptions of advanced options, see the [wiki](https://github.com/devttys0/binwalk/wiki).
