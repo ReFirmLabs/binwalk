@@ -77,6 +77,15 @@ If a bundled library is disabled, the equivalent library must be installed to a 
     5.18
     5.19
 
+
+Specifying a Python Interpreter
+===============================
+
+The default python interpreter used during install is the system-wide `python` interpreter. A different interpreter (e.g., `python2`, `python3`) can be specified at build time:
+
+    $ ./configure --with-python=python3
+
+
 Uninstallation
 ==============
 
