@@ -36,8 +36,8 @@ binwalk.Modules().execute('--signature', 'firmware1.bin', 'firmware2.bin')
 
 All args and kwargs keys/values correspond to binwalk's command line options. Either args or kwargs, or a combination of the two may be used, with the following caveats:
 
-    o All command line switches passed via args must be preceeded by hyphens (not required for kwargs)
-    o All file names must be passed via args, not kwargs
+* All command line switches passed via args must be preceeded by hyphens (not required for kwargs)
+* All file names must be passed via args, not kwargs
 
 Accessing Scan Results
 ======================
