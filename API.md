@@ -1,7 +1,7 @@
 Description
 ===========
 
-The binwalk python module can be used by any python script to programatically perform binwalk scans and obtain the results of those scans. 
+The binwalk python module can be used by any python script to programmatically perform binwalk scans and obtain the results of those scans. 
 
 The classes, methods and objects in the binwalk modules are documented via pydoc, including examples, so those interested in using the binwalk module are encouraged to look there. However, several common usage examples are provided here to help jump-start development efforts.
 
