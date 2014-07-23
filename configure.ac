@@ -65,20 +65,26 @@ if test "$BUILD_C_LIBS" != "0"
 then
     if test "$BUILD_MAGIC" != "0"
     then
-        rm -rf $(ls ./src/C/file-*.tar.gz | sed -e 's/\.tar\.gz//')
-        (cd ./src/C && tar -zxvf file-*.tar.gz > /dev/null)
-        (cd ./src/C/file-*/ && ./configure) || exit 1
+        rm -rf $(ls ./src/bundles/file-*.tar.gz | sed -e 's/\.tar\.gz//')
+        (cd ./src/bundles && tar -zxvf file-*.tar.gz > /dev/null)
+        (cd ./src/bundles/file-*/ && ./configure) || exit 1
     fi
 
     if test "$BUILD_FUZZY" != "0"
     then
-        rm -rf $(ls ./src/C/ssdeep-*.tar.gz | sed -e 's/\.tar\.gz//')
-        (cd ./src/C && tar -zxvf ssdeep-*.tar.gz > /dev/null)
-        (cd ./src/C/ssdeep-*/ && ./configure) || exit 1
+        rm -rf $(ls ./src/bundles/ssdeep-*.tar.gz | sed -e 's/\.tar\.gz//')
+        (cd ./src/bundles && tar -zxvf ssdeep-*.tar.gz > /dev/null)
+        (cd ./src/bundles/ssdeep-*/ && ./configure) || exit 1
     fi
 fi
 
+if test "$BUILD_PYQTGRAPH" != "0"
+then
+    (cd ./src/bundles && tar -zxvf pyqtgraph-*.tar.gz > /dev/null)
+fi
+
 AC_SUBST(BUILD_C_LIBS, $BUILD_C_LIBS)
+AC_SUBST(BUILD_BUNDLES, $BUILD_BUNDLES)
 AC_SUBST(BUILD_MAGIC, $BUILD_MAGIC)
 AC_SUBST(BUILD_FUZZY, $BUILD_FUZZY)
 AC_SUBST(BUILD_PYQTGRAPH, $BUILD_PYQTGRAPH)
