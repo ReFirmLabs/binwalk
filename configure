@@ -1286,11 +1286,11 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --disable-clibs         do not build/install any c libraries
-  --disable-bundles       do not install bundled software
+  --disable-clibs         do not build/install binwalk c libraries
+  --disable-bundles       do not build/install any bundled software
   --disable-libmagic      do not build/install the bundled libmagic library
   --disable-libfuzzy      do not build/install the bundled libfuzzy library
-  --disable-pyqtgraph     do not install the bundled pyqtgraph library
+  --disable-pyqtgraph     do not build/install the bundled pyqtgraph module
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -3376,21 +3376,18 @@ then
     BUILD_PYQTGRAPH=0
 fi
 
-if test "$BUILD_C_LIBS" != "0"
+if test "$BUILD_MAGIC" != "0"
 then
-    if test "$BUILD_MAGIC" != "0"
-    then
-        rm -rf $(ls ./src/bundles/file-*.tar.gz | sed -e 's/\.tar\.gz//')
-        (cd ./src/bundles && tar -zxvf file-*.tar.gz > /dev/null)
-        (cd ./src/bundles/file-*/ && ./configure) || exit 1
-    fi
+    rm -rf $(ls ./src/bundles/file-*.tar.gz | sed -e 's/\.tar\.gz//')
+    (cd ./src/bundles && tar -zxvf file-*.tar.gz > /dev/null)
+    (cd ./src/bundles/file-*/ && ./configure) || exit 1
+fi
 
-    if test "$BUILD_FUZZY" != "0"
-    then
-        rm -rf $(ls ./src/bundles/ssdeep-*.tar.gz | sed -e 's/\.tar\.gz//')
-        (cd ./src/bundles && tar -zxvf ssdeep-*.tar.gz > /dev/null)
-        (cd ./src/bundles/ssdeep-*/ && ./configure) || exit 1
-    fi
+if test "$BUILD_FUZZY" != "0"
+then
+    rm -rf $(ls ./src/bundles/ssdeep-*.tar.gz | sed -e 's/\.tar\.gz//')
+    (cd ./src/bundles && tar -zxvf ssdeep-*.tar.gz > /dev/null)
+    (cd ./src/bundles/ssdeep-*/ && ./configure) || exit 1
 fi
 
 if test "$BUILD_PYQTGRAPH" != "0"
