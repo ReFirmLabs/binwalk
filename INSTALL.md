@@ -28,7 +28,7 @@ Dependencies
 
 The following dependencies are only required for optional binwalk features, such as file extraction and graphing capabilities. Unless otherwise specified, these dependencies are available from most Linux package managers.
 
-Binwalk uses [pyqtgraph](http://www.pyqtgraph.org) to generate graphs and visualizations; pyqtgraph requires the following Python modules: 
+Binwalk uses [pyqtgraph](http://www.pyqtgraph.org) to generate graphs and visualizations, which requires the following: 
 
     libqt4-opengl 
     python-opengl 
@@ -72,7 +72,13 @@ Alternatively, installation of all bundled libraries can be disabled at build ti
 
 If a bundled library is disabled, the equivalent library must be installed to a standard system library location (e.g., `/usr/lib`, `/usr/local/lib`, etc) in order for binwalk to function properly.
 
-**Note:** If the bundled libmagic library is not used, be aware that minor version releases of libmagic may not be backwards compatible with each other and installation of the wrong version of libmagic may cause binwalk to fail to function properly. Conversely, updating libmagic to a version that works with binwalk may cause other utilities that rely on libmagic to fail. Currently, the following libmagic versions are known to work properly with binwalk (other versions may or may not work):
+**Note:** If the bundled libmagic library is not used, be aware that:
+
+1. Some versions of libmagic have known bugs that are triggered by binwalk under some circumstances
+2. Minor version releases of libmagic may not be backwards compatible with each other and installation of the wrong version of libmagic may cause binwalk to fail to function properly. 
+3. Conversely, updating libmagic to a version that works with binwalk may cause other utilities that rely on libmagic to fail. 
+
+Currently, the following libmagic versions are known to work properly with binwalk (other versions may or may not work):
 
     5.18
     5.19
