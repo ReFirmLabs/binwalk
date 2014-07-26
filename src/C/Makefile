@@ -4,13 +4,13 @@ LIB_DIR="../$(PYLIBDIR)"
 
 all:
 	make -C miniz
-	cp miniz/*.so $(LIB_DIR)
+	cp miniz/*.$(SOEXT) $(LIB_DIR)
 	make -C compress
-	cp compress/*.so $(LIB_DIR)
+	cp compress/*.$(SOEXT) $(LIB_DIR)
 
 clean_libs:
-	rm -f $(LIB_DIR)/libtinfl.so
-	rm -f $(LIB_DIR)/libcompress42.so
+	rm -f $(LIB_DIR)/libtinfl.$(SOEXT)
+	rm -f $(LIB_DIR)/libcompress42.$(SOEXT)
 
 clean: clean_libs
 	make -C miniz clean
