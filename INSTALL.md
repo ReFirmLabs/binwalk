@@ -74,7 +74,7 @@ If a bundled library is disabled, the equivalent library must be installed to a 
 
 **Note:** If the bundled libmagic library is not used, be aware that:
 
-1. Some versions of libmagic have known bugs that are triggered by binwalk under some circumstances
+1. Some versions of libmagic have known bugs that are triggered by binwalk under some circumstances.
 2. Minor version releases of libmagic may not be backwards compatible with each other and installation of the wrong version of libmagic may cause binwalk to fail to function properly. 
 3. Conversely, updating libmagic to a version that works with binwalk may cause other utilities that rely on libmagic to fail. 
 
