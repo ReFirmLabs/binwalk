@@ -7,6 +7,7 @@ import sys
 import ast
 import hashlib
 import operator as op
+import binwalk.core.idb
 from binwalk.core.compat import *
 
 # This allows other modules/scripts to subclass BlockFile from a custom class. Defaults to io.FileIO.
@@ -14,6 +15,10 @@ if has_key(__builtins__, 'BLOCK_FILE_PARENT_CLASS'):
     BLOCK_FILE_PARENT_CLASS = __builtins__['BLOCK_FILE_PARENT_CLASS']
 else:
     BLOCK_FILE_PARENT_CLASS = io.FileIO
+
+# Special override for when we're running in IDA
+if binwalk.core.idb.LOADED_IN_IDA:
+    BLOCK_FILE_PARENT_CLASS = binwalk.core.idb.IDBFileIO
 
 # The __debug__ value is a bit backwards; by default it is set to True, but
 # then set to False if the Python interpreter is run with the -O option.
