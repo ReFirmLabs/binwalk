@@ -226,17 +226,17 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
     namely things that are wrappers around self.read (e.g., readline, readlines, etc).
 
     This class also provides a read_block method, which is used by binwalk to read in a
-    block of data, plus some additional data (MAX_TRAILING_SIZE), but on the next block read
+    block of data, plus some additional data (DEFAULT_BLOCK_PEEK_SIZE), but on the next block read
     pick up at the end of the previous data block (not the end of the additional data). This
     is necessary for scans where a signature may span a block boundary.
 
     The descision to force read to return a str object instead of a bytes object is questionable
-    for Python 3, it seemed the best way to abstract differences in Python 2/3 from the rest
+    for Python 3, but it seemed the best way to abstract differences in Python 2/3 from the rest
     of the code (especially for people writing plugins) and to add Python 3 support with 
     minimal code change.
     '''
 
-    # The MAX_TRAILING_SIZE limits the amount of data available to a signature.
+    # The DEFAULT_BLOCK_PEEK_SIZE limits the amount of data available to a signature.
     # While most headers/signatures are far less than this value, some may reference 
     # pointers in the header structure which may point well beyond the header itself.
     # Passing the entire remaining buffer to libmagic is resource intensive and will
@@ -426,4 +426,17 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
         data += self.peek(self.block_peek_size)
 
         return (data, dlen)
+
+    def dup(self):
+        '''
+        Creates a new BlockFile instance with all the same initialization settings as this one.
+
+        Returns new BlockFile object.
+        '''
+        return BlockFile(self.name,
+                         length=self.length, 
+                         offset=self.offset, 
+                         block=self.base_block_read_size, 
+                         peek=self.base_peek_size, 
+                         swap=self.swap)
 
