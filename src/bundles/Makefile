@@ -11,7 +11,7 @@ all:
 	if [ "$(BUILD_MAGIC)" -eq "1" ]; then make -C file-$(FILE_VERSION)/src magic.h; fi # This must be done first for OSX, else MAGIC_VERSION is undefined
 	if [ "$(BUILD_MAGIC)" -eq "1" ]; then make -C file-$(FILE_VERSION)/src libmagic.la; fi
 	if [ "$(BUILD_MAGIC)" -eq "1" ]; then cp file-$(FILE_VERSION)/src/.libs/libmagic.$(SOEXT) $(LIB_DIR); fi
-	if [ "$(BUILD_PYQTGRAPH)" -eq "1" ]; then cp -R pyqtgraph-$(PYQTGRAPH_VERSION)/pyqtgraph $(LIB_DIR)/; fi
+	if [ "$(BUILD_PYQTGRAPH)" -eq "1" ] && [ ! -e $(LIB_DIR)/pyqtgraph ]; then cp -R pyqtgraph-$(PYQTGRAPH_VERSION)/pyqtgraph $(LIB_DIR)/; fi
 
 clean_libs:
 	rm -f $(LIB_DIR)/libmagic.$(SOEXT)
