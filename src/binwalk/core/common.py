@@ -5,7 +5,7 @@ import os
 import re
 import sys
 import ast
-#import hashlib
+import hashlib
 import operator as op
 import binwalk.core.idb
 from binwalk.core.compat import *

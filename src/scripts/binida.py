@@ -4,7 +4,7 @@ import binwalk
 
 class binwalk_t(idaapi.plugin_t):
     flags = 0
-    comment = "Binwalk IDA Plugin"
+    comment = "Scan the current IDB for file signatures"
     help = ""
     wanted_name = "Binwalk IDA Plugin"
     wanted_hotkey = ""
