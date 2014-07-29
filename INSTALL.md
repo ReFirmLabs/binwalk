@@ -11,15 +11,19 @@ Installation
 
 Installation follows the typical configure/make process (standard development tools such as gcc, make, and Python must be installed in order to build):
 
-    $ ./configure
-    $ make
-    $ sudo make install
+```bash
+$ ./configure
+$ make
+$ sudo make install
+```
 
 Binwalk's core features will work out of the box without any additional dependencies. However, to take advantage of binwalk's graphing and extraction capabilities, multiple supporting utilities/packages need to be installed.
 
 To ease "dependency hell", a shell script named `deps.sh` is included which attempts to install all required dependencies for Debian and RedHat based systems:
 
-    $ ./deps.sh
+```bash
+$ ./deps.sh
+```
 
 If you are running a different system, or prefer to install these dependencies manually, see the Dependencies section below.
 
@@ -64,11 +68,15 @@ For convenience, the following libraries are bundled with binwalk and will not c
 
 Installation of any individual bundled library can be disabled at build time:
 
-    $ ./configure --disable-libmagic --disable-libfuzzy --disable-pyqtgraph
+```bash
+$ ./configure --disable-libmagic --disable-libfuzzy --disable-pyqtgraph
+```
 
 Alternatively, installation of all bundled libraries can be disabled at build time:
 
-    $ ./configure --disable-bundles
+```bash
+$ ./configure --disable-bundles
+```
 
 If a bundled library is disabled, the equivalent library must be installed to a standard system library location (e.g., `/usr/lib`, `/usr/local/lib`, etc) in order for binwalk to function properly.
 
@@ -89,7 +97,9 @@ Specifying a Python Interpreter
 
 The default python interpreter used during install is the system-wide `python` interpreter. A different interpreter (e.g., `python2`, `python3`) can be specified at build time:
 
-    $ ./configure --with-python=python3
+```bash
+$ ./configure --with-python=python3
+```
 
 
 Installing the IDA Plugin
@@ -97,13 +107,17 @@ Installing the IDA Plugin
 
 If IDA is installed on your system, you may optionally install the IDA plugin by specifying the location of your IDA install directory at build time:
 
-    $ ./configure --with-ida=/home/user/ida-6.6
-    $ make ida
+```bash
+$ ./configure --with-ida=/home/user/ida-6.6
+$ make ida
+```
 
 Uninstallation
 ==============
 
 The following command will remove binwalk from your system. Note that this will *not* remove manually installed packages, or utilities installed via deps.sh:
 
-    $ sudo make uninstall
+```bash
+$ sudo make uninstall
+```
 
