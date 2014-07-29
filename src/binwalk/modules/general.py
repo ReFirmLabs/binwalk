@@ -3,6 +3,7 @@
 import os
 import sys
 import argparse
+import binwalk.core.idb
 import binwalk.core.filter
 import binwalk.core.common
 import binwalk.core.display
@@ -130,7 +131,8 @@ class General(Module):
         
         if self.show_help:
             show_help()
-            sys.exit(0)
+            if not binwalk.core.idb.LOADED_IN_IDA:
+                sys.exit(0)
 
     def reset(self):
         for fp in self.target_files:
