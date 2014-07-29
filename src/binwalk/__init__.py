@@ -1,4 +1,4 @@
-__all__ = ['Modules', 'ModuleException']
+__all__ = ['execute', 'Modules', 'ModuleException']
 
 import sys
 import binwalk.core.common
@@ -8,3 +8,6 @@ import binwalk.core.common
 sys.path.append(binwalk.core.common.get_libs_path())
 
 from binwalk.core.module import Modules, ModuleException
+
+def execute(*args, **kwargs):
+    return Modules(*args, **kwargs).execute()

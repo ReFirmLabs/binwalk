@@ -176,6 +176,12 @@ def strings(filename, minimum=4):
                 else:
                     result = ""
 
+class GenericContainer(object):
+
+    def __init__(self, **kwargs):
+        for (k,v) in iterator(kwargs):
+            setattr(self, k, v)
+
 class MathExpression(object):
     '''
     Class for safely evaluating mathematical expressions from a string.
@@ -268,51 +274,65 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
         Returns None.
         '''
         self.total_read = 0
-        self.swap_size = swap
         self.block_read_size = self.DEFAULT_BLOCK_READ_SIZE
         self.block_peek_size = self.DEFAULT_BLOCK_PEEK_SIZE
 
+        # This is so that custom parent classes can access/modify arguments as necessary
+        self.args = GenericContainer(fname=fname,
+                                     mode=mode,
+                                     length=length,
+                                     offset=offset,
+                                     block=block,
+                                     peek=peek,
+                                     swap=swap,
+                                     size=0)
+
         # Python 2.6 doesn't like modes like 'rb' or 'wb'
-        mode = mode.replace('b', '')
+        mode = self.args.mode.replace('b', '')
 
-        try:
-            self.size = file_size(fname)
-        except KeyboardInterrupt as e:
-            raise e
-        except Exception:
-            self.size = 0
+        super(self.__class__, self).__init__(fname, mode)
 
-        if offset < 0:
-            self.offset = self.size + offset
+        self.swap_size = self.args.swap
+        
+        if self.args.size:
+            self.size = self.args.size
         else:
-            self.offset = offset
+            try:
+                self.size = file_size(self.args.fname)
+            except KeyboardInterrupt as e:
+                raise e
+            except Exception:
+                self.size = 0
+
+        if self.args.offset < 0:
+            self.offset = self.size + self.args.offset
+        else:
+            self.offset = self.args.offset
 
         if self.offset < 0:
             self.offset = 0
         elif self.offset > self.size:
             self.offset = self.size
 
-        if offset < 0:
-            self.length = offset * -1
-        elif length:
-            self.length = length
+        if self.args.offset < 0:
+            self.length = self.args.offset * -1
+        elif self.args.length:
+            self.length = self.args.length
         else:
-            self.length = self.size - offset
+            self.length = self.size - self.args.offset
 
         if self.length < 0:
             self.length = 0
         elif self.length > self.size:
             self.length = self.size
 
-        if block is not None:
-            self.block_read_size = block
+        if self.args.block is not None:
+            self.block_read_size = self.args.block
         self.base_block_size = self.block_read_size
             
-        if peek is not None:
-            self.block_peek_size = peek
+        if self.args.peek is not None:
+            self.block_peek_size = self.args.peek
         self.base_peek_size = self.block_peek_size
-
-        super(self.__class__, self).__init__(fname, mode)
 
         # Work around for python 2.6 where FileIO._name is not defined
         try:

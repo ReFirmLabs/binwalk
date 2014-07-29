@@ -51,18 +51,22 @@ class IDBFileIO(io.FileIO):
         else:
             self.__idb__ = True
             self.name = fname
+
             self.idb_start = 0
             self.idb_pos = 0
             self.idb_end = end_address()
 
-            if self.size == 0:
-                self.size = end_address() - start_address()
+            if self.args.size == 0:
+                self.args.size = end_address()
+            
+            if self.args.offset == 0:
+                self.args.offset = start_address()
+            elif self.args.offset < 0:
+                self.args.length = self.args.offset * -1
+                self.args.offset = end_address() + self.args.offset
 
-            if self.length == 0:
-                self.length = self.size
-
-            if self.offset == 0:
-                self.offset = start_address()
+            if self.args.length == 0 or self.args.length > (end_address() - start_address()):
+                self.args.length = end_address() - start_address()
 
     def read(self, n=-1):
         if not self.__idb__:
