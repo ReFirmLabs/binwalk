@@ -92,6 +92,14 @@ The default python interpreter used during install is the system-wide `python` i
     $ ./configure --with-python=python3
 
 
+Installing the IDA Plugin
+=========================
+
+If IDA is installed on your system, you may optionally install the IDA plugin by specifying the location of your IDA install directory at build time:
+
+    $ ./configure --with-ida=/home/user/ida-6.6
+    $ make ida
+
 Uninstallation
 ==============
 
