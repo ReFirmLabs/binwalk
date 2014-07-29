@@ -7,6 +7,11 @@ AC_LANG(C)
 AC_TYPE_SIZE_T
 AC_FUNC_MALLOC
 
+AC_ARG_WITH([ida],
+            [AS_HELP_STRING([--with-ida=$HOME/ida], [define the IDA install path])],
+            [IDA_DIR=$withval],
+            [IDA_DIR=$HOME/ida])
+
 AC_ARG_WITH([python],
             [AS_HELP_STRING([--with-python=python], [explicitly install using the specified python interpreter (python2, python3, etc)])],
             [PYTHON=$withval],
@@ -86,6 +91,7 @@ AC_SUBST(BUILD_MAGIC, $BUILD_MAGIC)
 AC_SUBST(BUILD_FUZZY, $BUILD_FUZZY)
 AC_SUBST(BUILD_PYQTGRAPH, $BUILD_PYQTGRAPH)
 AC_SUBST(PYTHON, $PYTHON)
+AC_SUBST(IDA_DIR, $IDA_DIR)
 AC_SUBST(SONAME, $SONAME)
 AC_SUBST(SOEXT, $SOEXT)
 AC_SUBST(PLATFORM, $(uname -s))

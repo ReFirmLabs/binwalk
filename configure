@@ -603,6 +603,7 @@ INSTALL_OPTIONS
 PLATFORM
 SOEXT
 SONAME
+IDA_DIR
 PYTHON
 BUILD_PYQTGRAPH
 BUILD_FUZZY
@@ -661,6 +662,7 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+with_ida
 with_python
 enable_clibs
 enable_bundles
@@ -1295,6 +1297,7 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-ida=$HOME/ida    define the IDA install path
   --with-python=python    explicitly install using the specified python
                           interpreter (python2, python3, etc)
 
@@ -3304,6 +3307,15 @@ fi
 
 
 
+# Check whether --with-ida was given.
+if test "${with_ida+set}" = set; then :
+  withval=$with_ida; IDA_DIR=$withval
+else
+  IDA_DIR=$HOME/ida
+fi
+
+
+
 # Check whether --with-python was given.
 if test "${with_python+set}" = set; then :
   withval=$with_python; PYTHON=$withval
@@ -3406,6 +3418,8 @@ BUILD_FUZZY=$BUILD_FUZZY
 BUILD_PYQTGRAPH=$BUILD_PYQTGRAPH
 
 PYTHON=$PYTHON
+
+IDA_DIR=$IDA_DIR
 
 SONAME=$SONAME
 
