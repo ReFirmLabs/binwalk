@@ -69,15 +69,41 @@ class IDBFileIO(io.FileIO):
             return super(IDBFileIO, self).read(n)
         else:
             data = ''
-            start_n = n
-            start_idb_pos = self.idb_pos
+            read_count = 0
+            filler_count = 0
 
+            # Loop to read n bytes of data across IDB segments, filling
+            # segment gaps with NULL bytes.
             while n and self.idb_pos <= self.idb_end:
-                # This generally assumes 8-bit bytes
-                data += chr(idc.Byte(self.idb_pos))
-                self.idb_pos += 1
-                n -= 1
-            
+                segment = idaapi.getseg(self.idb_pos)
+
+                if not segment:
+                    filler_count += 1
+                    self.idb_pos += 1
+                    n -= 1
+                else:
+                    if filler_count:
+                        data += "\x00" * filler_count
+                        filler_count = 0
+                    
+                    if (self.idb_pos + n) > segment.endEA:
+                        read_count = segment.endEA - self.idb_pos
+                    else:
+                        read_count = n
+
+                    try:
+                        data += idc.GetManyBytes(self.idb_pos, read_count)
+                    except TypeError as e:
+                        # This happens when trying to read from uninitialized segments (e.g., .bss)
+                        data += "\x00" * read_count
+
+                    n -= read_count
+                    self.idb_pos += read_count
+
+            if filler_count:
+                data += "\x00" * filler_count
+                filler_count = 0
+
             return data
 
     def write(self, data):
