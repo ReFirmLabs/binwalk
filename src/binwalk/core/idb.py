@@ -2,11 +2,22 @@
 
 import io
 import os
+import logging
+
+class ShutUpHashlib(logging.Filter):
+    '''
+    This is used to suppress hashlib exception messages
+    if using the Python interpreter bundled with IDA.
+    '''
+    def filter(self, record):
+        return not record.getMessage().startswith("code for hash")
 
 try:
     import idc
     import idaapi
     LOADED_IN_IDA = True
+    logger = logging.getLogger() 
+    logger.addFilter(ShutUpHashlib())
 except ImportError:
     LOADED_IN_IDA = False
 

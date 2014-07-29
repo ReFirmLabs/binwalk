@@ -690,7 +690,7 @@ class Modules(object):
             if hasattr(binwalk.modules, dependency.name):
                 dependency.module = getattr(binwalk.modules, dependency.name)
             else:
-                raise ModuleException("%s depends on %s which was not found in binwalk.modules.__init__.py\n" % (str(module), dependency.name))
+                continue # CJH raise ModuleException("%s depends on %s which was not found in binwalk.modules.__init__.py\n" % (str(module), dependency.name))
                 
             # No recursive dependencies, thanks
             if dependency.module == module:
