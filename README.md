@@ -33,4 +33,4 @@ Basic usage is simple:
 $ binwalk firmware.bin
 ```
 
-For additional examples and desriptions of advanced options, see the [wiki](https://github.com/devttys0/binwalk/wiki).
+For additional examples and descriptions of advanced options, see the [wiki](https://github.com/devttys0/binwalk/wiki).
