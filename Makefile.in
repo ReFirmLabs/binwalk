@@ -25,7 +25,7 @@ SRC_BUNDLES_DIR="$(SRC_DIR)/bundles"
 ifeq ($(strip $(prefix)),)
 	PREFIX=""
 else
-	PREFIX="--prefix=$(prefix)"
+	PREFIX="--prefix=$(DESTDIR)$(prefix)"
 endif
 
 .PHONY: all install build deps clean uninstall
