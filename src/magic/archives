@@ -316,3 +316,12 @@
 
 # Felix von Leitner <felix-file@fefe.de>
 0       string  d8:announce     BitTorrent file
+
+# BSA archives, based on http://forum.step-project.com/topic/5033-ramifications-of-bsa-extraction-in-mod-organizer/page-16
+0       string          BSA\x00\x67             BSA archive, version: 103,
+>8      byte            !0x24                   invalid
+>8      byte            0x24                    folder records offset: %d
+0       string          BSA\x00\x68             BSA archive, version: 104,
+>8      byte            !0x24                   invalid
+>8      byte            0x24                    folder records offset: %d
+
