@@ -9,6 +9,7 @@ Installation
 Binwalk follows the standard Unix configure/make installation procedure:
 
 ```bash
+$ autoreconf
 $ ./configure
 $ make
 $ sudo make install
