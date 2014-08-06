@@ -18,29 +18,24 @@ AC_ARG_WITH([python],
             [PYTHON=python])
 
 AC_ARG_ENABLE([clibs],
-              [AS_HELP_STRING([--disable-clibs], [do not build/install binwalk c libraries])],
-              [BUILD_C_LIBS=0],
-              [BUILD_C_LIBS=1])
+              [AS_HELP_STRING([--disable-clibs], [do not build/install binwalk c libraries])],,
+              [BUILD_C_LIBS=yes])
 
 AC_ARG_ENABLE([bundles],
-              [AS_HELP_STRING([--disable-bundles], [do not build/install any bundled software])],
-              [BUILD_BUNDLES=0],
-              [BUILD_BUNDLES=1])
+              [AS_HELP_STRING([--disable-bundles], [do not build/install any bundled software])],,
+              [BUILD_BUNDLES=yes])
 
 AC_ARG_ENABLE([libmagic],
-              [AS_HELP_STRING([--disable-libmagic], [do not build/install the bundled libmagic library])],
-              [BUILD_MAGIC=0],
-              [BUILD_MAGIC=1])
+              [AS_HELP_STRING([--disable-libmagic], [do not build/install the bundled libmagic library])],,
+              [BUILD_MAGIC=yes])
 
 AC_ARG_ENABLE([libfuzzy],
-              [AS_HELP_STRING([--disable-libfuzzy], [do not build/install the bundled libfuzzy library])],
-              [BUILD_FUZZY=0],
-              [BUILD_FUZZY=1])
+              [AS_HELP_STRING([--disable-libfuzzy], [do not build/install the bundled libfuzzy library])],,
+              [BUILD_FUZZY=yes])
 
 AC_ARG_ENABLE([pyqtgraph],
-              [AS_HELP_STRING([--disable-pyqtgraph], [do not build/install the bundled pyqtgraph module])],
-              [BUILD_PYQTGRAPH=0],
-              [BUILD_PYQTGRAPH=1])
+              [AS_HELP_STRING([--disable-pyqtgraph], [do not build/install the bundled pyqtgraph module])],,
+              [BUILD_PYQTGRAPH=yes])
 
 CFLAGS="-Wall -fPIC $CFLAGS"
 INSTALL_OPTIONS="-m644"
@@ -59,28 +54,28 @@ else
 	SOEXT="so"
 fi
 
-if test "$BUILD_BUNDLES" == "0"
+if test "$BUILD_BUNDLES" == "no"
 then
-    BUILD_MAGIC=0
-    BUILD_FUZZY=0
-    BUILD_PYQTGRAPH=0
+    BUILD_MAGIC=no
+    BUILD_FUZZY=no
+    BUILD_PYQTGRAPH=no
 fi
 
-if test "$BUILD_MAGIC" != "0"
+if test "$BUILD_MAGIC" != "no"
 then
     rm -rf $(ls ./src/bundles/file-*.tar.gz | sed -e 's/\.tar\.gz//')
     (cd ./src/bundles && tar -zxvf file-*.tar.gz > /dev/null)
     (cd ./src/bundles/file-*/ && ./configure) || exit 1
 fi
 
-if test "$BUILD_FUZZY" != "0"
+if test "$BUILD_FUZZY" != "no"
 then
     rm -rf $(ls ./src/bundles/ssdeep-*.tar.gz | sed -e 's/\.tar\.gz//')
     (cd ./src/bundles && tar -zxvf ssdeep-*.tar.gz > /dev/null)
     (cd ./src/bundles/ssdeep-*/ && ./configure) || exit 1
 fi
 
-if test "$BUILD_PYQTGRAPH" != "0"
+if test "$BUILD_PYQTGRAPH" != "no"
 then
     (cd ./src/bundles && tar -zxvf pyqtgraph-*.tar.gz > /dev/null)
 fi
