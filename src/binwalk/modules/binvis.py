@@ -209,9 +209,12 @@ class Plotter(Module):
 
             # Give points that occur more frequently a brighter color and larger point size.
             # Frequency is determined as a percentage of total unique data points.
-            if frequency_percentage > .005:
+            if frequency_percentage > .010:
                 size[i] = .20
                 r = 1.0
+            elif frequency_percentage > .005:
+                size[i] = .15
+                b = 1.0
             elif frequency_percentage > .002:
                 size[i] = .10
                 g = 1.0
