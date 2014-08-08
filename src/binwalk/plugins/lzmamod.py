@@ -11,7 +11,7 @@ class LZMAModPlugin(binwalk.core.plugin.Plugin):
     '''
     MODULES = ['Signature']
 
-    FAKE_LZMA_SIZE = "\x00\x00\x00\x10\x00\x00\x00\x00"
+    FAKE_LZMA_SIZE = "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
     SIGNATURE = "lzma compressed data"
 
     def init(self):

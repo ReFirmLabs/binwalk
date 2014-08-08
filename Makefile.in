@@ -40,21 +40,21 @@ ida: build
 	if [ "$(IDA_DIR)" != "" ] && [ -e "$(IDA_DIR)/python/lib/python2.7" ]; then cp -R $(SRC_DIR)/binwalk $(IDA_DIR)/python/lib/python2.7/; fi 
 
 build:
-	if [ "$(BUILD_C_LIBS)" -eq "yes" ]; then make -C $(SRC_C_DIR); fi
-	if [ "$(BUILD_BUNDLES)" -eq "yes" ]; then make -C $(SRC_BUNDLES_DIR); fi
+	if [ "$(BUILD_C_LIBS)" = "yes" ]; then make -C $(SRC_C_DIR); fi
+	if [ "$(BUILD_BUNDLES)" = "yes" ]; then make -C $(SRC_BUNDLES_DIR); fi
 	$(PYTHON) ./setup.py build
 
 deps:
 	./deps.sh
 
 clean:
-	if [ "$(BUILD_C_LIBS)" -eq "yes" ]; then make -C $(SRC_C_DIR) clean; fi
-	if [ "$(BUILD_BUNDLES)" -eq "yes" ]; then make -C $(SRC_BUNDLES_DIR) clean; fi
+	if [ "$(BUILD_C_LIBS)" = "yes" ]; then make -C $(SRC_C_DIR) clean; fi
+	if [ "$(BUILD_BUNDLES)" = "yes" ]; then make -C $(SRC_BUNDLES_DIR) clean; fi
 	$(PYTHON) ./setup.py clean
 
 distclean: clean
-	if [ "$(BUILD_C_LIBS)" -eq "yes" ]; then make -C $(SRC_C_DIR) distclean; fi
-	if [ "$(BUILD_BUNDLES)" -eq "yes" ]; then make -C $(SRC_BUNDLES_DIR) distclean; fi
+	if [ "$(BUILD_C_LIBS)" = "yes" ]; then make -C $(SRC_C_DIR) distclean; fi
+	if [ "$(BUILD_BUNDLES)" = "yes" ]; then make -C $(SRC_BUNDLES_DIR) distclean; fi
 	rm -rf Makefile config.* *.cache
 
 uninstall:
