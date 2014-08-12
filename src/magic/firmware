@@ -519,7 +519,17 @@
 >0x68   belong  !0x00D50800             invalid
 >0x68   belong  0x00D50800              see https://github.com/devttys0/wrt120n
 
-0       string  Digi\x00\x00\x00        Digi International firmware,
->28     belong  x                       load address: 0x%.8X,
->20     belong  x                       entry point: 0x%.8X,
+# Digi firmware images
+0xC0            string  Digi            Digi International firmware,
+>0xC8           beshort !0x4253
+>>0xC8          beshort !0x4950
+>>>0xC8         beshort !0x4944
+>>>>0xC8        beshort !0x444f
+>>>>>0xC8       beshort !0x4443
+>>>>>>0xC8      beshort !0x4f53
+>>>>>>>0xC8     beshort !0x4f43
+>>>>>>>>0xC8    beshort !0x4646
+>>>>>>>>>0xC8   beshort !0x5350         invalid header,
+>0xD4           belong  x               load address: 0x%.8X,
+>0xDC           belong  x               entry point: 0x%.8X,
 
