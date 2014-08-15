@@ -44,3 +44,9 @@
 0   string     /home/              Unix home path string:
 >0  string     x                   "%s"
 
+0   string      neighbor           Neighborly text, best guess: Goodspeed,
+>0  string      x                  "%s"
+
+0   string      Neighbor           Neighborly text, best guess: Goodspeed,
+>0  string      x                  "%s"
+
