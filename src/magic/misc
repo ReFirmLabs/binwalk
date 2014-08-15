@@ -45,8 +45,9 @@
 >0  string     x                   "%s"
 
 0   string      neighbor           Neighborly text, best guess: Goodspeed,
->0  string      x                  "%s"
+>0  string      x                  "%s
+>63 string      x                  \b%s"
 
 0   string      Neighbor           Neighborly text, best guess: Goodspeed,
->0  string      x                  "%s"
-
+>0  string      x                  "%s
+>63 string      x                  \b%s"

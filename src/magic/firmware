@@ -365,8 +365,12 @@
 # Generic copyright signature
 0	string		Copyright			Copyright string:
 >9	byte		0				invalid
->9	string		x				"%s
->40	string		x				\b%s"
+>0	string		x				"%s
+>63	string		x				\b%s"
+0	string		copyright			Copyright string:
+>9	byte		0				invalid
+>0	string		x				"%s
+>63	string		x				\b%s"
 
 # Sercomm firmware header
 0	string		sErCoMm				Sercomm firmware signature,
