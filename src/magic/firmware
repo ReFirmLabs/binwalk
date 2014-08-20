@@ -537,3 +537,22 @@
 >0xD4           belong  x               load address: 0x%.8X,
 >0xDC           belong  x               entry point: 0x%.8X,
 
+# Lancom firmware signatures, courtesy of christophvw
+0    string            ELSF              LANCOM firmware header,
+>22  string            x                 model: "%s",
+>18  string            x                 firmware version: "%.4s",
+>12  ubyte             255               Rel,
+>12  ubyte             253               alpha,
+>12  ubyte             220               PR,
+>12  ubyte             <220              RC%d,
+>12  ubyte             <237              RU{math:%d-220},
+>17  ubyte             x                 build %d
+
+0 string               ELSO              LANCOM OEM file
+
+0 string               ELSP                LANCOM file entry
+>202 string            @(RECENT_FIRMWARE)/ \b, file name:
+>>221 string           x                   "%s"
+>(200.S+206) belong    x                   \b, file size: %d bytes
+>221 string            x                   {file-name:%s}
+>(200.S+206) belong    x                   {file-size:%d}
