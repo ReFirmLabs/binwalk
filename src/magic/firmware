@@ -545,15 +545,40 @@
 >12  ubyte             255               Rel,
 >12  ubyte             253               alpha,
 >12  ubyte             220               PR,
->12  ubyte             <220              RC%d,
->12  ubyte             <237              RU{math:%d-220},
->17  ubyte             x                 build %d
+>12  ubyte             >0
+>>12 ubyte             <220              RC%d,
+>12  ubyte             >220
+>>12 ubyte             <237              RU{math:%d-220},
+>12  ubyte             0                 dev
+>17  ubyte             >0
+>>17 ubyte             x                 build %d
+#get build date
+>7   ubyte             !63
+#date is stored as string
+>>7  string            x                 ("%.8s")
 
-0 string               ELSO              LANCOM OEM file
+0    string            ELSO              LANCOM OEM file
+
+0    string            ELSB              LANCOM firmware loader,
+>22  string            x                 model: "%s",
+>18  string            x                 loader version: "%.4s",
+
+
+0    string            ELSC              LANCOM WWAN firmware,
+>4   ubyte             3
+>>5  beshort           0
+>>7  string            x                 "%s"
 
 0 string               ELSP                LANCOM file entry
 >202 string            @(RECENT_FIRMWARE)/ \b, file name:
 >>221 string           x                   "%s"
->(200.S+206) belong    x                   \b, file size: %d bytes
->221 string            x                   {file-name:%s}
->(200.S+206) belong    x                   {file-size:%d}
+>>221 string           x                   \b{file-name:%s}
+>(198.L+202) belong    2
+>>(198.L+206) belong   x                   \b, file size: %d bytes
+>>(198.L+206) belong   x                   \b{file-size:%d}
+>(198.L+202) belong    3
+>>&4 string            @(RECENT_FIRMWARE)/ \b, alias:
+>>&23 string           x                   "%s"
+>>&(&0.L(0)) belong    x
+>>>&4 belong           x                   \b, file size: %d bytes
+
