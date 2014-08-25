@@ -68,7 +68,7 @@ function debian
     # lha isn't in newer ubuntu repos, so install it separately in case it fails
     $SUDO apt-get -y install lha
 	$SUDO apt-get -y install git build-essential libtool autoconf mtd-utils zlib1g-dev liblzma-dev ncompress gzip bzip2 tar arj p7zip p7zip-full openjdk-6-jdk
-	$SUDO apt-get -y install libqt4-opengl python-opengl python-qt4 python-qt4-gl python-numpy python-scipy
+	$SUDO apt-get -y install python-opengl python-qt4 python-qt4-gl python-numpy python-scipy
 	if [ "$(which python3)" != "" ]
 	then
 		$SUDO apt-get -y install python3-pyqt4 python3-numpy python3-scipy
