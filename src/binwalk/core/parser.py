@@ -263,9 +263,9 @@ class MagicParser(object):
             # Default to little endian, unless the type field starts with 'be'. 
             # This assumes that we're running on a little endian system...
             if entry.type.startswith('be'):
-                endianess = self.BIG_ENDIAN
+                endianness = self.BIG_ENDIAN
             else:
-                endianess = self.LITTLE_ENDIAN
+                endianness = self.LITTLE_ENDIAN
             
             # Try to convert the condition to an integer. This does not allow
             # for more advanced conditions for the first line of a signature, 
@@ -287,8 +287,8 @@ class MagicParser(object):
             elif 'quad' in entry.type:
                 entry.length = 8
 
-            # Convert the integer value to a string of the appropriate endianess
-            entry.condition = self._to_string(intval, entry.length, endianess)
+            # Convert the integer value to a string of the appropriate endianness
+            entry.condition = self._to_string(intval, entry.length, endianness)
 
         return entry
 
@@ -332,13 +332,13 @@ class MagicParser(object):
 
         return candidate_offsets
 
-    def _to_string(self, value, size, endianess):
+    def _to_string(self, value, size, endianness):
         '''
         Converts an integer value into a raw string.
 
         @value     - The integer value to convert.
         @size      - Size, in bytes, of the integer value.
-        @endianess - One of self.LITTLE_ENDIAN | self.BIG_ENDIAN.
+        @endianness - One of self.LITTLE_ENDIAN | self.BIG_ENDIAN.
 
         Returns a raw string containing value.
         '''
@@ -347,7 +347,7 @@ class MagicParser(object):
         for i in range(0, size):
             data += chr((value >> (8*i)) & 0xFF)
 
-        if endianess != self.LITTLE_ENDIAN:
+        if endianness != self.LITTLE_ENDIAN:
             data = data[::-1]
 
         return data
