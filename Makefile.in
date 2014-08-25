@@ -1,5 +1,6 @@
 export CC=@CC@
 export CFLAGS=@CFLAGS@
+export CPPFLAGS=@CPPFLAGS@
 export SONAME=@SONAME@
 export SOEXT=@SOEXT@
 export prefix=@prefix@
