@@ -116,9 +116,11 @@ class Extractor(Module):
 
         if r.valid:
             binwalk.core.common.debug("Extractor callback for %s:%d [%s & %s & %s]" % (r.file.name, r.offset, str(r.valid), str(r.display), str(r.extract)))
-        
-        # Only extract valid results that have been marked for extraction
-        if r.valid and r.extract:
+       
+        # Only extract valid results that have been marked for extraction and displayed to the user.
+        # Note that r.display is still True even if --quiet has been specified; it is False if the result has been
+        # explicitly excluded via the -y/-x options.
+        if r.valid and r.extract and r.display:
             # Do the extraction
             binwalk.core.common.debug("Attempting extraction...")
             (extraction_directory, dd_file) = self.extract(r.offset, r.description, r.file.name, size, r.name)
