@@ -3,11 +3,11 @@ LIBNAME=libtinfl.$(SOEXT)
 all: $(LIBNAME)
 
 $(LIBNAME): tinfl.o
-	$(CC) $(CFLAGS) -shared -Wl,$(SONAME),$(LIBNAME) tinfl.o -o $(LIBNAME) $(LDFLAGS)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -shared -Wl,$(SONAME),$(LIBNAME) tinfl.o -o $(LIBNAME) $(LDFLAGS)
 	chmod +x $(LIBNAME)
 
 tinfl.o:
-	$(CC) $(CFLAGS) -c tinfl.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c tinfl.c
 
 install:
 	mkdir -p $(DESTDIR)$(LIBDIR)

@@ -3,11 +3,11 @@ LIBNAME=libcompress42.$(SOEXT)
 all: $(LIBNAME)
 
 $(LIBNAME): compress42.o
-	$(CC) $(CFLAGS) -shared -Wl,$(SONAME),$(LIBNAME) compress42.o -o $(LIBNAME) $(LDFLAGS)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -shared -Wl,$(SONAME),$(LIBNAME) compress42.o -o $(LIBNAME) $(LDFLAGS)
 	chmod +x $(LIBNAME)
 
 compress42.o:
-	$(CC) $(CFLAGS) compress42.c -c
+	$(CC) $(CFLAGS) $(CPPFLAGS) compress42.c -c
 
 install:
 	mkdir -p $(DESTDIR)$(LIBDIR)
