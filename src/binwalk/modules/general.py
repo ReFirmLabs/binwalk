@@ -71,7 +71,7 @@ class General(Module):
         Option(long='quiet',
                short='q',
                kwargs={'quiet' : True},
-               description='Supress output to stdout'),
+               description='Suppress output to stdout'),
         Option(long='verbose',
                short='v',
                kwargs={'verbose' : True},

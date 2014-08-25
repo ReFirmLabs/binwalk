@@ -27,7 +27,7 @@ class Signature(Module):
             Option(short='C',
                    long='cast',
                    kwargs={'enabled' : True, 'cast_data_types' : True},
-                   description='Cast offsets as a given data type (use -y to specify the data type / endianess)'),
+                   description='Cast offsets as a given data type (use -y to specify the data type / endianness)'),
             Option(short='m',
                    long='magic',
                    kwargs={'enabled' : True, 'magic_files' : []},
