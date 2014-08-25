@@ -193,7 +193,6 @@
 	extern	void	*memset	LARGS((void *,char,unsigned int));
 	extern	void	*memcpy	LARGS((void *,void const *,unsigned int));
 	extern	int		atoi	LARGS((char const *));
-	extern	void	exit	LARGS((int));
 	extern	int		isatty	LARGS((int));
 #endif
 	
@@ -645,7 +644,7 @@ long 			bytes_out;			/* Total number of byte to output				*/
 #endif
 
 int  	main			ARGS((int,char **));
-void  	Usage			ARGS((void));
+int  	Usage			ARGS((void));
 void  	comprexx		ARGS((char **));
 void  	compdir			ARGS((char *));
 void  	compress		ARGS((int,int));
@@ -654,9 +653,9 @@ void  	compress		ARGS((int,int));
 int 	is_compressed		ARGS((char *,int));
 void  	read_error		ARGS((void));
 void  	write_error		ARGS((void));
-void 	abort_compress	ARGS((void));
+int 	abort_compress	ARGS((void));
 void  	prratio			ARGS((FILE *,long,long));
-void  	about			ARGS((void));
+int  	about			ARGS((void));
 
 /*****************************************************************
  * TAG( main )
@@ -724,7 +723,7 @@ main(argc, argv)
     	if (filelist == NULL)
 		{
 			fprintf(stderr, "Cannot allocate memory for file list.\n");
-			exit (1);
+			return 1;
 		}
     	fileptr = filelist;
     	*filelist = NULL;
@@ -765,9 +764,8 @@ main(argc, argv)
 					{
 			    	case 'V':
 						about();
-						break;
-
-					case 's':
+						return 0;
+			    	case 's':
 						silent = 1;
 						quiet = 1;
 						break;
@@ -799,6 +797,7 @@ main(argc, argv)
 						{
 					    	fprintf(stderr, "Missing maxbits\n");
 					    	Usage();
+						return 1;
 						}
 
 						maxbits = atoi(*argv);
@@ -823,6 +822,7 @@ main(argc, argv)
 			    	default:
 						fprintf(stderr, "Unknown flag: '%c'; ", **argv);
 						Usage();
+						return 1;
 					}
 		    	}
 			}
@@ -873,10 +873,10 @@ nextarg:	continue;
 		//rsize = read(0, input_buffer, sizeof(input_buffer));
 		//decompress(input_buffer, rsize);
 
-		//exit((exit_code== -1) ? 1:exit_code);
+		//return (exit_code== -1) ? 1:exit_code;
 	}
 
-void
+int
 Usage()
 	{
 		fprintf(stderr, "\
@@ -894,7 +894,7 @@ Usage: %s [-dfvcVr] [-b maxbits] [file ...]\n\
        -r   Recursive. If a filename is a directory, descend\n\
             into it and compress everything in it.\n");
 
-    		exit(1);
+    		return 1;
 	}
 
 void
@@ -1888,13 +1888,13 @@ write_error()
 		abort_compress();
 	}
 
-void
+int
 abort_compress()
 	{
 		if (remove_ofname)
 	    	unlink(ofname);
 
-		exit(1);
+		return 1;
 	}
 
 void
@@ -1924,7 +1924,7 @@ prratio(stream, num, den)
 		fprintf(stream, "%d.%02d%%", q / 100, q % 100);
 	}
 
-void
+int
 about()
 	{
 		/* CJH */
@@ -1977,5 +1977,5 @@ Authors version 4.0 (World release in 1985):\n\
      Spencer W. Thomas, Jim McKie, Steve Davies,\n\
      Ken Turkowski, James A. Woods, Joe Orost\n");
 
-		exit(0);
+		return 0;
 	}
