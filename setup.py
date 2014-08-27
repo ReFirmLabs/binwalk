@@ -144,7 +144,7 @@ install_data_files = [os.path.join("libs", "*.so")]
 for data_dir in data_dirs:
     install_data_files.append("%s%s*" % (data_dir, os.path.sep))
 
-if os.getenv("BUILD_PYQTGRAPH") == "1":
+if os.getenv("BUILD_PYQTGRAPH") == "yes":
     install_data_files.append(os.path.join("libs", "pyqtgraph", "*.py"))
 
     for (root, dirs, files) in os.walk(os.path.join(MODULE_NAME, "libs", "pyqtgraph")):
