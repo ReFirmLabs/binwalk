@@ -221,6 +221,7 @@ class Module(object):
         self.target_file_list = []
         self.status = None
         self.enabled = False
+        self.previous_next_file_fp = None
         self.current_target_file_name = None
         self.name = self.__class__.__name__
         self.plugins = binwalk.core.plugin.Plugins(self)
@@ -335,12 +336,28 @@ class Module(object):
         '''
         fp = None
 
+        # Ensure files are close to prevent IOError (too many open files)
+        try:
+            self.previous_next_file_fp.close()
+        except KeyboardInterrupt as e:
+            raise e
+        except Exception:
+            pass
+
         # Add any pending extracted files to the target_files list and reset the extractor's pending file list
-        self.target_file_list += [self.config.open_file(f) for f in self.extractor.pending]
+        self.target_file_list += self.extractor.pending
         self.extractor.pending = []
         
         if self.target_file_list:
-            fp = self.target_file_list.pop(0)
+            next_target_file = self.target_file_list.pop(0)
+           
+            # Values in self.target_file_list are either already open files (BlockFile instances), or paths
+            # to files that need to be opened for scanning.
+            if isinstance(next_target_file, binwalk.core.common.BlockFile):
+                fp = next_target_file
+            else:
+                fp = self.config.open_file(self.target_file_list.pop(0))
+
             self.status.clear()
             self.status.total = fp.length
 
@@ -349,6 +366,7 @@ class Module(object):
         else:
             self.current_target_file_name = None
 
+        self.previous_next_file_fp = fp
         return fp
 
     def clear(self, results=True, errors=True):
