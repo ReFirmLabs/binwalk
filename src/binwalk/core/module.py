@@ -356,7 +356,7 @@ class Module(object):
             if isinstance(next_target_file, binwalk.core.common.BlockFile):
                 fp = next_target_file
             else:
-                fp = self.config.open_file(self.target_file_list.pop(0))
+                fp = self.config.open_file(next_target_file)
 
             self.status.clear()
             self.status.total = fp.length
