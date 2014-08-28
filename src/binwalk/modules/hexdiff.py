@@ -46,7 +46,7 @@ class HexDiff(Module):
                    kwargs={'terse' : True},
                    description='Diff all files, but only display a hex dump of the first file'),
     ]
-    
+
     KWARGS = [
             Kwarg(name='show_red', default=True),
             Kwarg(name='show_blue', default=True),
@@ -57,7 +57,7 @@ class HexDiff(Module):
 
     RESULT_FORMAT = "%s\n"
     RESULT = ['display']
-    
+
     def _no_colorize(self, c, color="red", bold=True):
         return c
 
@@ -107,10 +107,10 @@ class HexDiff(Module):
                 break
 
         hexbyte = self.colorize("%.2X" % ord(byte), color)
-        
+
         if byte not in string.printable or byte in string.whitespace:
             byte = "."
-        
+
         asciibyte = self.colorize(byte, color)
 
         return (hexbyte, asciibyte)
@@ -164,13 +164,13 @@ class HexDiff(Module):
             else:
                 display = self.CUSTOM_DISPLAY_FORMAT % (offset, line)
                 sep_count += 1
-            
+
             if line != self.SKIPPED_LINE or last_line != line:
                 self.result(offset=offset, description=line, display=display)
 
             last_line = line
             loop_count += 1
-                
+
     def init(self):
         # Disable the invalid description auto-filtering feature.
         # This will not affect our own validation.
@@ -185,7 +185,13 @@ class HexDiff(Module):
             self.block = self.DEFAULT_BLOCK_SIZE
 
         # Build a list of files to hexdiff
-        self.hex_target_files = [x for x in iter(self.next_file, None)]
+        self.hex_target_files = []
+        while True:
+            f = self.next_file(close_previous=False)
+            if not f:
+                break
+            else:
+                self.hex_target_files.append(f)
 
         # Build the header format string
         header_width = (self.block * 4) + 2

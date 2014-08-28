@@ -72,7 +72,7 @@ class Kwarg(object):
     def __init__(self, name="", default=None, description=""):
         '''
         Class constructor.
-    
+
         @name        - Kwarg name.
         @default     - Default kwarg value.
         @description - Description string.
@@ -135,7 +135,7 @@ class Error(Result):
     '''
     A subclass of binwalk.core.module.Result.
     '''
-    
+
     def __init__(self, **kwargs):
         '''
         Accepts all the same kwargs as binwalk.core.module.Result, but the following are also added:
@@ -168,7 +168,7 @@ class Module(object):
             Dependency(name='Extractor',
                        attribute='extractor'),
     ]
-    
+
     # A list of binwalk.core.module.Dependency instances that can be filled in as needed by each individual module.
     DEPENDS = []
 
@@ -176,7 +176,7 @@ class Module(object):
     # Must be set prior to calling self.header.
     HEADER_FORMAT = "%-12s  %-12s    %s\n"
 
-    # Format string for printing each result during a scan. 
+    # Format string for printing each result during a scan.
     # Must be set prior to calling self.result.
     RESULT_FORMAT = "%-12d  0x%-12X  %s\n"
 
@@ -228,9 +228,9 @@ class Module(object):
         self.dependencies = self.DEFAULT_DEPENDS + self.DEPENDS
 
         process_kwargs(self, kwargs)
-        
+
         self.plugins.load_plugins()
-        
+
         try:
             self.load()
         except KeyboardInterrupt as e:
@@ -322,13 +322,13 @@ class Module(object):
                 result = [self.RESULT]
             else:
                 result = self.RESULT
-    
+
             for name in result:
                 args.append(getattr(r, name))
-        
+
         return args
 
-    def next_file(self):
+    def next_file(self, close_previous=True):
         '''
         Gets the next file to be scanned (including pending extracted files, if applicable).
         Also re/initializes self.status.
@@ -337,20 +337,21 @@ class Module(object):
         fp = None
 
         # Ensure files are close to prevent IOError (too many open files)
-        try:
-            self.previous_next_file_fp.close()
-        except KeyboardInterrupt as e:
-            raise e
-        except Exception:
-            pass
+        if close_previous:
+            try:
+                self.previous_next_file_fp.close()
+            except KeyboardInterrupt as e:
+                raise e
+            except Exception:
+                pass
 
         # Add any pending extracted files to the target_files list and reset the extractor's pending file list
         self.target_file_list += self.extractor.pending
         self.extractor.pending = []
-        
+
         if self.target_file_list:
             next_target_file = self.target_file_list.pop(0)
-           
+
             # Values in self.target_file_list are either already open files (BlockFile instances), or paths
             # to files that need to be opened for scanning.
             if isinstance(next_target_file, binwalk.core.common.BlockFile):
@@ -362,7 +363,7 @@ class Module(object):
             self.status.total = fp.length
 
         if fp is not None:
-            self.current_target_file_name = fp.name    
+            self.current_target_file_name = fp.name
         else:
             self.current_target_file_name = None
 
@@ -435,7 +436,7 @@ class Module(object):
         e.module = self.__class__.__name__
 
         self.errors.append(e)
-        
+
         if e.exception:
             sys.stderr.write("\n" + e.module + " Exception: " + str(e.exception) + "\n")
             sys.stderr.write("-" * exception_header_width + "\n")
@@ -457,7 +458,7 @@ class Module(object):
             self.config.display.header(*self.HEADER, file_name=self.current_target_file_name)
         elif self.HEADER:
             self.config.display.header(self.HEADER, file_name=self.current_target_file_name)
-    
+
     def footer(self):
         '''
         Displays the scan footer.
@@ -465,7 +466,7 @@ class Module(object):
         Returns None.
         '''
         self.config.display.footer()
-            
+
     def main(self, parent):
         '''
         Responsible for calling self.init, initializing self.config.display, and calling self.run.
@@ -504,7 +505,7 @@ class Module(object):
         except Exception as e:
             self.error(exception=e)
             return False
-        
+
         self._plugins_pre_scan()
 
         try:
@@ -628,7 +629,7 @@ class Modules(object):
             for module_option in module.CLI:
                 if module_option.long:
                     long_opt = '--' + module_option.long
-                    
+
                     if module_option.dtype:
                         optargs = "=<%s>" % module_option.dtype
                     else:
@@ -685,13 +686,13 @@ class Modules(object):
             self.loaded_modules[module] = obj
 
         return obj
-            
+
     def load(self, module, kwargs={}):
         argv = self.argv(module, argv=self.arguments)
         argv.update(kwargs)
         argv.update(self.dependencies(module, argv['enabled']))
         return module(**argv)
-        
+
     def dependencies(self, module, module_enabled):
         import binwalk.modules
         attributes = {}
@@ -703,7 +704,7 @@ class Modules(object):
                 dependency.module = getattr(binwalk.modules, dependency.name)
             else:
                 raise ModuleException("%s depends on %s which was not found in binwalk.modules.__init__.py\n" % (str(module), dependency.name))
-                
+
             # No recursive dependencies, thanks
             if dependency.module == module:
                 continue
@@ -716,7 +717,7 @@ class Modules(object):
             # set any custom kwargs for those dependencies.
             if module_enabled or not dependency.kwargs:
                 depobj = self.run(dependency.module, dependency=True, kwargs=dependency.kwargs)
-            
+
             # If a dependency failed, consider this a non-recoverable error and raise an exception
             if depobj.errors:
                 raise ModuleException("Failed to load " + dependency.name + " module")
@@ -728,7 +729,7 @@ class Modules(object):
     def argv(self, module, argv=sys.argv[1:]):
         '''
         Processes argv for any options specific to the specified module.
-    
+
         @module - The module to process argv for.
         @argv   - A list of command line arguments (excluding argv[0]).
 
@@ -787,7 +788,7 @@ class Modules(object):
 
                 # Loop through all the kwargs for this command line option
                 for (name, default_value) in iterator(module_option.kwargs):
-                    
+
                     # If this kwarg has not been previously processed, or if its priority is equal to or
                     # greater than the previously processed kwarg's priority, then let's process it.
                     if not has_key(last_priority, name) or last_priority[name] <= module_option.priority:
@@ -804,7 +805,7 @@ class Modules(object):
 
         binwalk.core.common.debug("%s :: %s => %s" % (module.TITLE, str(argv), str(kwargs)))
         return kwargs
-    
+
     def kwargs(self, obj, kwargs):
         '''
         Processes a module's kwargs. All modules should use this for kwarg processing.
