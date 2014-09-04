@@ -8,7 +8,7 @@ from binwalk.core.compat import *
 from binwalk.core.common import get_quoted_strings, MathExpression
 
 class Tag(object):
-    
+
     TAG_DELIM_START = "{"
     TAG_DELIM_END = "}"
     TAG_ARG_SEPERATOR = ":"
@@ -46,7 +46,7 @@ class Signature(object):
     '''
     Class for parsing smart signature tags in libmagic result strings.
 
-    This class is intended for internal use only, but a list of supported 'smart keywords' that may be used 
+    This class is intended for internal use only, but a list of supported 'smart keywords' that may be used
     in magic files is available via the SmartSignature.KEYWORDS dictionary:
 
         from binwalk import SmartSignature
@@ -60,6 +60,7 @@ class Signature(object):
         Tag(name='string-len', keyword='string-len', type=str, handler='parse_string_len'),
         Tag(name='math', keyword='math', type=int, handler='parse_math'),
         Tag(name='one-of-many', keyword='one-of-many', handler='one_of_many'),
+        Tag(name='display-once', keyword='display-once', handler='display_once'),
 
         Tag(name='jump', keyword='jump-to-offset', type=int),
         Tag(name='name', keyword='file-name', type=str),
@@ -68,7 +69,7 @@ class Signature(object):
         Tag(name='delay', keyword='extract-delay', type=str),
         Tag(name='year', keyword='file-year', type=str),
         Tag(name='epoch', keyword='file-epoch', type=int),
-        
+
         Tag(name='raw-size', keyword='raw-string-length', type=int),
         Tag(name='raw-replace', keyword='raw-replace'),
         Tag(name='string-len-replace', keyword='string-len'),
@@ -85,6 +86,7 @@ class Signature(object):
         '''
         self.filter = filter
         self.last_one_of_many = None
+        self.valid_once_already_seen = set()
         self.ignore_smart_signatures = ignore_smart_signatures
 
     def parse(self, data):
@@ -120,7 +122,7 @@ class Signature(object):
                 results['description'] = self.strip_tags(data)
         else:
             self.valid = False
-            
+
         results['valid'] = self.valid
         results['display'] = self.display
 
@@ -164,6 +166,26 @@ class Signature(object):
             data = data.replace('"' + quoted_string + '"', "")
         return data
 
+    def display_once(self, data, tag):
+        '''
+        Determines if a given data string should be printed if {display-once} was specified.
+
+        @data - String result data.
+
+        Returns False if the string result should not be displayed.
+        Returns True if the string result should be displayed.
+        '''
+        if self.filter.valid_result(data):
+            signature = data.split(',')[0]
+            if signature in self.valid_once_already_seen:
+                self.display = False
+                return (data, False)
+            else:
+                self.valid_once_already_seen.add(signature)
+                return (data, True)
+
+        return (data, True)
+
     def one_of_many(self, data, tag):
         '''
         Determines if a given data string is one result of many.
@@ -181,7 +203,7 @@ class Signature(object):
                 self.last_one_of_many = data.split(',')[0]
             else:
                 self.last_one_of_many = None
-            
+
         return (data, True)
 
     def get_keyword_arg(self, data, tag):
@@ -199,7 +221,7 @@ class Signature(object):
 
         if tag.tag in safe_data:
             arg = safe_data.split(tag.tag)[1].split(tag.TAG_DELIM_END)[0]
-        
+
         return (data, arg)
 
     def get_math_arg(self, data, tag):
@@ -225,7 +247,7 @@ class Signature(object):
     def parse_math(self, data, tag):
         '''
         Replace math keywords with the requested values.
-            
+
         @data - String result data.
 
         Returns the modified string result data.
@@ -253,7 +275,7 @@ class Signature(object):
 
             # Get the raw string  keyword arg
             (data, raw_string) = self.get_keyword_arg(data, raw_str_tag)
-            
+
             # Was a raw string keyword specified?
             if raw_string:
                 # Get the raw string length arg
@@ -261,15 +283,15 @@ class Signature(object):
 
                 # Replace all instances of raw-replace in data with raw_string[:raw_size]
                 # Also strip out everything after the raw-string keyword, including the keyword itself.
-                # Failure to do so may (will) result in non-printable characters and this string will be 
+                # Failure to do so may (will) result in non-printable characters and this string will be
                 # marked as invalid when it shouldn't be.
                 data = data[:data.find(raw_str_tag.tag)].replace(raw_replace_tag.tag, '"' + raw_string[:raw_size] + '"')
 
         return (data, True)
-        
+
     def parse_string_len(self, data, str_len_tag):
         '''
-        Process {string-len} macros. 
+        Process {string-len} macros.
 
         @data - String to parse.
 
