@@ -17,7 +17,7 @@ $ make
 $ sudo make install
 ```
 
-Binwalk's core features will work out of the box without any additional dependencies. However, to take advantage of binwalk's graphing and extraction capabilities, multiple supporting utilities/packages need to be installed.
+Binwalk's core features will work out of the box without any additional dependencies. However, to take advantage of binwalk's more advanced capabilities, multiple supporting utilities/packages need to be installed.
 
 To ease "dependency hell", a shell script named `deps.sh` is included which attempts to install all required dependencies for Debian and RedHat based systems:
 
@@ -56,6 +56,7 @@ Binwalk relies on multiple external utilties in order to automatically extract/d
     p7zip-full
     openjdk-6-jdk
     firmware-mod-kit [https://code.google.com/p/firmware-mod-kit]
+    capstone [http://www.capstone-engine.org/]
 
 Bundled Software
 ================

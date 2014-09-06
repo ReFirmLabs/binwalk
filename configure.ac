@@ -29,14 +29,6 @@ AC_ARG_ENABLE([libmagic],
               [AS_HELP_STRING([--disable-libmagic], [do not build/install the bundled libmagic library])],,
               [BUILD_MAGIC=yes])
 
-AC_ARG_ENABLE([libfuzzy],
-              [AS_HELP_STRING([--disable-libfuzzy], [do not build/install the bundled libfuzzy library])],,
-              [BUILD_FUZZY=yes])
-
-AC_ARG_ENABLE([pyqtgraph],
-              [AS_HELP_STRING([--disable-pyqtgraph], [do not build/install the bundled pyqtgraph module])],,
-              [BUILD_PYQTGRAPH=yes])
-
 CFLAGS="-Wall -fPIC $CFLAGS"
 INSTALL_OPTIONS="-m644"
 
@@ -57,8 +49,6 @@ fi
 if test "$BUILD_BUNDLES" == "no"
 then
     BUILD_MAGIC=no
-    BUILD_FUZZY=no
-    BUILD_PYQTGRAPH=no
 fi
 
 if test "$BUILD_MAGIC" != "no"
@@ -68,23 +58,9 @@ then
     (cd ./src/bundles/file-*/ && ./configure) || exit 1
 fi
 
-if test "$BUILD_FUZZY" != "no"
-then
-    rm -rf $(ls ./src/bundles/ssdeep-*.tar.gz | sed -e 's/\.tar\.gz//')
-    (cd ./src/bundles && tar -zxvf ssdeep-*.tar.gz > /dev/null)
-    (cd ./src/bundles/ssdeep-*/ && ./configure) || exit 1
-fi
-
-if test "$BUILD_PYQTGRAPH" != "no"
-then
-    (cd ./src/bundles && tar -zxvf pyqtgraph-*.tar.gz > /dev/null)
-fi
-
 AC_SUBST(BUILD_C_LIBS, $BUILD_C_LIBS)
 AC_SUBST(BUILD_BUNDLES, $BUILD_BUNDLES)
 AC_SUBST(BUILD_MAGIC, $BUILD_MAGIC)
-AC_SUBST(BUILD_FUZZY, $BUILD_FUZZY)
-AC_SUBST(BUILD_PYQTGRAPH, $BUILD_PYQTGRAPH)
 AC_SUBST(PYTHON, $PYTHON)
 AC_SUBST(IDA_DIR, $IDA_DIR)
 AC_SUBST(SONAME, $SONAME)
