@@ -23,7 +23,7 @@ class Signature(Module):
             Option(short='A',
                    long='opcodes',
                    kwargs={'enabled' : True, 'search_for_opcodes' : True},
-                   description='Scan target file(s) for common executable opcodes'),
+                   description='Scan target file(s) for common executable opcode signatures'),
             Option(short='C',
                    long='cast',
                    kwargs={'enabled' : True, 'cast_data_types' : True},
@@ -83,7 +83,7 @@ class Signature(Module):
         binwalk.core.common.debug("Loading magic files: %s" % str(self.magic_files))
         self.mfile = self.parser.parse(self.magic_files)
         self.magic = binwalk.core.magic.Magic(self.mfile)
-        
+
         # Once the temporary magic files are loaded into libmagic, we don't need them anymore; delete the temp files
         self.parser.rm_magic_files()
 
@@ -129,7 +129,7 @@ class Signature(Module):
                 magic_result = self.magic.buffer(data[candidate_offset:candidate_offset+fp.block_peek_size])
                 if not magic_result:
                     continue
-                
+
                 # The smart filter parser returns a binwalk.core.module.Result object
                 r = self.smart.parse(magic_result)
 
@@ -138,11 +138,11 @@ class Signature(Module):
 
                 # Provide an instance of the current file object
                 r.file = fp
-        
+
                 # Register the result for futher processing/display
                 # self.result automatically calls self.validate for result validation
                 self.result(r=r)
-       
+
                 # Is this a valid result and did it specify a jump-to-offset keyword?
                 if r.valid and r.jump > 0:
                     absolute_jump_offset = r.offset + r.jump

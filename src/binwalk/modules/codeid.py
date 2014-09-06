@@ -19,7 +19,7 @@ class CodeID(Module):
             Option(short='Y',
                    long='disasm',
                    kwargs={'enabled' : True},
-                   description='Identify the architecture of files containing executable code'),
+                   description='Identify the architecture of excutable code using the capstone disassembler'),
             Option(short='T',
                    long='minsn',
                    type=int,
