@@ -31,6 +31,12 @@ $ sudo apt-get install libqt4-opengl python-opengl python-qt4 python-qt4-gl pyth
 $ sudo pip install pyqtgraph
 ```
 
+Binwalk's "Fuzzy Hashing" options requires the libfuzzy library:
+
+```bash
+$ sudo apt-get install libfuzzy2
+```
+
 Binwalk's `--disasm` option requires the [Capstone](http://www.capstone-engine.org/) disassembly framework and its corresponding Python bindings:
 
 ```bash
