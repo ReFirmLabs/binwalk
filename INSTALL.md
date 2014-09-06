@@ -17,46 +17,39 @@ $ make
 $ sudo make install
 ```
 
-Binwalk's core features will work out of the box without any additional dependencies. However, to take advantage of binwalk's more advanced capabilities, multiple supporting utilities/packages need to be installed.
-
-To ease "dependency hell", a shell script named `deps.sh` is included which attempts to install all required dependencies for Debian and RedHat based systems:
-
-```bash
-$ ./deps.sh
-```
-
-If you are running a different system, or prefer to install these dependencies manually, see the Dependencies section below.
+Binwalk's core features will work out of the box without any additional dependencies. However, to take advantage of binwalk's more advanced capabilities, multiple supporting utilities/packages need to be installed (see the Dependencies section below).
 
 Dependencies
 ============
 
-The following dependencies are only required for optional binwalk features, such as file extraction and graphing capabilities. Unless otherwise specified, these dependencies are available from most Linux package managers.
+The following run-time dependencies are only required for optional binwalk features, such as file extraction and graphing capabilities. Unless otherwise specified, these dependencies are available from most Linux package managers.
 
 Binwalk uses [pyqtgraph](http://www.pyqtgraph.org) to generate graphs and visualizations, which requires the following: 
 
-    libqt4-opengl 
-    python-opengl 
-    python-qt4 
-    python-qt4-gl 
-    python-numpy 
-    python-scipy
+```bash
+$ sudo apt-get install libqt4-opengl python-opengl python-qt4 python-qt4-gl python-numpy python-scipy
+$ sudo pip install pyqtgraph
+```
+
+Binwalk's `--disasm` option requires the [Capstone](http://www.capstone-engine.org/) disassembly framework and its corresponding Python bindings:
+
+```bash
+$ wget http://www.capstone-engine.org/download/2.1.2/capstone-2.1.2.tgz
+$ tar -zxvf capstone-2.1.2.tgz
+$ (cd capstone-2.1.2 && ./make.sh && sudo make install)
+$ (cd capstone-2.1.2/bindings/python && sudo python ./setup.py install)
+```
 
 Binwalk relies on multiple external utilties in order to automatically extract/decompress files and data:
 
-    mtd-utils
-    zlib1g-dev
-    liblzma-dev
-    ncompress
-    gzip
-    bzip2
-    tar
-    arj
-    p7zip
-    cabextract
-    p7zip-full
-    openjdk-6-jdk
-    firmware-mod-kit [https://code.google.com/p/firmware-mod-kit]
-    capstone [http://www.capstone-engine.org/]
+```bash
+$ sudo apt-get install mtd-utils zlib1g-dev liblzma-dev ncompress gzip bzip2 tar arj p7zip p7zip-full cabextract openjdk-6-jdk
+```
+
+```bash
+$ git clone https://github.com/devttys0/sasquatch
+$ (cd sasquatch && make && sudo make install)
+```
 
 Bundled Software
 ================
@@ -64,13 +57,11 @@ Bundled Software
 For convenience, the following libraries are bundled with binwalk and will not conflict with system-wide libraries:
 
     libmagic
-    libfuzzy
-    pyqtgraph
 
 Installation of any individual bundled library can be disabled at build time:
 
 ```bash
-$ ./configure --disable-libmagic --disable-libfuzzy --disable-pyqtgraph
+$ ./configure --disable-libmagic
 ```
 
 Alternatively, installation of all bundled libraries can be disabled at build time:
@@ -79,7 +70,7 @@ Alternatively, installation of all bundled libraries can be disabled at build ti
 $ ./configure --disable-bundles
 ```
 
-If a bundled library is disabled, the equivalent library must be installed to a standard system library location (e.g., `/usr/lib`, `/usr/local/lib`, etc) in order for binwalk to function properly.
+If a bundled library is disabled, the equivalent library must be installed to a standard system library location (e.g., `/usr/lib`, `/usr/local/lib`, etc) in order for binwalk to find it at run time.
 
 **Note:** If the bundled libmagic library is not used, be aware that:
 
@@ -116,7 +107,7 @@ $ make ida
 Uninstallation
 ==============
 
-The following command will remove binwalk from your system. Note that this will *not* remove manually installed packages, or utilities installed via deps.sh:
+The following command will remove binwalk from your system. Note that this will *not* remove manually installed packages or tools:
 
 ```bash
 $ sudo make uninstall
