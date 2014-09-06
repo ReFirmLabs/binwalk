@@ -1,5 +1,6 @@
 import capstone
 import binwalk.core.common
+import binwalk.core.compat
 from binwalk.core.module import Module, Option, Kwarg
 
 class Architecture(object):
@@ -18,17 +19,17 @@ class CodeID(Module):
             Option(short='Y',
                    long='disasm',
                    kwargs={'enabled' : True},
-                   description='Identify executable code using the capstone disassembler'),
+                   description='Identify the architecture of files containing executable code'),
             Option(short='T',
                    long='minsn',
                    type=int,
                    kwargs={'min_insn_count' : 0},
-                   description='Minimum number of instructions to be considered valid'),
+                   description='Minimum number of consecutive instructions to be considered valid (default: %d)' % DEFAULT_MIN_INSN_COUNT),
           ]
 
     KWARGS = [
                 Kwarg(name='enabled', default=False),
-                Kwarg(name='min_insn_count', default=0),
+                Kwarg(name='min_insn_count', default=DEFAULT_MIN_INSN_COUNT),
              ]
 
     ARCHITECTURES = [
@@ -89,8 +90,15 @@ class CodeID(Module):
                     ]
 
     def init(self):
+        self.disassemblers = []
+
         if not self.min_insn_count:
             self.min_insn_count = self.DEFAULT_MIN_INSN_COUNT
+
+        self.disasm_data_size = self.min_insn_count * 10
+
+        for arch in self.ARCHITECTURES:
+            self.disassemblers.append((capstone.Cs(arch.type, (arch.mode + arch.endianess)), arch.description))
 
     def scan_file(self, fp):
         total_read = 0
@@ -100,20 +108,28 @@ class CodeID(Module):
             if not data:
                 break
 
-            offset = 0
-            while offset < dlen:
-                for arch in self.ARCHITECTURES:
-                    md = capstone.Cs(arch.type, (arch.mode + arch.endianess))
-                    ninsn = len([insn for insn in md.disasm_lite(data[offset:offset+(self.min_insn_count*10)], 0)])
-                    binwalk.core.common.debug("0x%.8X   %s, at least %d valid instructions" % ((total_read+offset), arch.description, ninsn))
+            # If this data block doesn't contain at least two different bytes, skip it
+            # to prevent false positives (e.g., "\x00\x00\x00x\00" is a nop in MIPS).
+            if len(set(data)) >= 2:
+                block_offset = 0
+                while block_offset < dlen:
+                    # Don't pass the entire data block into disasm_lite, it's horribly inefficient
+                    # to pass large strings around in Python. Break it up into smaller code blocks instead.
+                    code_block = binwalk.core.compat.str2bytes(data[block_offset:block_offset+self.disasm_data_size])
 
-                    if ninsn >= self.min_insn_count:
-                        description = arch.description + ", at least %d valid instructions" % ninsn
-                        r = self.result(offset=total_read+offset, file=fp, description=description)
-                        if r.valid and r.display and not self.config.verbose:
-                            return
+                    # If this code block doesn't contain at least two different bytes, skip it
+                    # to prevent false positives (e.g., "\x00\x00\x00x\00" is a nop in MIPS).
+                    if len(set(code_block)) >= 2:
+                        for (md, description) in self.disassemblers:
+                            ninsn = len([insn for insn in md.disasm_lite(code_block, 0)])
+                            binwalk.core.common.debug("0x%.8X   %s, at least %d valid instructions" % ((total_read+block_offset), description, ninsn))
 
-                offset += 1
+                            if ninsn >= self.min_insn_count:
+                                r = self.result(offset=total_read+block_offset, file=fp, description=(description + ", at least %d valid instructions" % ninsn))
+                                if r.valid and r.display and not self.config.verbose:
+                                    return
+
+                    block_offset += 1
 
             total_read += dlen
 

@@ -31,7 +31,7 @@ $ sudo apt-get install libqt4-opengl python-opengl python-qt4 python-qt4-gl pyth
 $ sudo pip install pyqtgraph
 ```
 
-Binwalk's "Fuzzy Hashing" options requires the libfuzzy library:
+Binwalk's "Fuzzy Hashing" options require the libfuzzy library:
 
 ```bash
 $ sudo apt-get install libfuzzy2
@@ -60,7 +60,7 @@ $ (cd sasquatch && make && sudo make install)
 Bundled Software
 ================
 
-For convenience, the following libraries are bundled with binwalk and will not conflict with system-wide libraries:
+For convenience, the following libraries are bundled with binwalk and installed so as not to conflict with system-wide libraries:
 
     libmagic
 
