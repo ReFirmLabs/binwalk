@@ -180,7 +180,7 @@ class Signature(object):
             if signature in self.valid_once_already_seen:
                 self.display = False
                 return (data, False)
-            else:
+            elif tag.tag in data:
                 self.valid_once_already_seen.add(signature)
                 return (data, True)
 
