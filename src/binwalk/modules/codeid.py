@@ -17,18 +17,23 @@ class CodeID(Module):
 
     CLI = [
             Option(short='Y',
-                   long='disasm',
+                   long='code',
                    kwargs={'enabled' : True},
-                   description='Identify the architecture of excutable code using the capstone disassembler'),
+                   description='Attempts to identify the CPU architecture of a file using the capstone disassembler'),
             Option(short='T',
                    long='minsn',
                    type=int,
                    kwargs={'min_insn_count' : 0},
                    description='Minimum number of consecutive instructions to be considered valid (default: %d)' % DEFAULT_MIN_INSN_COUNT),
+            Option(short='V',
+                   long='disasm',
+                   kwargs={'show_disasm' : True},
+                   description='Display the disassembled instructions'),
           ]
 
     KWARGS = [
                 Kwarg(name='enabled', default=False),
+                Kwarg(name='show_disasm', default=False),
                 Kwarg(name='min_insn_count', default=DEFAULT_MIN_INSN_COUNT),
              ]
 
@@ -121,13 +126,18 @@ class CodeID(Module):
                     # to prevent false positives (e.g., "\x00\x00\x00x\00" is a nop in MIPS).
                     if len(set(code_block)) >= 2:
                         for (md, description) in self.disassemblers:
-                            ninsn = len([insn for insn in md.disasm_lite(code_block, 0)])
-                            binwalk.core.common.debug("0x%.8X   %s, at least %d valid instructions" % ((total_read+block_offset), description, ninsn))
+                            insns = [insn for insn in md.disasm_lite(code_block, (total_read+block_offset))]
+                            binwalk.core.common.debug("0x%.8X   %s, at least %d valid instructions" % ((total_read+block_offset), description, len(insns)))
 
-                            if ninsn >= self.min_insn_count:
-                                r = self.result(offset=total_read+block_offset, file=fp, description=(description + ", at least %d valid instructions" % ninsn))
-                                if r.valid and r.display and not self.config.verbose:
-                                    return
+                            if len(insns) >= self.min_insn_count:
+                                r = self.result(offset=total_read+block_offset, file=fp, description=(description + ", at least %d valid instructions" % len(insns)))
+                                if r.valid and r.display:
+                                    if self.show_disasm:
+                                        for (position, size, mnem, opnds) in insns:
+                                            self.result(offset=position, file=fp, description="\t%s %s" % (mnem, opnds))
+                                    if not self.config.verbose:
+                                        return
+
 
                     block_offset += 1
 

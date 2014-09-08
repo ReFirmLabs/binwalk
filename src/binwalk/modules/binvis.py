@@ -30,10 +30,10 @@ class Plotter(Module):
                    type=int,
                    kwargs={'max_points' : 0},
                    description='Set the maximum number of plotted data points'),
-            Option(short='V',
-                   long='grids',
-                   kwargs={'show_grids' : True},
-                   description='Display the x-y-z grids in the resulting plot'),
+#            Option(short='V',
+#                   long='grids',
+#                   kwargs={'show_grids' : True},
+#                   description='Display the x-y-z grids in the resulting plot'),
     ]
 
     KWARGS = [
@@ -72,7 +72,7 @@ class Plotter(Module):
         self.app = QtGui.QApplication([])
         self.window = gl.GLViewWidget()
         self.window.opts['distance'] = self.VIEW_DISTANCE
-        
+
         if len(self.config.target_files) == 1:
             self.window.setWindowTitle(self.config.target_files[0].name)
 
@@ -86,7 +86,7 @@ class Plotter(Module):
     def _generate_plot_points(self, data_points):
         '''
         Generates plot points from a list of data points.
-        
+
         @data_points - A dictionary containing each unique point and its frequency of occurance.
 
         Returns a set of plot points.
@@ -143,7 +143,7 @@ class Plotter(Module):
             total += 1
             if total >= self.max_points:
                 break
-                    
+
         return plot_points
 
     def _generate_data_point(self, data):
@@ -180,7 +180,7 @@ class Plotter(Module):
             i = 0
             while (i+(self.axis-1)) < dlen:
                 point = self._generate_data_point(data[i:i+self.axis])
-                if has_key(data_points, point):    
+                if has_key(data_points, point):
                     data_points[point] += 1
                 else:
                     data_points[point] = 1
@@ -191,7 +191,7 @@ class Plotter(Module):
     def _generate_plot(self, plot_points):
         import numpy as np
         import pyqtgraph.opengl as gl
-        
+
         nitems = float(len(plot_points))
 
         pos = np.empty((nitems, 3))
@@ -282,7 +282,7 @@ class Plotter(Module):
         Plot data points within a 3D cube.
         '''
         return (ord(data[0]), ord(data[1]), ord(data[2]))
-    
+
     def _generate_2d_data_point(self, data):
         '''
         Plot data points projected on each cube face.
@@ -303,7 +303,7 @@ class Plotter(Module):
             return (ord(data[0]), 255, ord(data[1]))
         elif self.plane_count == 5:
             return (ord(data[0]), ord(data[1]), 255)
-    
+
     def run(self):
         self.plot()
         return True
