@@ -37,7 +37,7 @@ class Display(object):
     def format_strings(self, header, result):
         self.result_format = result
         self.header_format = header
-        
+
         if self.num_columns == 0:
             self.num_columns = len(header.split())
 
@@ -98,8 +98,12 @@ class Display(object):
 
     def _fprint(self, fmt, columns, csv=True, stdout=True, filter=True):
         line = fmt % tuple(columns)
-        
-        if not filter or self.filter.valid_result(line):
+
+        # TODO: Additional filtering was originally done here to support the --grep option,
+        #       which is now depreciated. Seems redundant now, as the result won't get passed
+        #       to the display class unless it has already passed the filter.valid_result check.
+        #if not filter or self.filter.valid_result(line):
+        if True:
             if not self.quiet and stdout:
                 sys.stdout.write(self._format_line(line.strip()) + "\n")
                 sys.stdout.flush()
@@ -129,7 +133,7 @@ class Display(object):
                 raise e
             except Exception:
                 pass
-        
+
         return start
 
     def _format_line(self, line):
@@ -140,18 +144,23 @@ class Display(object):
         delim = '\n'
         offset = 0
         self.string_parts = []
+        libmagic_newline_delim = "\\012- "
 
-        if self.fit_to_screen and len(line) > self.SCREEN_WIDTH:
-            # Split the line into an array of columns, e.g., ['0', '0x00000000', 'Some description here']
-            line_columns = line.split(None, self.num_columns-1)
+        # Split the line into an array of columns, e.g., ['0', '0x00000000', 'Some description here']
+        line_columns = line.split(None, self.num_columns-1)
+        if line_columns:
             # Find where the start of the last column (description) starts in the line of text.
             # All line wraps need to be aligned to this offset.
             offset = line.rfind(line_columns[-1])
             # The delimiter will be a newline followed by spaces padding out the line wrap to the alignment offset.
             delim += ' ' * offset
+
+            if libmagic_newline_delim in line:
+                line = line.replace(libmagic_newline_delim, delim)
+
+        if line_columns and self.fit_to_screen and len(line) > self.SCREEN_WIDTH:
             # Calculate the maximum length that each wrapped line can be
             max_line_wrap_length = self.SCREEN_WIDTH - offset
-
             # Append all but the last column to formatted_line
             formatted_line = line[:offset]
 
@@ -172,7 +181,6 @@ class Display(object):
             # Append self.string_parts to formatted_line; each part seperated by delim
             formatted_line += delim.join(self.string_parts)
         else:
-            # Line fits on screen as-is, no need to format it
             formatted_line = line
 
         return formatted_line

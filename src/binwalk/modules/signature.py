@@ -53,6 +53,8 @@ class Signature(Module):
     VERBOSE_FORMAT = "%s    %d"
 
     def init(self):
+        self.keep_going = self.config.keep_going
+
         # Create Signature and MagicParser class instances. These are mostly for internal use.
         self.smart = binwalk.core.smart.Signature(self.config.filter, ignore_smart_signatures=self.dumb_scan)
         self.parser = binwalk.core.parser.MagicParser(self.config.filter, self.smart)
@@ -69,6 +71,7 @@ class Signature(Module):
             ]
 
         elif self.cast_data_types:
+            self.keep_going = True
             self.magic_files = [
                     self.config.settings.user.bincast,
                     self.config.settings.system.bincast,
@@ -82,10 +85,11 @@ class Signature(Module):
         # Parse the magic file(s) and initialize libmagic
         binwalk.core.common.debug("Loading magic files: %s" % str(self.magic_files))
         self.mfile = self.parser.parse(self.magic_files)
-        self.magic = binwalk.core.magic.Magic(self.mfile)
+        self.magic = binwalk.core.magic.Magic(self.mfile, keep_going=self.keep_going)
 
         # Once the temporary magic files are loaded into libmagic, we don't need them anymore; delete the temp files
-        self.parser.rm_magic_files()
+        if not binwalk.core.common.DEBUG:
+            self.parser.rm_magic_files()
 
         self.VERBOSE = ["Signatures:", self.parser.signature_count]
 

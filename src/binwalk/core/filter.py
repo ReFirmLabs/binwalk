@@ -22,13 +22,13 @@ class FilterType(object):
             self.regex = re.compile(self.filter)
 
 class FilterInclude(FilterType):
-    
+
     def __init__(self, **kwargs):
         super(FilterInclude, self).__init__(**kwargs)
         self.type = self.FILTER_INCLUDE
 
 class FilterExclude(FilterType):
-    
+
     def __init__(self, **kwargs):
         super(FilterExclude, self).__init__(**kwargs)
         self.type = self.FILTER_EXCLUDE
@@ -42,7 +42,6 @@ class Filter(object):
     # If the result returned by libmagic is "data" or contains the text
     # 'invalid' or a backslash are known to be invalid/false positives.
     UNKNOWN_RESULTS = ["data", "very short file (no magic)"]
-    INVALID_RESULTS = ["invalid", "\\"]
     INVALID_RESULT = "invalid"
     NON_PRINTABLE_RESULT = "\\"
 
@@ -71,7 +70,7 @@ class Filter(object):
                  signatures that contain the FILTER_INCLUDE match will
                  be included in the scan, but will not cause non-matching
                  results to be excluded.
-        
+
         Returns None.
         '''
         if not isinstance(match, type([])):
@@ -92,7 +91,7 @@ class Filter(object):
         the specified matching text.
 
         @match - Regex, or list of regexs, to match.
-        
+
         Returns None.
         '''
         if not isinstance(match, type([])):
@@ -116,8 +115,8 @@ class Filter(object):
         '''
         data = data.lower()
 
-        # Loop through the filters to see if any of them are a match. 
-        # If so, return the registered type for the matching filter (FILTER_INCLUDE || FILTER_EXCLUDE). 
+        # Loop through the filters to see if any of them are a match.
+        # If so, return the registered type for the matching filter (FILTER_INCLUDE || FILTER_EXCLUDE).
         for f in self.filters:
             if f.regex.search(data):
                 return f.type
@@ -148,13 +147,18 @@ class Filter(object):
         if self.show_invalid_results:
             return True
 
-        # Don't include quoted strings or keyword arguments in this search, as 
+        # Sanitized data contains only the non-quoted portion of the data
+        sanitized_data = common.strip_quoted_strings(self.smart.strip_tags(data))
+
+        # Don't include quoted strings or keyword arguments in this search, as
         # strings from the target file may legitimately contain the INVALID_RESULT text.
-        if self.INVALID_RESULT in common.strip_quoted_strings(self.smart.strip_tags(data)):
+        if self.INVALID_RESULT in sanitized_data:
             return False
 
-        # There should be no non-printable characters in any of the data
-        if self.NON_PRINTABLE_RESULT in data:
+        # There should be no non-printable characters in any of the quoted string data
+        non_printables_raw = set(re.findall("\\\\\d{3}", data))
+        non_printables_sanitized = set(re.findall("\\\\d{3}", sanitized_data))
+        if len(non_printables_raw) and non_printables_raw != non_printables_sanitized:
             return False
 
         return True
@@ -197,13 +201,13 @@ class Filter(object):
 
             # Else, return False
             return False
-    
+
         return None
 
     def clear(self):
         '''
         Clears all include, exclude and grep filters.
-        
+
         Retruns None.
         '''
         self.filters = []

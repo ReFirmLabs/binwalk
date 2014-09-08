@@ -29,16 +29,19 @@ class Magic(object):
     MAGIC_NO_CHECK_APPTYPE  = 0x008000
     MAGIC_NO_CHECK_TOKENS   = 0x100000
     MAGIC_NO_CHECK_ENCODING = 0x200000
-    
+
     MAGIC_FLAGS = MAGIC_NO_CHECK_TEXT | MAGIC_NO_CHECK_ENCODING | MAGIC_NO_CHECK_APPTYPE | MAGIC_NO_CHECK_TOKENS
 
     LIBRARY = "magic"
 
-    def __init__(self, magic_file=None, flags=0):
+    def __init__(self, magic_file=None, flags=0, keep_going=False):
         if magic_file:
             self.magic_file = str2bytes(magic_file)
         else:
             self.magic_file = None
+
+        if keep_going:
+            flags = flags | self.MAGIC_CONTINUE
 
         self.libmagic = binwalk.core.C.Library(self.LIBRARY, self.LIBMAGIC_FUNCTIONS)
 
