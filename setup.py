@@ -139,8 +139,7 @@ if "install" in sys.argv or "build" in sys.argv:
 
 # The data files to install along with the module
 data_dirs = ["magic", "config", "plugins", "modules", "core"]
-install_data_files = [os.path.join("libs", "*.so")]
-install_data_files = [os.path.join("libs", "*.dylib")]
+install_data_files = [os.path.join("libs", "*.so"), os.path.join("libs", "*.dylib")]
 
 for data_dir in data_dirs:
     install_data_files.append("%s%s*" % (data_dir, os.path.sep))
