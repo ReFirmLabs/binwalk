@@ -58,10 +58,10 @@ def remove_binwalk_module(pydir=None, pybin=None):
             remove_tree(path)
         except OSError as e:
             pass
-    
+
     if not pybin:
         pybin = which(MODULE_NAME)
-    
+
     if pybin:
         try:
             print("removing '%s'" % pybin)
@@ -140,6 +140,7 @@ if "install" in sys.argv or "build" in sys.argv:
 # The data files to install along with the module
 data_dirs = ["magic", "config", "plugins", "modules", "core"]
 install_data_files = [os.path.join("libs", "*.so")]
+install_data_files = [os.path.join("libs", "*.dylib")]
 
 for data_dir in data_dirs:
     install_data_files.append("%s%s*" % (data_dir, os.path.sep))
