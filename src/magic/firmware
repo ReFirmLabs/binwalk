@@ -584,7 +584,9 @@
 
 # Signatures to identify the start of a VxWorks symbol table
 8       string      \x00\x00\x05\x00\x00\x00\x00\x00    VxWorks symbol table, big endian,
+>4      belong      0                                   invalid 
 >4      belong      x                                   first entry: [type: function, code address: 0x%X,
+>0      belong      0                                   invalid
 >0      belong      x                                   symbol address: 0x%X]{display-once}
 >24     belong      !0x500
 >>24    belong      !0x700
@@ -600,7 +602,9 @@
 >>>72   belong      !0x900                              \b, invalid
 
 8       string      \x00\x00\x07\x00\x00\x00\x00\x00    VxWorks symbol table, big endian,
+>4      belong      0                                   invalid
 >4      belong      x                                   first entry: [type: initialized data, code address: 0x%X,
+>0      belong      0                                   invalid
 >0      belong      x                                   symbol address: 0x%X]{display-once}
 >24     belong      !0x500
 >>24    belong      !0x700
@@ -616,7 +620,9 @@
 >>>72   belong      !0x900                              \b, invalid
 
 8       string      \x00\x00\x09\x00\x00\x00\x00\x00    VxWorks symbol table, big endian,
+>4      belong      0                                   invalid
 >4      belong      x                                   first entry: [type: uninitialized data, code address: 0x%X,
+>0      belong      0                                   invalid
 >0      belong      x                                   symbol address: 0x%X]{display-once}
 >24     belong      !0x500
 >>24    belong      !0x700
@@ -632,7 +638,9 @@
 >>>72   belong      !0x900                              \b, invalid
 
 8       string      \x00\x05\x00\x00\x00\x00\x00\x00    VxWorks symbol table, little endian,
+>4      lelong      0                                   invalid
 >4      lelong      x                                   first entry: [type: function, code address: 0x%X,
+>0      lelong      0                                   invalid
 >0      lelong      x                                   symbol address: 0x%X]{display-once}
 >24     lelong      !0x500
 >>24    lelong      !0x700
@@ -648,7 +656,9 @@
 >>>72   lelong      !0x900                              \b, invalid
 
 8       string      \x00\x07\x00\x00\x00\x00\x00\x00    VxWorks symbol table, little endian,
+>4      lelong      0                                   invalid
 >4      lelong      x                                   first entry: [type: initialized data, code address: 0x%X,
+>0      lelong      0                                   invalid
 >0      lelong      x                                   symbol address: 0x%X]{display-once}
 >24     lelong      !0x500
 >>24    lelong      !0x700
@@ -664,7 +674,9 @@
 >>>72   lelong      !0x900                              \b, invalid
 
 8       string      \x00\x09\x00\x00\x00\x00\x00\x00    VxWorks symbol table, little endian,
+>4      lelong      0                                   invalid
 >4      lelong      x                                   first entry: [type: uninitialized data, code address: 0x%X,
+>0      lelong      0                                   invalid
 >0      lelong      x                                   symbol address: 0x%X]{display-once}
 >24     lelong      !0x500
 >>24    lelong      !0x700

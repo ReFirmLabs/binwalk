@@ -37,7 +37,7 @@ class General(Module):
         Option(long='continue',
                short='k',
                kwargs={'keep_going' : True},
-               description='Show all matches for every offset, not just the first'),
+               description="Don't stop at the first match"),
         Option(long='swap',
                short='g',
                type=int,
