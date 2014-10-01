@@ -31,12 +31,6 @@ $ sudo apt-get install libqt4-opengl python-opengl python-qt4 python-qt4-gl pyth
 $ sudo pip install pyqtgraph
 ```
 
-Binwalk's "Fuzzy Hashing" options require the libfuzzy library:
-
-```bash
-$ sudo apt-get install libfuzzy2
-```
-
 Binwalk's `--disasm` option requires the [Capstone](http://www.capstone-engine.org/) disassembly framework and its corresponding Python bindings:
 
 ```bash
@@ -109,6 +103,9 @@ If IDA is installed on your system, you may optionally install the IDA plugin by
 $ ./configure --with-ida=/home/user/ida-6.6
 $ make ida
 ```
+
+Or, simply copy the `src/scripts/binida.py` file into IDA's `plugins` directory.
+
 
 Uninstallation
 ==============
