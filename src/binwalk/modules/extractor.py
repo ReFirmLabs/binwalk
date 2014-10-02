@@ -24,7 +24,7 @@ class Extractor(Module):
     # Comments in the extract.conf files start with a pound
     COMMENT_DELIM ='#'
 
-    # Place holder for the extracted file name in the command 
+    # Place holder for the extracted file name in the command
     FILE_NAME_PLACEHOLDER = '%e'
 
     TITLE = 'Extraction'
@@ -116,7 +116,7 @@ class Extractor(Module):
 
         if r.valid:
             binwalk.core.common.debug("Extractor callback for %s:%d [%s & %s & %s]" % (r.file.name, r.offset, str(r.valid), str(r.display), str(r.extract)))
-       
+
         # Only extract valid results that have been marked for extraction and displayed to the user.
         # Note that r.display is still True even if --quiet has been specified; it is False if the result has been
         # explicitly excluded via the -y/-x options.
@@ -173,9 +173,9 @@ class Extractor(Module):
         rules = []
         match = False
         r = {
-            'extension'    : '',
-            'cmd'        : '',
-            'regex'        : None
+            'extension'     : '',
+            'cmd'           : '',
+            'regex'         : None
         }
 
         # Process single explicitly specified rule
@@ -184,8 +184,8 @@ class Extractor(Module):
             r['regex'] = re.compile(regex)
             if cmd:
                 r['cmd'] = cmd
-        
-            self.append_rule(r)    
+
+            self.append_rule(r)
             return
 
         # Process rule string, or list of rule strings
@@ -193,7 +193,7 @@ class Extractor(Module):
             rules = [txtrule]
         else:
             rules = txtrule
-        
+
         for rule in rules:
             r['cmd'] = ''
             r['extension'] = ''
@@ -210,7 +210,7 @@ class Extractor(Module):
                 pass
 
             # Verify that the match string was retrieved.
-            if match: 
+            if match:
                 self.append_rule(r)
 
     def remove_rule(self, text):
@@ -226,7 +226,7 @@ class Extractor(Module):
         for i in range(0, len(self.extract_rules)):
             if self.extract_rules[i]['regex'].match(text):
                 rm.append(i)
-        
+
         for i in rm:
             self.extract_rules.pop(i)
 
@@ -251,7 +251,7 @@ class Extractor(Module):
         Loads extraction rules from the specified file.
 
         @fname - Path to the extraction rule file.
-        
+
         Returns None.
         '''
         try:
@@ -327,7 +327,7 @@ class Extractor(Module):
             self.remove_after_execute = tf
 
         return self.remove_after_execute
-    
+
     def extract(self, offset, description, file_name, size, name=None):
         '''
         Extract an embedded file from the target file, if it matches an extract rule.
@@ -353,13 +353,13 @@ class Extractor(Module):
 
         output_directory = self.build_output_directory(file_name)
 
-        # Extract to end of file if no size was specified    
+        # Extract to end of file if no size was specified
         if not size:
             size = file_size(file_path) - offset
-                
+
         if os.path.isfile(file_path):
             os.chdir(output_directory)
-            
+
             # Loop through each extraction rule until one succeeds
             for i in range(0, len(rules)):
                 rule = rules[i]
@@ -373,7 +373,7 @@ class Extractor(Module):
 
                     # Many extraction utilities will extract the file to a new file, just without
                     # the file extension (i.e., myfile.7z -> myfile). If the presumed resulting
-                    # file name already exists before executing the extract command, do not attempt 
+                    # file name already exists before executing the extract command, do not attempt
                     # to clean it up even if its resulting file size is 0.
                     if self.remove_after_execute:
                         extracted_fname = os.path.splitext(fname)[0]
@@ -386,7 +386,7 @@ class Extractor(Module):
                     else:
                         extract_ok = True
 
-                    # Only clean up files if remove_after_execute was specified                
+                    # Only clean up files if remove_after_execute was specified
                     if extract_ok == True and self.remove_after_execute:
 
                         # Remove the original file that we extracted
@@ -406,7 +406,7 @@ class Extractor(Module):
                                 raise e
                             except Exception as e:
                                 pass
-                    
+
                     # If the command executed OK, don't try any more rules
                     if extract_ok == True:
                         break
@@ -497,15 +497,15 @@ class Extractor(Module):
         if not output_file_name or output_file_name is None:
             bname = default_bname
         else:
-            # Strip the output file name of invalid/dangerous characters (like file paths)    
+            # Strip the output file name of invalid/dangerous characters (like file paths)
             bname = os.path.basename(output_file_name)
-        
+
         fname = unique_file_name(bname, extension)
-            
+
         try:
             # Open the target file and seek to the offset
             fdin = self.config.open_file(file_name, length=size, offset=offset)
-            
+
             # Open the output file
             try:
                 fdout = BlockFile(fname, 'w')
@@ -531,8 +531,8 @@ class Extractor(Module):
             raise e
         except Exception as e:
             raise Exception("Extractor.dd failed to extract data from '%s' to '%s': %s" % (file_name, fname, str(e)))
-       
-        binwalk.core.common.debug("Carved data block 0x%X - 0x%X from '%s' to '%s'" % (offset, offset+size, file_name, fname)) 
+
+        binwalk.core.common.debug("Carved data block 0x%X - 0x%X from '%s' to '%s'" % (offset, offset+size, file_name, fname))
         return fname
 
     def execute(self, cmd, fname):
@@ -568,10 +568,10 @@ class Extractor(Module):
                     # Replace all instances of FILE_NAME_PLACEHOLDER in the command with fname
                     command = command.strip().replace(self.FILE_NAME_PLACEHOLDER, fname)
 
-                    binwalk.core.common.debug("subprocess.call(%s, stdout=%s, stderr=%s)" % (command, str(tmp), str(tmp)))    
+                    binwalk.core.common.debug("subprocess.call(%s, stdout=%s, stderr=%s)" % (command, str(tmp), str(tmp)))
                     rval = subprocess.call(shlex.split(command), stdout=tmp, stderr=tmp)
                     binwalk.core.common.debug('External extractor command "%s" completed with return code %d' % (cmd, rval))
-                    
+
                     if rval == 0:
                         retval = True
                     else:
@@ -587,10 +587,10 @@ class Extractor(Module):
             if binwalk.core.common.DEBUG or (not hasattr(e, 'errno') or e.errno != 2):
                 binwalk.core.common.warning("Extractor.execute failed to run external extrator '%s': %s" % (str(cmd), str(e)))
             retval = None
-        
+
         if tmp is not None:
             tmp.close()
 
         return retval
-    
+
 

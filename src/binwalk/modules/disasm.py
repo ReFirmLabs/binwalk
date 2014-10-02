@@ -31,10 +31,15 @@ class Disasm(Module):
                    type=int,
                    kwargs={'min_insn_count' : 0},
                    description='Minimum number of consecutive instructions to be considered valid (default: %d)' % DEFAULT_MIN_INSN_COUNT),
+            Option(long='continue',
+                   short='k',
+                   kwargs={'keep_going' : True},
+                   description="Don't stop at the first match"),
           ]
 
     KWARGS = [
                 Kwarg(name='enabled', default=False),
+                Kwarg(name='keep_going', default=False),
                 Kwarg(name='min_insn_count', default=DEFAULT_MIN_INSN_COUNT),
              ]
 
@@ -146,7 +151,7 @@ class Disasm(Module):
                         if self.config.verbose:
                             for (position, size, mnem, opnds) in result.insns:
                                 self.result(offset=position, file=fp, description="\t\t%s %s" % (mnem, opnds))
-                        if not self.config.keep_going:
+                        if not self.keep_going:
                             return
 
             total_read += dlen
