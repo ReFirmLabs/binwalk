@@ -175,7 +175,6 @@
 >54	    string		x		{jump-to-offset:0x%.8s+110+
 >94	    string		x		\b0x%.8s}
 
-
 # HP Printer Job Language
 # The header found on Win95 HP plot files is the "Silliest Thing possible" 
 # (TM)

@@ -2,10 +2,28 @@ import binwalk.core.plugin
 
 class CPIOPlugin(binwalk.core.plugin.Plugin):
     '''
-    Ensures that ASCII CPIO archive entries only get extracted once.    
+    Ensures that ASCII CPIO archive entries only get extracted once.
     '''
+#    CPIO_OUT_DIR = "cpio-root"
 
     MODULES = ['Signature']
+
+#    def init(self):
+#        if self.module.extractor.enabled:
+#            self.module.extractor.add_rule(regex="^ascii cpio archive",
+#                                           extension="cpio",
+#                                           cmd=self.extractor)
+
+#    def extractor(self, fname):
+#        out_dir = os.path.join(os.path.split(fname)[0], self.CPIO_OUT_DIR)
+
+#        try:
+#            os.mkdir(out_dir)
+#        except OSError:
+#            return
+
+#        # Lazy.
+#        os.system("cd '%s' && cpio -d -i --no-absolute-filenames < '%s' 2>&1 1>/dev/null" % (out_dir, fname))
 
     def pre_scan(self):
         # Be sure to re-set this at the beginning of every scan
@@ -28,7 +46,7 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
                     self.found_archive = False
                     result.extract = False
                 else:
-                    # The first entry has already been found and this is not the last entry, or the last entry 
+                    # The first entry has already been found and this is not the last entry, or the last entry
                     # has not yet been found. Don't extract.
                     result.extract = False
             else:

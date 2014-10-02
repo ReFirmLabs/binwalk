@@ -27,12 +27,12 @@ class Deflate(object):
 
         # The tinfl library is built and installed with binwalk
         self.tinfl = binwalk.core.C.Library(self.TINFL_NAME, self.TINFL_FUNCTIONS)
-        
+
         # Add an extraction rule
         if self.module.extractor.enabled:
-            self.module.extractor.add_rule(regex='^%s' % self.DESCRIPTION.lower(), extension="deflate", cmd=self._extractor)
+            self.module.extractor.add_rule(regex='^%s' % self.DESCRIPTION.lower(), extension="deflate", cmd=self.extractor)
 
-    def _extractor(self, file_name):
+    def extractor(self, file_name):
         out_file = os.path.splitext(file_name)[0]
         self.tinfl.inflate_raw_file(file_name, out_file)
 
