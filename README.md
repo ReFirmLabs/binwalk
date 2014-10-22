@@ -15,6 +15,12 @@ $ make
 $ sudo make install
 ```
 
+If you're running Python 2.x, you'll also want to install the Python lzma module:
+
+```bash
+$ sudo apt-get install python-lzma
+```
+
 For instructions on installing optional dependencies, see `INSTALL.md`.
 
 For advanced installation options, see `INSTALL.md`.
