@@ -1,5 +1,6 @@
 import lzma
 import binwalk.core.plugin
+import binwalk.core.compat
 from binwalk.core.common import BlockFile
 
 class LZMAPlugin(binwalk.core.plugin.Plugin):
@@ -18,15 +19,18 @@ class LZMAPlugin(binwalk.core.plugin.Plugin):
     def is_valid_lzma(self, data):
         valid = True
 
-        # The only acceptable exception is that of IOError "unknown BUF error",
-        # which indicates that the input data was truncated.
+        # The only acceptable exceptions are those indicating that the input data was truncated.
         try:
-            d = lzma.decompress(data)
+            lzma.decompress(binwalk.core.compat.str2bytes(data))
         except IOError as e:
-            if e.message != "unknown BUF error":
+            # The Python2 module gives this error on truncated input data.
+            if str(e) != "unknown BUF error":
                 valid = False
         except Exception as e:
-            valid = False
+            # The Python3 module gives this error on truncated input data.
+            # The inconsistency between modules is a bit worrisome.
+            if str(e) != "Compressed data ended before the end-of-stream marker was reached":
+                valid = False
 
         return valid
 
