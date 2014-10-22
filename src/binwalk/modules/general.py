@@ -113,7 +113,6 @@ class General(Module):
         self._open_target_files()
         self._set_verbosity()
 
-        #self.filter = binwalk.core.filter.Filter(self._display_invalid)
         self.filter = binwalk.core.filter.Filter(self.show_invalid)
 
         # Set any specified include/exclude filters
