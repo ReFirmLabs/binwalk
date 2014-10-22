@@ -147,21 +147,16 @@ class Deflate(object):
 
 class RawCompression(Module):
 
-    DECOMPRESSORS = {
-            'deflate'   : Deflate,
-            'lzma'      : LZMA,
-    }
-
     TITLE = 'Raw Compression'
 
     CLI = [
             Option(short='X',
                    long='deflate',
-                   kwargs={'enabled' : True, 'decompressor_class' : 'deflate'},
+                   kwargs={'enabled' : True, 'scan_for_deflate' : True},
                    description='Scan for raw deflate compression streams'),
             Option(short='Z',
                    long='lzma',
-                   kwargs={'enabled' : True, 'decompressor_class' : 'lzma'},
+                   kwargs={'enabled' : True, 'scan_for_lzma' : True},
                    description='Scan for raw LZMA compression streams'),
             Option(short='S',
                    long='stop',
@@ -172,17 +167,25 @@ class RawCompression(Module):
     KWARGS = [
             Kwarg(name='enabled', default=False),
             Kwarg(name='stop_on_first_hit', default=False),
-            Kwarg(name='decompressor_class', default=None),
+            Kwarg(name='scan_for_deflate', default=False),
+            Kwarg(name='scan_for_lzma', default=False),
     ]
 
+    #READ_BLOCK_SIZE = 64*1024
+
     def init(self):
-        self.decompressor = self.DECOMPRESSORS[self.decompressor_class](self)
+        self.decompressors = []
+
+        if self.scan_for_deflate:
+            self.decompressors.append(Deflate(self))
+        if self.scan_for_lzma:
+            self.decompressors.append(LZMA(self))
 
     def run(self):
         for fp in iter(self.next_file, None):
 
             file_done = False
-            fp.set_block_size(peek=self.decompressor.BLOCK_SIZE)
+            #fp.set_block_size(peek=self.READ_BLOCK_SIZE)
 
             self.header()
 
@@ -192,12 +195,17 @@ class RawCompression(Module):
                     break
 
                 for i in range(0, dlen):
-                    description = self.decompressor.decompress(data[i:i+self.decompressor.BLOCK_SIZE])
-                    if description:
-                        self.result(description=description, file=fp, offset=fp.tell()-dlen+i)
-                        if self.stop_on_first_hit:
-                            file_done = True
-                            break
+                    for decompressor in self.decompressors:
+                        description = decompressor.decompress(data[i:i+decompressor.BLOCK_SIZE])
+                        if description:
+                            self.result(description=description, file=fp, offset=fp.tell()-dlen+i)
+                            if self.stop_on_first_hit:
+                                file_done = True
+                                break
+
+                    if file_done:
+                        break
+
                     self.status.completed += 1
 
                 self.status.completed = fp.tell() - fp.offset
