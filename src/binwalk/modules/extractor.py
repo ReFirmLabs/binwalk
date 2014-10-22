@@ -557,7 +557,7 @@ class Extractor(Module):
         try:
             if callable(cmd):
                 try:
-                    cmd(fname)
+                    retval = cmd(fname)
                 except KeyboardInterrupt as e:
                     raise e
                 except Exception as e:

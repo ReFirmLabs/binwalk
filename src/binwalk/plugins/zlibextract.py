@@ -20,7 +20,6 @@ class ZLIBExtractPlugin(binwalk.core.plugin.Plugin):
 
     def extractor(self, fname):
         outfile = os.path.splitext(fname)[0]
-        #print ("Extracting from '%s' to '%s'" % (fname, outfile))
 
         try:
             fpin = binwalk.core.common.BlockFile(fname)
@@ -32,6 +31,6 @@ class ZLIBExtractPlugin(binwalk.core.plugin.Plugin):
             fpin.close()
             fpout.close()
         except Exception, e:
-            pass
-            #print ("Failed to decompress data:", str(e))
+            return False
 
+        return True
