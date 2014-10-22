@@ -27,7 +27,7 @@ The following run-time dependencies are only required for optional binwalk featu
 Binwalk uses [pyqtgraph](http://www.pyqtgraph.org) to generate graphs and visualizations, which requires the following: 
 
 ```bash
-$ sudo apt-get install libqt4-opengl python-opengl python-qt4 python-qt4-gl python-numpy python-scipy
+$ sudo apt-get install libqt4-opengl python-opengl python-qt4 python-qt4-gl python-numpy python-scipy python-pip
 $ sudo pip install pyqtgraph
 ```
 
