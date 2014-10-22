@@ -27,6 +27,10 @@ class Extractor(Module):
     # Place holder for the extracted file name in the command
     FILE_NAME_PLACEHOLDER = '%e'
 
+    # Unique path delimiter, used for generating unique output file/directory names.
+    # Useful when, for example, extracting two squashfs images (squashfs-root, squashfs-root-0).
+    UNIQUE_PATH_DELIMITER = '%%'
+
     TITLE = 'Extraction'
     ORDER = 9
     PRIMARY = False
@@ -565,6 +569,13 @@ class Extractor(Module):
 
                 # Execute.
                 for command in cmd.split("&&"):
+
+                    # Generate unique file paths for all paths in the current command that are surrounded by UNIQUE_PATH_DELIMITER
+                    while self.UNIQUE_PATH_DELIMITER in command:
+                        need_unique_path = command.split(self.UNIQUE_PATH_DELIMITER)[1].split(self.UNIQUE_PATH_DELIMITER)[0]
+                        unique_path = binwalk.core.common.unique_file_name(need_unique_path)
+                        command = command.replace(self.UNIQUE_PATH_DELIMITER + need_unique_path + self.UNIQUE_PATH_DELIMITER, unique_path)
+
                     # Replace all instances of FILE_NAME_PLACEHOLDER in the command with fname
                     command = command.strip().replace(self.FILE_NAME_PLACEHOLDER, fname)
 
@@ -581,11 +592,7 @@ class Extractor(Module):
         except KeyboardInterrupt as e:
             raise e
         except Exception as e:
-            # Silently ignore no such file or directory errors. Why? Because these will inevitably be raised when
-            # making the switch to the new firmware mod kit directory structure. We handle this elsewhere, but it's
-            # annoying to see this spammed out to the console every time.
-            if binwalk.core.common.DEBUG or (not hasattr(e, 'errno') or e.errno != 2):
-                binwalk.core.common.warning("Extractor.execute failed to run external extrator '%s': %s" % (str(cmd), str(e)))
+            binwalk.core.common.warning("Extractor.execute failed to run external extrator '%s': %s" % (str(cmd), str(e)))
             retval = None
 
         if tmp is not None:
