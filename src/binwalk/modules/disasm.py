@@ -140,7 +140,7 @@ class Disasm(Module):
                                                         count=1)
 
                     block_offset += 1
-
+                    self.status.completed += 1
 
                 if result is not None:
                     r = self.result(offset=result.offset,
@@ -150,7 +150,7 @@ class Disasm(Module):
                     if r.valid and r.display:
                         if self.config.verbose:
                             for (position, size, mnem, opnds) in result.insns:
-                                self.result(offset=position, file=fp, description="\t\t%s %s" % (mnem, opnds))
+                                self.result(offset=position, file=fp, description="%s %s" % (mnem, opnds))
                         if not self.keep_going:
                             return
 
