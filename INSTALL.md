@@ -17,12 +17,20 @@ $ make
 $ sudo make install
 ```
 
-Binwalk's core features will work out of the box without any additional dependencies. However, to take advantage of binwalk's more advanced capabilities, multiple supporting utilities/packages need to be installed (see the Dependencies section below).
+Many features will work out of the box without any additional dependencies. However, to take advantage of binwalk's more advanced capabilities, multiple supporting utilities/packages need to be installed (see the Dependencies section below).
 
 Dependencies
 ============
 
-The following run-time dependencies are only required for optional binwalk features, such as file extraction and graphing capabilities. Unless otherwise specified, these dependencies are available from most Linux package managers.
+Binwalk's only required run-time dependencies are libmagic and python-lzma:
+
+```bash
+$ sudo apt-get install libmagic1 python-lzma
+```
+
+Note that the libmagic development package is *not* required, and almost all Linux systems will already have libmagic installed. Additionally, python-lzma is a standard package in Python3, and thus requires no additional installation if running binwalk in Python3.
+
+The remaining run-time dependencies are only required for optional binwalk features, such as file extraction and graphing capabilities. Unless otherwise specified, these dependencies are available from most Linux package managers.
 
 Binwalk uses [pyqtgraph](http://www.pyqtgraph.org) to generate graphs and visualizations, which requires the following: 
 
@@ -54,23 +62,17 @@ $ (cd sasquatch && make && sudo make install)
 Bundled Software
 ================
 
-For convenience, the following libraries are bundled with binwalk and installed so as not to conflict with system-wide libraries:
+For convenience, the following libraries are bundled with the binwalk source:
 
     libmagic
 
-Installation of any individual bundled library can be disabled at build time:
+By default, libmagic is not built or installed unless explicitly enabled during the build process:
 
 ```bash
-$ ./configure --disable-libmagic
+$ ./configure --enable-libmagic
 ```
 
-Alternatively, installation of all bundled libraries can be disabled at build time:
-
-```bash
-$ ./configure --disable-bundles
-```
-
-If a bundled library is disabled, the equivalent library must be installed to a standard system library location (e.g., `/usr/lib`, `/usr/local/lib`, etc) in order for binwalk to find it at run time.
+By default, it is assumed that the libmagic library is already installed to a standard system library location (e.g., `/usr/lib`, `/usr/local/lib`, etc) in order for binwalk to find it at run time. 
 
 **Note:** If the bundled libmagic library is not used, be aware that:
 

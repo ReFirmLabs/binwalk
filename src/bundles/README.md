@@ -8,6 +8,6 @@ Package maintainers can generally replace these libraries with standard librarie
 Installation
 ------------
 
-These libraries are built and installed by default, unless the `--disable-bundles` option is provided to the configure script.
+These libraries are not built or installed by default, unless the `--enable-<libname>` option is provided to the configure script.
 
 They will be installed into the `libs` sub-directory of the binwalk Python module, so as to not conflict with existing libraries on the system.

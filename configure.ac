@@ -21,13 +21,9 @@ AC_ARG_ENABLE([clibs],
               [AS_HELP_STRING([--disable-clibs], [do not build/install binwalk c libraries])],,
               [BUILD_C_LIBS=yes])
 
-AC_ARG_ENABLE([bundles],
-              [AS_HELP_STRING([--disable-bundles], [do not build/install any bundled software])],,
-              [BUILD_BUNDLES=yes])
-
 AC_ARG_ENABLE([libmagic],
-              [AS_HELP_STRING([--disable-libmagic], [do not build/install the bundled libmagic library])],,
-              [BUILD_MAGIC=yes])
+              [AS_HELP_STRING([--enable-libmagic], [build/install the bundled libmagic library])],,
+              [BUILD_MAGIC=no])
 
 CFLAGS="-Wall -fPIC $CFLAGS"
 INSTALL_OPTIONS="-m644"
