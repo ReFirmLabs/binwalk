@@ -43,7 +43,7 @@ $ (cd capstone-2.1.2/bindings/python && sudo python ./setup.py install)
 Binwalk relies on multiple external utilties in order to automatically extract/decompress files and data:
 
 ```bash
-$ sudo apt-get install mtd-utils zlib1g-dev liblzma-dev ncompress gzip bzip2 tar arj p7zip p7zip-full cabextract openjdk-6-jdk
+$ sudo apt-get install mtd-utils zlib1g-dev liblzma-dev ncompress gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract openjdk-6-jdk cramfsprogs cramfsswap
 ```
 
 ```bash
