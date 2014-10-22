@@ -84,6 +84,7 @@ Currently, the following libmagic versions are known to work properly with binwa
     5.19
     5.20
 
+
 Specifying a Python Interpreter
 ===============================
 
