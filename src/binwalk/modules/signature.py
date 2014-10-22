@@ -82,9 +82,11 @@ class Signature(Module):
             self.magic_files.append(self.config.settings.user.binwalk)
             self.magic_files.append(self.config.settings.system.binwalk)
 
-        # Parse the magic file(s) and initialize libmagic
+        # Parse the magic file(s)
         binwalk.core.common.debug("Loading magic files: %s" % str(self.magic_files))
         self.mfile = self.parser.parse(self.magic_files)
+
+        # Initialize libmagic
         self.magic = binwalk.core.magic.Magic(self.mfile, keep_going=self.keep_going)
 
         # Once the temporary magic files are loaded into libmagic, we don't need them anymore; delete the temp files

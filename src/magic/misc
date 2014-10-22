@@ -44,10 +44,26 @@
 0   string     /home/              Unix home path string:
 >0  string     x                   "%s"
 
-0   string      neighbor           Neighborly text, best guess: Goodspeed,
+0   string      neighbor           Neighborly text,
 >0  string      x                  "%s
 >63 string      x                  \b%s"
 
-0   string      Neighbor           Neighborly text, best guess: Goodspeed,
+0   string      Neighbor           Neighborly text,
 >0  string      x                  "%s
 >63 string      x                  \b%s"
+
+0   string      neighborly         Neighborly text, best guess: Goodspeed, 
+>0  string      x                  "%s
+>63 string      x                  \b%s"
+
+0   string      begin\x20           uuencoded data,
+>9  byte        !0x20               invalid format,
+>6  byte        <0x30               invalid permissions,
+>6  byte        >0x39               invalid permissions,
+>7  byte        <0x30               invalid permissions,
+>7  byte        >0x39               invalid permissions,
+>8  byte        <0x30               invalid permissions,
+>8  byte        >0x39               invalid permissions,
+>10 string      x                   file name: "%s",
+>6  string      x                   file permissions: "%.3s"
+
