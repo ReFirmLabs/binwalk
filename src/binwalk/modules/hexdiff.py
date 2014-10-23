@@ -172,10 +172,6 @@ class HexDiff(Module):
             loop_count += 1
 
     def init(self):
-        # Disable the invalid description auto-filtering feature.
-        # This will not affect our own validation.
-        self.config.filter.show_invalid_results = True
-
         # Always disable terminal formatting, as it won't work properly with colorized output
         self.config.display.fit_to_screen = False
 

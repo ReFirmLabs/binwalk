@@ -5,6 +5,7 @@ import lzma
 import struct
 import binwalk.core.C
 import binwalk.core.compat
+import binwalk.core.common
 from binwalk.core.module import Option, Kwarg, Module
 
 class LZMAHeader(object):
@@ -16,15 +17,25 @@ class LZMA(object):
 
     DESCRIPTION = "Raw LZMA compression stream"
     FAKE_SIZE = "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
+    COMMON_PROPERTIES = [0x5D, 0x6E]
     MAX_PROP = ((4 * 5 + 4) * 9 + 8)
     BLOCK_SIZE = 32*1024
 
     def __init__(self, module):
         self.module = module
+        self.decompressed_data = None
 
         self.build_properties()
         self.build_dictionaries()
         self.build_headers()
+
+        # Add an extraction rule
+        #if self.module.extractor.enabled:
+        #    self.module.extractor.add_rule(regex='^%s' % self.DESCRIPTION.lower(), extension="lzma", cmd=self.extractor)
+
+    # TODO: Reliable extraction is horribly inefficient with the Python lzma module
+    #def extractor(self, file_name):
+    #    compressed_data = binwalk.core.common.BlockFile(file_name).read()
 
     def build_property(self, pb, lp, lc):
         prop = (((pb * 5) + lp) * 9) + lc
@@ -53,18 +64,25 @@ class LZMA(object):
     def build_properties(self):
         self.properties = set()
 
-        for pb in range(0, 9):
-            for lp in range(0, 5):
-                for lc in range(0, 5):
-                    prop = self.build_property(pb, lp, lc)
-                    if prop is not None:
-                        self.properties.add(chr(prop))
+        if self.module.partial_scan == True:
+            for prop in self.COMMON_PROPERTIES:
+                self.properties.add(chr(prop))
+        else:
+            for pb in range(0, 9):
+                for lp in range(0, 5):
+                    for lc in range(0, 5):
+                        prop = self.build_property(pb, lp, lc)
+                        if prop is not None:
+                            self.properties.add(chr(prop))
 
     def build_dictionaries(self):
-        self.dictionaries = set()
+        self.dictionaries = []
 
-        for n in range(16, 26):
-            self.dictionaries.add(binwalk.core.compat.bytes2str(struct.pack("<I", 2**n)))
+        if self.module.partial_scan == True:
+            self.dictionaries.append(struct.pack("<I", 2**16))
+        else:
+            for n in range(16, 26):
+                self.dictionaries.append(binwalk.core.compat.bytes2str(struct.pack("<I", 2**n)))
 
     def build_headers(self):
         self.headers = set()
@@ -73,34 +91,42 @@ class LZMA(object):
             for dictionary in self.dictionaries:
                 self.headers.add(prop + dictionary + self.FAKE_SIZE)
 
-    def decompress(self, data):
+    def decompress(self, data, complete=False):
         result = None
         description = None
+        self.decompressed_data = None
+        i = 0
 
         for header in self.headers:
+            i += 1
             # The only acceptable exceptions are those indicating that the input data was truncated.
             try:
-                lzma.decompress(binwalk.core.compat.str2bytes(header + data))
+                final_data = binwalk.core.compat.str2bytes(header + data)
+                if complete:
+                    open("test.bin-%d" % i, "wb").write(final_data)
+                self.decompressed_data = lzma.decompress(final_data)
                 result = self.parse_header(header)
                 break
             except IOError as e:
                 # The Python2 module gives this error on truncated input data.
-                if str(e) == "unknown BUF error":
+                if not complete and str(e) == "unknown BUF error":
                     result = self.parse_header(header)
                     break
             except Exception as e:
                 # The Python3 module gives this error on truncated input data.
                 # The inconsistency between modules is a bit worrisome.
-                if str(e) == "Compressed data ended before the end-of-stream marker was reached":
+                if not complete and str(e) == "Compressed data ended before the end-of-stream marker was reached":
                     result = self.parse_header(header)
                     break
 
         if result is not None:
-            description = "%s, pb: %d, lp: %d, lc: %d, dictionary size: %d" % (self.DESCRIPTION,
-                                                                               result.pb,
-                                                                               result.lp,
-                                                                               result.lc,
-                                                                               result.dictionary)
+            prop = self.build_property(result.pb, result.lp, result.lc)
+            description = "%s, properties: 0x%.2X [pb: %d, lp: %d, lc: %d], dictionary size: %d" % (self.DESCRIPTION,
+                                                                                                   prop,
+                                                                                                   result.pb,
+                                                                                                   result.lp,
+                                                                                                   result.lc,
+                                                                                                   result.dictionary)
 
         return description
 
@@ -158,6 +184,10 @@ class RawCompression(Module):
                    long='lzma',
                    kwargs={'enabled' : True, 'scan_for_lzma' : True},
                    description='Scan for raw LZMA compression streams'),
+            Option(short='P',
+                   long='partial',
+                   kwargs={'partial_scan' : True},
+                   description='Perform a superficial, but faster, scan'),
             Option(short='S',
                    long='stop',
                    kwargs={'stop_on_first_hit' : True},
@@ -166,12 +196,11 @@ class RawCompression(Module):
 
     KWARGS = [
             Kwarg(name='enabled', default=False),
+            Kwarg(name='partial_scan', default=False),
             Kwarg(name='stop_on_first_hit', default=False),
             Kwarg(name='scan_for_deflate', default=False),
             Kwarg(name='scan_for_lzma', default=False),
     ]
-
-    #READ_BLOCK_SIZE = 64*1024
 
     def init(self):
         self.decompressors = []
@@ -185,7 +214,6 @@ class RawCompression(Module):
         for fp in iter(self.next_file, None):
 
             file_done = False
-            #fp.set_block_size(peek=self.READ_BLOCK_SIZE)
 
             self.header()
 

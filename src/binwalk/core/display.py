@@ -16,9 +16,8 @@ class Display(object):
     HEADER_WIDTH = 80
     DEFAULT_FORMAT = "%s\n"
 
-    def __init__(self, quiet=False, verbose=False, log=None, csv=False, fit_to_screen=False, filter=None):
+    def __init__(self, quiet=False, verbose=False, log=None, csv=False, fit_to_screen=False):
         self.quiet = quiet
-        self.filter = filter
         self.verbose = verbose
         self.fit_to_screen = fit_to_screen
         self.fp = None
@@ -99,17 +98,12 @@ class Display(object):
     def _fprint(self, fmt, columns, csv=True, stdout=True, filter=True):
         line = fmt % tuple(columns)
 
-        # TODO: Additional filtering was originally done here to support the --grep option,
-        #       which is now depreciated. Seems redundant now, as the result won't get passed
-        #       to the display class unless it has already passed the filter.valid_result check.
-        #if not filter or self.filter.valid_result(line):
-        if True:
-            if not self.quiet and stdout:
-                sys.stdout.write(self._format_line(line.strip()) + "\n")
-                sys.stdout.flush()
+        if not self.quiet and stdout:
+            sys.stdout.write(self._format_line(line.strip()) + "\n")
+            sys.stdout.flush()
 
-            if self.fp and not (self.csv and not csv):
-                self.log(fmt, columns)
+        if self.fp and not (self.csv and not csv):
+            self.log(fmt, columns)
 
     def _append_to_data_parts(self, data, start, end):
         '''

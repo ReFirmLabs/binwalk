@@ -38,10 +38,29 @@ class Signature(Module):
                    long='dumb',
                    kwargs={'dumb_scan' : True},
                    description='Disable smart signature keywords'),
+        Option(short='I',
+               long='invalid',
+               kwargs={'show_invalid' : True},
+               description='Show results marked as invalid'),
+        Option(short='x',
+               long='exclude',
+               kwargs={'exclude_filters' : []},
+               type=list,
+               dtype=str.__name__,
+               description='Exclude results that match <str>'),
+        Option(short='y',
+               long='include',
+               kwargs={'include_filters' : []},
+               type=list,
+               dtype=str.__name__,
+               description='Only show results that match <str>'),
     ]
 
     KWARGS = [
             Kwarg(name='enabled', default=False),
+            Kwarg(name='show_invalid', default=False),
+            Kwarg(name='include_filters', default=[]),
+            Kwarg(name='exclude_filters', default=[]),
             Kwarg(name='raw_bytes', default=None),
             Kwarg(name='search_for_opcodes', default=False),
             Kwarg(name='explicit_signature_scan', default=False),
@@ -55,9 +74,18 @@ class Signature(Module):
     def init(self):
         self.keep_going = self.config.keep_going
 
+        # Initialize the filter
+        self.filter = binwalk.core.filter.Filter(self.show_invalid)
+
+        # Set any specified include/exclude filters
+        for regex in self.exclude_filters:
+            self.filter.exclude(regex)
+        for regex in self.include_filters:
+            self.filter.include(regex)
+
         # Create Signature and MagicParser class instances. These are mostly for internal use.
-        self.smart = binwalk.core.smart.Signature(self.config.filter, ignore_smart_signatures=self.dumb_scan)
-        self.parser = binwalk.core.parser.MagicParser(self.config.filter, self.smart)
+        self.smart = binwalk.core.smart.Signature(self.filter, ignore_smart_signatures=self.dumb_scan)
+        self.parser = binwalk.core.parser.MagicParser(self.filter, self.smart)
 
         # If a raw byte sequence was specified, build a magic file from that instead of using the default magic files
         if self.raw_bytes is not None:
@@ -99,7 +127,7 @@ class Signature(Module):
         '''
         Called automatically by self.result.
         '''
-        if self.config.filter.show_invalid_results:
+        if self.filter.show_invalid_results:
             r.valid = True
         else:
             if not r.description:
@@ -111,7 +139,7 @@ class Signature(Module):
             if r.jump and (r.jump + r.offset) > r.file.size:
                 r.valid = False
 
-            r.valid = self.config.filter.valid_result(r.description)
+            r.valid = self.filter.valid_result(r.description)
 
     def scan_file(self, fp):
         current_file_offset = 0
