@@ -16,7 +16,7 @@ class LZMAHeader(object):
 class LZMA(object):
 
     DESCRIPTION = "Raw LZMA compression stream"
-    FAKE_SIZE = "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
+    FAKE_SIZE = b"\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF"
     COMMON_PROPERTIES = [0x5D, 0x6E]
     MAX_PROP = ((4 * 5 + 4) * 9 + 8)
     BLOCK_SIZE = 32*1024
