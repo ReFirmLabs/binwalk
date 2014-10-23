@@ -348,7 +348,7 @@ class Extractor(Module):
         fname = ''
         cleanup_extracted_fname = True
         original_dir = os.getcwd()
-        rules = self._match(description)
+        rules = self.match(description)
         file_path = os.path.realpath(file_name)
 
         # No extraction rules for this file
@@ -451,7 +451,7 @@ class Extractor(Module):
                     return offset
         return -1
 
-    def _match(self, description):
+    def match(self, description):
         '''
         Check to see if the provided description string matches an extract rule.
         Called internally by self.extract().
