@@ -1,4 +1,3 @@
-import lzma
 import binwalk.core.plugin
 import binwalk.core.compat
 from binwalk.core.common import BlockFile
@@ -16,12 +15,16 @@ class LZMAPlugin(binwalk.core.plugin.Plugin):
     # Check up to the first 64KB
     MAX_DATA_SIZE = 64 * 1024
 
+    def init(self):
+        import lzma
+        self.decompressor = lzma.decompress
+
     def is_valid_lzma(self, data):
         valid = True
 
         # The only acceptable exceptions are those indicating that the input data was truncated.
         try:
-            lzma.decompress(binwalk.core.compat.str2bytes(data))
+            self.decompressor(binwalk.core.compat.str2bytes(data))
         except IOError as e:
             # The Python2 module gives this error on truncated input data.
             if str(e) != "unknown BUF error":

@@ -10,7 +10,12 @@ try:
 except ImportError:
     pass
 
-from binwalk.modules.signature import Signature
+# Don't load the signature module if the lzma module can't be found
+try:
+    from binwalk.modules.signature import Signature
+except ImportError:
+    pass
+
 from binwalk.modules.hexdiff import HexDiff
 from binwalk.modules.general import General
 from binwalk.modules.extractor import Extractor
