@@ -1,29 +1,51 @@
+import os
+import subprocess
 import binwalk.core.plugin
 
 class CPIOPlugin(binwalk.core.plugin.Plugin):
     '''
     Ensures that ASCII CPIO archive entries only get extracted once.
+    Also provides an internal CPIO extraction wrapper around the Unix
+    cpio utility since no output directory can be provided to it directly.
     '''
-#    CPIO_OUT_DIR = "cpio-root"
+    CPIO_OUT_DIR = "cpio-root"
 
     MODULES = ['Signature']
 
-#    def init(self):
-#        if self.module.extractor.enabled:
-#            self.module.extractor.add_rule(regex="^ascii cpio archive",
-#                                           extension="cpio",
-#                                           cmd=self.extractor)
+    def init(self):
+        if self.module.extractor.enabled:
+            self.module.extractor.add_rule(regex="^ascii cpio archive",
+                                           extension="cpio",
+                                           cmd=self.extractor)
 
-#    def extractor(self, fname):
-#        out_dir = os.path.join(os.path.split(fname)[0], self.CPIO_OUT_DIR)
+    def extractor(self, fname):
+        fname = os.path.abspath(fname)
+        out_dir = os.path.join(os.path.dirname(fname), self.CPIO_OUT_DIR)
 
-#        try:
-#            os.mkdir(out_dir)
-#        except OSError:
-#            return
+        try:
+            fpin = open(fname, "rb")
+            fperr = open(os.devnull, "rb")
+            os.mkdir(out_dir)
+        except OSError:
+            return
 
-#        # Lazy.
-#        os.system("cd '%s' && cpio -d -i --no-absolute-filenames < '%s' 2>&1 1>/dev/null" % (out_dir, fname))
+        try:
+            curdir = os.getcwd()
+            os.chdir(out_dir)
+        except OSError:
+            return
+
+        try:
+            subprocess.call(['cpio', '-d', '-i', '--no-absolute-filenames'],
+                            stdin=fpin,
+                            stderr=fperr,
+                            stdout=fperr)
+        except OSError:
+            pass
+
+        os.chdir(curdir)
+        fpin.close()
+        fperr.close()
 
     def pre_scan(self):
         # Be sure to re-set this at the beginning of every scan
