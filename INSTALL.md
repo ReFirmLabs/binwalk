@@ -1,10 +1,7 @@
 Before You Start
 ================
 
-Binwalk supports Python 2.7 - 3.x. Although binwalk is slightly faster in Python 3, the Python OpenGL bindings are still experimental for Python 3, so Python 2.7 is recommended.
-
-The following installation procedures assume that you are installing binwalk to be run using Python 2.7. If you want to use binwalk in Python 3, some package
-names and installation procedures may differ slightly.
+Binwalk supports Python 2.7 - 3.x. The following installation procedures assume that you are installing binwalk to be run using Python 2.7. If you want to use binwalk in Python 3, some package names and installation procedures may differ slightly.
 
 Installation
 ============
