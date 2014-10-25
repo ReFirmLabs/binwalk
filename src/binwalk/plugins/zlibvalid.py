@@ -2,9 +2,9 @@ import binwalk.core.C
 import binwalk.core.plugin
 from binwalk.core.common import BlockFile
 
-class ZlibPlugin(binwalk.core.plugin.Plugin):
+class ZlibValidPlugin(binwalk.core.plugin.Plugin):
     '''
-    Searches for and validates zlib compressed data.
+    Validates zlib compressed data.
     '''
     MODULES = ['Signature']
 

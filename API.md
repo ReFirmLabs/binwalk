@@ -18,11 +18,13 @@ import binwalk
 binwalk.scan()
 ```
 
-The `scan` function accepts both args and kwargs, which correspond to the normal command line options accepted by the binwalk command line utility, providing a large amount of freedom in how you choose to specify binwalk options (if none are specified, sys.argv is used by default).
+The `scan` function accepts both args and kwargs, which correspond to the normal command line options accepted by the binwalk command line utility, providing a large amount of freedom in how you choose to specify binwalk options (if none are specified, `sys.argv` is used by default).
 
-For example, to execute a signature scan, you at the very least have to specify the `--signature` command line option, as well as a list of files to scan. This can be done in a number of ways:
+For example, to execute a signature scan, you at the very least have to specify the `--signature` option, as well as a list of files to scan. This can be done in a number of ways:
 
 ```python
+binwalk.scan('--signature', 'firmware1.bin', 'firmware2.bin')
+
 binwalk.scan('firmware1.bin', 'firmware2.bin', signature=True)
 
 binwalk.scan('firmware1.bin', 'firmware2.bin', **{'signature' : True})
@@ -30,8 +32,6 @@ binwalk.scan('firmware1.bin', 'firmware2.bin', **{'signature' : True})
 binwalk.scan(*['firmware1.bin', 'firmware2.bin'], signature=True)
         
 binwalk.scan(*['--signature', 'firmware1.bin', 'firmware2.bin',])
-
-binwalk.scan('--signature', 'firmware1.bin', 'firmware2.bin')
 ```
 
 All args and kwargs keys/values correspond to binwalk's command line options. Either args or kwargs, or a combination of the two may be used, with the following caveats:
@@ -66,11 +66,13 @@ binwalk.core.module.Error has the additional guarunteed attribute:
 Thus, scan results and errors can be programatically accessed rather easily:
 
 ```python
-for module in binwalk.scan('firmware1.bin', 'firmware2.bin', signature=True):
+for module in binwalk.scan('firmware1.bin', 'firmware2.bin', signature=True, quiet=True):
     print ("%s Results:" % module.name)
     for result in module.results:
         print ("\t%s    0x%.8X    %s" % (result.file.name, result.offset, result.description))
 ```
+
+Note the above use of the `--quiet` option which prevents the binwalk module from printing its normal output to screen.
 
 Module Exceptions
 =================

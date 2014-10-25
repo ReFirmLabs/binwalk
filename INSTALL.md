@@ -51,10 +51,13 @@ $ (cd capstone-2.1.2/bindings/python && sudo python ./setup.py install)
 Binwalk relies on multiple external utilties in order to automatically extract/decompress files and data:
 
 ```bash
+# Install standard extraction utilities
 $ sudo apt-get install mtd-utils zlib1g-dev liblzma-dev ncompress gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract openjdk-6-jdk cramfsprogs cramfsswap squashfs-tools
 ```
 
 ```bash
+# Install sasquatch SquashFS extraction tool and its dependencies
+$ sudo apt-get install zlib1g-dev liblzma-dev liblzo2-dev
 $ git clone https://github.com/devttys0/sasquatch
 $ (cd sasquatch && make && sudo make install)
 ```
