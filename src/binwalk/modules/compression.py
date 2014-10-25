@@ -53,7 +53,7 @@ class LZMA(object):
     def build_property(self, pb, lp, lc):
         prop = (((pb * 5) + lp) * 9) + lc
         if prop > self.MAX_PROP:
-            prop = None
+            return None
         return int(prop)
 
     def parse_property(self, prop):
