@@ -1,24 +1,37 @@
 #--------------------File Systems---------------------
 
-# Minix filesystems - Juan Cespedes <cespedes@debian.org>
-# These signatures are useless until they can be improved.
-#0x410   leshort         0x137f          Minix filesystem
-#>0x402  beshort         !0              \b, %d zones
-#>0x1e   string          minix           \b, bootable
-#0x410   leshort         0x138f          Minix filesystem, 30 char names
-#0x410   leshort         0x2468          Minix filesystem, version 2
-#0x410   leshort         0x2478          Minix filesystem, version 2, 30 char names
-#0x410	leshort		0x4d5a		Minix filesystem, version 3
-#0x410	leshort		0x4d6a		Minix filesystem, version 3, 30 char names
+# Minix filesystems
+0x410   string      \x7f\x13\x00\x00\x00\x00    Minix filesystem, V1, little endian,
+>0x402  beshort     x                           %d zones
+>0x1e   string      minix                       \b, bootable
+>0x1e   string      !minix
+>>0x1e  string      !\x00\x00\x00\x00\x00       invalid
 
-#0x410   beshort         0x137f          Minix filesystem (big endian)
-#>0x402  beshort         !0              \b, %d zones
-#>0x1e   string          minix           \b, bootable
-#0x410   beshort         0x138f          Minix filesystem (big endian), 30 char names
-#0x410   beshort         0x2468          Minix filesystem (big endian), version 2
-#0x410   beshort         0x2478          Minix filesystem (big endian), version 2, 30 char names
-#0x410	beshort		0x4d5a		Minix filesystem (big endian), version 3
-#0x410	beshort		0x4d6a		Minix filesystem (big endian), version 3, 30 char names
+0x410   string      \x13\x7f\x00\x00\x00\x00    Minix filesystem, V1, big endian,
+>0x402  beshort     x                           %d zones
+>0x1e   string      minix                       \b, bootable
+>0x1e   string      !minix
+>>0x1e  string      !\x00\x00\x00\x00\x00       invalid
+
+0x410   string      \x8f\x13\x00\x00\x00\x00    Minix filesystem, V1, little endian, 30 char names,
+>0x402  beshort     x                           %d zones
+>0x1e   string      minix                       \b, bootable
+>0x1e   string      !minix
+>>0x1e  string      !\x00\x00\x00\x00\x00       invalid
+
+0x410   string      \x13\x8f\x00\x00\x00\x00    Minix filesystem, V1, big endian, 30 char names,
+>0x402  beshort     x                           %d zones
+>0x1e   string      minix                       \b, bootable
+>0x1e   string      !minix
+>>0x1e  string      !\x00\x00\x00\x00\x00       invalid
+
+#0x410   leshort     0x2468      Minix filesystem, V2, little endian,
+#>0x402  beshort     x           %d zones
+#>0x1e   string      minix       \b, bootable
+
+#0x410   beshort     0x2468      Minix filesystem, V2, big endian,
+#>0x402  beshort     x           %d zones
+#>0x1e   string      minix       \b, bootable
 
 # YAFFS
 0	string	\x03\x00\x00\x00\x01\x00\x00\x00\xFF\xFF	YAFFS filesystem

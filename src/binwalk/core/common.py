@@ -59,7 +59,7 @@ def get_libs_path():
 def file_md5(file_name):
     '''
     Generate an MD5 hash of the specified file.
-    
+
     @file_name - The file to hash.
 
     Returns an MD5 hex digest string.
@@ -94,15 +94,15 @@ def file_size(filename):
 def strip_quoted_strings(string):
     '''
     Strips out data in between double quotes.
-    
+
     @string - String to strip.
 
     Returns a sanitized string.
     '''
     # This regex removes all quoted data from string.
     # Note that this removes everything in between the first and last double quote.
-    # This is intentional, as printed (and quoted) strings from a target file may contain 
-    # double quotes, and this function should ignore those. However, it also means that any 
+    # This is intentional, as printed (and quoted) strings from a target file may contain
+    # double quotes, and this function should ignore those. However, it also means that any
     # data between two quoted strings (ex: '"quote 1" you won't see me "quote 2"') will also be stripped.
     return re.sub(r'\"(.*)\"', "", string)
 
@@ -118,8 +118,8 @@ def get_quoted_strings(string):
     try:
         # This regex grabs all quoted data from string.
         # Note that this gets everything in between the first and last double quote.
-        # This is intentional, as printed (and quoted) strings from a target file may contain 
-        # double quotes, and this function should ignore those. However, it also means that any 
+        # This is intentional, as printed (and quoted) strings from a target file may contain
+        # double quotes, and this function should ignore those. However, it also means that any
         # data between two quoted strings (ex: '"quote 1" non-quoted data "quote 2"') will also be included.
         return re.findall(r'\"(.*)\"', string)[0]
     except KeyboardInterrupt as e:
@@ -137,7 +137,7 @@ def unique_file_name(base_name, extension=''):
     Returns a unique file string.
     '''
     idcount = 0
-    
+
     if extension and not extension.startswith('.'):
         extension = '.%s' % extension
 
@@ -192,8 +192,8 @@ class MathExpression(object):
         ast.Add: op.add,
         ast.Sub: op.sub,
         ast.Mult: op.mul,
-        ast.Div: op.truediv, 
-        ast.Pow: op.pow, 
+        ast.Div: op.truediv,
+        ast.Pow: op.pow,
         ast.BitXor: op.xor
     }
 
@@ -243,19 +243,19 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
 
     The descision to force read to return a str object instead of a bytes object is questionable
     for Python 3, but it seemed the best way to abstract differences in Python 2/3 from the rest
-    of the code (especially for people writing plugins) and to add Python 3 support with 
+    of the code (especially for people writing plugins) and to add Python 3 support with
     minimal code change.
     '''
 
     # The DEFAULT_BLOCK_PEEK_SIZE limits the amount of data available to a signature.
-    # While most headers/signatures are far less than this value, some may reference 
+    # While most headers/signatures are far less than this value, some may reference
     # pointers in the header structure which may point well beyond the header itself.
     # Passing the entire remaining buffer to libmagic is resource intensive and will
     # significantly slow the scan; this value represents a reasonable buffer size to
     # pass to libmagic which will not drastically affect scan time.
     DEFAULT_BLOCK_PEEK_SIZE = 8 * 1024
 
-    # Max number of bytes to process at one time. This needs to be large enough to 
+    # Max number of bytes to process at one time. This needs to be large enough to
     # limit disk I/O, but small enough to limit the size of processed data blocks.
     DEFAULT_BLOCK_READ_SIZE = 1 * 1024 * 1024
 
@@ -293,7 +293,7 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
         super(self.__class__, self).__init__(fname, mode)
 
         self.swap_size = self.args.swap
-        
+
         if self.args.size:
             self.size = self.args.size
         else:
@@ -329,7 +329,7 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
         if self.args.block is not None:
             self.block_read_size = self.args.block
         self.base_block_size = self.block_read_size
-            
+
         if self.args.peek is not None:
             self.block_peek_size = self.args.peek
         self.base_peek_size = self.block_peek_size
@@ -353,7 +353,7 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
         '''
         i = 0
         data = ""
-        
+
         if self.swap_size > 0:
             while i < len(block):
                 data += block[i:i+self.swap_size][::-1]
@@ -376,7 +376,7 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
     def write(self, data):
         '''
         Writes data to the opened file.
-        
+
         io.FileIO.write does not guaruntee that all data will be written;
         this method overrides io.FileIO.write and does guaruntee that all data will be written.
 
@@ -408,7 +408,7 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
             # Don't read more than self.length bytes from the file
             if (self.total_read + n) > self.length:
                 n = self.length - self.total_read
-                
+
             while n < 0 or l < n:
                 tmp = super(self.__class__, self).read(n-l)
                 if tmp:
@@ -459,9 +459,9 @@ class BlockFile(BLOCK_FILE_PARENT_CLASS):
         Returns new BlockFile object.
         '''
         return BlockFile(self.name,
-                         length=self.length, 
-                         offset=self.offset, 
-                         block=self.base_block_read_size, 
-                         peek=self.base_peek_size, 
+                         length=self.length,
+                         offset=self.offset,
+                         block=self.base_block_read_size,
+                         peek=self.base_peek_size,
                          swap=self.swap)
 
