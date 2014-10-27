@@ -25,7 +25,7 @@
 >3	string			<1		invalid
 >3	string			>\11		invalid
 >3      byte                    x               Version %d
-0       string                  \376bin         MySQL replication log
+#0       string                  \376bin         MySQL replication log
 
 #------------------------------------------------------------------------------
 # iRiver H Series database file 

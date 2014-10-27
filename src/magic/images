@@ -1,8 +1,20 @@
 # Tag Image File Format, from Daniel Quinlan (quinlan@yggdrasil.com)
 # The second word of TIFF files is the TIFF version number, 42, which has
 # never changed.  The TIFF specification recommends testing for it.
-0       string          MM\x00\x2a      TIFF image data, big-endian
+0       string          MM\x00\x2a      TIFF image data, big-endian,
+>4      belong          0               invalid
+>4      belong          <0              invalid
+# First image directory must begin on an even byte boundary
+>4      belong          &1              invalid
+>4      belong          >10000000       invalid
+>4      belong          x               offset of first image directory: %d
+
 0       string          II\x2a\x00      TIFF image data, little-endian
+>4      lelong          0               invalid
+>4      lelong          <0              invalid
+>4      lelong          &1              invalid
+>4      lelong          >10000000       invalid
+>4      lelong          x               offset of first image directory: %d
 
 # PNG [Portable Network Graphics, or "PNG's Not GIF"] images
 # (Greg Roelofs, newt@uchicago.edu)

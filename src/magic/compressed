@@ -55,8 +55,11 @@
 >>17	byte		=0x0E		os: Win32
 
 # lzip  
-0       string          LZIP            lzip compressed data
->4      byte            x               \b, version: %d
+0       string          LZIP            lzip compressed data,
+>4      ubyte           0               invalid
+# Current version is still 1.x
+>4      ubyte           >4              invalid
+>4      byte            x               version: %d
 
 # lrzip
 0       string          LRZI            lrzip compressed data

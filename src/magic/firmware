@@ -128,16 +128,19 @@
 >4	beshort		0x2a05		image type: CCFG,
 >4	beshort		0x6ce8		image type: DCFG,
 >4	beshort		0xc371		image type: LOG,
->6	byte		x		header version: %d,
+>6	byte		x		    header version: %d,
+>10 ubyte       >12         invalid month
+>12 ubyte       >31         invalid day
+>8  ubyte       >3000       invalid year
 #month
->10	byte		x		created: %d/
+>10	byte		x		    created: %d/
 #day	
->12	byte 		x		\b%d/
+>12	byte 		x		    \b%d/
 #year
->8	beshort		x		\b%d,
->16	belong		x		image size: %d bytes,
->22	byte		x		body checksum: 0x%X,
->23	byte		x		header checksum: 0x%X
+>8	beshort		x		    \b%d,
+>16	belong		x		    image size: %d bytes,
+>22	byte		x		    body checksum: 0x%X,
+>23	byte		x		    header checksum: 0x%X
 
 # Linksys WRT54GX ROME image
 0		belong			0x59a0e842		Realtek firmware header, ROME bootloader,
@@ -149,6 +152,9 @@
 >4      beshort         0x6ce8          image type: DCFG,
 >4      beshort         0xc371          image type: LOG,
 >6      byte            x               header version: %d,
+>10     ubyte           >12             invalid month
+>12     ubyte           >31             invalid day
+>8      ubyte           >3000           invalid year
 #month
 >10     byte            x               created: %d/
 #day    
@@ -234,8 +240,13 @@
 
 # --------------------------------
 # Microsoft Xbox data file formats
-0       string          XIP0            XIP, Microsoft Xbox data
-0       string          XTF0            XTF, Microsoft Xbox data
+# http://home.comcast.net/~admiral_powerslave/filestructure.html
+0       string          XIP0                        XIP, Microsoft Xbox data,
+>12     lelong          x                           total size: %d
+>16     lelong          !0                          invalid
+>24     lelong          !0                          invalid
+
+0       string          XTF0\x00\x00\x00            XTF, Microsoft Xbox data
 
 #Windows CE Binary Image Data Format aka B000FF
 #More information on the format:
@@ -308,7 +319,7 @@
 #>0	string		x			"%s"
 
 # Firmware header used by some TV's
-0	string		FNIB		ZBOOT firmware header, header size: 32 bytes,
+0	string		FNIB	ZBOOT firmware header, header size: 32 bytes,
 >8	lelong		x		load address: 0x%.8X,
 >12	lelong		x		start address: 0x%.8X,
 >16	lelong		x		checksum: 0x%.8X,
@@ -564,10 +575,10 @@
 >18  string            x                 loader version: "%.4s",
 
 
-0    string            ELSC              LANCOM WWAN firmware,
+0    string            ELSC              LANCOM WWAN firmware
 >4   ubyte             3
 >>5  beshort           0
->>7  string            x                 "%s"
+>>7  string            x                 \b, "%s"
 
 0 string               ELSP                LANCOM file entry
 >202 string            @(RECENT_FIRMWARE)/ \b, file name:

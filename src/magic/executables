@@ -337,12 +337,14 @@
 # cisco:  file(1) magic for cisco Systems routers
 #
 # Most cisco file-formats are covered by the generic elf code
-0	string			\x85\x01\x14	Cisco IOS microcode
->7      string          	>\0         	
->>7	string			x		for "%s"
-0	string			\x85\x01\xcb	Cisco IOS experimental microcode
->7      string          	>\0         	
->>7	string			x		for "%s"
+0	string			\x85\x01\x14	Cisco IOS microcode,
+>7  string          x               for "%s"
+#>7  string          	>\0         	
+#>>7	string			x		for "%s"
+0	string			\x85\x01\xcb	Cisco IOS experimental microcode,
+>7  string          x               for "%s"
+#>7  string          	>\0         	
+#>>7	string			x		for "%s"
 
 # EST flat binary format (which isn't, but anyway)
 # From: Mark Brown <broonie@sirena.org.uk>

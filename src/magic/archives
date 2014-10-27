@@ -111,8 +111,20 @@
 >7	byte		>9		invalid os
 >7	byte		<0		invalid os
 
-# RAR archiver (Greg Roelofs, newt@uchicago.edu)
-0	string		Rar!		RAR archive data
+# RAR archiver (http://kthoom.googlecode.com/hg/docs/unrar.html)
+0	string		\x52\x61\x72\x21\x1A\x07\x00		RAR archive data, first volume type:
+>9  ubyte       <0x72                               invalid
+>9  ubyte       >0x7B                               invalid
+>9  ubyte       0x72                                MARK_HEAD
+>9  ubyte       0x73                                MAIN_HEAD
+>9  ubyte       0x74                                FILE_HEAD
+>9  ubyte       0x75                                COMM_HEAD
+>9  ubyte       0x76                                AV_HEAD
+>9  ubyte       0x77                                SUB_HEAD
+>9  ubyte       0x78                                PROTECT_HEAD
+>9  ubyte       0x79                                SIGN_HEAD
+>9  ubyte       0x7A                                NEWSUB_HEAD
+>9  ubyte       0x7B                                ENDARC_HEAD
 
 # HPACK archiver (Peter Gutmann, pgut1@cs.aukuni.ac.nz)
 0	string		HPAK		HPACK archive data
