@@ -238,23 +238,13 @@
 # Useless until forther improvements can be made to the signature.
 #0   string      S0          Motorola S-Record; binary data in text format
 
-# --------------------------------
-# Microsoft Xbox data file formats
-# http://home.comcast.net/~admiral_powerslave/filestructure.html
-0       string          XIP0                        XIP, Microsoft Xbox data,
->12     lelong          x                           total size: %d
->16     lelong          !0                          invalid
->24     lelong          !0                          invalid
-
-0       string          XTF0\x00\x00\x00            XTF, Microsoft Xbox data
-
 #Windows CE Binary Image Data Format aka B000FF
 #More information on the format:
 #http://msdn.microsoft.com/en-us/library/ms924510.aspx
 #http://forum.xda-developers.com/showthread.php?t=801167
-0	string	B000FF	B000FF Windows CE image header,
->7	lelong	x	Image start: 0x%X,
->11	lelong	x	Image length: %d
+0	string	B000FF	Windows CE image header,
+>7	lelong	x	    Image start: 0x%X,
+>11	lelong	x	    Image length: %d
 
 
 #Windows CE RomImage

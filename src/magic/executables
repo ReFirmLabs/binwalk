@@ -279,33 +279,6 @@
 >56     leshort         >1              \b, %u registry entries
 
 #------------------------------------------------------------------------------
-# Microsoft Xbox executables .xbe (Esa HyytiÃ¤ <ehyytia@cc.hut.fi>)
-0       string          XBEH            XBE, Microsoft Xbox executable
-# probabilistic checks whether signed or not
->0x0004 ulelong =0x0
->>&2    ulelong !0x0  \b, invalid
->>&2    ulelong =0x0
->>>&2   ulelong !0x0  \b, invalid
->>>&2   ulelong =0x0  \b, not signed
->0x0004 ulelong >0
->>&2    ulelong =0x0  \b, invalid
->>&2    ulelong >0
->>>&2   ulelong =0x0  \b, invalid
->>>&2   ulelong >0    \b, signed
->0x0104 lelong  <0    \b, invalid base address
-# expect base address of 0x10000
->0x0104               ulelong =0x10000
->>(0x0118-0x0FF60)    ulelong&0x80000007  0x80000007 \b, all regions
->>(0x0118-0x0FF60)    ulelong&0x80000007  !0x80000007
->>>(0x0118-0x0FF60)   ulelong >0           (regions:
->>>>(0x0118-0x0FF60)  ulelong &0x00000001  NA
->>>>(0x0118-0x0FF60)  ulelong &0x00000002  Japan
->>>>(0x0118-0x0FF60)  ulelong &0x00000004  Rest_of_World
->>>>(0x0118-0x0FF60)  ulelong &0x80000000  Manufacturer
->>>(0x0118-0x0FF60)   ulelong >0           \b)
-
-
-#------------------------------------------------------------------------------
 # motorola:  file(1) magic for Motorola 68K and 88K binaries
 #
 # 68K
