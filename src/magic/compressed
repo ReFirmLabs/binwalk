@@ -136,16 +136,6 @@
 >4      ledate          x               %s
 >4	lelong		x		\b{file-epoch:%d}
 
-# Zlib signatures
-# Too short to be useful on their own; see:
-#
-#	o src/binwalk/magic/zlib
-#	o src/binwalk/plugins/zlib.py
-#
-#0	beshort		0x789C		zlib compressed data
-#0	beshort		0x78DA		zlib compressed data
-#0	beshort		0x7801		zlib compressed data
-
 # Supplementary magic data for the file(1) command to support
 # rzip(1).  The format is described in magic(5).
 #

@@ -1,4 +1,5 @@
-import binwalk.core.C
+import zlib
+import binwalk.core.compat
 import binwalk.core.plugin
 from binwalk.core.common import BlockFile
 
@@ -8,17 +9,7 @@ class ZlibValidPlugin(binwalk.core.plugin.Plugin):
     '''
     MODULES = ['Signature']
 
-    MIN_DECOMP_SIZE = 16 * 1024
     MAX_DATA_SIZE = 33 * 1024
-
-    TINFL = "tinfl"
-    TINFL_FUNCTIONS = [
-        binwalk.core.C.Function(name="is_deflated", type=int),
-    ]
-
-    def init(self):
-        # Load libtinfl.so
-        self.tinfl = binwalk.core.C.Library(self.TINFL, self.TINFL_FUNCTIONS)
 
     def scan(self, result):
         # If this result is a zlib signature match, try to decompress the data
@@ -28,10 +19,13 @@ class ZlibValidPlugin(binwalk.core.plugin.Plugin):
             data = fd.read(self.MAX_DATA_SIZE)
             fd.close()
 
-            # Check if this is valid zlib data
-            decomp_size = self.tinfl.is_deflated(data, len(data), 1)
-            if decomp_size > 0:
-                result.description += ", uncompressed size >= %d" % decomp_size
-            else:
-                result.valid = False
-
+            # Check if this is valid zlib data. It is valid if:
+            #
+            #   1. It decompresses without error
+            #   2. Decompression fails only because of truncated input
+            try:
+                zlib.decompress(binwalk.core.compat.str2bytes(data))
+            except zlib.error as e:
+                # Error -5, incomplete or truncated data input
+                if not str(e).startswith("Error -5"):
+                    result.valid = False

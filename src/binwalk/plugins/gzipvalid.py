@@ -1,4 +1,5 @@
-import binwalk.core.C
+import zlib
+import binwalk.core.compat
 import binwalk.core.plugin
 from binwalk.core.common import BlockFile
 
@@ -8,17 +9,7 @@ class GzipValidPlugin(binwalk.core.plugin.Plugin):
     '''
     MODULES = ['Signature']
 
-    MIN_DECOMP_SIZE = 16 * 1024
     MAX_DATA_SIZE = 33 * 1024
-
-    TINFL = "tinfl"
-    TINFL_FUNCTIONS = [
-        binwalk.core.C.Function(name="is_deflated", type=int),
-    ]
-
-    def init(self):
-        # Load libtinfl.so
-        self.tinfl = binwalk.core.C.Library(self.TINFL, self.TINFL_FUNCTIONS)
 
     def scan(self, result):
         # If this result is a gzip signature match, try to decompress the data
@@ -40,8 +31,13 @@ class GzipValidPlugin(binwalk.core.plugin.Plugin):
                     offset += 1
                 offset += 1
 
+            # Append basic zlib header to the beginning of the compressed data
+            data = "\x78\x9C" + data[offset:]
+
             # Check if this is valid deflate data (no zlib header)
-            decomp_size = self.tinfl.is_deflated(data[offset:], len(data[offset:]), 0)
-            if decomp_size <= 0:
-                result.valid = False
+            try:
+                zlib.decompress(binwalk.core.compat.str2bytes(data))
+            except zlib.error as e:
+                if not str(e).startswith("Error -5"):
+                    result.valid = False
 
