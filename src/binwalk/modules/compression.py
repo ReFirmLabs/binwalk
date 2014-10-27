@@ -1,9 +1,9 @@
 # Performs raw decompression of various compression algorithms (currently, only deflate).
 
 import os
+import zlib
 import lzma
 import struct
-import binwalk.core.C
 import binwalk.core.compat
 import binwalk.core.common
 from binwalk.core.module import Option, Kwarg, Module
@@ -149,22 +149,10 @@ class Deflate(object):
 
     ENABLED = False
     BLOCK_SIZE = 33*1024
-    # To prevent many false positives, only show data that decompressed to a reasonable size and didn't just result in a bunch of NULL bytes
-    MIN_DECOMP_SIZE = 32*1024
     DESCRIPTION = "Raw deflate compression stream"
-
-    TINFL_NAME = "tinfl"
-
-    TINFL_FUNCTIONS = [
-            binwalk.core.C.Function(name="is_deflated", type=int),
-            binwalk.core.C.Function(name="inflate_raw_file", type=None),
-    ]
 
     def __init__(self, module):
         self.module = module
-
-        # The tinfl library is built and installed with binwalk
-        self.tinfl = binwalk.core.C.Library(self.TINFL_NAME, self.TINFL_FUNCTIONS)
 
         # Add an extraction rule
         if self.module.extractor.enabled:
@@ -172,16 +160,23 @@ class Deflate(object):
 
     def extractor(self, file_name):
         out_file = os.path.splitext(file_name)[0]
-        self.tinfl.inflate_raw_file(file_name, out_file)
 
     def decompress(self, data):
+        valid = True
         description = None
 
-        decomp_size = self.tinfl.is_deflated(data, len(data), 0)
-        if decomp_size >= self.MIN_DECOMP_SIZE:
-            description = self.DESCRIPTION + ', uncompressed size >= %d' % decomp_size
+        # Prepend data with a standard zlib header
+        data = "\x78\x9C" + data
 
-        return description
+        # Looking for either a valid decompression, or an error indicating truncated input data
+        try:
+            zlib.decompress(binwalk.core.compat.str2bytes(data))
+        except zlib.error as e:
+            if not str(e).startswith("Error -5"):
+                # Bad data.
+                return None
+
+        return self.DESCRIPTION
 
 class RawCompression(Module):
 

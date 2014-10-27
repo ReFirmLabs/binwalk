@@ -173,6 +173,7 @@
 
 /* CJH */
 #define NOFUNCDEF
+
 #ifndef NOFUNCDEF
 	extern	void	*malloc	LARGS((int));
 	extern	void	free	LARGS((void *));
