@@ -56,8 +56,9 @@
 >20    belong  x               0x%x bytes per page
 
 # TROC file system
-0	string	TROC		TROC filesystem,
+0	string	TROC    TROC filesystem,
 >4	lelong	x		%d file entries
+>4  lelong  <1      (invalid)
 
 # PFS file system
 0	string	PFS/		PFS filesystem,

@@ -601,6 +601,21 @@
 >72     belong      !0x500
 >>72    belong      !0x700
 >>>72   belong      !0x900                              \b, invalid
+>88     belong      !0x500
+>>88    belong      !0x700
+>>>88   belong      !0x900                              \b, invalid
+>104    belong      !0x500
+>>104   belong      !0x700
+>>>104  belong      !0x900                              \b, invalid
+>120    belong      !0x500
+>>120   belong      !0x700
+>>>120  belong      !0x900                              \b, invalid
+>136    belong      !0x500
+>>136   belong      !0x700
+>>>136  belong      !0x900                              \b, invalid
+>152    belong      !0x500
+>>152   belong      !0x700
+>>>152  belong      !0x900                              \b, invalid
 
 8       string      \x00\x00\x07\x00\x00\x00\x00\x00    VxWorks symbol table, big endian,
 >4      belong      0                                   invalid
@@ -619,6 +634,21 @@
 >72     belong      !0x500
 >>72    belong      !0x700
 >>>72   belong      !0x900                              \b, invalid
+>88     belong      !0x500
+>>88    belong      !0x700
+>>>88   belong      !0x900                              \b, invalid
+>104    belong      !0x500
+>>104   belong      !0x700
+>>>104  belong      !0x900                              \b, invalid
+>120    belong      !0x500
+>>120   belong      !0x700
+>>>120  belong      !0x900                              \b, invalid
+>136    belong      !0x500
+>>136   belong      !0x700
+>>>136  belong      !0x900                              \b, invalid
+>152    belong      !0x500
+>>152   belong      !0x700
+>>>152  belong      !0x900                              \b, invalid
 
 8       string      \x00\x00\x09\x00\x00\x00\x00\x00    VxWorks symbol table, big endian,
 >4      belong      0                                   invalid
@@ -637,6 +667,21 @@
 >72     belong      !0x500
 >>72    belong      !0x700
 >>>72   belong      !0x900                              \b, invalid
+>88     belong      !0x500
+>>88    belong      !0x700
+>>>88   belong      !0x900                              \b, invalid
+>104    belong      !0x500
+>>104   belong      !0x700
+>>>104  belong      !0x900                              \b, invalid
+>120    belong      !0x500
+>>120   belong      !0x700
+>>>120  belong      !0x900                              \b, invalid
+>136    belong      !0x500
+>>136   belong      !0x700
+>>>136  belong      !0x900                              \b, invalid
+>152    belong      !0x500
+>>152   belong      !0x700
+>>>152  belong      !0x900                              \b, invalid
 
 8       string      \x00\x05\x00\x00\x00\x00\x00\x00    VxWorks symbol table, little endian,
 >4      lelong      0                                   invalid
@@ -655,6 +700,21 @@
 >72     lelong      !0x500
 >>72    lelong      !0x700
 >>>72   lelong      !0x900                              \b, invalid
+>88     lelong      !0x500
+>>88    lelong      !0x700
+>>>88   lelong      !0x900                              \b, invalid
+>104    lelong      !0x500
+>>104   lelong      !0x700
+>>>104  lelong      !0x900                              \b, invalid
+>120    lelong      !0x500
+>>120   lelong      !0x700
+>>>120  lelong      !0x900                              \b, invalid
+>136    lelong      !0x500
+>>136   lelong      !0x700
+>>>136  lelong      !0x900                              \b, invalid
+>152    lelong      !0x500
+>>152   lelong      !0x700
+>>>152  lelong      !0x900                              \b, invalid
 
 8       string      \x00\x07\x00\x00\x00\x00\x00\x00    VxWorks symbol table, little endian,
 >4      lelong      0                                   invalid
@@ -673,6 +733,21 @@
 >72     lelong      !0x500
 >>72    lelong      !0x700
 >>>72   lelong      !0x900                              \b, invalid
+>88     lelong      !0x500
+>>88    lelong      !0x700
+>>>88   lelong      !0x900                              \b, invalid
+>104    lelong      !0x500
+>>104   lelong      !0x700
+>>>104  lelong      !0x900                              \b, invalid
+>120    lelong      !0x500
+>>120   lelong      !0x700
+>>>120  lelong      !0x900                              \b, invalid
+>136    lelong      !0x500
+>>136   lelong      !0x700
+>>>136  lelong      !0x900                              \b, invalid
+>152    lelong      !0x500
+>>152   lelong      !0x700
+>>>152  lelong      !0x900                              \b, invalid
 
 8       string      \x00\x09\x00\x00\x00\x00\x00\x00    VxWorks symbol table, little endian,
 >4      lelong      0                                   invalid
@@ -691,4 +766,19 @@
 >72     lelong      !0x500
 >>72    lelong      !0x700
 >>>72   lelong      !0x900                              \b, invalid
+>88     lelong      !0x500
+>>88    lelong      !0x700
+>>>88   lelong      !0x900                              \b, invalid
+>104    lelong      !0x500
+>>104   lelong      !0x700
+>>>104  lelong      !0x900                              \b, invalid
+>120    lelong      !0x500
+>>120   lelong      !0x700
+>>>120  lelong      !0x900                              \b, invalid
+>136    lelong      !0x500
+>>136   lelong      !0x700
+>>>136  lelong      !0x900                              \b, invalid
+>152    lelong      !0x500
+>>152   lelong      !0x700
+>>>152  lelong      !0x900                              \b, invalid
 
