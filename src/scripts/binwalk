@@ -22,7 +22,10 @@ def display_status(m):
     while True:
         try:
             user_input()
-            sys.stderr.write("Progress: %.2f%% (%d / %d)\n\n" % (((float(m.status.completed) / float(m.status.total)) * 100), m.status.completed, m.status.total))
+            percentage = ((float(m.status.completed) / float(m.status.total)) * 100)
+            sys.stderr.write("Progress: %.2f%% (%d / %d)\n\n" % (percentage,
+                                                                 m.status.completed,
+                                                                 m.status.total))
         except KeyboardInterrupt as e:
             raise e
         except Exception:
@@ -43,6 +46,8 @@ def main():
     try:
         if len(sys.argv) == 1:
             usage(modules)
+        # If no explicit module was enabled in the command line arguments,
+        # run again with the default signature scan explicitly enabled.
         elif not modules.execute():
             modules.execute(*sys.argv[1:], signature=True)
     except binwalk.ModuleException as e:
