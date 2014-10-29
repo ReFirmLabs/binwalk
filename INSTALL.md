@@ -9,12 +9,11 @@ Installation
 Installation follows the typical configure/make process (standard development tools such as gcc, make, and Python must be installed in order to build):
 
 ```bash
+$ autoreconf
 $ ./configure
 $ make
 $ sudo make install
 ```
-
-Many features will work out of the box without any additional dependencies. However, to take advantage of binwalk's more advanced capabilities, multiple supporting utilities/packages need to be installed (see the Dependencies section below).
 
 Dependencies
 ============
@@ -53,7 +52,7 @@ $ sudo apt-get install mtd-utils zlib1g-dev liblzma-dev gzip bzip2 tar arj lhasa
 ```
 
 ```bash
-# Install sasquatch SquashFS extraction tool and its dependencies
+# Install sasquatch to extract non-standard SquashFS images
 $ sudo apt-get install zlib1g-dev liblzma-dev liblzo2-dev
 $ git clone https://github.com/devttys0/sasquatch
 $ (cd sasquatch && make && sudo make install)
