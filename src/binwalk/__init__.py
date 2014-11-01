@@ -1,8 +1,5 @@
 __all__ = ['scan', 'execute', 'Modules', 'ModuleException']
 
-import sys
-import binwalk.core.common
-
 from binwalk.core.module import Modules, ModuleException
 
 # Convenience functions
