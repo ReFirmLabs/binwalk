@@ -15,7 +15,10 @@ class JFFS2Entry(object):
             setattr(self, k, v)
 
 class UnJFFS2(object):
-
+    '''
+    User space JFFS2 extractor; just a simple Python wrapper around the jffs2dump
+    and jffs2reader utilities from mtd-utils. Not terribly efficient, but works.
+    '''
     def __init__(self, image, directory, verbose=False):
         self.image = image
         self.verbose = verbose
@@ -142,7 +145,9 @@ class UnJFFS2(object):
             self.extract_entry(entry)
 
 class UnJFFS2Plugin(binwalk.core.plugin.Plugin):
-
+    '''
+    Extrator plugin for JFFS2 file systems.
+    '''
     MODULES = ['Signature']
 
     def init(self):
