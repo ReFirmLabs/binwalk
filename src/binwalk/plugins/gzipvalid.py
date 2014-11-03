@@ -38,6 +38,10 @@ class GzipValidPlugin(binwalk.core.plugin.Plugin):
             try:
                 zlib.decompress(binwalk.core.compat.str2bytes(data))
             except zlib.error as e:
-                if not str(e).startswith("Error -5"):
+                error = str(e)
+                # Truncated input data results in error -5.
+                # gzip uses different checksums than zlib, which results in error -3.
+                if not error.startswith("Error -5") and not error.startswith("Error -3"):
                     result.valid = False
+
 
