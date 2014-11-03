@@ -17,9 +17,11 @@
 
 # lzop from <markus.oberhumer@jk.uni-linz.ac.at>
 0	string		\x89\x4c\x5a\x4f\x00\x0d\x0a\x1a\x0a	lzop compressed data
+>9	beshort		>0x093F     invalid
 >9	beshort		<0x0940
 >>9	byte&0xf0	=0x00		- version 0.
 >>9	beshort&0x0fff	x		\b%03x,
+>>9 beshort&0x0fff  <1      invalid,
 >>13	byte		1		LZO1X-1,
 >>13	byte		2		LZO1X-1(15),
 >>13	byte		3		LZO1X-999,
