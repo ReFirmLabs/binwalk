@@ -99,8 +99,11 @@ class Display(object):
         line = fmt % tuple(columns)
 
         if not self.quiet and stdout:
-            sys.stdout.write(self._format_line(line.strip()) + "\n")
-            sys.stdout.flush()
+            try:
+                sys.stdout.write(self._format_line(line.strip()) + "\n")
+                sys.stdout.flush()
+            except IOError as e:
+                pass
 
         if self.fp and not (self.csv and not csv):
             self.log(fmt, columns)
