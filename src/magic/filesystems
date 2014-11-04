@@ -37,23 +37,23 @@
 0	string	\x03\x00\x00\x00\x01\x00\x00\x00\xFF\xFF	YAFFS filesystem
 
 # EFS2 file system - jojo@utulsa.edu
-0      lelong 0x53000000       EFS2 Qualcomm filesystem super block, little endian,
->8     string !EFSSuper        invalid,
->4     leshort &1              NAND
->4     leshort ^1              NOR
->4     leshort x               version 0x%x,
->24    lelong  x               %d blocks,
->16    lelong  x               0x%x pages per block,
->20    lelong  x               0x%x bytes per page
+0      lelong       0x53000000       EFS2 Qualcomm filesystem super block, little endian,
+>8     string       !EFSSuper        invalid,
+>4     leshort&0x01 1                NAND
+>4     leshort&0x01 0                NOR
+>4     leshort      x                version 0x%x,
+>24    lelong       x                %d blocks,
+>16    lelong       x                0x%x pages per block,
+>20    lelong       x                0x%x bytes per page
 
-0      belong 0x53000000       EFS2 Qualcomm filesystem super block, big endian,
->8     string !SSFErepu	       invalid,
->4     beshort &1              NAND
->4     beshort ^1              NOR
->4     beshort x               version 0x%x,
->24    belong  x               %d blocks,
->16    belong  x               0x%x pages per block,
->20    belong  x               0x%x bytes per page
+0      belong       0x53000000       EFS2 Qualcomm filesystem super block, big endian,
+>8     string       !SSFErepu	     invalid,
+>4     beshort&0x01 1                NAND
+>4     beshort&0x01 0                NOR
+>4     beshort      x                version 0x%x,
+>24    belong       x                %d blocks,
+>16    belong       x                0x%x pages per block,
+>20    belong       x                0x%x bytes per page
 
 # TROC file system
 0	string	TROC    TROC filesystem,
@@ -182,7 +182,7 @@
 >>40	bequad	x	\b{file-size:%lld}
 >4      belong  x       %d inodes,
 >28     beshort >3
->>12    belong          blocksize: %d bytes,
+>>12    belong  x       blocksize: %d bytes,
 >28     beshort <2
 >>32    beshort x       blocksize: %d bytes,
 >28     beshort 2
@@ -216,24 +216,24 @@
 >28     leshort 3
 >>63    lequad x        size: %lld bytes,
 >>63    lequad x        {file-size:%lld}
->28	leshort >3	
+>28	    leshort >3	
 >>40	lequad	x	size: %lld bytes,
 >>40	lequad	x	{file-size:%lld}
 >4      lelong  x       %d inodes,
->28	leshort >3
->>12	lelong		blocksize: %d bytes,
+>28	    leshort >3
+>>12	lelong	x	    blocksize: %d bytes,
 >28     leshort <2
 >>32    leshort x       blocksize: %d bytes,
 >28     leshort 2
 >>51    lelong  x       blocksize: %d bytes,
->28	leshort 3
->>51	lelong 	x	blocksize: %d bytes,
->28	leshort	>3	
->>12	lelong	x	blocksize: %d bytes,
->28	leshort <4
+>28	    leshort 3
+>>51	lelong 	x	    blocksize: %d bytes,
+>28	    leshort	>3	
+>>12	lelong	x	    blocksize: %d bytes,
+>28	    leshort <4
 >>39    ledate  x	created: %s
->28	leshort >3
->>8	ledate x	created: %s
+>28	    leshort >3
+>>8	    ledate x	created: %s
 >28     leshort <3
 >>8     lelong  x       {jump-to-offset:%d}
 >28     leshort 3
@@ -266,7 +266,7 @@
 >>40    bequad  x       {file-size:%lld}
 >4      belong  x       %d inodes,
 >28     beshort >3
->>12    belong          blocksize: %d bytes,
+>>12    belong  x       blocksize: %d bytes,
 >28     beshort <2
 >>32    beshort x       blocksize: %d bytes,
 >28     beshort 2
@@ -311,7 +311,7 @@
 >>40    bequad  x       {file-size:%lld}
 >4      belong  x       %d inodes,
 >28     beshort >3
->>12    belong          blocksize: %d bytes,
+>>12    belong  x       blocksize: %d bytes,
 >28     beshort <2
 >>32    beshort x       blocksize: %d bytes,
 >28     beshort 2
@@ -356,7 +356,7 @@
 >>40    bequad  x       {file-size:%lld}
 >4      belong  x       %d inodes,
 >28     beshort >3
->>12    belong          blocksize: %d bytes,
+>>12    belong  x       blocksize: %d bytes,
 >28     beshort <2
 >>32    beshort x       blocksize: %d bytes,
 >28     beshort 2
@@ -401,7 +401,7 @@
 >>40    lequad  x       {file-size:%lld}
 >4      lelong  x       %d inodes,
 >28     leshort >3
->>12    lelong          blocksize: %d bytes,
+>>12    lelong  x       blocksize: %d bytes,
 >28     leshort <2
 >>32    leshort x       blocksize: %d bytes,
 >28     leshort 2
@@ -446,7 +446,7 @@
 >>40    lequad  x       {file-size:%lld}
 >4      lelong  x       %d inodes,
 >28     leshort >3
->>12    lelong          blocksize: %d bytes,
+>>12    lelong  x       blocksize: %d bytes,
 >28     leshort <2
 >>32    leshort x       blocksize: %d bytes,
 >28     leshort 2
@@ -481,8 +481,8 @@
 >4  lelong          x               rev %d
 >6  leshort         x               \b.%d
 # No journal?  ext2
->36  lelong          ^0x0000004      ext2 filesystem data
->>2 leshort         ^0x0000001      (mounted or unclean)
+>36  lelong&0x04    0      ext2 filesystem data
+>>2 leshort&0x01    0      (mounted or unclean)
 # Has a journal?  ext3 or ext4
 >36  lelong          &0x0000004
 #  and small INCOMPAT?
@@ -519,7 +519,7 @@
 >36	belong	x					%d files
 
 # netboot image - Juan Cespedes <cespedes@debian.org>
-0	lelong			0x1b031336L	Netboot image,
+0	lelong			0x1b031336	Netboot image,
 >4	lelong&0xFFFFFF00	0
 >>4	lelong&0x100		0x000		mode 2
 >>4	lelong&0x100		0x100		mode 3

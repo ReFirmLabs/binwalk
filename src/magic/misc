@@ -2,9 +2,9 @@
 # $File: pdf,v 1.6 2009/09/19 16:28:11 christos Exp $
 # pdf:  file(1) magic for Portable Document Format
 #
-0       string          %PDF-           PDF document,
->6	byte		!0x2e		invalid
->5      string          x               version: "%3s"
+0   string  %PDF-       PDF document,
+>6	byte    !0x2e		invalid
+>5  string  x           version: "%3s"
 
 #------------------------------------------------------------------------------
 # $File: zyxel,v 1.6 2009/09/19 16:28:13 christos Exp $

@@ -522,7 +522,7 @@
 # Obfuscated Arcadyan firmware
 0x68    belong  0x00D50800                      Obfuscated Arcadyan firmware,
 >0      belong  x                               signature bytes: 0x%X,
->0x70   belong  !\x00\x00\x00\x00\x00\x00\x00   invalid,
+>0x70   string  !\x00\x00\x00\x00\x00\x00\x00   invalid,
 >0x70   belong  0x00000000                      see https://github.com/devttys0/wrt120n/deobfuscator
 
 # Digi firmware images
@@ -578,10 +578,10 @@
 >>(198.L+206) belong   x                   \b, file size: %d bytes
 >>(198.L+206) belong   x                   \b{file-size:%d}
 >(198.L+202) belong    3
->>&4 string            @(RECENT_FIRMWARE)/ \b, alias:
->>&23 string           x                   "%s"
->>&(&0.L(0)) belong    x
->>>&4 belong           x                   \b, file size: %d bytes
+>>4 string             @(RECENT_FIRMWARE)/ \b, alias:
+>>23 string            x                   "%s"
+#>>(&0.L(0)) belong     x
+>>>4 belong            x                   \b, file size: %d bytes
 
 # Signatures to identify the start of a VxWorks symbol table
 8       string      \x00\x00\x05\x00\x00\x00\x00\x00    VxWorks symbol table, big endian,

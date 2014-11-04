@@ -195,11 +195,11 @@
 # For example the LaserJet 5L driver puts the "PJL ENTER LANGUAGE" in line 10
 # From: Uwe Bonnes <bon@elektron.ikp.physik.th-darmstadt.de>
 # 
-0       string          \033%-12345X@PJL        HP Printer Job Language data
->&0     string          >\0                     "%s"
->>&0    string          >\0                     "%s"
->>>&0   string          >\0                     "%s"
->>>>&0  string          >\0                     "%s"
+0       string          \033%-12345X@PJL        HP Printer Job Language data, "
+>0      string          >\0                     %s
+>>128   string          >\0                     %s
+>>>256  string          >\0                     %s
+>0      byte            x                       "
 
 #------------------------------------------------------------------------------
 #
