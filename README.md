@@ -6,13 +6,10 @@ Binwalk is a fast, easy to use tool for analyzing, reverse engineering, and extr
 Installation
 ============
 
-Binwalk follows the standard Unix configure/make installation procedure:
+Binwalk follows the standard Python installation procedure:
 
 ```bash
-$ autoreconf
-$ ./configure
-$ make
-$ sudo make install
+$ sudo python setup.py install
 ```
 
 If you're running Python 2.x, you'll also want to install the Python lzma module:
