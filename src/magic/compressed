@@ -81,7 +81,7 @@
 >7      byte            x                       \b.%d
 
 # standard unix compress
-# Implemented in the compress binwalk plugin.
+# Disabled until a python alternative can be foudn for the compress binwalk plugin.
 #0       string		\x1f\x9d\x90          compress'd data, 16 bits
 
 # http://tukaani.org/xz/xz-file-format.txt
@@ -164,8 +164,6 @@
 >6	byte&0x10	0x10			multi-block stream
 
 0	string	\xff\x06\x00\x00\x73\x4e\x61\x50\x70\x59	Snappy compression, stream identifier
-
-0   string	\x1f\x9d\x90	compress'd data, 16 bits
 
 #0	beshort		0x7801		Zlib header, no compression
 0	beshort		0x789c		Zlib compressed data, default compression
