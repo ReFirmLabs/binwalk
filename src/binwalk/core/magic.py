@@ -1,5 +1,4 @@
 import re
-import time
 import struct
 import datetime
 import binwalk.core.compat
@@ -7,14 +6,10 @@ import binwalk.core.compat
 class ParserException(Exception):
     pass
 
-class GenericContainer(object):
+class SignatureTag(object):
     def __init__(self, **kwargs):
         for (k,v) in binwalk.core.compat.iterator(kwargs):
             setattr(self, k, v)
-class DataType(GenericContainer):
-    pass
-class SignatureTag(GenericContainer):
-    pass
 
 class SignatureLine(object):
 
@@ -204,9 +199,34 @@ class Magic(object):
         '''
         self.data = ""
         self.signatures = []
+
         self.show_invalid = invalid
+        self.includes = [re.compile(x) for x in include]
+        self.excludes = [re.compile(x) for x in exclude]
+
         self.bspace = re.compile(".\\\\b")
         self.printable = re.compile("[ -~]*")
+
+    def filtered(self, text):
+        filtered = None
+
+        for include in self.includes:
+            if include.match(text):
+                filtered = False
+                break
+
+        if self.includes and filtered == None:
+            return True
+
+        for exclude in self.excludes:
+            if exclude.match(text):
+                filtered = True
+                break
+
+        if filtered == None:
+            filtered = False
+
+        return filtered
 
     def parse(self, signature, offset):
         description = []
@@ -309,7 +329,6 @@ class Magic(object):
         return tags
 
     def scan(self, data, dlen=None):
-        sigs = {}
         results = []
 
         self.data = data
@@ -318,17 +337,14 @@ class Magic(object):
             dlen = len(self.data)
 
         for signature in self.signatures:
-            offset = set([(match.start() - signature.offset) for match in signature.regex.finditer(self.data) if (match.start() - signature.offset) >= 0 and (match.start() - signature.offset) <= dlen])
-            sigs[signature] = offset
+            for match in signature.regex.finditer(self.data):
+                offset = match.start() - signature.offset
+                if offset >= 0 and offset <= dlen:
+                    tags = self.parse(signature, offset)
+                    if not tags['invalid'] or self.show_invalid:
+                        results.append(SignatureResult(**tags))
 
-        for (signature, offsets) in binwalk.core.compat.iterator(sigs):
-            for offset in offsets:
-                tags = self.parse(signature, offset)
-                if not tags['invalid'] or self.show_invalid:
-                    results.append(SignatureResult(**tags))
-                    if not self.show_invalid:
-                        break
-
+        results.sort(key=lambda x: x.offset, reverse=False)
         return results
 
     def load(self, fname):
@@ -349,7 +365,8 @@ class Magic(object):
                 sigline = SignatureLine(line)
                 if sigline.level == 0:
                     if signature:
-                        self.signatures.append(signature)
+                        if not self.filtered(signature.lines[0].format):
+                            self.signatures.append(signature)
                     signature = Signature(sigline)
                 elif signature:
                     signature.append(sigline)
@@ -357,7 +374,8 @@ class Magic(object):
                     raise ParserException("Invalid signature line: '%s'" % line)
 
         if signature:
-            self.signatures.append(signature)
+            if not self.filtered(signature.lines[0].format):
+                self.signatures.append(signature)
 
         fp.close()
 
