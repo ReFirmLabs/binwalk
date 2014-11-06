@@ -17,11 +17,11 @@
 
 # lzop from <markus.oberhumer@jk.uni-linz.ac.at>
 0	string		\x89\x4c\x5a\x4f\x00\x0d\x0a\x1a\x0a	lzop compressed data
->9	beshort		>0x093F     invalid
+>9	beshort		>0x093F     {invalid}
 >9	beshort		<0x0940
 >>9	byte&0xf0	=0x00		- version 0.
 >>9	beshort&0x0fff	x		\b%03x,
->>9 beshort&0x0fff  <1      invalid,
+>>9 beshort&0x0fff  <1      {invalid},
 >>13	byte		1		LZO1X-1,
 >>13	byte		2		LZO1X-1(15),
 >>13	byte		3		LZO1X-999,
@@ -58,9 +58,9 @@
 
 # lzip  
 0       string          LZIP            lzip compressed data,
->4      ubyte           0               invalid
+>4      ubyte           0               {invalid}
 # Current version is still 1.x
->4      ubyte           >4              invalid
+>4      ubyte           >4              {invalid}
 >4      byte            x               version: %d
 
 # lrzip
@@ -73,10 +73,10 @@
 # http://www.7-zip.org or DOC/7zFormat.txt 
 #
 0       string          7z\274\257\047\034      7-zip archive data,
->6	byte		<0			invalid
+>6	byte		<0			{invalid}
 >6	byte		0			
->>7	byte		0			invalid
->6	byte		>20			invalid
+>>7	byte		0			{invalid}
+>6	byte		>20			{invalid}
 >6      byte            x                       version %d
 >7      byte            x                       \b.%d
 
@@ -95,12 +95,12 @@
 #0       string          \037\213\x08    gzip compressed data
 0	string		\x1f\x8b\x08	gzip compressed data
 >3      byte            &0x01           \b, ASCII
->3	byte&0xE0	!0x00		\b, invalid reserved flag bits
+>3	byte&0xE0	!0x00		\b, {invalid} reserved flag bits
 >8	byte		2		\b, maximum compression
 >8	byte		4		\b, fastest compression
->8	byte		1		\b, invalid extra flags
->8	byte		3		\b, invalid extra flags
->8	byte		>4		\b, invalid extra flags
+>8	byte		1		\b, {invalid} extra flags
+>8	byte		3		\b, {invalid} extra flags
+>8	byte		>4		\b, {invalid} extra flags
 >3      byte            &0x02           \b, has header CRC
 >3      byte&0x04       0x04
 >>10	leshort		x		\b, has %d bytes of extra data
@@ -125,18 +125,18 @@
 >9      byte            =0x0C           \b, from QDOS
 >9      byte            =0x0D           \b, from Acorn RISCOS
 #>9	byte		=0xFF		\b, from ZyNOS
-#>9	byte		>0x0D		\b, invalid
+#>9	byte		>0x0D		\b, {invalid}
 #>>9	byte		x		source: 0x%.2X
-#>9	byte		<0		\b, invalid
+#>9	byte		<0		\b, {invalid}
 #>>9	byte		x		source: 0x%.2X
->3      byte            &0x20           \b, encrypted (invalid)
-# Dates before 1992 are invalid, unless of course you're DD-WRT in which
+>3      byte            &0x20           \b, encrypted ({invalid})
+# Dates before 1992 are {invalid}, unless of course you're DD-WRT in which
 # case you don't know how to set a date in your gzip files. Brilliant.
 >4	lelong		=0		\b, NULL date:
->4	lelong		<0		\b, invalid date:
+>4	lelong		<0		\b, {invalid} date:
 >4	lelong		>0		
->>4	lelong		<694224000	\b, invalid date:
->>4	lelong		=694224000	\b, invalid date:
+>>4	lelong		<694224000	\b, {invalid} date:
+>>4	lelong		=694224000	\b, {invalid} date:
 >>4	lelong		>694224000	\b, last modified:
 >4      ledate          x               %s
 >4	lelong		x		\b{file-epoch:%d}

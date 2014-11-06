@@ -14,38 +14,38 @@
 #>>>>>>>1	lelong	!4194304	
 #>>>>>>>>1	lelong	!8388608	
 #>>>>>>>>>1	lelong	!16777216	
-#>>>>>>>>>>1	lelong	!33554432	invalid
+#>>>>>>>>>>1	lelong	!33554432	{invalid}
 #>1		lelong	x		dictionary size: %d bytes,
 #
 ## Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 ## This could technically be valid, but is unlikely.
 #>5		lequad	!-1
-#>>5		lequad	<32		invalid
-#>>5		lequad	>0x40000000	invalid
+#>>5		lequad	<32		{invalid}
+#>>5		lequad	>0x40000000	{invalid}
 #
 ## These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 ## Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-## marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+## marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 #>1		lelong	65536
-#>>5		lequad	65536		invalid
+#>>5		lequad	65536		{invalid}
 #>1		lelong	131072
-#>>5		lequad	131072		invalid
+#>>5		lequad	131072		{invalid}
 #>1		lelong	262144
-#>>5		lequad	262144		invalid
+#>>5		lequad	262144		{invalid}
 #>1		lelong	524288
-#>>5		lequad	524288		invalid
+#>>5		lequad	524288		{invalid}
 #>1		lelong	1048576
-#>>5		lequad	1048576		invalid
+#>>5		lequad	1048576		{invalid}
 #>1		lelong	2097152
-#>>5		lequad	2097152		invalid
+#>>5		lequad	2097152		{invalid}
 #>1		lelong	4194304
-#>>5		lequad	4194304		invalid
+#>>5		lequad	4194304		{invalid}
 #>1		lelong	8388608
-#>>5		lequad	8388608		invalid
+#>>5		lequad	8388608		{invalid}
 #>1		lelong	16777216
-#>>5		lequad	16777216	invalid
+#>>5		lequad	16777216	{invalid}
 #>1		lelong	33554432
-#>>5		lequad	33554432	invalid
+#>>5		lequad	33554432	{invalid}
 #>5		lequad	x		uncompressed size: %lld bytes
 #
 #
@@ -64,38 +64,38 @@
 #>>>>>>>1	lelong	!4194304	
 #>>>>>>>>1	lelong	!8388608	
 #>>>>>>>>>1	lelong	!16777216	
-#>>>>>>>>>>1	lelong	!33554432	invalid
+#>>>>>>>>>>1	lelong	!33554432	{invalid}
 #>1		lelong	x		dictionary size: %d bytes,
 #
 ## Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 ## This could technically be valid, but is unlikely.
 #>5		lequad	!-1
-#>>5		lequad	<32		invalid
-#>>5		lequad	>0x40000000	invalid
+#>>5		lequad	<32		{invalid}
+#>>5		lequad	>0x40000000	{invalid}
 #
 ## These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 ## Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-## marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+## marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 #>1		lelong	65536
-#>>5		lequad	65536		invalid
+#>>5		lequad	65536		{invalid}
 #>1		lelong	131072
-#>>5		lequad	131072		invalid
+#>>5		lequad	131072		{invalid}
 #>1		lelong	262144
-#>>5		lequad	262144		invalid
+#>>5		lequad	262144		{invalid}
 #>1		lelong	524288
-#>>5		lequad	524288		invalid
+#>>5		lequad	524288		{invalid}
 #>1		lelong	1048576
-#>>5		lequad	1048576		invalid
+#>>5		lequad	1048576		{invalid}
 #>1		lelong	2097152
-#>>5		lequad	2097152		invalid
+#>>5		lequad	2097152		{invalid}
 #>1		lelong	4194304
-#>>5		lequad	4194304		invalid
+#>>5		lequad	4194304		{invalid}
 #>1		lelong	8388608
-#>>5		lequad	8388608		invalid
+#>>5		lequad	8388608		{invalid}
 #>1		lelong	16777216
-#>>5		lequad	16777216	invalid
+#>>5		lequad	16777216	{invalid}
 #>1		lelong	33554432
-#>>5		lequad	33554432	invalid
+#>>5		lequad	33554432	{invalid}
 #>5		lequad	x		uncompressed size: %lld bytes
 #
 #
@@ -114,38 +114,38 @@
 #>>>>>>>1	lelong	!4194304	
 #>>>>>>>>1	lelong	!8388608	
 #>>>>>>>>>1	lelong	!16777216	
-#>>>>>>>>>>1	lelong	!33554432	invalid
+#>>>>>>>>>>1	lelong	!33554432	{invalid}
 #>1		lelong	x		dictionary size: %d bytes,
 #
 ## Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 ## This could technically be valid, but is unlikely.
 #>5		lequad	!-1
-#>>5		lequad	<32		invalid
-#>>5		lequad	>0x40000000	invalid
+#>>5		lequad	<32		{invalid}
+#>>5		lequad	>0x40000000	{invalid}
 #
 ## These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 ## Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-## marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+## marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 #>1		lelong	65536
-#>>5		lequad	65536		invalid
+#>>5		lequad	65536		{invalid}
 #>1		lelong	131072
-#>>5		lequad	131072		invalid
+#>>5		lequad	131072		{invalid}
 #>1		lelong	262144
-#>>5		lequad	262144		invalid
+#>>5		lequad	262144		{invalid}
 #>1		lelong	524288
-#>>5		lequad	524288		invalid
+#>>5		lequad	524288		{invalid}
 #>1		lelong	1048576
-#>>5		lequad	1048576		invalid
+#>>5		lequad	1048576		{invalid}
 #>1		lelong	2097152
-#>>5		lequad	2097152		invalid
+#>>5		lequad	2097152		{invalid}
 #>1		lelong	4194304
-#>>5		lequad	4194304		invalid
+#>>5		lequad	4194304		{invalid}
 #>1		lelong	8388608
-#>>5		lequad	8388608		invalid
+#>>5		lequad	8388608		{invalid}
 #>1		lelong	16777216
-#>>5		lequad	16777216	invalid
+#>>5		lequad	16777216	{invalid}
 #>1		lelong	33554432
-#>>5		lequad	33554432	invalid
+#>>5		lequad	33554432	{invalid}
 #>5		lequad	x		uncompressed size: %lld bytes
 #
 #
@@ -164,38 +164,38 @@
 #>>>>>>>1	lelong	!4194304	
 #>>>>>>>>1	lelong	!8388608	
 #>>>>>>>>>1	lelong	!16777216	
-#>>>>>>>>>>1	lelong	!33554432	invalid
+#>>>>>>>>>>1	lelong	!33554432	{invalid}
 #>1		lelong	x		dictionary size: %d bytes,
 #
 ## Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 ## This could technically be valid, but is unlikely.
 #>5		lequad	!-1
-#>>5		lequad	<32		invalid
-#>>5		lequad	>0x40000000	invalid
+#>>5		lequad	<32		{invalid}
+#>>5		lequad	>0x40000000	{invalid}
 #
 ## These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 ## Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-## marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+## marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 #>1		lelong	65536
-#>>5		lequad	65536		invalid
+#>>5		lequad	65536		{invalid}
 #>1		lelong	131072
-#>>5		lequad	131072		invalid
+#>>5		lequad	131072		{invalid}
 #>1		lelong	262144
-#>>5		lequad	262144		invalid
+#>>5		lequad	262144		{invalid}
 #>1		lelong	524288
-#>>5		lequad	524288		invalid
+#>>5		lequad	524288		{invalid}
 #>1		lelong	1048576
-#>>5		lequad	1048576		invalid
+#>>5		lequad	1048576		{invalid}
 #>1		lelong	2097152
-#>>5		lequad	2097152		invalid
+#>>5		lequad	2097152		{invalid}
 #>1		lelong	4194304
-#>>5		lequad	4194304		invalid
+#>>5		lequad	4194304		{invalid}
 #>1		lelong	8388608
-#>>5		lequad	8388608		invalid
+#>>5		lequad	8388608		{invalid}
 #>1		lelong	16777216
-#>>5		lequad	16777216	invalid
+#>>5		lequad	16777216	{invalid}
 #>1		lelong	33554432
-#>>5		lequad	33554432	invalid
+#>>5		lequad	33554432	{invalid}
 #>5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -214,38 +214,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -264,38 +264,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -314,38 +314,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -364,38 +364,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -414,38 +414,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -464,38 +464,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -514,38 +514,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -564,38 +564,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -614,38 +614,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -664,38 +664,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -714,38 +714,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -764,38 +764,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -814,38 +814,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -864,38 +864,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -914,38 +914,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -964,38 +964,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1014,38 +1014,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1064,38 +1064,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1114,38 +1114,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1164,38 +1164,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1214,38 +1214,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1264,38 +1264,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1314,38 +1314,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1364,38 +1364,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1414,38 +1414,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1464,38 +1464,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1514,38 +1514,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1564,38 +1564,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1614,38 +1614,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1664,38 +1664,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1714,38 +1714,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1764,38 +1764,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1814,38 +1814,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1864,38 +1864,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1914,38 +1914,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -1964,38 +1964,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -2014,38 +2014,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -2064,38 +2064,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -2114,38 +2114,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -2164,38 +2164,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -2214,38 +2214,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -2264,38 +2264,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -2314,38 +2314,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -2364,38 +2364,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -2414,38 +2414,38 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 
 
@@ -2464,37 +2464,37 @@
 >>>>>>>1	lelong	!4194304	
 >>>>>>>>1	lelong	!8388608	
 >>>>>>>>>1	lelong	!16777216	
->>>>>>>>>>1	lelong	!33554432	invalid
+>>>>>>>>>>1	lelong	!33554432	{invalid}
 >1		lelong	x		dictionary size: %d bytes,
 
 # Assume that a valid size will be greater than 32 bytes and less than 1GB (a value of -1 IS valid).
 # This could technically be valid, but is unlikely.
 >5		lequad	!-1
->>5		lequad	<32		invalid
->>5		lequad	>0x40000000	invalid
+>>5		lequad	<32		{invalid}
+>>5		lequad	>0x40000000	{invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
-# marking matches with the same uncompressed and dictionary sizes as invalid eliminates much of these false positives.
+# marking matches with the same uncompressed and dictionary sizes as {invalid} eliminates much of these false positives.
 >1		lelong	65536
->>5		lequad	65536		invalid
+>>5		lequad	65536		{invalid}
 >1		lelong	131072
->>5		lequad	131072		invalid
+>>5		lequad	131072		{invalid}
 >1		lelong	262144
->>5		lequad	262144		invalid
+>>5		lequad	262144		{invalid}
 >1		lelong	524288
->>5		lequad	524288		invalid
+>>5		lequad	524288		{invalid}
 >1		lelong	1048576
->>5		lequad	1048576		invalid
+>>5		lequad	1048576		{invalid}
 >1		lelong	2097152
->>5		lequad	2097152		invalid
+>>5		lequad	2097152		{invalid}
 >1		lelong	4194304
->>5		lequad	4194304		invalid
+>>5		lequad	4194304		{invalid}
 >1		lelong	8388608
->>5		lequad	8388608		invalid
+>>5		lequad	8388608		{invalid}
 >1		lelong	16777216
->>5		lequad	16777216	invalid
+>>5		lequad	16777216	{invalid}
 >1		lelong	33554432
->>5		lequad	33554432	invalid
+>>5		lequad	33554432	{invalid}
 >5		lequad	x		uncompressed size: %lld bytes
 

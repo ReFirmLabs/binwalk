@@ -1,64 +1,377 @@
-# Python wrapper for the libmagic library.
-# Although libmagic comes with its own wrapper, there are compatibility issues with older libmagic versions
-# as well as unofficial libmagic Python wrappers, so it's easier to just have our own wrapper.
+import re
+import time
+import struct
+import datetime
+import binwalk.core.compat
 
-import binwalk.core.C
-import binwalk.core.common
-from ctypes import *
-from binwalk.core.compat import *
-
-class magic_set(Structure):
+class ParserException(Exception):
     pass
-magic_set._fields_ = []
-magic_t = POINTER(magic_set)
+
+class GenericContainer(object):
+    def __init__(self, **kwargs):
+        for (k,v) in binwalk.core.compat.iterator(kwargs):
+            setattr(self, k, v)
+class DataType(GenericContainer):
+    pass
+class SignatureTag(GenericContainer):
+    pass
+
+class SignatureLine(object):
+
+    def __init__(self, line):
+        self.tags = []
+
+        line = line.replace('\\ ', '\x20')
+
+        parts = line.split(None, 3)
+
+        self.level = parts[0].count('>')
+
+        self.offset = parts[0].replace('>', '')
+        try:
+            self.offset = int(self.offset, 0)
+        except ValueError as e:
+            pass
+
+        if '&' in parts[1]:
+            (self.type, self.bitmask) = parts[1].split('&', 1)
+            self.boolean = '&'
+            self.bitmask = int(self.bitmask, 0)
+        else:
+            self.type = parts[1]
+            self.boolean = None
+            self.bitmask = None
+
+        if parts[2][0] in ['=', '!', '>', '<', '&', '|']:
+            self.condition = parts[2][0]
+            self.value = parts[2][1:]
+        else:
+            self.condition = '='
+            self.value = parts[2]
+
+        if self.value == 'x':
+            self.value = None
+        elif self.type == 'string':
+            try:
+                self.value = binwalk.core.compat.string_decode(self.value)
+            except ValueError as e:
+                raise ParserException("Failed to decode string value '%s' in line '%s'" % (self.value, line))
+        else:
+            self.value = int(self.value, 0)
+
+        if len(parts) == 4:
+            self.format = parts[3].replace('%ll', '%l')
+            retag = re.compile(r'\{.*?\}')
+
+            # Parse out tag keywords from the format string
+            for tag in [m.group() for m in retag.finditer(self.format)]:
+                tag = tag.replace('{', '').replace('}', '')
+                if ':' in tag:
+                    (n, v) = tag.split(':', 1)
+                else:
+                    n = tag
+                    v = True
+                self.tags.append(SignatureTag(name=n, value=v))
+
+            # Remove tags from the printable format string
+            self.format = retag.sub('', self.format).strip()
+        else:
+            self.format = ""
+
+        if self.type[0] == 'u':
+            self.signed = False
+            self.type = self.type[1:]
+        else:
+            self.signed = True
+
+        if self.type.startswith('be'):
+            self.type = self.type[2:]
+            self.endianess = '>'
+        elif self.type.startswith('le'):
+            self.endianess = '<'
+            self.type = self.type[2:]
+        else:
+            self.endianess = '<'
+
+        if self.type == 'string':
+            self.fmt = None
+            if self.value:
+                self.size = len(self.value)
+            else:
+                self.size = 128
+        elif self.type == 'byte':
+            self.fmt = 'b'
+            self.size = 1
+        elif self.type == 'short':
+            self.fmt = 'h'
+            self.size = 2
+        elif self.type == 'quad':
+            self.fmt = 'q'
+            self.size = 8
+        else:
+            self.fmt = 'i'
+            self.size = 4
+
+        if self.fmt:
+            self.pkfmt = '%c%c' % (self.endianess, self.fmt)
+        else:
+            self.pkfmt = None
+
+        if not self.signed:
+            self.fmt = self.fmt.upper()
+
+class Signature(object):
+
+    def __init__(self, first_line):
+        self.lines = [first_line]
+        self.offset = first_line.offset
+        self.confidence = first_line.size
+        self.regex = self.generate_regex(first_line)
+
+    def generate_regex(self, line):
+        restr = ""
+
+        if line.type in ['string']:
+            restr = re.escape(line.value)
+        elif line.size == 1:
+            restr = re.escape(chr(line.value))
+        elif line.size == 2:
+            if line.endianess == '<':
+                restr = re.escape(chr(line.value & 0xFF) + chr(line.value >> 8))
+            elif line.endianess == '>':
+                restr = re.escape(chr(line.value >> 8) + chr(line.value & 0xFF))
+        elif line.size == 4:
+            if line.endianess == '<':
+                restr = re.escape(chr(line.value & 0xFF) +
+                                  chr((line.value >> 8) & 0xFF) +
+                                  chr((line.value >> 16) & 0xFF) +
+                                  chr(line.value >> 24))
+            elif line.endianess == '>':
+                restr = re.escape(chr(line.value >> 24) +
+                                  chr((line.value >> 16) & 0xFF) +
+                                  chr((line.value >> 8) & 0xFF) +
+                                  chr(line.value & 0xFF))
+        elif line.size == 8:
+            if line.endianess == '<':
+                restr = re.escape(chr(line.value & 0xFF) +
+                                  chr((line.value >> 8) & 0xFF) +
+                                  chr((line.value >> 16) & 0xFF) +
+                                  chr((line.value >> 24) & 0xFF) +
+                                  chr((line.value >> 32) & 0xFF) +
+                                  chr((line.value >> 40) & 0xFF) +
+                                  chr((line.value >> 48) & 0xFF) +
+                                  chr(line.value >> 56))
+            elif line.endianess == '>':
+                restr = re.escape(chr(line.value >> 56) +
+                                  chr((line.value >> 48) & 0xFF) +
+                                  chr((line.value >> 40) & 0xFF) +
+                                  chr((line.value >> 32) & 0xFF) +
+                                  chr((line.value >> 24) & 0xFF) +
+                                  chr((line.value >> 16) & 0xFF) +
+                                  chr((line.value >> 8) & 0xFF) +
+                                  chr(line.value & 0xFF))
+
+        return re.compile(restr)
+
+    def append(self, line):
+        self.lines.append(line)
+
+class SignatureResult(object):
+
+    def __init__(self, **kwargs):
+        self.offset = 0
+        self.adjust = 0
+        self.jump = 0
+        self.size = 0
+        self.description = ""
+        self.valid = True
+        self.invalid = False
+        self.display = True
+        self.file = None
+
+        for (k,v) in binwalk.core.compat.iterator(kwargs):
+            setattr(self, k, v)
 
 class Magic(object):
-    '''
-    Minimalist Python wrapper around libmagic.
-    '''
 
-    LIBMAGIC_FUNCTIONS = [
-            binwalk.core.C.Function(name="magic_open", type=magic_t),
-            binwalk.core.C.Function(name="magic_close", type=int),
-            binwalk.core.C.Function(name="magic_load", type=int),
-            binwalk.core.C.Function(name="magic_buffer", type=str),
-    ]
+    def __init__(self, exclude=[], include=[], invalid=False):
+        '''
+        Class constructor.
 
-    MAGIC_CONTINUE          = 0x000020
-    MAGIC_NO_CHECK_TEXT     = 0x020000
-    MAGIC_NO_CHECK_APPTYPE  = 0x008000
-    MAGIC_NO_CHECK_TOKENS   = 0x100000
-    MAGIC_NO_CHECK_ENCODING = 0x200000
+        @invalid - If set to True, invalid results will not be ignored.
 
-    MAGIC_FLAGS = MAGIC_NO_CHECK_TEXT | MAGIC_NO_CHECK_ENCODING | MAGIC_NO_CHECK_APPTYPE | MAGIC_NO_CHECK_TOKENS
+        Returns None.
+        '''
+        self.data = ""
+        self.signatures = []
+        self.show_invalid = invalid
+        self.bspace = re.compile(".\\\\b")
+        self.printable = re.compile("[ -~]*")
 
-    LIBRARY = "magic"
+    def parse(self, signature, offset):
+        description = []
+        max_line_level = 0
+        tags = {'offset' : offset, 'invalid' : False}
 
-    def __init__(self, magic_file=None, flags=0, keep_going=False):
-        if magic_file:
-            self.magic_file = str2bytes(magic_file)
-        else:
-            self.magic_file = None
+        for line in signature.lines:
+            if line.level <= max_line_level:
+                if isinstance(line.offset, int):
+                    line_offset = line.offset
+                else:
+                    # (4.l+12)
+                    if '.' in line.offset:
+                        (o, t) = line.offset.split('.', 1)
+                        o = offset + int(o.split('(', 1)[1], 0)
+                        t = t[0]
 
-        if keep_going:
-            flags = flags | self.MAGIC_CONTINUE
+                        try:
+                            if t in ['b', 'B']:
+                                v = struct.unpack('b', binwalk.core.compat.str2bytes(self.data[o:o+1]))[0]
+                            elif t == 's':
+                                v = struct.unpack('<h', binwalk.core.compat.str2bytes(self.data[o:o+2]))[0]
+                            elif t == 'l':
+                                v = struct.unpack('<i', binwalk.core.compat.str2bytes(self.data[o:o+4]))[0]
+                            elif t == 'S':
+                                v = struct.unpack('>h', binwalk.core.compat.str2bytes(self.data[o:o+2]))[0]
+                            elif t == 'L':
+                                v = struct.unpack('>i', binwalk.core.compat.str2bytes(self.data[o:o+4]))[0]
+                        except struct.error as e:
+                            v = 0
 
-        self.libmagic = binwalk.core.C.Library(self.LIBRARY, self.LIBMAGIC_FUNCTIONS)
+                        v = "(%d%s" % (v, line.offset.split(t, 1)[1])
+                    # (32+0x20)
+                    else:
+                        v = line.offset
 
-        binwalk.core.common.debug("libmagic.magic_open(0x%X)" % (self.MAGIC_FLAGS | flags))
-        self.magic_cookie = self.libmagic.magic_open(self.MAGIC_FLAGS | flags)
+                    #print ("Converted offset '%s' to '%s'" % (line.offset, v))
+                    line_offset = binwalk.core.common.MathExpression(v).value
 
-        binwalk.core.common.debug("libmagic.magic_load(%s, %s)" % (type(self.magic_cookie), self.magic_file))
-        self.libmagic.magic_load(self.magic_cookie, self.magic_file)
-        binwalk.core.common.debug("libmagic loaded OK!")
+                start = offset + line_offset
+                end = start + line.size
 
-    def close(self):
-        if self.magic_cookie:
-            self.libmagic.magic_close(self.magic_cookie)
-            del self.magic_cookie
-            self.magic_cookie = None
+                if line.pkfmt:
+                    try:
+                        dvalue = struct.unpack(line.pkfmt, binwalk.core.compat.str2bytes(self.data[start:end]))[0]
+                    except struct.error as e:
+                        dvalue = 0
+                elif line.size:
+                    dvalue = self.data[start:end]
+                    if line.value is None:
+                        dvalue = dvalue.split('\x00')[0].split('\r')[0].split('\r')[0]
 
-    def buffer(self, data):
-        if self.magic_cookie:
-            return self.libmagic.magic_buffer(self.magic_cookie, str2bytes(data), len(data))
+                if line.boolean == '&':
+                    dvalue &= line.bitmask
 
+                if ((line.value is None) or
+                    (line.condition == '=' and dvalue == line.value) or
+                    (line.condition == '>' and dvalue > line.value) or
+                    (line.condition == '<' and dvalue < line.value) or
+                    (line.condition == '!' and dvalue != line.value) or
+                    (line.condition == '&' and (dvalue & line.value)) or
+                    (line.condition == '|' and (dvalue | line.value))):
+
+                    if line.type == 'date':
+                        ts = datetime.datetime.utcfromtimestamp(dvalue)
+                        dvalue = ts.strftime("%Y-%m-%d %H:%M:%S")
+
+                    if '%' in line.format:
+                        description.append(line.format % dvalue)
+                    else:
+                        description.append(line.format)
+
+                    for tag in line.tags:
+                        if isinstance(tag.value, str) and '%' in tag.value:
+                            tags[tag.name] = tag.value % dvalue
+                        else:
+                            try:
+                                tags[tag.name] = int(tag.value, 0)
+                            except KeyboardInterrupt as e:
+                                raise e
+                            except Exception as e:
+                                tags[tag.name] = tag.value
+
+                    # Abort abort abort
+                    if not self.show_invalid and tags['invalid']:
+                        break
+
+                    max_line_level = line.level + 1
+                else:
+                    max_line_level = line.level
+
+        tags['description'] = self.bspace.sub('', " ".join(description))
+
+        if (('\\' in tags['description']) or
+           (self.printable.match(tags['description']).group() != tags['description'])):
+            tags['invalid'] = True
+
+        tags['valid'] = (not tags['invalid'])
+
+        return tags
+
+    def scan(self, data, dlen=None):
+        sigs = {}
+        results = []
+
+        self.data = data
+
+        if dlen is None:
+            dlen = len(self.data)
+
+        for signature in self.signatures:
+            offset = set([(match.start() - signature.offset) for match in signature.regex.finditer(self.data) if (match.start() - signature.offset) >= 0 and (match.start() - signature.offset) <= dlen])
+            sigs[signature] = offset
+
+        for (signature, offsets) in binwalk.core.compat.iterator(sigs):
+            for offset in offsets:
+                tags = self.parse(signature, offset)
+                if not tags['invalid'] or self.show_invalid:
+                    results.append(SignatureResult(**tags))
+                    if not self.show_invalid:
+                        break
+
+        return results
+
+    def load(self, fname):
+        '''
+        Load signatures from a file.
+
+        @fname - Path to signature file.
+
+        Returns None.
+        '''
+        signature = None
+
+        fp = open(fname, "r")
+
+        for line in fp.readlines():
+            line = line.split('#')[0].strip()
+            if line:
+                sigline = SignatureLine(line)
+                if sigline.level == 0:
+                    if signature:
+                        self.signatures.append(signature)
+                    signature = Signature(sigline)
+                elif signature:
+                    signature.append(sigline)
+                else:
+                    raise ParserException("Invalid signature line: '%s'" % line)
+
+        if signature:
+            self.signatures.append(signature)
+
+        fp.close()
+
+        self.signatures.sort(key=lambda x: x.confidence, reverse=True)
+
+
+
+
+if __name__ == '__main__':
+    import sys
+
+    m = Magic(invalid=True)
+    m.load(sys.argv[1])
+    print ("Loaded %d signatures" % len(m.signatures))
+    for signature in m.scan(open(sys.argv[2], "r").read()):
+        if signature.valid:
+            print (signature.offset, signature.description)

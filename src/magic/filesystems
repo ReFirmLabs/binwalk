@@ -5,25 +5,25 @@
 >0x402  beshort     x                           %d zones
 >0x1e   string      minix                       \b, bootable
 >0x1e   string      !minix
->>0x1e  string      !\x00\x00\x00\x00\x00       invalid
+>>0x1e  string      !\x00\x00\x00\x00\x00       {invalid}
 
 0x410   string      \x13\x7f\x00\x00\x00\x00    Minix filesystem, V1, big endian,
 >0x402  beshort     x                           %d zones
 >0x1e   string      minix                       \b, bootable
 >0x1e   string      !minix
->>0x1e  string      !\x00\x00\x00\x00\x00       invalid
+>>0x1e  string      !\x00\x00\x00\x00\x00       {invalid}
 
 0x410   string      \x8f\x13\x00\x00\x00\x00    Minix filesystem, V1, little endian, 30 char names,
 >0x402  beshort     x                           %d zones
 >0x1e   string      minix                       \b, bootable
 >0x1e   string      !minix
->>0x1e  string      !\x00\x00\x00\x00\x00       invalid
+>>0x1e  string      !\x00\x00\x00\x00\x00       {invalid}
 
 0x410   string      \x13\x8f\x00\x00\x00\x00    Minix filesystem, V1, big endian, 30 char names,
 >0x402  beshort     x                           %d zones
 >0x1e   string      minix                       \b, bootable
 >0x1e   string      !minix
->>0x1e  string      !\x00\x00\x00\x00\x00       invalid
+>>0x1e  string      !\x00\x00\x00\x00\x00       {invalid}
 
 #0x410   leshort     0x2468      Minix filesystem, V2, little endian,
 #>0x402  beshort     x           %d zones
@@ -38,7 +38,7 @@
 
 # EFS2 file system - jojo@utulsa.edu
 0      lelong       0x53000000       EFS2 Qualcomm filesystem super block, little endian,
->8     string       !EFSSuper        invalid,
+>8     string       !EFSSuper        {invalid},
 >4     leshort&0x01 1                NAND
 >4     leshort&0x01 0                NOR
 >4     leshort      x                version 0x%x,
@@ -47,7 +47,7 @@
 >20    lelong       x                0x%x bytes per page
 
 0      belong       0x53000000       EFS2 Qualcomm filesystem super block, big endian,
->8     string       !SSFErepu	     invalid,
+>8     string       !SSFErepu	     {invalid},
 >4     beshort&0x01 1                NAND
 >4     beshort&0x01 0                NOR
 >4     beshort      x                version 0x%x,
@@ -58,7 +58,7 @@
 # TROC file system
 0	string	TROC    TROC filesystem,
 >4	lelong	x		%d file entries
->4  lelong  <1      (invalid)
+>4  lelong  <1      ({invalid})
 
 # PFS file system
 0	string	PFS/		PFS filesystem,
@@ -73,33 +73,33 @@
 
 # cramfs filesystem - russell@coker.com.au
 0       lelong  0x28cd3d45      CramFS filesystem, little endian
->4	lelong	<0		invalid
->4	lelong	>1073741824	invalid
+>4	lelong	<0		{invalid}
+>4	lelong	>1073741824	{invalid}
 >4      lelong  x 		size %u
 >8      lelong  &1 		version #2
 >8      lelong  &2 		sorted_dirs
 >8      lelong  &4 		hole_support
 >32     lelong  x 		CRC 0x%x,
 >36     lelong  x 		edition %u,
->40	lelong	<0		invalid
+>40	lelong	<0		{invalid}
 >40     lelong  x 		%u blocks,
->44	lelong	<0		invalid
+>44	lelong	<0		{invalid}
 >44     lelong  x 		%u files
 >4      lelong  x 		{jump-to-offset:%u}
 >4      lelong  x 		{file-size:%u}
 
 0       belong  0x28cd3d45      CramFS filesystem, big endian
->4	belong	<0		invalid
->4	belong	>1073741824	invalid
+>4	belong	<0		{invalid}
+>4	belong	>1073741824	{invalid}
 >4      belong  x 		size %u
 >8      belong  &1 		version #2
 >8      belong  &2 		sorted_dirs
 >8      belong  &4 		hole_support
 >32     belong  x 		CRC 0x%x,
 >36     belong  x 		edition %u,
->40	belong	<0		invalid
+>40	belong	<0		{invalid}
 >40     belong  x 		%u blocks,
->44	belong	<0		invalid
+>44	belong	<0		{invalid}
 >44     belong  x 		%u files
 >4      belong  x 		{jump-to-offset:%u}
 >4      belong  x 		{file-size:%u}
@@ -120,7 +120,7 @@
 >>>>2		leshort !0x2004
 >>>>>2		leshort !0x2006
 >>>>>>2		leshort !0xE008
->>>>>>>2	leshort !0xE009	\b, invalid
+>>>>>>>2	leshort !0xE009	\b, {invalid}
 >(4.l)		leshort !0x1985		
 >>(4.l+1)	leshort !0x1985	
 >>>(4.l+2)	leshort !0x1985	
@@ -128,9 +128,9 @@
 >>>>>(4.l)      leshort !0xFFFF
 >>>>>>(4.l+1)   leshort !0xFFFF
 >>>>>>>(4.l+2)  leshort !0xFFFF
->>>>>>>>(4.l+3) leshort !0xFFFF \b, invalid
->4		lelong	0	invalid
->4		lelong	<0	invalid
+>>>>>>>>(4.l+3) leshort !0xFFFF \b, {invalid}
+>4		lelong	0	{invalid}
+>4		lelong	<0	{invalid}
 >4		lelong	x	{one-of-many}{jump-to-offset:%d}
 
 0       	beshort 0x1985	JFFS2 filesystem, big endian
@@ -140,7 +140,7 @@
 >>>>2		beshort !0x2004
 >>>>>2		beshort !0x2006
 >>>>>>2		beshort !0xE008
->>>>>>>2	beshort !0xE009	\b, invalid
+>>>>>>>2	beshort !0xE009	\b, {invalid}
 >(4.L)		beshort	!0x1985	 
 >>(4.L+1)	beshort	!0x1985	 
 >>>(4.L+2)	beshort	!0x1985
@@ -148,17 +148,17 @@
 >>>>>(4.L)	beshort !0xFFFF
 >>>>>>(4.L+1)	beshort !0xFFFF
 >>>>>>>(4.L+2)	beshort !0xFFFF
->>>>>>>>(4.L+3)	beshort !0xFFFF \b, invalid
->4		belong	0	invalid
->4		belong	<0	invalid
+>>>>>>>>(4.L+3)	beshort !0xFFFF \b, {invalid}
+>4		belong	0	{invalid}
+>4		belong	<0	{invalid}
 >4		belong	x	{one-of-many}{jump-to-offset:%d}
 
 
 # Squashfs, big endian
 0       string  sqsh    Squashfs filesystem, big endian,
->28     beshort >10     invalid
->28     beshort <1      invalid
->30	beshort >10	invalid
+>28     beshort >10     {invalid}
+>28     beshort <1      {invalid}
+>30	beshort >10	{invalid}
 >28     beshort x       version %d.
 >30     beshort x       \b%d,
 >28     beshort >3      compression:
@@ -166,8 +166,8 @@
 >>20    beshort 2       \blzma,
 >>20	beshort 3	\bgzip (non-standard type definition),
 >>20	beshort 4	\blzma (non-standard type definition),
->>20    beshort 0       \binvalid,
->>20    beshort >4      \binvalid,
+>>20    beshort 0       \b{invalid},
+>>20    beshort >4      \b{invalid},
 >28     beshort <3
 >>8     belong  x       size: %d bytes,
 >>8	    belong	x	\b{jump-to-offset:%d}
@@ -198,9 +198,9 @@
 
 # Squashfs, little endian
 0       string  hsqs    Squashfs filesystem, little endian,
->28     leshort >10     invalid
->28     leshort <1      invalid
->30	leshort >10	invalid
+>28     leshort >10     {invalid}
+>28     leshort <1      {invalid}
+>30	leshort >10	{invalid}
 >28     leshort x       version %d.
 >30     leshort x       \b%d,
 >28	leshort >3	compression:
@@ -208,8 +208,8 @@
 >>20	leshort	2	\blzma,
 >>20	leshort 3	\bgzip (non-standard type definition),
 >>20	leshort 4	\blzma (non-standard type definition),
->>20	leshort 0	\binvalid,
->>20	leshort >4	\binvalid,
+>>20	leshort 0	\b{invalid},
+>>20	leshort >4	\b{invalid},
 >28     leshort <3
 >>8     lelong  x       size: %d bytes,
 >>8     lelong  x       {file-size:%d}
@@ -243,9 +243,9 @@
 
 # Squashfs with LZMA compression
 0       string  sqlz    Squashfs filesystem, big endian, lzma compression, 
->28     beshort >10     invalid
->28     beshort <1      invalid
->30	beshort >10	invalid
+>28     beshort >10     {invalid}
+>28     beshort <1      {invalid}
+>30	beshort >10	{invalid}
 >28     beshort x       version %d.
 >30     beshort x       \b%d,
 >28     beshort >3      compression:
@@ -253,8 +253,8 @@
 >>20    beshort 2       \blzma,
 >>20	beshort 3	\bgzip (non-standard type definition),
 >>20	beshort 4	\blzma (non-standard type definition),
->>20    beshort 0       \binvalid,
->>20    beshort >4      \binvalid,
+>>20    beshort 0       \b{invalid},
+>>20    beshort >4      \b{invalid},
 >28     beshort <3
 >>8     belong  x       size: %d bytes,
 >>8     belong  x       {file-size:%d}
@@ -288,9 +288,9 @@
 
 # Squashfs 3.3 LZMA signature
 0       string  qshs    Squashfs filesystem, big endian, lzma signature,
->28     beshort >10     invalid
->28     beshort <1      invalid
->30	beshort >10	invalid
+>28     beshort >10     {invalid}
+>28     beshort <1      {invalid}
+>30	beshort >10	{invalid}
 >28     beshort x       version %d.
 >30     beshort x       \b%d,
 >28     beshort >3      compression:
@@ -298,8 +298,8 @@
 >>20    beshort 2       \blzma,
 >>20	beshort 3	\bgzip (non-standard type definition),
 >>20	beshort 4	\blzma (non-standard type definition),
->>20    beshort 0       \binvalid,
->>20    beshort >4      \binvalid,
+>>20    beshort 0       \b{invalid},
+>>20    beshort >4      \b{invalid},
 >28     beshort <3
 >>8     belong  x       size: %d bytes,
 >>8     belong  x       {file-size:%d}
@@ -333,9 +333,9 @@
 
 # Squashfs for DD-WRT
 0       string  tqsh    Squashfs filesystem, big endian, DD-WRT signature,
->28     beshort >10     invalid
->28     beshort <1      invalid
->30	beshort >10	invalid
+>28     beshort >10     {invalid}
+>28     beshort <1      {invalid}
+>30	beshort >10	{invalid}
 >28     beshort x       version %d.
 >30     beshort x       \b%d,
 >28     beshort >3      compression:
@@ -343,8 +343,8 @@
 >>20    beshort 2       \blzma,
 >>20	beshort 3	\bgzip (non-standard type definition),
 >>20	beshort 4	\blzma (non-standard type definition),
->>20    beshort 0       \binvalid,
->>20    beshort >4      \binvalid,
+>>20    beshort 0       \b{invalid},
+>>20    beshort >4      \b{invalid},
 >28     beshort <3
 >>8     belong  x       size: %d bytes,
 >>8     belong  x       {file-size:%d}
@@ -378,9 +378,9 @@
 
 # Squashfs for DD-WRT
 0       string  hsqt    Squashfs filesystem, little endian, DD-WRT signature,
->28     leshort >10     invalid
->28     leshort <1      invalid
->30	leshort >10	invalid
+>28     leshort >10     {invalid}
+>28     leshort <1      {invalid}
+>30	leshort >10	{invalid}
 >28     leshort x       version %d.
 >30     leshort x       \b%d,
 >28     leshort >3      compression:
@@ -388,8 +388,8 @@
 >>20    leshort 2       \blzma,
 >>20	leshort 3	\bgzip (non-standard type definition),
 >>20	leshort 4	\blzma (non-standard type definition),
->>20    leshort 0       \binvalid,
->>20    leshort >4      \binvalid,
+>>20    leshort 0       \b{invalid},
+>>20    leshort >4      \b{invalid},
 >28     leshort <3
 >>8     lelong  x       size: %d bytes,
 >>8     lelong  x       {file-size:%d}
@@ -423,9 +423,9 @@
 
 # Non-standard Squashfs signature found on some D-Link routers
 0       string  shsq    Squashfs filesystem, little endian, non-standard signature, 
->28     leshort >10     invalid
->28     leshort <1      invalid
->30	leshort >10	invalid
+>28     leshort >10     {invalid}
+>28     leshort <1      {invalid}
+>30	leshort >10	{invalid}
 >28     leshort x       version %d.
 >30     leshort x       \b%d,
 >28     leshort >3      compression:
@@ -433,8 +433,8 @@
 >>20    leshort 2       \blzma,
 >>20	leshort 3	\bgzip (non-standard type definition),
 >>20	leshort 4	\blzma (non-standard type definition),
->>20    leshort 0       \binvalid,
->>20    leshort >4      \binvalid,
+>>20    leshort 0       \b{invalid},
+>>20    leshort >4      \b{invalid},
 >28     leshort <3
 >>8     lelong  x       size: %d bytes,
 >>8     lelong  x       {file-size:%d}
@@ -471,13 +471,13 @@
 # volume label and UUID Russell Coker
 # http://etbe.coker.com.au/2008/07/08/label-vs-uuid-vs-device/
 0   leshort         0xEF53      	Linux EXT filesystem,{offset-adjust:-0x438}
->2	leshort		>4		invalid state
->2	leshort		3		invalid state
->2	leshort		<0		invalid state
->4	leshort		>3		invalid error behavior
->4	leshort		<0		invalid error behavior
->4	lelong		>1		invalid major revision
->4  lelong		<0		invalid major revision
+>2	leshort		>4		{invalid} state
+>2	leshort		3		{invalid} state
+>2	leshort		<0		{invalid} state
+>4	leshort		>3		{invalid} error behavior
+>4	leshort		<0		{invalid} error behavior
+>4	lelong		>1		{invalid} major revision
+>4  lelong		<0		{invalid} major revision
 >4  lelong          x               rev %d
 >6  leshort         x               \b.%d
 # No journal?  ext2
@@ -504,7 +504,7 @@
 
 #romfs filesystems - Juan Cespedes <cespedes@debian.org>
 0       string	-rom1fs-\0		romfs filesystem, version 1
->8	belong	>10000000		invalid
+>8	belong	>10000000		{invalid}
 >8      belong  x                       size: %d bytes,
 >16	string	x			{file-name:%s}
 >16     string  x                       named "%s"
@@ -513,7 +513,7 @@
 
 # Wind River MemFS file system, found in some VxWorks devices
 0	string	owowowowowowowowowowowowowowow		Wind River management filesystem,
->30	string	!ow					invalid,
+>30	string	!ow					{invalid},
 >32	belong	1					compressed,
 >32	belong	2					plain text,
 >36	belong	x					%d files
@@ -523,7 +523,7 @@
 >4	lelong&0xFFFFFF00	0
 >>4	lelong&0x100		0x000		mode 2
 >>4	lelong&0x100		0x100		mode 3
->4	lelong&0xFFFFFF00	!0		unknown mode (invalid)
+>4	lelong&0xFFFFFF00	!0		unknown mode ({invalid})
 
 0	string			WDK\x202.0\x00	WDK file system, version 2.0{offset-adjust:-18}
 
@@ -533,15 +533,15 @@
 >6148	string		1						version 1.0,
 >6148	string		2						version 2.0,
 >6148	string		3						version 3.0
->6148	byte		>0x33						invalid version,
->6148	byte		<0x31						invalid version,
+>6148	byte		>0x33						{invalid} version,
+>6148	byte		<0x31						{invalid} version,
 >38	string		>\0						volume name: "%s",
 >2047	string		\000CD001\001EL\x20TORITO\x20SPECIFICATION	bootable
 
 # updated by Joerg Jenderek at Nov 2012
 # DOS Emulator image is 128 byte, null right padded header + harddisc image
 0       	string  DOSEMU\0	DOS Emulator image
->0x27E		leshort	!0xAA55		\b, invalid
+>0x27E		leshort	!0xAA55		\b, {invalid}
 >0x27E  	leshort 0xAA55
 #offset is 128
 >>19    	byte   128
@@ -573,7 +573,7 @@
 
 # BSD 2.x file system image; used in RetroBSD for PIC32.
 0		string		FS\x3C\x3C		BSD 2.x filesystem,
->1020	string		!\x3E\x3EFS		invalid (missing FSMAGIC2),
+>1020	string		!\x3E\x3EFS		{invalid} (missing FSMAGIC2),
 >8		lelong		x				size: {math:%d*1024} bytes,
 >8		lelong		x				\b{file-size:%d*1024}
 >8		lelong		x				\b{jump-to-offset:%d*1024}
@@ -586,13 +586,13 @@
 # Simple file system found in Foscam camera firmware
 0       beshort 0xbd9a  Foscam WebUI filesystem,
 >2      leshort x       checksum: 0x%X,
->16     lelong  <3      invalid first file name length,
->16     lelong  >127    invalid first file name length,
->20     byte    0       invalid first file name,
+>16     lelong  <3      {invalid} first file name length,
+>16     lelong  >127    {invalid} first file name length,
+>20     byte    0       {invalid} first file name,
 >20     byte    !0x2E
 >>20    byte    !0x2F
->>>20   byte    <65     invalid first file name,
->>>20   byte    >122    invalid first file name,
+>>>20   byte    <65     {invalid} first file name,
+>>>20   byte    >122    {invalid} first file name,
 >20     byte    x       first file name: {raw-replace}
 >16     lelong  x       {raw-string-length:%d}
 >20     string  x       {raw-string:%s}

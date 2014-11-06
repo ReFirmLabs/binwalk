@@ -4,7 +4,6 @@ import os
 import sys
 import argparse
 import binwalk.core.idb
-import binwalk.core.filter
 import binwalk.core.common
 import binwalk.core.display
 import binwalk.core.settings

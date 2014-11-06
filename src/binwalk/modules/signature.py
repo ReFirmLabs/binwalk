@@ -4,8 +4,6 @@
 # If the lzma import fails, this module won't be loaded at all.
 import lzma
 import binwalk.core.magic
-import binwalk.core.smart
-import binwalk.core.parser
 from binwalk.core.module import Module, Option, Kwarg
 
 class Signature(Module):
@@ -75,27 +73,13 @@ class Signature(Module):
     VERBOSE_FORMAT = "%s    %d"
 
     def init(self):
-        self.keep_going = self.config.keep_going
-
-        # Initialize the filter
-        self.filter = binwalk.core.filter.Filter(self.show_invalid)
-
-        # Set any specified include/exclude filters
-        for regex in self.exclude_filters:
-            self.filter.exclude(regex)
-        for regex in self.include_filters:
-            self.filter.include(regex)
-
-        # Create Signature and MagicParser class instances. These are mostly for internal use.
-        self.smart = binwalk.core.smart.Signature(self.filter, ignore_smart_signatures=self.dumb_scan)
-        self.parser = binwalk.core.parser.MagicParser(self.filter, self.smart)
-
         # If a raw byte sequence was specified, build a magic file from that instead of using the default magic files
-        if self.raw_bytes is not None:
-            self.magic_files = [self.parser.file_from_string(self.raw_bytes)]
+        # TODO: re-implement this
+        #if self.raw_bytes is not None:
+        #    self.magic_files = [self.parser.file_from_string(self.raw_bytes)]
 
         # Append the user's magic file first so that those signatures take precedence
-        elif self.search_for_opcodes:
+        if self.search_for_opcodes:
             self.magic_files = [
                     self.config.settings.user.binarch,
                     self.config.settings.system.binarch,
@@ -113,26 +97,25 @@ class Signature(Module):
             self.magic_files.append(self.config.settings.user.binwalk)
             self.magic_files.append(self.config.settings.system.binwalk)
 
+        # Initialize libmagic
+        self.magic = binwalk.core.magic.Magic(include=self.include_filters,
+                                              exclude=self.exclude_filters,
+                                              invalid=self.show_invalid)
+
         # Parse the magic file(s)
         binwalk.core.common.debug("Loading magic files: %s" % str(self.magic_files))
-        self.mfile = self.parser.parse(self.magic_files)
+        for f in self.magic_files:
+            self.magic.load(f)
 
-        # Initialize libmagic
-        self.magic = binwalk.core.magic.Magic(self.mfile, keep_going=self.keep_going)
-
-        # Once the temporary magic files are loaded into libmagic, we don't need them anymore; delete the temp files
-        if not binwalk.core.common.DEBUG:
-            self.parser.rm_magic_files()
-
-        self.VERBOSE = ["Signatures:", self.parser.signature_count]
+        self.VERBOSE = ["Signatures:", len(self.magic.signatures)]
 
     def validate(self, r):
         '''
         Called automatically by self.result.
         '''
-        if self.filter.show_invalid_results:
+        if self.show_invalid:
             r.valid = True
-        else:
+        elif r.valid:
             if not r.description:
                 r.valid = False
 
@@ -141,8 +124,6 @@ class Signature(Module):
 
             if r.jump and (r.jump + r.offset) > r.file.size:
                 r.valid = False
-
-            r.valid = self.filter.valid_result(r.description)
 
     def scan_file(self, fp):
         current_file_offset = 0
@@ -156,28 +137,25 @@ class Signature(Module):
             block_start = fp.tell() - dlen
             self.status.completed = block_start - fp.offset
 
-            for candidate_offset in self.parser.find_signature_candidates(data, dlen):
+            # TODO: Make magic scan return a results object.
+            for r in self.magic.scan(data, dlen):
 
                 # current_block_offset is set when a jump-to-offset keyword is encountered while
                 # processing signatures. This points to an offset inside the current data block
                 # that scanning should jump to, so ignore any subsequent candidate signatures that
-                # occurr before this offset inside the current data block.
-                if candidate_offset < current_block_offset:
+                # occur before this offset inside the current data block.
+                if r.offset < current_block_offset:
                     continue
-
-                # Pass the data to libmagic for parsing
-                magic_result = self.magic.buffer(data[candidate_offset:candidate_offset+fp.block_peek_size])
-                if not magic_result:
-                    continue
-
-                # The smart filter parser returns a binwalk.core.module.Result object
-                r = self.smart.parse(magic_result)
 
                 # Set the absolute offset inside the target file
-                r.offset = block_start + candidate_offset + r.adjust
+                # TODO: Don't need the offset adjust stuff anymore, get rid of it
+                r.offset = block_start + r.offset + r.adjust
 
                 # Provide an instance of the current file object
                 r.file = fp
+
+                # Check if this was marked as invalid
+                r.valid = (not r.invalid)
 
                 # Register the result for futher processing/display
                 # self.result automatically calls self.validate for result validation
@@ -199,7 +177,4 @@ class Signature(Module):
             self.header()
             self.scan_file(fp)
             self.footer()
-
-        if hasattr(self, "magic") and self.magic:
-            self.magic.close()
 

@@ -6,24 +6,24 @@
 # Recognize some MySQL files.
 #
 0       beshort                 0xfe01          MySQL table definition file
->2	string			<1		invalid
->2	string			>\11		invalid
+>2	string			<1		{invalid}
+>2	string			>\11		{invalid}
 >2      byte                    x               Version %d
 0       string		        \xfe\xfe\x03    MySQL MISAM index file
->3	string			<1		invalid
->3	string			>\11		invalid
+>3	string			<1		{invalid}
+>3	string			>\11		{invalid}
 >3      byte                    x               Version %d
 0       string                  \xfe\xfe\x07    MySQL MISAM compressed data file
->3	string			<1		invalid
->3	string			>\11		invalid
+>3	string			<1		{invalid}
+>3	string			>\11		{invalid}
 >3      byte                    x               Version %d
 0       string                  \xfe\xfe\x05    MySQL ISAM index file
->3	string			<1		invalid
->3	string			>\11		invalid
+>3	string			<1		{invalid}
+>3	string			>\11		{invalid}
 >3      byte                    x               Version %d
 0       string                  \xfe\xfe\x06    MySQL ISAM compressed data file
->3	string			<1		invalid
->3	string			>\11		invalid
+>3	string			<1		{invalid}
+>3	string			>\11		{invalid}
 >3      byte                    x               Version %d
 #0       string                  \376bin         MySQL replication log
 

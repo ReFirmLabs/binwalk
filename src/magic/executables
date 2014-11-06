@@ -11,7 +11,7 @@
 #
 # updated by Daniel Quinlan (quinlan@yggdrasil.com)
 0	string		\177ELF		ELF
->4	byte		0		invalid class
+>4	byte		0		{invalid} class
 >4	byte		1		32-bit
 # only for MIPS - in the future, the ABI field of e_flags should be used.
 >>18	leshort		8
@@ -26,7 +26,7 @@
 >4	byte		>2
 >>4	byte		x		unknown ELF class: 0x%X
 >5	byte		!1
->>5	byte		!2		invalid byte order
+>>5	byte		!2		{invalid} byte order
 >5	byte		1		LSB
 # The official e_machine number for MIPS is now #8, regardless of endianness.
 # The second number (#10) will be deprecated later. For now, we still
@@ -66,21 +66,21 @@
 #>>>(0x38+0x10) lelong	>0		(signal %d),
 >>16	leshort		&0xff00		processor-specific,
 >>18	leshort		0		no machine,
->>18	leshort		1		AT&T WE32100 - invalid byte order,
->>18	leshort		2		SPARC - invalid byte order,
+>>18	leshort		1		AT&T WE32100 - {invalid} byte order,
+>>18	leshort		2		SPARC - {invalid} byte order,
 >>18	leshort		3		Intel 80386,
 >>18	leshort		4		Motorola
->>>36	lelong		&0x01000000	68000 - invalid byte order,
->>>36	lelong		&0x00810000	CPU32 - invalid byte order,
->>>36	lelong		0		68020 - invalid byte order,
->>18	leshort		5		Motorola 88000 - invalid byte order,
+>>>36	lelong		&0x01000000	68000 - {invalid} byte order,
+>>>36	lelong		&0x00810000	CPU32 - {invalid} byte order,
+>>>36	lelong		0		68020 - {invalid} byte order,
+>>18	leshort		5		Motorola 88000 - {invalid} byte order,
 >>18	leshort		6		Intel 80486,
 >>18	leshort		7		Intel 80860,
 >>18	leshort		8		MIPS,
->>18	leshort		9		Amdahl - invalid byte order,
+>>18	leshort		9		Amdahl - {invalid} byte order,
 >>18	leshort		10		MIPS (deprecated),
->>18	leshort		11		RS6000 - invalid byte order,
->>18	leshort		15		PA-RISC - invalid byte order,
+>>18	leshort		11		RS6000 - {invalid} byte order,
+>>18	leshort		15		PA-RISC - {invalid} byte order,
 >>>50	leshort		0x0214		2.0
 >>>48	leshort		&0x0008		(LP64),
 >>18	leshort		16		nCUBE,
@@ -96,7 +96,7 @@
 >>18	leshort		41		Alpha,
 >>18	leshort		0xa390		IBM S/390 (obsolete),
 >>18	leshort		42		Hitachi SH,
->>18	leshort		43		SPARC V9 - invalid byte order,
+>>18	leshort		43		SPARC V9 - {invalid} byte order,
 >>18	leshort		44		Siemens Tricore Embedded Processor,
 >>18	leshort		45		Argonaut RISC Core, Argonaut Technologies Inc.,
 >>18	leshort		46		Hitachi H8/300,
@@ -111,7 +111,7 @@
 >>18	leshort		75		Digital VAX,
 >>18	leshort		97		NatSemi 32k,
 >>18	leshort		0x9026		Alpha (unofficial),
->>20	lelong		0		invalid version
+>>20	lelong		0		{invalid} version
 >>20	lelong		1		version 1
 >>36	lelong		1		MathCoPro/FPU/MAU Required
 >5	byte		2		MSB
@@ -150,13 +150,13 @@
 >>18	beshort		0		no machine,
 >>18	beshort		1		AT&T WE32100,
 >>18	beshort		2		SPARC,
->>18	beshort		3		Intel 80386 - invalid byte order,
+>>18	beshort		3		Intel 80386 - {invalid} byte order,
 >>18	beshort		4		Motorola
 >>>36	belong		&0x01000000	68000,
 >>>36	belong		&0x00810000	CPU32,
 >>>36	belong		0		68020,
 >>18	beshort		5		Motorola 88000,
->>18	beshort		6		Intel 80486 - invalid byte order,
+>>18	beshort		6		Intel 80486 - {invalid} byte order,
 >>18	beshort		7		Intel 80860,
 >>18	beshort		8		MIPS,
 >>18	beshort		9		Amdahl,
@@ -201,7 +201,7 @@
 >>18	beshort		0x9026		Alpha (unofficial),
 >>18	beshort		0xa390		IBM S/390 (obsolete),
 >>18    beshort         0xde3d          Ubicom32,
->>20	belong		0		invalid version
+>>20	belong		0		{invalid} version
 >>20	belong		1		version 1
 >>36	belong		1		MathCoPro/FPU/MAU Required
 # Up to now only 0, 1 and 2 are defined; I've seen a file with 0x83, it seemed
@@ -227,13 +227,13 @@
 
 # Some simple Microsoft executable signatures
 0 		    string 		MZ\0\0\0\0\0\0		Microsoft
->0x3c		lelong		<4			        invalid
+>0x3c		lelong		<4			        {invalid}
 >(0x3c.l)   string      !PE\0\0     		MS-DOS executable
 >(0x3c.l)   string      PE\0\0      		portable executable
 
 0           string      MZ                  Microsoft
->0x3c		lelong		<4			        invalid
->(0x3c.l)   string      !PE\0\0             invalid
+>0x3c		lelong		<4			        {invalid}
+>(0x3c.l)   string      !PE\0\0             {invalid}
 >(0x3c.l)   string      PE\0\0              portable executable
 
 
@@ -245,8 +245,8 @@
 # Additional fields added by Craig Heffner
 #
 0       string          bFLT            BFLT executable
->4	belong		<1		invalid
->4	belong		>4		invalid
+>4	belong		<1		{invalid}
+>4	belong		>4		{invalid}
 >4      belong          x               version %d, 
 >4      belong          4
 >8	belong		x		code offset: 0x%.8X, 
@@ -361,7 +361,7 @@
 >4      belong          0x0030                          (Java 1.4)
 >4      belong          0x0031                          (Java 1.5)
 >4      belong          0x0032                          (Java 1.6)
->4      belong          >0x0050                         invalid
+>4      belong          >0x0050                         {invalid}
 
 # Summary: HP-38/39 calculator
 0	string		HP38Bin		HP 38 binary
@@ -376,8 +376,8 @@
 >7      string          I               (Target List)
 >7      string          J               (ASCII Vector specification)
 >7      string          K               (wildcard)
->7	byte		<0x41		invalid
->7	byte		>0x4B		invalid
+>7	byte		<0x41		{invalid}
+>7	byte		>0x4B		{invalid}
 
 0	string		HP39Bin		HP 39 binary
 >7      string          A               (Directory List)
@@ -391,8 +391,8 @@
 >7      string          I               (Target List)
 >7      string          J               (ASCII Vector specification)
 >7      string          K               (wildcard)
->7	byte		<0x41		invalid
->7	byte		>0x4B		invalid
+>7	byte		<0x41		{invalid}
+>7	byte		>0x4B		{invalid}
 
 0	string		HP38Asc		HP 38 ASCII
 >7      string          A               (Directory List)
@@ -406,8 +406,8 @@
 >7      string          I               (Target List)
 >7      string          J               (ASCII Vector specification)
 >7      string          K               (wildcard)
->7	byte		<0x41		invalid
->7	byte		>0x4B		invalid
+>7	byte		<0x41		{invalid}
+>7	byte		>0x4B		{invalid}
 
 0	string		HP39Asc		HP 39 ASCII
 >7      string          A               (Directory List)
@@ -421,8 +421,8 @@
 >7      string          I               (Target List)
 >7      string          J               (ASCII Vector specification)
 >7      string          K               (wildcard)
->7	byte		<0x41		invalid
->7	byte		>0x4B		invalid
+>7	byte		<0x41		{invalid}
+>7	byte		>0x4B		{invalid}
 
 # Summary: HP-48/49 calculator
 0       string          HPHP48          HP 48 binary
@@ -450,8 +450,8 @@
 >8      leshort         0x2e48          (GNAME)
 >8      leshort         0x2e6d          (LNAME)
 >8      leshort         0x2e92          (XLIB)
->8	leshort		<0x2911		(invalid)
->8	leshort		>0x2e92		(invalid)
+>8	leshort		<0x2911		({invalid})
+>8	leshort		>0x2e92		({invalid})
 
 0       string          HPHP49          HP 49 binary
 >8      leshort         0x2911          (ADR)
@@ -478,16 +478,16 @@
 >8      leshort         0x2e48          (GNAME)
 >8      leshort         0x2e6d          (LNAME)
 >8      leshort         0x2e92          (XLIB)
->8      leshort         <0x2911         (invalid)
->8      leshort         >0x2e92         (invalid)
+>8      leshort         <0x2911         ({invalid})
+>8      leshort         >0x2e92         ({invalid})
 
 0	string		\x23!/		Executable script,
 >6	byte		!0x2F
->>7	byte		!0x2F		invalid
+>>7	byte		!0x2F		{invalid}
 >2	string		x		shebang: "%s"
 
 0	string		\x23!\x20/	Executable script,
 >7	byte		!0x2F
->>8	byte		!0x2F		invalid
+>>8	byte		!0x2F		{invalid}
 >3	string		x		shebang: "%s"
 

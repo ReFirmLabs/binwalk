@@ -3,7 +3,7 @@
 # pdf:  file(1) magic for Portable Document Format
 #
 0   string  %PDF-       PDF document,
->6	byte    !0x2e		invalid
+>6	byte    !0x2e		{invalid}
 >5  string  x           version: "%3s"
 
 #------------------------------------------------------------------------------
@@ -27,10 +27,10 @@
 
 0	string		\x3chtml		HTML document header{extract-delay:HTML document footer}
 >5	byte		!0x20
->>5	byte		!0x3e			\b, invalid
+>>5	byte		!0x3e			\b, {invalid}
 0	string		\x3cHTML		HTML document header{extract-delay:HTML document footer}
 >5	byte		!0x20
->>5	byte		!0x3e			\b, invalid
+>>5	byte		!0x3e			\b, {invalid}
 
 0	string		\x3c/html\x3e		HTML document footer{offset-adjust:7}
 0	string		\x3c/HTML\x3e		HTML document footer{offset-adjust:7}
@@ -57,13 +57,13 @@
 >63 string      x                  \b%s"
 
 0   string      begin\x20           uuencoded data,
->9  byte        !0x20               invalid format,
->6  byte        <0x30               invalid permissions,
->6  byte        >0x39               invalid permissions,
->7  byte        <0x30               invalid permissions,
->7  byte        >0x39               invalid permissions,
->8  byte        <0x30               invalid permissions,
->8  byte        >0x39               invalid permissions,
+>9  byte        !0x20               {invalid} format,
+>6  byte        <0x30               {invalid} permissions,
+>6  byte        >0x39               {invalid} permissions,
+>7  byte        <0x30               {invalid} permissions,
+>7  byte        >0x39               {invalid} permissions,
+>8  byte        <0x30               {invalid} permissions,
+>8  byte        >0x39               {invalid} permissions,
 >10 string      x                   file name: "%s",
 >6  string      x                   file permissions: "%.3s"
 

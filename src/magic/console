@@ -77,16 +77,16 @@
 0       string          XBEH            Microsoft Xbox executable (XBE),
 ## probabilistic checks whether signed or not
 >0x0004 ulelong =0x0
->>2    ulelong !0x0  \b, invalid
+>>2    ulelong !0x0  \b, {invalid}
 >>2    ulelong =0x0
->>>2   ulelong !0x0  \b, invalid
+>>>2   ulelong !0x0  \b, {invalid}
 >>>2   ulelong =0x0  \b, not signed
 >0x0004 ulelong >0
->>2    ulelong =0x0  \b, invalid
+>>2    ulelong =0x0  \b, {invalid}
 >>2    ulelong >0
->>>2   ulelong =0x0  \b, invalid
+>>>2   ulelong =0x0  \b, {invalid}
 >>>2   ulelong >0    \b, signed
->0x0104 lelong  <0    \b, invalid base address
+>0x0104 lelong  <0    \b, {invalid} base address
 ## expect base address of 0x10000
 >0x0104               ulelong =0x10000
 >>(0x0118-0x0FF60)    ulelong&0x80000007  0x80000007 \b, all regions
@@ -103,8 +103,8 @@
 # # http://home.comcast.net/~admiral_powerslave/filestructure.html
 0       string          XIP0                        XIP, Microsoft Xbox data,
 >12     lelong          x                           total size: %d
->16     lelong          !0                          invalid
->24     lelong          !0                          invalid
+>16     lelong          !0                          {invalid}
+>24     lelong          !0                          {invalid}
 
 0       string          XTF0\x00\x00\x00            XTF, Microsoft Xbox data
 

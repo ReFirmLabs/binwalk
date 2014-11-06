@@ -18,11 +18,11 @@
 # Type: Certificates/key files in DER format
 # From: Gert Hulselmans <hulselmansgert@gmail.com>
 0	string	\x30\x82		Private key in DER format (PKCS#8),
->4	string	!\x02\x01\x00		invalid,
+>4	string	!\x02\x01\x00		{invalid},
 >>2	beshort	x			header length: 4, sequence length: %d
 
 0	string  \x30\x82		Certificate in DER format (x509 v3),
->4	string	!\x30\x82		invalid,
+>4	string	!\x30\x82		{invalid},
 >>2	beshort	x			header length: 4, sequence length: %d
 
 # GnuPG
@@ -40,11 +40,11 @@
 # Mavroyanopoulos Nikos <nmav@hellug.gr>
 # mcrypt:   file(1) magic for mcrypt 2.2.x;
 #0	string		\0m\3		mcrypt 2.5 encrypted data,
-#>4	byte		0		invalid
+#>4	byte		0		{invalid}
 #>4	string		>\0		algorithm: "%s",
-#>>&1	leshort		<1		invalid
+#>>&1	leshort		<1		{invalid}
 #>>&1	leshort		>0		keysize: %d bytes,
-#>>>&0	byte		0		invalid
+#>>>&0	byte		0		{invalid}
 #>>>&0	string		>\0		mode: "%s",
 
 0	string		\0m\2		mcrypt 2.2 encrypted data,
@@ -66,23 +66,23 @@
 >3	byte		16		algorithm: blowfish-256,
 >3	byte		100		algorithm: RC6,
 >3	byte		101		algorithm: IDEA,
->3	byte		<0		invalid algorithm
->3	byte		>101		invalid algorithm,
+>3	byte		<0		{invalid} algorithm
+>3	byte		>101		{invalid} algorithm,
 >3	byte		>16
->>3	byte		<100		invalid algorithm,
+>>3	byte		<100		{invalid} algorithm,
 >4	byte		0		mode: CBC,
 >4	byte		1		mode: ECB,
 >4	byte		2		mode: CFB,
 >4	byte		3		mode: OFB,
 >4	byte		4		mode: nOFB,
->4	byte		<0		invalid mode,
->4	byte		>4		invalid mode,
+>4	byte		<0		{invalid} mode,
+>4	byte		>4		{invalid} mode,
 >5	byte		0		keymode: 8bit
 >5	byte		1		keymode: 4bit
 >5	byte		2		keymode: SHA-1 hash
 >5	byte		3		keymode: MD5 hash
->5	byte		<0		invalid keymode
->5	byte		>3		invalid keymode
+>5	byte		<0		{invalid} keymode
+>5	byte		>3		{invalid} keymode
 
 #------------------------------------------------------------------------------
 # pgp:  file(1) magic for Pretty Good Privacy
