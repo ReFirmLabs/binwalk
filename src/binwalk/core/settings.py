@@ -7,7 +7,7 @@ from binwalk.core.compat import *
 class Settings:
     '''
     Binwalk settings class, used for accessing user and system file paths and general configuration settings.
-    
+
     After instatiating the class, file paths can be accessed via the self.paths dictionary.
     System file paths are listed under the 'system' key, user file paths under the 'user' key.
 
@@ -58,6 +58,20 @@ class Settings:
                                               prefix=self._system_path(self.BINWALK_CONFIG_DIR, self.PREFIX_FILE),
                                               plugins=self._system_path(self.BINWALK_PLUGINS_DIR))
 
+    def magic_signature_files(self, system_only=False, user_only=False):
+        files = []
+
+        if not system_only:
+            user_dir = os.path.join(self.user_dir, self.BINWALK_USER_DIR, self.BINWALK_MAGIC_DIR)
+            files += [os.path.join(user_dir, x) for x in os.listdir(user_dir)]
+        if not user_only:
+            system_dir = os.path.join(self.system_dir, self.BINWALK_MAGIC_DIR)
+            files += [os.path.join(system_dir, x) for x in os.listdir(system_dir)]
+            if self.system.binarch in files:
+                files.remove(self.system.binarch)
+
+        return files
+
     def find_magic_file(self, fname, system_only=False, user_only=False):
         '''
         Finds the specified magic file name in the system / user magic file directories.
@@ -83,7 +97,7 @@ class Settings:
                 loc = fpath
 
         return fpath
-    
+
     def _get_user_dir(self):
         '''
         Get the user's home directory.
@@ -102,7 +116,7 @@ class Settings:
 
         @dirname  - Directory path.
         @filename - File name.
-        
+
         Returns a full path of 'dirname/filename'.
         '''
         if not os.path.exists(dirname):
@@ -112,7 +126,7 @@ class Settings:
                 raise e
             except Exception:
                 pass
-        
+
         fpath = os.path.join(dirname, filename)
 
         if not os.path.exists(fpath):
@@ -144,10 +158,10 @@ class Settings:
     def _system_path(self, subdir, basename=''):
         '''
         Gets the full path to the 'subdir/basename' file in the system binwalk directory.
-        
+
         @subdir   - Subdirectory inside the system binwalk directory.
         @basename - File name inside the subdirectory.
-        
+
         Returns the full path to the 'subdir/basename' file.
         '''
         try:

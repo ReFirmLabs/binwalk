@@ -119,30 +119,14 @@ class CleanCommand(Command):
             pass
 
 if "install" in sys.argv:
-    # If an older version of binwalk is currently installed, completely remove it to prevent conflicts
-    existing_binwalk_modules = find_binwalk_module_paths()
-    if existing_binwalk_modules and not os.path.exists(os.path.join(existing_binwalk_modules[0], "core")):
+    # If a previous version of binwalk is currently installed, completely remove it to prevent conflicts
+    if find_binwalk_module_paths():
         remove_binwalk_module()
 
-# Re-build the magic file during a build/install
-if "install" in sys.argv or "build" in sys.argv:
-    # Generate a new magic file from the files in the magic directory
-    print("creating %s magic file" % MODULE_NAME)
-    magic_files = os.listdir("magic")
-    magic_files.sort()
-    fd = open("%s/magic/%s" % (MODULE_NAME, MODULE_NAME), "wb")
-    for magic in magic_files:
-        fpath = os.path.join("magic", magic)
-        if os.path.isfile(fpath):
-            fd.write(open(fpath, "rb").read())
-    fd.close()
-
 # The data files to install along with the module
-data_dirs = ["magic", "config", "plugins", "modules", "core"]
-install_data_files = [os.path.join("libs", "*.so"), os.path.join("libs", "*.dylib")]
-
-for data_dir in data_dirs:
-    install_data_files.append("%s%s*" % (data_dir, os.path.sep))
+install_data_files = []
+for data_dir in ["magic", "config", "plugins", "modules", "core"]:
+        install_data_files.append("%s%s*" % (data_dir, os.path.sep))
 
 # Install the module, script, and support files
 setup(name = MODULE_NAME,

@@ -11,14 +11,35 @@ class SignatureTag(object):
         for (k,v) in binwalk.core.compat.iterator(kwargs):
             setattr(self, k, v)
 
+class SignatureResult(object):
+
+    def __init__(self, **kwargs):
+        # These are set by signature keyword tags
+        self.jump = 0
+        self.size = 0
+        self.name = None
+        self.offset = 0
+        self.adjust = 0
+        self.strlen = 0
+        self.string = False
+        self.invalid = False
+
+        # These are set by code internally
+        self.file = None
+        self.valid = True
+        self.display = True
+        self.description = ""
+
+        for (k,v) in binwalk.core.compat.iterator(kwargs):
+            setattr(self, k, v)
+
 class SignatureLine(object):
 
     def __init__(self, line):
         self.tags = []
+        self.original_text = line
 
-        line = line.replace('\\ ', '\x20')
-
-        parts = line.split(None, 3)
+        parts = line.replace('\\ ', '\\x20').split(None, 3)
 
         self.level = parts[0].count('>')
 
@@ -31,6 +52,10 @@ class SignatureLine(object):
         if '&' in parts[1]:
             (self.type, self.bitmask) = parts[1].split('&', 1)
             self.boolean = '&'
+            self.bitmask = int(self.bitmask, 0)
+        elif '|' in parts[1]:
+            (self.type, self.bitmask) = parts[1].split('|', 1)
+            self.boolean = '|'
             self.bitmask = int(self.bitmask, 0)
         else:
             self.type = parts[1]
@@ -171,22 +196,6 @@ class Signature(object):
     def append(self, line):
         self.lines.append(line)
 
-class SignatureResult(object):
-
-    def __init__(self, **kwargs):
-        self.offset = 0
-        self.adjust = 0
-        self.jump = 0
-        self.size = 0
-        self.description = ""
-        self.valid = True
-        self.invalid = False
-        self.display = True
-        self.file = None
-
-        for (k,v) in binwalk.core.compat.iterator(kwargs):
-            setattr(self, k, v)
-
 class Magic(object):
 
     def __init__(self, exclude=[], include=[], invalid=False):
@@ -209,6 +218,7 @@ class Magic(object):
 
     def filtered(self, text):
         filtered = None
+        text = text.lower()
 
         for include in self.includes:
             if include.match(text):
@@ -230,6 +240,7 @@ class Magic(object):
 
     def parse(self, signature, offset):
         description = []
+        tag_strlen = None
         max_line_level = 0
         tags = {'offset' : offset, 'invalid' : False}
 
@@ -275,12 +286,19 @@ class Magic(object):
                     except struct.error as e:
                         dvalue = 0
                 elif line.size:
-                    dvalue = self.data[start:end]
+                    # Strings have line.value == None
                     if line.value is None:
-                        dvalue = dvalue.split('\x00')[0].split('\r')[0].split('\r')[0]
+                        if [x for x in line.tags if x.name == 'string'] and binwalk.core.compat.has_key(tags, 'strlen'):
+                            dvalue = self.data[start:(start+tags['strlen'])]
+                        else:
+                            dvalue = self.data[start:end].split('\x00')[0].split('\r')[0].split('\r')[0]
+                    else:
+                        dvalue = self.data[start:end]
 
                 if line.boolean == '&':
                     dvalue &= line.bitmask
+                elif line.boolean == '|':
+                    dvalue |= line.bitmask
 
                 if ((line.value is None) or
                     (line.condition == '=' and dvalue == line.value) or
@@ -295,13 +313,22 @@ class Magic(object):
                         dvalue = ts.strftime("%Y-%m-%d %H:%M:%S")
 
                     if '%' in line.format:
-                        description.append(line.format % dvalue)
+                        desc = line.format % dvalue
                     else:
-                        description.append(line.format)
+                        desc = line.format
+
+                    if desc:
+                        description.append(desc)
 
                     for tag in line.tags:
                         if isinstance(tag.value, str) and '%' in tag.value:
                             tags[tag.name] = tag.value % dvalue
+                            try:
+                                tags[tag.name] = int(tags[tag.name], 0)
+                            except KeyboardInterrupt as e:
+                                raise e
+                            except Exception as e:
+                                pass
                         else:
                             try:
                                 tags[tag.name] = int(tag.value, 0)
@@ -316,12 +343,19 @@ class Magic(object):
 
                     max_line_level = line.level + 1
                 else:
-                    max_line_level = line.level
+                    # No match on the first line, abort
+                    if line.level == 0:
+                        break
+                    else:
+                        max_line_level = line.level
 
         tags['description'] = self.bspace.sub('', " ".join(description))
 
-        if (('\\' in tags['description']) or
-           (self.printable.match(tags['description']).group() != tags['description'])):
+        if not tags['description']:
+            tags['display'] = False
+            tags['invalid'] = True
+
+        if self.printable.match(tags['description']).group() != tags['description']:
             tags['invalid'] = True
 
         tags['valid'] = (not tags['invalid'])
@@ -330,19 +364,20 @@ class Magic(object):
 
     def scan(self, data, dlen=None):
         results = []
+        matched_offsets = set()
 
         self.data = data
-
         if dlen is None:
             dlen = len(self.data)
 
         for signature in self.signatures:
             for match in signature.regex.finditer(self.data):
                 offset = match.start() - signature.offset
-                if offset >= 0 and offset <= dlen:
+                if (offset not in matched_offsets or self.show_invalid) and offset >= 0 and offset <= dlen:
                     tags = self.parse(signature, offset)
                     if not tags['invalid'] or self.show_invalid:
                         results.append(SignatureResult(**tags))
+                        matched_offsets.add(offset)
 
         results.sort(key=lambda x: x.offset, reverse=False)
         return results
@@ -381,15 +416,3 @@ class Magic(object):
 
         self.signatures.sort(key=lambda x: x.confidence, reverse=True)
 
-
-
-
-if __name__ == '__main__':
-    import sys
-
-    m = Magic(invalid=True)
-    m.load(sys.argv[1])
-    print ("Loaded %d signatures" % len(m.signatures))
-    for signature in m.scan(open(sys.argv[2], "r").read()):
-        if signature.valid:
-            print (signature.offset, signature.description)

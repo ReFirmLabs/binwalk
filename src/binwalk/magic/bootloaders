@@ -7,7 +7,7 @@
 
 # U-Boot boot loader
 0	string	U-Boot\x20  U-Boot version string,
->7  byte    <48         {invalid},
->7  byte    >57         {invalid},
->8  byte    !0x2E       {invalid},
+>7  byte    <48         {invalid}
+>7  byte    >57         {invalid}
+>8  byte    !0x2E       {invalid}
 >0  string  x           "%s"

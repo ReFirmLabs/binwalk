@@ -94,8 +94,7 @@ class Signature(Module):
 
         # Use the system default magic file if no other was specified, or if -B was explicitly specified
         if (not self.magic_files) or (self.explicit_signature_scan and not self.cast_data_types):
-            self.magic_files.append(self.config.settings.user.binwalk)
-            self.magic_files.append(self.config.settings.system.binwalk)
+            self.magic_files += self.config.settings.magic_signature_files()
 
         # Initialize libmagic
         self.magic = binwalk.core.magic.Magic(include=self.include_filters,
@@ -147,6 +146,8 @@ class Signature(Module):
                 if r.offset < current_block_offset:
                     continue
 
+                relative_offset = r.offset
+
                 # Set the absolute offset inside the target file
                 # TODO: Don't need the offset adjust stuff anymore, get rid of it
                 r.offset = block_start + r.offset + r.adjust
@@ -164,7 +165,7 @@ class Signature(Module):
                 # Is this a valid result and did it specify a jump-to-offset keyword, and are we doing a "smart" scan?
                 if r.valid and r.jump > 0 and not self.dumb_scan:
                     absolute_jump_offset = r.offset + r.jump
-                    current_block_offset = candidate_offset + r.jump
+                    current_block_offset = relative_offset + r.jump
 
                     # If the jump-to-offset is beyond the confines of the current block, seek the file to
                     # that offset and quit processing this block of data.
