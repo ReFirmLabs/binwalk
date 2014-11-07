@@ -1,3 +1,5 @@
+__all__ = ['Magic']
+
 import re
 import struct
 import datetime
@@ -222,7 +224,7 @@ class Magic(object):
         self.bspace = re.compile(".\\\\b")
         self.printable = re.compile("[ -~]*")
 
-    def filtered(self, text):
+    def _filtered(self, text):
         filtered = None
         text = text.lower()
 
@@ -244,7 +246,7 @@ class Magic(object):
 
         return filtered
 
-    def do_math(self, offset, expression):
+    def _do_math(self, offset, expression):
         # (4.l+12)
         if '.' in expression:
             (o, t) = expression.split('.', 1)
@@ -273,7 +275,7 @@ class Magic(object):
         #print ("Converted offset '%s' to '%s'" % (expression, v))
         return binwalk.core.common.MathExpression(v).value
 
-    def parse(self, signature, offset):
+    def _analyze(self, signature, offset):
         description = []
         tag_strlen = None
         max_line_level = 0
@@ -284,7 +286,7 @@ class Magic(object):
                 if isinstance(line.offset, int):
                     line_offset = line.offset
                 else:
-                    line_offset = self.do_math(offset, line.offset)
+                    line_offset = self._do_math(offset, line.offset)
 
                 start = offset + line_offset
                 end = start + line.size
@@ -308,7 +310,7 @@ class Magic(object):
                     if isinstance(line.opvalue, int):
                         opval = line.opvalue
                     else:
-                        opval = self.do_math(offset, line.opvalue)
+                        opval = self._do_math(offset, line.opvalue)
 
                     if line.operator == '&':
                         dvalue &= opval
@@ -396,7 +398,7 @@ class Magic(object):
             for match in signature.regex.finditer(self.data):
                 offset = match.start() - signature.offset
                 if (offset not in matched_offsets or self.show_invalid) and offset >= 0 and offset <= dlen:
-                    tags = self.parse(signature, offset)
+                    tags = self._analyze(signature, offset)
                     if not tags['invalid'] or self.show_invalid:
                         results.append(SignatureResult(**tags))
                         matched_offsets.add(offset)
@@ -412,17 +414,21 @@ class Magic(object):
 
         Returns None.
         '''
+        fp = open(fname, "r")
+        lines = fp.readlines()
+        self.parse(lines)
+        fp.close()
+
+    def parse(self, lines):
         signature = None
 
-        fp = open(fname, "r")
-
-        for line in fp.readlines():
+        for line in lines:
             line = line.split('#')[0].strip()
             if line:
                 sigline = SignatureLine(line)
                 if sigline.level == 0:
                     if signature:
-                        if not self.filtered(signature.title):
+                        if not self._filtered(signature.title):
                             self.signatures.append(signature)
                     signature = Signature(len(self.signatures), sigline)
                 elif signature:
@@ -431,10 +437,8 @@ class Magic(object):
                     raise ParserException("Invalid signature line: '%s'" % line)
 
         if signature:
-            if not self.filtered(signature.lines[0].format):
+            if not self._filtered(signature.lines[0].format):
                 self.signatures.append(signature)
-
-        fp.close()
 
         self.signatures.sort(key=lambda x: x.confidence, reverse=True)
 

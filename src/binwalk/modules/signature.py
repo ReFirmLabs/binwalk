@@ -70,11 +70,6 @@ class Signature(Module):
     def init(self):
         self.one_of_many = None
 
-        # If a raw byte sequence was specified, build a magic file from that instead of using the default magic files
-        # TODO: re-implement this
-        #if self.raw_bytes is not None:
-        #    self.magic_files = [self.parser.file_from_string(self.raw_bytes)]
-
         # Append the user's magic file first so that those signatures take precedence
         if self.search_for_opcodes:
             self.magic_files = [
@@ -83,13 +78,18 @@ class Signature(Module):
             ]
 
         # Use the system default magic file if no other was specified, or if -B was explicitly specified
-        if (not self.magic_files) or self.explicit_signature_scan:
+        if (not self.magic_files and not self.raw_bytes) or self.explicit_signature_scan:
             self.magic_files += self.config.settings.user.magic + self.config.settings.system.magic
 
         # Initialize libmagic
         self.magic = binwalk.core.magic.Magic(include=self.include_filters,
                                               exclude=self.exclude_filters,
                                               invalid=self.show_invalid)
+
+        # Create a signature from the raw bytes, if any
+        if self.raw_bytes:
+            binwalk.core.common.debug("Generating signature for raw byte sequence: '%s'" % self.raw_bytes)
+            self.magic.parse(["0    string    %s    Raw signature" % self.raw_bytes])
 
         # Parse the magic file(s)
         binwalk.core.common.debug("Loading magic files: %s" % str(self.magic_files))
