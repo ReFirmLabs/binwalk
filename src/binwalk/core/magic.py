@@ -144,7 +144,33 @@ class SignatureLine(object):
         else:
             self.endianess = '>'
 
-        # Set the size and struct format value for the specified data type
+        # Check the comparison value for the type of comparison to be performed (e.g.,
+        # '=0x1234', '>0x1234', etc). If no operator is specified, '=' is implied.
+        if parts[2][0] in ['=', '!', '>', '<', '&', '|']:
+            self.condition = parts[2][0]
+            self.value = parts[2][1:]
+        else:
+            self.condition = '='
+            self.value = parts[2]
+
+        # If this is a wildcard value, explicitly set self.value to None
+        if self.value == 'x':
+            self.value = None
+        # String values need to be decoded, as they may contain escape characters (e.g., '\x20')
+        elif self.type == 'string':
+            try:
+                self.value = binwalk.core.compat.string_decode(self.value)
+            except ValueError as e:
+                raise ParserException("Failed to decode string value '%s' in line '%s'" % (self.value, line))
+        # Non-string types are integer values
+        else:
+            try:
+                self.value = int(self.value, 0)
+            except ValueError as e:
+                raise ParserException("Failed to convert value '%s' to an integer on line '%s'" % (self.value, line))
+
+        # Set the size and struct format value for the specified data type.
+        # This must be done, obviously, after the value has been parsed out above.
         if self.type == 'string':
             # Strings don't have a struct format value, since they don't have to be unpacked
             self.fmt = None
@@ -182,31 +208,6 @@ class SignatureLine(object):
         else:
             self.pkfmt = None
 
-        # Check the comparison value for the type of comparison to be performed (e.g.,
-        # '=0x1234', '>0x1234', etc). If no operator is specified, '=' is implied.
-        if parts[2][0] in ['=', '!', '>', '<', '&', '|']:
-            self.condition = parts[2][0]
-            self.value = parts[2][1:]
-        else:
-            self.condition = '='
-            self.value = parts[2]
-
-        # If this is a wildcard value, explicitly set self.value to None
-        if self.value == 'x':
-            self.value = None
-        # String values need to be decoded, as they may contain escape characters (e.g., '\x20')
-        elif self.type == 'string':
-            try:
-                self.value = binwalk.core.compat.string_decode(self.value)
-            except ValueError as e:
-                raise ParserException("Failed to decode string value '%s' in line '%s'" % (self.value, line))
-        # Non-string types are integer values
-        else:
-            try:
-                self.value = int(self.value, 0)
-            except ValueError as e:
-                raise ParserException("Failed to convert value '%s' to an integer on line '%s'" % (self.value, line))
-
         # Check if a format string was specified (this is optional)
         if len(parts) == 4:
             # %lld formats are only supported if Python was built with HAVE_LONG_LONG
@@ -218,7 +219,6 @@ class SignatureLine(object):
             # Parse out tag keywords from the format string
             for tag in [m.group() for m in retag.finditer(self.format)]:
                 # Get rid of the curly braces.
-                # TODO: Do this in the regex.
                 tag = tag.replace('{', '').replace('}', '')
 
                 # If the tag specifies a value, it will be colon delimited (e.g., '{name:%s}')
@@ -255,7 +255,7 @@ class Signature(object):
         self.title = first_line.format
         self.offset = first_line.offset
         self.confidence = first_line.size
-        self.regex = _self.generate_regex(first_line)
+        self.regex = self._generate_regex(first_line)
 
     def _generate_regex(self, line):
         '''
@@ -355,6 +355,8 @@ class Magic(object):
         # Regex rule to match printable ASCII characters in formatted signature
         # strings (see self._analyze).
         self.printable = re.compile("[ -~]*")
+        # Regex rule to find format strings
+        self.fmtstr = re.compile("%[^%]")
 
     def _filtered(self, text):
         '''
@@ -531,12 +533,13 @@ class Magic(object):
                         ts = datetime.datetime.utcfromtimestamp(dvalue)
                         dvalue = ts.strftime("%Y-%m-%d %H:%M:%S")
 
+                    # Generate the tuple for the format string
+                    dvalue_tuple = ()
+                    for x in self.fmtstr.finditer(line.format):
+                        dvalue_tuple += (dvalue,)
+
                     # Format the description string
-                    # TODO: This is too simplistic of a check. What if '%%' is in the format string?
-                    if '%' in line.format:
-                        desc = line.format % dvalue
-                    else:
-                        desc = line.format
+                    desc = line.format % dvalue_tuple
 
                     # If there was any description string, append it to the list of description string parts
                     if desc:
@@ -545,26 +548,26 @@ class Magic(object):
                     # Process tag keywords specified in the signature line. These have already been parsed out of the
                     # original format string so that they can be processed separately from the printed description string.
                     for tag in line.tags:
-                        # Format the tag string
-                        # TODO: This is too simplistic of a check. What if '%%' is in the format string?
-                        if isinstance(tag.value, str) and '%' in tag.value:
-                            tags[tag.name] = tag.value % dvalue
+                        # If the tag value is a string, try to format it
+                        if isinstance(tag.value, str):
+                            # Generate the tuple for the format string
+                            dvalue_tuple = ()
+                            for x in self.fmtstr.finditer(tag.value):
+                                dvalue_tuple += (dvalue,)
 
-                            # Some tag values are intended to be integer values, so try to convert them as such
-                            try:
-                                tags[tag.name] = int(tags[tag.name], 0)
-                            except KeyboardInterrupt as e:
-                                raise e
-                            except Exception as e:
-                                pass
+                            # Format the tag string
+                            tags[tag.name] = tag.value % dvalue_tuple
+                        # Else, just use the raw tag value
                         else:
-                            # Some tag values are intended to be integer values, so try to convert them as such
-                            try:
-                                tags[tag.name] = int(tag.value, 0)
-                            except KeyboardInterrupt as e:
-                                raise e
-                            except Exception as e:
-                                tags[tag.name] = tag.value
+                            tags[tag.name] = tag.value
+
+                        # Some tag values are intended to be integer values, so try to convert them as such
+                        try:
+                            tags[tag.name] = int(tags[tag.name], 0)
+                        except KeyboardInterrupt as e:
+                            raise e
+                        except Exception as e:
+                            pass
 
                     # Abort processing soon as this signature is marked invalid, unless invalid results
                     # were explicitly requested. This means that the sooner invalid checks are made in a

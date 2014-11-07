@@ -118,11 +118,6 @@ class CleanCommand(Command):
         except Exception:
             pass
 
-if "install" in sys.argv:
-    # If a previous version of binwalk is currently installed, completely remove it to prevent conflicts
-    if find_binwalk_module_paths():
-        remove_binwalk_module()
-
 # The data files to install along with the module
 install_data_files = []
 for data_dir in ["magic", "config", "plugins", "modules", "core"]:
