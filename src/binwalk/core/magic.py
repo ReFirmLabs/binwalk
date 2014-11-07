@@ -1,3 +1,7 @@
+# A pure Python replacement for libmagic. Supports most libmagic features, plus
+# several additional features not provided by libmagic. Tailored specifically
+# for quickly searching blocks of data for multiple embedded signatures.
+
 __all__ = ['Magic']
 
 import re
@@ -6,15 +10,23 @@ import datetime
 import binwalk.core.compat
 
 class ParserException(Exception):
+    '''
+    Exception thrown specifically for signature file parsing errors.
+    '''
     pass
 
 class SignatureTag(object):
+    '''
+    Conatiner class for each signature tag entry.
+    '''
     def __init__(self, **kwargs):
         for (k,v) in binwalk.core.compat.iterator(kwargs):
             setattr(self, k, v)
 
 class SignatureResult(object):
-
+    '''
+    Container class for signature results.
+    '''
     def __init__(self, **kwargs):
         # These are set by signature keyword tags
         self.jump = 0
@@ -34,18 +46,25 @@ class SignatureResult(object):
         self.display = True
         self.description = ""
 
+        # Kwargs overrides the defaults set above
         for (k,v) in binwalk.core.compat.iterator(kwargs):
             setattr(self, k, v)
 
         self.valid = (not self.invalid)
 
 class SignatureLine(object):
+    '''
+    Responsible for parsing signature lines from magic signature files.
+    '''
+
+    # Printed strings are truncated to this size
+    MAX_STRING_SIZE = 128
 
     def __init__(self, line):
         '''
         Class constructor. Responsible for parsing a line from a signature file.
 
-        @line - A line from the signature file.
+        @line - A line of text from the signature file.
 
         Returns None.
         '''
@@ -54,7 +73,15 @@ class SignatureLine(object):
 
         # Split the line on any white space; for this to work, backslash-escaped
         # spaces ('\ ') are replaced with their escaped hex value ('\x20').
+        #
+        # [offset] [data type] [comparison value] [format string]
+        # 0        belong      0x12345678         Foo file type,
+        # >4       string      x                  file name: %s,
         parts = line.replace('\\ ', '\\x20').split(None, 3)
+
+        # Sanity check on the split line
+        if len(parts) not in [3, 4]:
+            raise ParserException("Invalid signature line: '%s'" % line)
 
         # The indentation level is determined by the number of '>' characters at
         # the beginning of the signature line.
@@ -69,76 +96,65 @@ class SignatureLine(object):
         except ValueError as e:
             pass
 
+        # self.type is the specified data type ('belong', 'string', etc)
         self.type = parts[1]
         self.opvalue = None
         self.operator = None
+
+        # Each data type can specify an additional operation to be performed on the
+        # data being scanned before performing a comparison (e.g., 'belong&0xFF' will
+        # AND the data with 0xFF before the comparison is performed).
+        #
+        # We support the following operators:
         for operator in ['&', '|', '*', '+', '-', '/']:
-            if operator in parts[1]:
-                (self.type, self.opvalue) = parts[1].split(operator, 1)
+            # Look for each operator in self.type
+            if operator in self.type:
+                # If found, split self.type into the type and operator value
+                (self.type, self.opvalue) = self.type.split(operator, 1)
+
+                # Keep a record of the specified operator
                 self.operator = operator
+
+                # Try to convert the operator value into an integer. This works for
+                # simple operator values, but not for complex types (e.g., '(4.l+12)').
                 try:
                     self.opvalue = int(self.opvalue, 0)
                 except ValueError as e:
                     pass
+
+                # Only one operator type is supported, so break as soon as one is found
                 break
 
-        if parts[2][0] in ['=', '!', '>', '<', '&', '|']:
-            self.condition = parts[2][0]
-            self.value = parts[2][1:]
-        else:
-            self.condition = '='
-            self.value = parts[2]
-
-        if self.value == 'x':
-            self.value = None
-        elif self.type == 'string':
-            try:
-                self.value = binwalk.core.compat.string_decode(self.value)
-            except ValueError as e:
-                raise ParserException("Failed to decode string value '%s' in line '%s'" % (self.value, line))
-        else:
-            self.value = int(self.value, 0)
-
-        if len(parts) == 4:
-            self.format = parts[3].replace('%ll', '%l')
-            retag = re.compile(r'\{.*?\}')
-
-            # Parse out tag keywords from the format string
-            for tag in [m.group() for m in retag.finditer(self.format)]:
-                tag = tag.replace('{', '').replace('}', '')
-                if ':' in tag:
-                    (n, v) = tag.split(':', 1)
-                else:
-                    n = tag
-                    v = True
-                self.tags.append(SignatureTag(name=n, value=v))
-
-            # Remove tags from the printable format string
-            self.format = retag.sub('', self.format).strip()
-        else:
-            self.format = ""
-
+        # If the specified type starts with 'u' (e.g., 'ubelong'), then it is unsigned; else, it is signed
         if self.type[0] == 'u':
             self.signed = False
             self.type = self.type[1:]
         else:
             self.signed = True
 
+        # Big endian values start with 'be' ('belong'), little endian values start with 'le' ('lelong').
+        # The struct module uses '>' to denote big endian and '<' to denote little endian.
         if self.type.startswith('be'):
             self.type = self.type[2:]
             self.endianess = '>'
         elif self.type.startswith('le'):
             self.endianess = '<'
             self.type = self.type[2:]
+        # Assume big endian if no endianess was explicitly specified
         else:
-            self.endianess = '<'
+            self.endianess = '>'
 
+        # Set the size and struct format value for the specified data type
         if self.type == 'string':
+            # Strings don't have a struct format value, since they don't have to be unpacked
             self.fmt = None
+
+            # If a string type has a specific value, set the comparison size to the length of that string
             if self.value:
                 self.size = len(self.value)
+            # Else, truncate the string to self.MAX_STRING_SIZE
             else:
-                self.size = 128
+                self.size = self.MAX_STRING_SIZE
         elif self.type == 'byte':
             self.fmt = 'b'
             self.size = 1
@@ -148,31 +164,113 @@ class SignatureLine(object):
         elif self.type == 'quad':
             self.fmt = 'q'
             self.size = 8
+        # Assume 4 byte length for all other data types
         else:
             self.fmt = 'i'
             self.size = 4
 
+        # The struct module uses the same characters for specifying signed and unsigned data types,
+        # except that signed data types are upper case. The above if-else code sets self.fmt to the
+        # lower case (unsigned) values.
+        if not self.signed:
+            self.fmt = self.fmt.upper()
+
+        # If a struct format was identified, create a format string to be passed to struct.unpack
+        # which specifies the endianess and data type format.
         if self.fmt:
             self.pkfmt = '%c%c' % (self.endianess, self.fmt)
         else:
             self.pkfmt = None
 
-        if not self.signed:
-            self.fmt = self.fmt.upper()
+        # Check the comparison value for the type of comparison to be performed (e.g.,
+        # '=0x1234', '>0x1234', etc). If no operator is specified, '=' is implied.
+        if parts[2][0] in ['=', '!', '>', '<', '&', '|']:
+            self.condition = parts[2][0]
+            self.value = parts[2][1:]
+        else:
+            self.condition = '='
+            self.value = parts[2]
+
+        # If this is a wildcard value, explicitly set self.value to None
+        if self.value == 'x':
+            self.value = None
+        # String values need to be decoded, as they may contain escape characters (e.g., '\x20')
+        elif self.type == 'string':
+            try:
+                self.value = binwalk.core.compat.string_decode(self.value)
+            except ValueError as e:
+                raise ParserException("Failed to decode string value '%s' in line '%s'" % (self.value, line))
+        # Non-string types are integer values
+        else:
+            try:
+                self.value = int(self.value, 0)
+            except ValueError as e:
+                raise ParserException("Failed to convert value '%s' to an integer on line '%s'" % (self.value, line))
+
+        # Check if a format string was specified (this is optional)
+        if len(parts) == 4:
+            # %lld formats are only supported if Python was built with HAVE_LONG_LONG
+            self.format = parts[3].replace('%ll', '%l')
+
+            # Regex to parse out tags, which are contained within curly braces
+            retag = re.compile(r'\{.*?\}')
+
+            # Parse out tag keywords from the format string
+            for tag in [m.group() for m in retag.finditer(self.format)]:
+                # Get rid of the curly braces.
+                # TODO: Do this in the regex.
+                tag = tag.replace('{', '').replace('}', '')
+
+                # If the tag specifies a value, it will be colon delimited (e.g., '{name:%s}')
+                if ':' in tag:
+                    (n, v) = tag.split(':', 1)
+                else:
+                    n = tag
+                    v = True
+
+                # Create a new SignatureTag instance and append it to self.tags
+                self.tags.append(SignatureTag(name=n, value=v))
+
+            # Remove all tags from the printable format string
+            self.format = retag.sub('', self.format).strip()
+        else:
+            self.format = ""
 
 class Signature(object):
-
+    '''
+    Class to hold signature data and generate signature regular expressions.
+    '''
     def __init__(self, id, first_line):
+        '''
+        Class constructor.
+
+        @id         - A ID value to uniquely identify this signature.
+        @first_line - The first SignatureLine of the signature (subsequent
+                      SignatureLines should be added via self.append).
+
+        Returns None.
+        '''
         self.id = id
         self.lines = [first_line]
         self.title = first_line.format
         self.offset = first_line.offset
         self.confidence = first_line.size
-        self.regex = self.generate_regex(first_line)
+        self.regex = _self.generate_regex(first_line)
 
-    def generate_regex(self, line):
+    def _generate_regex(self, line):
+        '''
+        Generates a regular expression from the magic bytes of a signature.
+        The regex is used by Magic._analyze.
+
+        @line - The first SignatureLine object of the signature.
+
+        Returns a compile regular expression.
+        '''
         restr = ""
 
+        # Strings and single byte signatures are taken at face value;
+        # multi-byte integer values are turned into regex strings based
+        # on their data type size and endianess.
         if line.type in ['string']:
             restr = re.escape(line.value)
         elif line.size == 1:
@@ -216,6 +314,14 @@ class Signature(object):
         return re.compile(restr)
 
     def append(self, line):
+        '''
+        Add a new SignatureLine object to the signature.
+
+        @line - A new SignatureLine instance.
+
+        Returns None.
+        '''
+        # This method is kind of useless, but may be a nice wrapper for future code.
         self.lines.append(line)
 
 class Magic(object):
