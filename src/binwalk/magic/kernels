@@ -5,16 +5,15 @@
 # and others such as Axel Kohlmeyer <akohlmey@rincewind.chemie.uni-ulm.de>
 # and Nicolás Lichtmaier <nick@debian.org>
 # All known start with: b8 c0 07 8e d8 b8 00 90 8e c0 b9 00 01 29 f6 29
-0		string		\xb8\xc0\x07\x8e\xd8\xb8\x00\x90\x8e\xc0\xb9\x00\x01\x29\xf6\x29	Linux kernel boot image
->514	string          !HdrS            							({invalid})
+0       string      \xb8\xc0\x07\x8e\xd8\xb8\x00\x90\x8e\xc0\xb9\x00\x01\x29\xf6\x29    Linux kernel boot image
+>514    string      !HdrS                                                               {invalid}
 
 # Finds and prints Linux kernel strings in raw Linux kernels (output like uname -a).
 # Commonly found in decompressed embedded kernel binaries.
-0	string		Linux\ version\ 	Linux kernel version
->14	byte		0			{invalid}
->14	byte		!0
->>14	string		x			"%s
->>45	string		x			\b%s"
+0       string      Linux\x20version\x20    Linux kernel version
+>14     byte        0                       {invalid}
+>14     byte        !0
+>>14    string      x                       "%s"
 
 # eCos kernel exception handlers
 #
@@ -26,13 +25,13 @@
 # lw      $k1, 0($k1)
 # jr      $k1
 # nop
-0	string	\x00\x68\x1A\x40\x00\x00\x00\x00\x7F\x00\x5A\x33	eCos kernel exception handler, architecture: MIPSEL,
->14	leshort	!0x3C1B												{invalid}
->18	leshort	!0x277B												{invalid}
->12	leshort	x													exception vector table base address: 0x%.4X
->16	leshort	x													\b%.4X
-0	string	\x40\x1A\x68\x00\x00\x00\x00\x00\x33\x5A\x00\x7F	eCos kernel exception handler, architecture: MIPS,
->12	beshort	!0x3C1B												{invalid}
->16	beshort	!0x277B												{invalid}
->14	beshort	x													exception vector table base address: 0x%.4X
->18	beshort	x													\b%.4X
+0       string      \x00\x68\x1A\x40\x00\x00\x00\x00\x7F\x00\x5A\x33    eCos kernel exception handler, architecture: MIPSEL,
+>14     leshort     !0x3C1B                                             {invalid}
+>18     leshort     !0x277B                                             {invalid}
+>12     uleshort    x                                                   exception vector table base address: 0x%.4X
+>16     uleshort    x                                                   \b%.4X
+0       string      \x40\x1A\x68\x00\x00\x00\x00\x00\x33\x5A\x00\x7F    eCos kernel exception handler, architecture: MIPS,
+>12     beshort     !0x3C1B                                             {invalid}
+>16     beshort     !0x277B                                             {invalid}
+>14     ubeshort    x                                                   exception vector table base address: 0x%.4X
+>18     ubeshort    x                                                   \b%.4X

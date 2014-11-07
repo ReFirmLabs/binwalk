@@ -23,6 +23,7 @@ class SignatureResult(object):
         self.strlen = 0
         self.string = False
         self.invalid = False
+        self.extract = True
 
         # These are set by code internally
         self.file = None
