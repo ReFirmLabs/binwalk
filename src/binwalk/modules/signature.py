@@ -18,8 +18,9 @@ class Signature(Module):
                    description='Scan target file(s) for common file signatures'),
             Option(short='R',
                    long='raw',
-                   kwargs={'enabled' : True, 'raw_bytes' : ''},
-                   type=str,
+                   kwargs={'enabled' : True, 'raw_bytes' : []},
+                   type=list,
+                   dtype=str.__name__,
                    description='Scan target file(s) for the specified sequence of bytes'),
             Option(short='A',
                    long='opcodes',
@@ -58,7 +59,7 @@ class Signature(Module):
             Kwarg(name='show_invalid', default=False),
             Kwarg(name='include_filters', default=[]),
             Kwarg(name='exclude_filters', default=[]),
-            Kwarg(name='raw_bytes', default=None),
+            Kwarg(name='raw_bytes', default=[]),
             Kwarg(name='search_for_opcodes', default=False),
             Kwarg(name='explicit_signature_scan', default=False),
             Kwarg(name='dumb_scan', default=False),
@@ -88,13 +89,18 @@ class Signature(Module):
 
         # Create a signature from the raw bytes, if any
         if self.raw_bytes:
-            binwalk.core.common.debug("Generating signature for raw byte sequence: '%s'" % self.raw_bytes)
-            self.magic.parse(["0    string    %s    Raw signature" % self.raw_bytes])
+            print (self.raw_bytes)
+            raw_signatures = []
+            for raw_bytes in self.raw_bytes:
+                raw_signatures.append("0    string    %s    %s" % (raw_bytes, raw_bytes))
+            binwalk.core.common.debug("Parsing raw signatures: %s" % str(raw_signatures))
+            self.magic.parse(raw_signatures)
 
         # Parse the magic file(s)
-        binwalk.core.common.debug("Loading magic files: %s" % str(self.magic_files))
-        for f in self.magic_files:
-            self.magic.load(f)
+        if self.magic_files:
+            binwalk.core.common.debug("Loading magic files: %s" % str(self.magic_files))
+            for f in self.magic_files:
+                self.magic.load(f)
 
         self.VERBOSE = ["Signatures:", len(self.magic.signatures)]
 
