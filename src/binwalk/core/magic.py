@@ -16,16 +16,17 @@ class SignatureResult(object):
     def __init__(self, **kwargs):
         # These are set by signature keyword tags
         self.jump = 0
+        self.many = False
         self.size = 0
         self.name = None
         self.offset = 0
-        self.adjust = 0
         self.strlen = 0
         self.string = False
         self.invalid = False
         self.extract = True
 
         # These are set by code internally
+        self.id = 0
         self.file = None
         self.valid = True
         self.display = True
@@ -33,6 +34,8 @@ class SignatureResult(object):
 
         for (k,v) in binwalk.core.compat.iterator(kwargs):
             setattr(self, k, v)
+
+        self.valid = (not self.invalid)
 
 class SignatureLine(object):
 
@@ -50,18 +53,15 @@ class SignatureLine(object):
         except ValueError as e:
             pass
 
-        if '&' in parts[1]:
-            (self.type, self.bitmask) = parts[1].split('&', 1)
-            self.boolean = '&'
-            self.bitmask = int(self.bitmask, 0)
-        elif '|' in parts[1]:
-            (self.type, self.bitmask) = parts[1].split('|', 1)
-            self.boolean = '|'
-            self.bitmask = int(self.bitmask, 0)
-        else:
-            self.type = parts[1]
-            self.boolean = None
-            self.bitmask = None
+        self.type = parts[1]
+        self.opvalue = None
+        self.operator = None
+        for operator in ['&', '|', '*', '+', '-', '/']:
+            if operator in parts[1]:
+                (self.type, self.opvalue) = parts[1].split(operator, 1)
+                self.operator = operator
+                self.opvalue = int(self.opvalue, 0)
+                break
 
         if parts[2][0] in ['=', '!', '>', '<', '&', '|']:
             self.condition = parts[2][0]
@@ -143,8 +143,10 @@ class SignatureLine(object):
 
 class Signature(object):
 
-    def __init__(self, first_line):
+    def __init__(self, id, first_line):
+        self.id = id
         self.lines = [first_line]
+        self.title = first_line.format
         self.offset = first_line.offset
         self.confidence = first_line.size
         self.regex = self.generate_regex(first_line)
@@ -243,7 +245,7 @@ class Magic(object):
         description = []
         tag_strlen = None
         max_line_level = 0
-        tags = {'offset' : offset, 'invalid' : False}
+        tags = {'id' : signature.id, 'offset' : offset, 'invalid' : False}
 
         for line in signature.lines:
             if line.level <= max_line_level:
@@ -286,8 +288,8 @@ class Magic(object):
                         dvalue = struct.unpack(line.pkfmt, binwalk.core.compat.str2bytes(self.data[start:end]))[0]
                     except struct.error as e:
                         dvalue = 0
-                elif line.size:
-                    # Strings have line.value == None
+                else:
+                    # Wildcard strings have line.value == None
                     if line.value is None:
                         if [x for x in line.tags if x.name == 'string'] and binwalk.core.compat.has_key(tags, 'strlen'):
                             dvalue = self.data[start:(start+tags['strlen'])]
@@ -296,10 +298,19 @@ class Magic(object):
                     else:
                         dvalue = self.data[start:end]
 
-                if line.boolean == '&':
-                    dvalue &= line.bitmask
-                elif line.boolean == '|':
-                    dvalue |= line.bitmask
+                if isinstance(dvalue, int) and line.operator:
+                    if line.operator == '&':
+                        dvalue &= line.opvalue
+                    elif line.operator == '|':
+                        dvalue |= line.opvalue
+                    elif line.operator == '*':
+                        dvalue *= line.opvalue
+                    elif line.operator == '+':
+                        dvalue += line.opvalue
+                    elif line.operator == '-':
+                        dvalue -= line.opvalue
+                    elif line.operator == '/':
+                        dvalue /= line.opvalue
 
                 if ((line.value is None) or
                     (line.condition == '=' and dvalue == line.value) or
@@ -352,14 +363,13 @@ class Magic(object):
 
         tags['description'] = self.bspace.sub('', " ".join(description))
 
-        #if not tags['description']:
-        #    tags['display'] = False
-        #    tags['invalid'] = True
+        # This should never happen
+        if not tags['description']:
+            tags['display'] = False
+            tags['invalid'] = True
 
         if self.printable.match(tags['description']).group() != tags['description']:
             tags['invalid'] = True
-
-        tags['valid'] = (not tags['invalid'])
 
         return tags
 
@@ -401,9 +411,9 @@ class Magic(object):
                 sigline = SignatureLine(line)
                 if sigline.level == 0:
                     if signature:
-                        if not self.filtered(signature.lines[0].format):
+                        if not self.filtered(signature.title):
                             self.signatures.append(signature)
-                    signature = Signature(sigline)
+                    signature = Signature(len(self.signatures), sigline)
                 elif signature:
                     signature.append(sigline)
                 else:

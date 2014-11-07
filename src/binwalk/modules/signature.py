@@ -68,6 +68,8 @@ class Signature(Module):
     VERBOSE_FORMAT = "%s    %d"
 
     def init(self):
+        self.one_of_many = None
+
         # If a raw byte sequence was specified, build a magic file from that instead of using the default magic files
         # TODO: re-implement this
         #if self.raw_bytes is not None:
@@ -111,6 +113,15 @@ class Signature(Module):
 
             if r.jump and (r.jump + r.offset) > r.file.size:
                 r.valid = False
+
+        if r.valid:
+            # Don't keep displaying signatures that repeat a bunch of times (e.g., JFFS2 nodes)
+            if r.id == self.one_of_many:
+                r.display = False
+            elif r.many:
+                self.one_of_many = r.id
+            else:
+                self.one_of_many = None
 
     def scan_file(self, fp):
         current_file_offset = 0
