@@ -580,9 +580,9 @@
 # BSD 2.x file system image; used in RetroBSD for PIC32.
 0        string        FS\x3C\x3C       BSD 2.x filesystem,
 >1020    string        !\x3E\x3EFS      {invalid}(missing FSMAGIC2),
->8       lelong        x                size: %d*1024 bytes,
->8       lelong        x                {size:%d*1024}
->8       lelong        x                {jump:%d*1024}
+>8       lelong*1024   x                size: %d bytes,
+>8       lelong*1024   x                {size:%d}
+>8       lelong*1024   x                {jump:%d}
 >8       lelong        x                total blocks: %d,
 >972     lelong        x                free blocks: %d,
 >968     ledate        x                last modified: %s

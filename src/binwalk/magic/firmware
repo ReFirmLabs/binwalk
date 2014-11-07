@@ -501,21 +501,21 @@
 6           string     dbgarea                  ZyXEL rom-0 configuration block, name: "%s",
 >16         beshort    x                        compressed size: %d,
 >14         beshort    x                        uncompressed size: %d,
->18         beshort    x                        data offset from start of block: %d+16
+>18         beshort+16 x                        data offset from start of block: %d
 
 6           string     spt.dat                  ZyXEL rom-0 configuration block, name: "%s",
 >16         beshort    x                        compressed size: %d,
 >14         beshort    x                        uncompressed size: %d,
->18         beshort    x                        data offset from start of block: %d+16
+>18         beshort+16 x                        data offset from start of block: %d
 
 6           string     autoexec.net             ZyXEL rom-0 configuration block, name: "%s",
 >16         beshort    x                        compressed size: %d,
 >14         beshort    x                        uncompressed size: %d,
->18         beshort    x                        data offset from start of block: %d+16
+>18         beshort+16 x                        data offset from start of block: %d
 
 # Obfuscated Arcadyan firmware
 0x68    belong  0x00D50800                      Obfuscated Arcadyan firmware,
->0      belong  x                               signature bytes: 0x%X,
+>0      ubelong x                               signature bytes: 0x%X,
 >0x70   string  !\x00\x00\x00\x00\x00\x00\x00   {invalid},
 >0x70   belong  0x00000000                      see https://github.com/devttys0/wrt120n/deobfuscator
 
