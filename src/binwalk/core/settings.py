@@ -27,7 +27,6 @@ class Settings:
 
     # File names
     PLUGINS = "plugins"
-    PREFIX_FILE = "prefix.conf"
     EXTRACT_FILE = "extract.conf"
     BINWALK_MAGIC_FILE = "binwalk"
     BINARCH_MAGIC_FILE = "binarch"
@@ -45,7 +44,7 @@ class Settings:
         # Build the paths to all user-specific files
         self.user = common.GenericContainer(binwalk=self._user_path(self.BINWALK_MAGIC_DIR, self.BINWALK_MAGIC_FILE),
                                             binarch=self._user_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE),
-                                            bincast=self._user_path(self.BINWALK_MAGIC_DIR, self.BINCAST_MAGIC_FILE),
+                                            magic=self._magic_signature_files(user_only=True),
                                             extract=self._user_path(self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE),
                                             plugins=self._user_path(self.BINWALK_PLUGINS_DIR))
 
@@ -53,13 +52,14 @@ class Settings:
         # Build the paths to all system-wide files
         self.system = common.GenericContainer(binwalk=self._system_path(self.BINWALK_MAGIC_DIR, self.BINWALK_MAGIC_FILE),
                                               binarch=self._system_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE),
-                                              bincast=self._system_path(self.BINWALK_MAGIC_DIR, self.BINCAST_MAGIC_FILE),
+                                              magic=self._magic_signature_files(system_only=True),
                                               extract=self._system_path(self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE),
-                                              prefix=self._system_path(self.BINWALK_CONFIG_DIR, self.PREFIX_FILE),
                                               plugins=self._system_path(self.BINWALK_PLUGINS_DIR))
 
-    def magic_signature_files(self, system_only=False, user_only=False):
+    def _magic_signature_files(self, system_only=False, user_only=False):
         files = []
+        user_binarch = self._user_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
+        system_binarch = self._system_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
 
         if not system_only:
             user_dir = os.path.join(self.user_dir, self.BINWALK_USER_DIR, self.BINWALK_MAGIC_DIR)
@@ -67,8 +67,11 @@ class Settings:
         if not user_only:
             system_dir = os.path.join(self.system_dir, self.BINWALK_MAGIC_DIR)
             files += [os.path.join(system_dir, x) for x in os.listdir(system_dir)]
-            if self.system.binarch in files:
-                files.remove(self.system.binarch)
+
+        if user_binarch in files:
+            files.remove(user_binarch)
+        if system_binarch in files:
+            files.remove(system_binarch)
 
         return files
 

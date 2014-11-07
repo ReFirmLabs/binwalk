@@ -352,9 +352,9 @@ class Magic(object):
 
         tags['description'] = self.bspace.sub('', " ".join(description))
 
-        if not tags['description']:
-            tags['display'] = False
-            tags['invalid'] = True
+        #if not tags['description']:
+        #    tags['display'] = False
+        #    tags['invalid'] = True
 
         if self.printable.match(tags['description']).group() != tags['description']:
             tags['invalid'] = True

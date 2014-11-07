@@ -56,6 +56,10 @@
 
 # PC bitmaps (OS/2, Windows BMP files)  (Greg Roelofs, newt@uchicago.edu)
 0       string          BM          PC bitmap,
+>14     leshort         !12
+>>14    leshort         !64
+>>>14   leshort         !40
+>>>>14  leshort         !128        {invalid}
 >14     leshort         12          OS/2 1.x format,
 >>18    lelong          <1          {invalid}
 >>18    lelong          >1000000    {invalid}

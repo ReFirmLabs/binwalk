@@ -25,10 +25,6 @@ class Signature(Module):
                    long='opcodes',
                    kwargs={'enabled' : True, 'search_for_opcodes' : True},
                    description='Scan target file(s) for common executable opcode signatures'),
-            #Option(short='C',
-            #       long='cast',
-            #       kwargs={'enabled' : True, 'cast_data_types' : True},
-            #       description='Cast offsets as a given data type (use -y to specify the data type / endianness)'),
             Option(short='m',
                    long='magic',
                    kwargs={'enabled' : True, 'magic_files' : []},
@@ -39,22 +35,22 @@ class Signature(Module):
                    long='dumb',
                    kwargs={'dumb_scan' : True},
                    description='Disable smart signature keywords'),
-        Option(short='I',
-               long='invalid',
-               kwargs={'show_invalid' : True},
-               description='Show results marked as invalid'),
-        Option(short='x',
-               long='exclude',
-               kwargs={'exclude_filters' : []},
-               type=list,
-               dtype=str.__name__,
-               description='Exclude results that match <str>'),
-        Option(short='y',
-               long='include',
-               kwargs={'include_filters' : []},
-               type=list,
-               dtype=str.__name__,
-               description='Only show results that match <str>'),
+            Option(short='I',
+                   long='invalid',
+                   kwargs={'show_invalid' : True},
+                   description='Show results marked as invalid'),
+            Option(short='x',
+                   long='exclude',
+                   kwargs={'exclude_filters' : []},
+                   type=list,
+                   dtype=str.__name__,
+                   description='Exclude results that match <str>'),
+            Option(short='y',
+                   long='include',
+                   kwargs={'include_filters' : []},
+                   type=list,
+                   dtype=str.__name__,
+                   description='Only show results that match <str>'),
     ]
 
     KWARGS = [
@@ -65,7 +61,6 @@ class Signature(Module):
             Kwarg(name='raw_bytes', default=None),
             Kwarg(name='search_for_opcodes', default=False),
             Kwarg(name='explicit_signature_scan', default=False),
-            Kwarg(name='cast_data_types', default=False),
             Kwarg(name='dumb_scan', default=False),
             Kwarg(name='magic_files', default=[]),
     ]
@@ -85,16 +80,9 @@ class Signature(Module):
                     self.config.settings.system.binarch,
             ]
 
-        elif self.cast_data_types:
-            self.keep_going = True
-            self.magic_files = [
-                    self.config.settings.user.bincast,
-                    self.config.settings.system.bincast,
-            ]
-
         # Use the system default magic file if no other was specified, or if -B was explicitly specified
-        if (not self.magic_files) or (self.explicit_signature_scan and not self.cast_data_types):
-            self.magic_files += self.config.settings.magic_signature_files()
+        if (not self.magic_files) or self.explicit_signature_scan:
+            self.magic_files += self.config.settings.user.magic + self.config.settings.system.magic
 
         # Initialize libmagic
         self.magic = binwalk.core.magic.Magic(include=self.include_filters,
@@ -136,7 +124,7 @@ class Signature(Module):
             block_start = fp.tell() - dlen
             self.status.completed = block_start - fp.offset
 
-            # TODO: Make magic scan return a results object.
+            # Scan this data block for magic signatures
             for r in self.magic.scan(data, dlen):
 
                 # current_block_offset is set when a jump-to-offset keyword is encountered while
@@ -146,17 +134,14 @@ class Signature(Module):
                 if r.offset < current_block_offset:
                     continue
 
+                # Keep a record of the relative offset of this signature inside the current data block
                 relative_offset = r.offset
 
                 # Set the absolute offset inside the target file
-                # TODO: Don't need the offset adjust stuff anymore, get rid of it
-                r.offset = block_start + r.offset + r.adjust
+                r.offset = block_start + r.offset
 
                 # Provide an instance of the current file object
                 r.file = fp
-
-                # Check if this was marked as invalid
-                r.valid = (not r.invalid)
 
                 # Register the result for futher processing/display
                 # self.result automatically calls self.validate for result validation
