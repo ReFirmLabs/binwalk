@@ -60,7 +60,10 @@ class SignatureLine(object):
             if operator in parts[1]:
                 (self.type, self.opvalue) = parts[1].split(operator, 1)
                 self.operator = operator
-                self.opvalue = int(self.opvalue, 0)
+                try:
+                    self.opvalue = int(self.opvalue, 0)
+                except ValueError as e:
+                    pass
                 break
 
         if parts[2][0] in ['=', '!', '>', '<', '&', '|']:
@@ -241,6 +244,35 @@ class Magic(object):
 
         return filtered
 
+    def do_math(self, offset, expression):
+        # (4.l+12)
+        if '.' in expression:
+            (o, t) = expression.split('.', 1)
+            o = offset + int(o.split('(', 1)[1], 0)
+            t = t[0]
+
+            try:
+                if t in ['b', 'B']:
+                    v = struct.unpack('b', binwalk.core.compat.str2bytes(self.data[o:o+1]))[0]
+                elif t == 's':
+                    v = struct.unpack('<h', binwalk.core.compat.str2bytes(self.data[o:o+2]))[0]
+                elif t == 'l':
+                    v = struct.unpack('<i', binwalk.core.compat.str2bytes(self.data[o:o+4]))[0]
+                elif t == 'S':
+                    v = struct.unpack('>h', binwalk.core.compat.str2bytes(self.data[o:o+2]))[0]
+                elif t == 'L':
+                    v = struct.unpack('>i', binwalk.core.compat.str2bytes(self.data[o:o+4]))[0]
+            except struct.error as e:
+                v = 0
+
+            v = "(%d%s" % (v, expression.split(t, 1)[1])
+        # (32+0x20)
+        else:
+            v = expression
+
+        #print ("Converted offset '%s' to '%s'" % (expression, v))
+        return binwalk.core.common.MathExpression(v).value
+
     def parse(self, signature, offset):
         description = []
         tag_strlen = None
@@ -252,33 +284,7 @@ class Magic(object):
                 if isinstance(line.offset, int):
                     line_offset = line.offset
                 else:
-                    # (4.l+12)
-                    if '.' in line.offset:
-                        (o, t) = line.offset.split('.', 1)
-                        o = offset + int(o.split('(', 1)[1], 0)
-                        t = t[0]
-
-                        try:
-                            if t in ['b', 'B']:
-                                v = struct.unpack('b', binwalk.core.compat.str2bytes(self.data[o:o+1]))[0]
-                            elif t == 's':
-                                v = struct.unpack('<h', binwalk.core.compat.str2bytes(self.data[o:o+2]))[0]
-                            elif t == 'l':
-                                v = struct.unpack('<i', binwalk.core.compat.str2bytes(self.data[o:o+4]))[0]
-                            elif t == 'S':
-                                v = struct.unpack('>h', binwalk.core.compat.str2bytes(self.data[o:o+2]))[0]
-                            elif t == 'L':
-                                v = struct.unpack('>i', binwalk.core.compat.str2bytes(self.data[o:o+4]))[0]
-                        except struct.error as e:
-                            v = 0
-
-                        v = "(%d%s" % (v, line.offset.split(t, 1)[1])
-                    # (32+0x20)
-                    else:
-                        v = line.offset
-
-                    #print ("Converted offset '%s' to '%s'" % (line.offset, v))
-                    line_offset = binwalk.core.common.MathExpression(v).value
+                    line_offset = self.do_math(offset, line.offset)
 
                 start = offset + line_offset
                 end = start + line.size
@@ -299,18 +305,23 @@ class Magic(object):
                         dvalue = self.data[start:end]
 
                 if isinstance(dvalue, int) and line.operator:
+                    if isinstance(line.opvalue, int):
+                        opval = line.opvalue
+                    else:
+                        opval = self.do_math(offset, line.opvalue)
+
                     if line.operator == '&':
-                        dvalue &= line.opvalue
+                        dvalue &= opval
                     elif line.operator == '|':
-                        dvalue |= line.opvalue
+                        dvalue |= opval
                     elif line.operator == '*':
-                        dvalue *= line.opvalue
+                        dvalue *= opval
                     elif line.operator == '+':
-                        dvalue += line.opvalue
+                        dvalue += opval
                     elif line.operator == '-':
-                        dvalue -= line.opvalue
+                        dvalue -= opval
                     elif line.operator == '/':
-                        dvalue /= line.opvalue
+                        dvalue /= opval
 
                 if ((line.value is None) or
                     (line.condition == '=' and dvalue == line.value) or
