@@ -466,11 +466,13 @@ class Magic(object):
         description = []
         tag_strlen = None
         max_line_level = 0
-        last_indirect_offset = 0
+        previous_line_end = 0
         tags = {'id' : signature.id, 'offset' : offset, 'invalid' : False}
 
         # Apply each line of the signature to self.data, starting at the specified offset
-        for line in signature.lines:
+        for n in range(0, len(signature.lines)):
+            line = signature.lines[n]
+
             # Ignore indentation levels above the current max indent level
             if line.level <= max_line_level:
                 # If the relative offset of this signature line is just an integer value, use it
@@ -480,10 +482,14 @@ class Magic(object):
                 else:
                     line_offset = self._do_math(offset, line.offset)
 
-                # If the uplevel delimiter was set in the signature line, add the last indirect
-                # offset to the line's specified offset.
+                # Sanity check
+                if not isinstance(line_offset, int):
+                    raise ParserException("Failed to convert offset '%s' to a number" % line.offset)
+
+                # If the uplevel delimiter was set in the signature line, then the specified offset
+                # is relative to the end of the last line's data (the '>>&0' offset syntax).
                 if line.uplevel:
-                    line_offset += last_indirect_offset
+                    line_offset += previous_line_end
 
                 # The start of the data needed by this line is at offset + line_offset.
                 # The end of the data will be line.size bytes later.
@@ -600,9 +606,19 @@ class Magic(object):
                     if not self.show_invalid and tags['invalid']:
                         break
 
-                    # Track the last indirect offset value
-                    if line.is_indirect_offset:
-                        last_indirect_offset = line_offset
+                    # Look ahead to the next line in the signature; if its indent level is greater than
+                    # that of the current line, then track the end of data for the current line. This is
+                    # so that subsequent lines can use the '>>&0' offset syntax to specify relative offsets
+                    # from previous lines.
+                    try:
+                        next_line = signature.lines[n+1]
+                        if next_line.level > line.level:
+                            if line.type == 'string':
+                                previous_line_end = line_offset + len(dvalue)
+                            else:
+                                previous_line_end = line_offset + line.size
+                    except IndexError as e:
+                        pass
 
                     # If this line satisfied its comparison, +1 the max indentation level
                     max_line_level = line.level + 1
