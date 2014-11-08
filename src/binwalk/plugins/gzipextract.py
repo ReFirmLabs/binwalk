@@ -1,35 +1,39 @@
 import os
-import zlib
-import binwalk.core.compat
-import binwalk.core.common
+import gzip
 import binwalk.core.plugin
 
-class ZLIBExtractPlugin(binwalk.core.plugin.Plugin):
+class GzipExtractPlugin(binwalk.core.plugin.Plugin):
     '''
-    Zlib extractor plugin.
+    Gzip extractor plugin.
     '''
     MODULES = ['Signature']
+    BLOCK_SIZE = 10 * 1024
 
     def init(self):
         # If the extractor is enabled for the module we're currently loaded
         # into, then register self.extractor as a zlib extraction rule.
         if self.module.extractor.enabled:
             self.module.extractor.add_rule(txtrule=None,
-                                           regex="^zlib compressed data",
-                                           extension="zlib",
+                                           regex="^gzip compressed data",
+                                           extension="gz",
                                            cmd=self.extractor)
 
     def extractor(self, fname):
+        fname = os.path.abspath(fname)
         outfile = os.path.splitext(fname)[0]
 
         try:
-            fpin = binwalk.core.common.BlockFile(fname)
-            fpout = binwalk.core.common.BlockFile(outfile, 'w')
+            fpout = open(outfile, "wb")
+            gz = gzip.GzipFile(fname, "rb")
 
-            plaintext = zlib.decompress(binwalk.core.compat.str2bytes(fpin.read()))
-            fpout.write(plaintext)
+            while True:
+                data = gz.read(self.BLOCK_SIZE)
+                if data:
+                    fpout.write(data)
+                else:
+                    break
 
-            fpin.close()
+            gz.close()
             fpout.close()
         except KeyboardInterrupt as e:
             raise e
