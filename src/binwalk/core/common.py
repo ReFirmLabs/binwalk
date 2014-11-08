@@ -7,18 +7,7 @@ import sys
 import ast
 import hashlib
 import operator as op
-import binwalk.core.idb
 from binwalk.core.compat import *
-
-# This allows other modules/scripts to subclass BlockFile from a custom class. Defaults to io.FileIO.
-if has_key(__builtins__, 'BLOCK_FILE_PARENT_CLASS'):
-    BLOCK_FILE_PARENT_CLASS = __builtins__['BLOCK_FILE_PARENT_CLASS']
-else:
-    BLOCK_FILE_PARENT_CLASS = io.FileIO
-
-# Special override for when we're running in IDA
-if binwalk.core.idb.LOADED_IN_IDA:
-    BLOCK_FILE_PARENT_CLASS = binwalk.core.idb.IDBFileIO
 
 # The __debug__ value is a bit backwards; by default it is set to True, but
 # then set to False if the Python interpreter is run with the -O option.
@@ -222,246 +211,265 @@ class MathExpression(object):
         else:
             raise TypeError(node)
 
-
-class BlockFile(BLOCK_FILE_PARENT_CLASS):
+class StringFile(object):
     '''
-    Abstraction class for accessing binary files.
-
-    This class overrides io.FilIO's read and write methods. This guaruntees two things:
-
-        1. All requested data will be read/written via the read and write methods.
-        2. All reads return a str object and all writes can accept either a str or a
-           bytes object, regardless of the Python interpreter version.
-
-    However, the downside is that other io.FileIO methods won't work properly in Python 3,
-    namely things that are wrappers around self.read (e.g., readline, readlines, etc).
-
-    This class also provides a read_block method, which is used by binwalk to read in a
-    block of data, plus some additional data (DEFAULT_BLOCK_PEEK_SIZE), but on the next block read
-    pick up at the end of the previous data block (not the end of the additional data). This
-    is necessary for scans where a signature may span a block boundary.
-
-    The descision to force read to return a str object instead of a bytes object is questionable
-    for Python 3, but it seemed the best way to abstract differences in Python 2/3 from the rest
-    of the code (especially for people writing plugins) and to add Python 3 support with
-    minimal code change.
+    A class to allow access to strings as if they were read from a file.
+    Used internally as a conditional superclass to InternalBlockFile.
     '''
-
-    # The DEFAULT_BLOCK_PEEK_SIZE limits the amount of data available to a signature.
-    # While most headers/signatures are far less than this value, some may reference
-    # pointers in the header structure which may point well beyond the header itself.
-    # Passing the entire remaining buffer to libmagic is resource intensive and will
-    # significantly slow the scan; this value represents a reasonable buffer size to
-    # pass to libmagic which will not drastically affect scan time.
-    DEFAULT_BLOCK_PEEK_SIZE = 8 * 1024
-
-    # Max number of bytes to process at one time. This needs to be large enough to
-    # limit disk I/O, but small enough to limit the size of processed data blocks.
-    DEFAULT_BLOCK_READ_SIZE = 1 * 1024 * 1024
-
-    def __init__(self, fname, mode='r', length=0, offset=0, block=DEFAULT_BLOCK_READ_SIZE, peek=DEFAULT_BLOCK_PEEK_SIZE, swap=0):
-        '''
-        Class constructor.
-
-        @fname  - Path to the file to be opened.
-        @mode   - Mode to open the file in (default: 'r').
-        @length - Maximum number of bytes to read from the file via self.block_read().
-        @offset - Offset at which to start reading from the file.
-        @block  - Size of data block to read (excluding any trailing size),
-        @peek   - Size of trailing data to append to the end of each block.
-        @swap   - Swap every n bytes of data.
-
-        Returns None.
-        '''
-        self.total_read = 0
-        self.block_read_size = self.DEFAULT_BLOCK_READ_SIZE
-        self.block_peek_size = self.DEFAULT_BLOCK_PEEK_SIZE
-
-        # This is so that custom parent classes can access/modify arguments as necessary
-        self.args = GenericContainer(fname=fname,
-                                     mode=mode,
-                                     length=length,
-                                     offset=offset,
-                                     block=block,
-                                     peek=peek,
-                                     swap=swap,
-                                     size=0)
-
-        # Python 2.6 doesn't like modes like 'rb' or 'wb'
-        mode = self.args.mode.replace('b', '')
-
-        super(self.__class__, self).__init__(fname, mode)
-
-        self.swap_size = self.args.swap
-
-        if self.args.size:
-            self.size = self.args.size
-        else:
-            try:
-                self.size = file_size(self.args.fname)
-            except KeyboardInterrupt as e:
-                raise e
-            except Exception:
-                self.size = 0
-
-        if self.args.offset < 0:
-            self.offset = self.size + self.args.offset
-        else:
-            self.offset = self.args.offset
-
-        if self.offset < 0:
-            self.offset = 0
-        elif self.offset > self.size:
-            self.offset = self.size
-
-        if self.args.offset < 0:
-            self.length = self.args.offset * -1
-        elif self.args.length:
-            self.length = self.args.length
-        else:
-            self.length = self.size - self.args.offset
-
-        if self.length < 0:
-            self.length = 0
-        elif self.length > self.size:
-            self.length = self.size
-
-        if self.args.block is not None:
-            self.block_read_size = self.args.block
-        self.base_block_size = self.block_read_size
-
-        if self.args.peek is not None:
-            self.block_peek_size = self.args.peek
-        self.base_peek_size = self.block_peek_size
-
-        # Work around for python 2.6 where FileIO._name is not defined
-        try:
-            self.name
-        except AttributeError:
-            self._name = fname
-
-        self.seek(self.offset)
-
-    def _swap_data_block(self, block):
-        '''
-        Reverses every self.swap_size bytes inside the specified data block.
-        Size of data block must be a multiple of self.swap_size.
-
-        @block - The data block to swap.
-
-        Returns a swapped string.
-        '''
-        i = 0
-        data = ""
-
-        if self.swap_size > 0:
-            while i < len(block):
-                data += block[i:i+self.swap_size][::-1]
-                i += self.swap_size
-        else:
-            data = block
-
-        return data
-
-    def reset(self):
-        self.set_block_size(block=self.base_block_size, peek=self.base_peek_size)
-        self.seek(self.offset)
-
-    def set_block_size(self, block=None, peek=None):
-        if block is not None:
-            self.block_read_size = block
-        if peek is not None:
-            self.block_peek_size = peek
-
-    def write(self, data):
-        '''
-        Writes data to the opened file.
-
-        io.FileIO.write does not guaruntee that all data will be written;
-        this method overrides io.FileIO.write and does guaruntee that all data will be written.
-
-        Returns the number of bytes written.
-        '''
-        n = 0
-        l = len(data)
-        data = str2bytes(data)
-
-        while n < l:
-            n += super(self.__class__, self).write(data[n:])
-
-        return n
+    def __init__(self, fname, mode='r'):
+        self.string = fname
+        self.name = "String"
+        self.args.size = len(self.string)
 
     def read(self, n=-1):
-        ''''
-        Reads up to n bytes of data (or to EOF if n is not specified).
-        Will not read more than self.length bytes.
-
-        io.FileIO.read does not guaruntee that all requested data will be read;
-        this method overrides io.FileIO.read and does guaruntee that all data will be read.
-
-        Returns a str object containing the read data.
-        '''
-        l = 0
-        data = b''
-
-        if self.total_read < self.length:
-            # Don't read more than self.length bytes from the file
-            if (self.total_read + n) > self.length:
-                n = self.length - self.total_read
-
-            while n < 0 or l < n:
-                tmp = super(self.__class__, self).read(n-l)
-                if tmp:
-                    data += tmp
-                    l += len(tmp)
-                else:
-                    break
-
-            self.total_read += len(data)
-
-        return self._swap_data_block(bytes2str(data))
-
-    def peek(self, n=-1):
-        '''
-        Peeks at data in file.
-        '''
-        pos = self.tell()
-        data = self.read(n)
-        self.seek(pos)
+        if n == -1:
+            data = self.string[self.total_read:]
+        else:
+            data = self.string[self.total_read:self.total_read+n]
         return data
 
-    def seek(self, n, whence=os.SEEK_SET):
-        if whence == os.SEEK_SET:
-            self.total_read = n - self.offset
-        elif whence == os.SEEK_CUR:
-            self.total_read += n
-        elif whence == os.SEEK_END:
-            self.total_read = self.size + n
+    def tell(self):
+        return self.total_read
 
-        super(self.__class__, self).seek(n, whence)
+    def write(self, *args, **kwargs):
+        pass
 
-    def read_block(self):
+    def seek(self, *args, **kwargs):
+        pass
+
+    def close(self):
+        pass
+
+def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
+
+    # Defining a class inside a function allows it to be dynamically subclassed
+    class InternalBlockFile(subclass):
         '''
-        Reads in a block of data from the target file.
+        Abstraction class for accessing binary files.
 
-        Returns a tuple of (str(file block data), block data length).
+        This class overrides io.FilIO's read and write methods. This guaruntees two things:
+
+            1. All requested data will be read/written via the read and write methods.
+            2. All reads return a str object and all writes can accept either a str or a
+               bytes object, regardless of the Python interpreter version.
+
+        However, the downside is that other io.FileIO methods won't work properly in Python 3,
+        namely things that are wrappers around self.read (e.g., readline, readlines, etc).
+
+        This class also provides a read_block method, which is used by binwalk to read in a
+        block of data, plus some additional data (DEFAULT_BLOCK_PEEK_SIZE), but on the next block read
+        pick up at the end of the previous data block (not the end of the additional data). This
+        is necessary for scans where a signature may span a block boundary.
+
+        The descision to force read to return a str object instead of a bytes object is questionable
+        for Python 3, but it seemed the best way to abstract differences in Python 2/3 from the rest
+        of the code (especially for people writing plugins) and to add Python 3 support with
+        minimal code change.
         '''
-        data = self.read(self.block_read_size)
-        dlen = len(data)
-        data += self.peek(self.block_peek_size)
 
-        return (data, dlen)
+        # The DEFAULT_BLOCK_PEEK_SIZE limits the amount of data available to a signature.
+        # While most headers/signatures are far less than this value, some may reference
+        # pointers in the header structure which may point well beyond the header itself.
+        # Passing the entire remaining buffer to libmagic is resource intensive and will
+        # significantly slow the scan; this value represents a reasonable buffer size to
+        # pass to libmagic which will not drastically affect scan time.
+        DEFAULT_BLOCK_PEEK_SIZE = 8 * 1024
 
-    def dup(self):
-        '''
-        Creates a new BlockFile instance with all the same initialization settings as this one.
+        # Max number of bytes to process at one time. This needs to be large enough to
+        # limit disk I/O, but small enough to limit the size of processed data blocks.
+        DEFAULT_BLOCK_READ_SIZE = 1 * 1024 * 1024
 
-        Returns new BlockFile object.
-        '''
-        return BlockFile(self.name,
-                         length=self.length,
-                         offset=self.offset,
-                         block=self.base_block_read_size,
-                         peek=self.base_peek_size,
-                         swap=self.swap)
+        def __init__(self, fname, mode='r', length=0, offset=0, block=DEFAULT_BLOCK_READ_SIZE, peek=DEFAULT_BLOCK_PEEK_SIZE, swap=0):
+            '''
+            Class constructor.
 
+            @fname  - Path to the file to be opened.
+            @mode   - Mode to open the file in (default: 'r').
+            @length - Maximum number of bytes to read from the file via self.block_read().
+            @offset - Offset at which to start reading from the file.
+            @block  - Size of data block to read (excluding any trailing size),
+            @peek   - Size of trailing data to append to the end of each block.
+            @swap   - Swap every n bytes of data.
+
+            Returns None.
+            '''
+            self.total_read = 0
+            self.block_read_size = self.DEFAULT_BLOCK_READ_SIZE
+            self.block_peek_size = self.DEFAULT_BLOCK_PEEK_SIZE
+
+            # This is so that custom parent classes can access/modify arguments as necessary
+            self.args = GenericContainer(fname=fname,
+                                         mode=mode,
+                                         length=length,
+                                         offset=offset,
+                                         block=block,
+                                         peek=peek,
+                                         swap=swap,
+                                         size=0)
+
+            # Python 2.6 doesn't like modes like 'rb' or 'wb'
+            mode = self.args.mode.replace('b', '')
+
+            super(self.__class__, self).__init__(fname, mode)
+
+            self.swap_size = self.args.swap
+
+            if self.args.size:
+                self.size = self.args.size
+            else:
+                try:
+                    self.size = file_size(self.args.fname)
+                except KeyboardInterrupt as e:
+                    raise e
+                except Exception:
+                    self.size = 0
+
+            if self.args.offset < 0:
+                self.offset = self.size + self.args.offset
+            else:
+                self.offset = self.args.offset
+
+            if self.offset < 0:
+                self.offset = 0
+            elif self.offset > self.size:
+                self.offset = self.size
+
+            if self.args.offset < 0:
+                self.length = self.args.offset * -1
+            elif self.args.length:
+                self.length = self.args.length
+            else:
+                self.length = self.size - self.args.offset
+
+            if self.length < 0:
+                self.length = 0
+            elif self.length > self.size:
+                self.length = self.size
+
+            if self.args.block is not None:
+                self.block_read_size = self.args.block
+            self.base_block_size = self.block_read_size
+
+            if self.args.peek is not None:
+                self.block_peek_size = self.args.peek
+            self.base_peek_size = self.block_peek_size
+
+            # Work around for python 2.6 where FileIO._name is not defined
+            try:
+                self.name
+            except AttributeError:
+                self._name = fname
+
+            self.seek(self.offset)
+
+        def _swap_data_block(self, block):
+            '''
+            Reverses every self.swap_size bytes inside the specified data block.
+            Size of data block must be a multiple of self.swap_size.
+
+            @block - The data block to swap.
+
+            Returns a swapped string.
+            '''
+            i = 0
+            data = ""
+
+            if self.swap_size > 0:
+                while i < len(block):
+                    data += block[i:i+self.swap_size][::-1]
+                    i += self.swap_size
+            else:
+                data = block
+
+            return data
+
+        def reset(self):
+            self.set_block_size(block=self.base_block_size, peek=self.base_peek_size)
+            self.seek(self.offset)
+
+        def set_block_size(self, block=None, peek=None):
+            if block is not None:
+                self.block_read_size = block
+            if peek is not None:
+                self.block_peek_size = peek
+
+        def write(self, data):
+            '''
+            Writes data to the opened file.
+
+            io.FileIO.write does not guaruntee that all data will be written;
+            this method overrides io.FileIO.write and does guaruntee that all data will be written.
+
+            Returns the number of bytes written.
+            '''
+            n = 0
+            l = len(data)
+            data = str2bytes(data)
+
+            while n < l:
+                n += super(self.__class__, self).write(data[n:])
+
+            return n
+
+        def read(self, n=-1):
+            ''''
+            Reads up to n bytes of data (or to EOF if n is not specified).
+            Will not read more than self.length bytes.
+
+            io.FileIO.read does not guaruntee that all requested data will be read;
+            this method overrides io.FileIO.read and does guaruntee that all data will be read.
+
+            Returns a str object containing the read data.
+            '''
+            l = 0
+            data = b''
+
+            if self.total_read < self.length:
+                # Don't read more than self.length bytes from the file
+                if (self.total_read + n) > self.length:
+                    n = self.length - self.total_read
+
+                while n < 0 or l < n:
+                    tmp = super(self.__class__, self).read(n-l)
+                    if tmp:
+                        data += tmp
+                        l += len(tmp)
+                    else:
+                        break
+
+                self.total_read += len(data)
+
+            return self._swap_data_block(bytes2str(data))
+
+        def peek(self, n=-1):
+            '''
+            Peeks at data in file.
+            '''
+            pos = self.tell()
+            data = self.read(n)
+            self.seek(pos)
+            return data
+
+        def seek(self, n, whence=os.SEEK_SET):
+            if whence == os.SEEK_SET:
+                self.total_read = n - self.offset
+            elif whence == os.SEEK_CUR:
+                self.total_read += n
+            elif whence == os.SEEK_END:
+                self.total_read = self.size + n
+
+            super(self.__class__, self).seek(n, whence)
+
+        def read_block(self):
+            '''
+            Reads in a block of data from the target file.
+
+            Returns a tuple of (str(file block data), block data length).
+            '''
+            data = self.read(self.block_read_size)
+            dlen = len(data)
+            data += self.peek(self.block_peek_size)
+
+            return (data, dlen)
+
+    return InternalBlockFile(fname, mode=mode, **kwargs)

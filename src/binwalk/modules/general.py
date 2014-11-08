@@ -1,5 +1,6 @@
 # Module to process general user input options (scan length, starting offset, etc).
 
+import io
 import os
 import sys
 import argparse
@@ -67,6 +68,10 @@ class General(Module):
                short=None,
                type=binwalk.core.common.BlockFile,
                kwargs={'files' : []}),
+
+        # Hidden, API-only arguments
+        Option(long="string",
+               kwargs={'subclass' : binwalk.core.common.StringFile}),
     ]
 
     KWARGS = [
@@ -82,12 +87,17 @@ class General(Module):
         Kwarg(name='files', default=[]),
         Kwarg(name='show_help', default=False),
         Kwarg(name='keep_going', default=False),
+        Kwarg(name='subclass', default=io.FileIO),
     ]
 
     PRIMARY = False
 
     def load(self):
         self.target_files = []
+
+        # A special case for when we're loaded into IDA
+        if self.subclass == io.FileIO and binwalk.core.idb.LOADED_IN_IDA:
+            self.subclass = binwalk.core.idb.IDBFileIO
 
         # Order is important with these two methods
         self._open_target_files()
@@ -141,7 +151,7 @@ class General(Module):
         if swap is None:
             swap = self.swap_size
 
-        return binwalk.core.common.BlockFile(fname, length=length, offset=offset, swap=swap, block=block, peek=peek)
+        return binwalk.core.common.BlockFile(fname, subclass=self.subclass, length=length, offset=offset, swap=swap, block=block, peek=peek)
 
     def _open_target_files(self):
         '''
@@ -151,7 +161,7 @@ class General(Module):
         # Validate the target files listed in target_files
         for tfile in self.files:
             # Ignore directories.
-            if not os.path.isdir(tfile):
+            if not self.subclass == io.FileIO or not os.path.isdir(tfile):
                 # Make sure we can open the target files
                 try:
                     self.target_files.append(self.open_file(tfile))
