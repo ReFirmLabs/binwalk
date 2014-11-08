@@ -91,23 +91,22 @@
 #       * Produce shorter output - notably, only report compression methods
 #         other than 8 ("deflate", the only method defined in RFC 1952).
 #0       string          \037\213\x08    gzip compressed data
-0       string        \x1f\x8b\x08    gzip compressed data
+0       string          \x1f\x8b\x08    gzip compressed data
 >3      byte            &0x01           \b, ASCII
->3      byte&0xE0    !0x00        \b, {invalid} reserved flag bits
->8      byte        2        \b, maximum compression
->8      byte        4        \b, fastest compression
->8      byte        1        \b, {invalid} extra flags
->8      byte        3        \b, {invalid} extra flags
->8      byte        >4        \b, {invalid} extra flags
+>3      byte&0xE0       !0x00           \b, {invalid}invalid reserved flag bits
+>8      byte            2               \b, maximum compression
+>8      byte            4               \b, fastest compression
+>8      byte            1               \b, {invalid}invalid extra flags
+>8      byte            3               \b, {invalid}invalid extra flags
+>8      byte            >4              \b, {invalid}invalid extra flags
 >3      byte            &0x02           \b, has header CRC
 >3      byte&0x04       0x04
->>10    leshort        x        \b, has %d bytes of extra data
->3      byte&0xC        =0x08        \b, has original file name
->>10    string        x        \b{file-name:%s}
->>10    string          x               \b: "%s"
+>>10    leshort         x               \b, has %d bytes of extra data
+>3      byte&0xC        =0x08           \b, has original file name
+>>10    string          x               \b: "%s"{name:%s}
 >3      byte            &0x10           \b, has comment
->>3     byte&0xC    0
->>>10   string        x        \b: "%s"
+>>3     byte&0xC        0
+>>>10   string          x               \b: "%s"
 >9      byte            =0x00           \b, from FAT filesystem (MS-DOS, OS/2, NT)
 >9      byte            =0x01           \b, from Amiga
 >9      byte            =0x02           \b, from VMS

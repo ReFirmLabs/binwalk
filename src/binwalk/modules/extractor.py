@@ -125,8 +125,7 @@ class Extractor(Module):
         # Note that r.display is still True even if --quiet has been specified; it is False if the result has been
         # explicitly excluded via the -y/-x options.
         if r.valid and r.extract and r.display:
-            # Do the extraction
-            binwalk.core.common.debug("Attempting extraction...")
+            # Attempt extraction
             (extraction_directory, dd_file) = self.extract(r.offset, r.description, r.file.name, size, r.name)
 
             # If the extraction was successful, self.extract will have returned the output directory and name of the dd'd file
@@ -354,6 +353,8 @@ class Extractor(Module):
         # No extraction rules for this file
         if not rules:
             return (None, None)
+        else:
+            binwalk.core.common.debug("Found %d matching extraction rules" % len(rules))
 
         output_directory = self.build_output_directory(file_name)
 
