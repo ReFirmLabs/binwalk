@@ -320,7 +320,7 @@
 >(7.b+40)       string  x                       boot partition: "%s"
 
 # TP-Link firmware header structure; thanks to Jonathan McGowan for reversing and documenting this format
-0          string          TP-LINK\x20Technologies TP-Link firmware header,{offset-adjust:-4}
+4          string          TP-LINK\x20Technologies TP-Link firmware header,
 #>-4    lelong          x                       header version: %d,
 >0x94      beshort         x                       firmware version: %d.
 >0x96      beshort         x                       \b%d.
@@ -404,15 +404,14 @@
 >4      byte        0           {invalid},
 >4      string      x           version: "%s"
 
-0   string      \x00\x00\x00\x00PART    Ubiquiti partition header,{offset-adjust:4}
+4   string      \x00\x00\x00\x00PART    Ubiquiti partition header,
 >0  byte        x                       header size: 56 bytes,
 >8  byte        0                       {invalid}
 >8  string      x                       name: "%s",
 >44 belong      x                       base address: 0x%.8X,
->52 belong      x                       data size: %d bytes
->52 belong      x                       {file-size:%d}
+>52 belong      x                       data size: %d bytes{size:%d}
 
-0   string      \x00\x00\x00\x00END\x2e Ubiquiti end header, header size: 12 bytes,{offset-adjust:4}
+4   string      \x00\x00\x00\x00END\x2e Ubiquiti end header, header size: 12 bytes,
 >12 belong      !0                      {invalid},
 >8  belong      x                       cumulative ~CRC32: 0x%.8X
 
@@ -483,7 +482,7 @@
 >19     string  AES-256\n               \b, encrypted AES-256
 
 # http://forum.xda-developers.com/showthread.php?p=47818657
-0    string    imgARMcC         Roku aimage SB{offset-adjust:-8}
+8    string    imgARMcC         Roku aimage SB
 
 # Boot ROM images for Sun/Cobalt Linux server appliances
 0       string    Cobalt\ Networks\ Inc.\nFirmware\ v    Paged Sun/COBALT boot rom,

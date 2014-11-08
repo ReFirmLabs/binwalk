@@ -34,6 +34,7 @@ class SignatureResult(object):
         self.size = 0
         self.name = None
         self.offset = 0
+        self.adjust = 0
         self.strlen = 0
         self.string = False
         self.invalid = False

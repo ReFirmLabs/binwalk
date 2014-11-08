@@ -152,10 +152,11 @@ class Signature(Module):
                     continue
 
                 # Keep a record of the relative offset of this signature inside the current data block
-                relative_offset = r.offset
+                # (used later for setting current_block_offset).
+                relative_offset = r.offset + r.adjust
 
                 # Set the absolute offset inside the target file
-                r.offset = block_start + r.offset
+                r.offset = block_start + relative_offset
 
                 # Provide an instance of the current file object
                 r.file = fp
