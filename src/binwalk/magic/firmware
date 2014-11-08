@@ -529,7 +529,7 @@
 >>>>>>0xC8      beshort !0x4f53
 >>>>>>>0xC8     beshort !0x4f43
 >>>>>>>>0xC8    beshort !0x4646
->>>>>>>>>0xC8   beshort !0x5350         {invalid} header,
+>>>>>>>>>0xC8   beshort !0x5350         {invalid}invalid header,
 >0xD4           belong  x               load address: 0x%.8X,
 >0xDC           belong  x               entry point: 0x%.8X,
 
@@ -543,7 +543,7 @@
 >12  ubyte             >0
 >>12 ubyte             <220              RC%d,
 >12  ubyte             >220
->>12 ubyte             <237              RU{math:%d-220},
+>>12 ubyte-220         <237              RU%d,
 >12  ubyte             0                 dev
 >17  ubyte             >0
 >>17 ubyte             x                 build %d
@@ -564,18 +564,21 @@
 >>5  beshort           0
 >>7  string            x                 \b, "%s"
 
-0 string               ELSP                LANCOM file entry
->202 string            @(RECENT_FIRMWARE)/ \b, file name:
->>221 string           x                   "%s"
->>221 string           x                   \b{file-name:%s}
->(198.L+202) belong    2
->>(198.L+206) belong   x                   \b, file size: %d bytes
->>(198.L+206) belong   x                   \b{file-size:%d}
->(198.L+202) belong    3
->>4 string             @(RECENT_FIRMWARE)/ \b, alias:
->>23 string            x                   "%s"
+0               string      ELSP                    LANCOM file entry
+>(198.L+202)    belong      !2
+>>(198.L+202)   belong      !3                      {invalid}
+>202            string      @(RECENT_FIRMWARE)/     \b, file name:
+>>221           string      x                       "%s"
+>>221           string      x                       \b{name:%s}
+>(198.L+202)    belong      2
+>>(198.L+206)   belong      <1                      {invalid}
+>>(198.L+206)   belong      x                       \b, file size: %d bytes
+>>(198.L+206)   belong      x                       \b{size:%d}
+>(198.L+202)    belong      3
+>>&4            string      @(RECENT_FIRMWARE)/     \b, alias:
+>>&23           string      x                       "%s"
 #>>(&0.L(0)) belong     x
->>>4 belong            x                   \b, file size: %d bytes
+#>>>&4 belong            x                   \b, file size: %d bytes
 
 # Signatures to identify the start of a VxWorks symbol table
 8       string      \x00\x00\x05\x00\x00\x00\x00\x00    VxWorks symbol table, big endian,

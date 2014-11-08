@@ -78,10 +78,12 @@
 ## Microsoft Xbox executables .xbe (Esa HyytiÃ¤ <ehyytia@cc.hut.fi>)
 0                       string              XBEH            Microsoft Xbox executable (XBE),
 ## probabilistic checks whether signed or not
->0x0004                 ulelong             =0x0
->>2                     ulelong             =0x0            \b, not signed
+>0x0004                 ulelong             =0
+>>10                    ulelong             =0
+>>>16                   ulelong             =0              \b, not signed
 >0x0004                 ulelong             >0
->>2                     ulelong             >0              \b, signed
+>>10                    ulelong             >0              \b, signed
+>>>16                   ulelong             >0              \b, signed
 ## expect base address of 0x10000
 >0x0104                 ulelong             !0x10000        {invalid}
 >0x0104                 ulelong             =0x10000

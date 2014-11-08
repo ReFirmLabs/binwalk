@@ -41,13 +41,13 @@
 #------------------------------------------------------------------------------
 # Mavroyanopoulos Nikos <nmav@hellug.gr>
 # mcrypt:   file(1) magic for mcrypt 2.2.x;
-#0    string        \0m\3        mcrypt 2.5 encrypted data,
-#>4    byte        0        {invalid}
-#>4    string        >\0        algorithm: "%s",
-#>>&1    leshort        <1        {invalid}
-#>>&1    leshort        >0        keysize: %d bytes,
-#>>>&0    byte        0        {invalid}
-#>>>&0    string        >\0        mode: "%s",
+0       string      \0m\3       mcrypt 2.5 encrypted data,
+>4      byte        0           {invalid}
+>4      string      x           algorithm: "%s",
+>>&1    leshort     <1          {invalid}
+>>&1    leshort     >0          keysize: %d bytes,
+>>>&0   byte        0           {invalid}
+>>>&0   string      >\0         mode: "%s",
 
 0       string      \0m\2       mcrypt 2.2 encrypted data,
 >3      byte        0           algorithm: blowfish-448,
