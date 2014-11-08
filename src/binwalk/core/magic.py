@@ -91,6 +91,17 @@ class SignatureLine(object):
         # characters to an integer offset. This will fail if the offset is a complex
         # value (e.g., '(4.l+16)').
         self.offset = parts[0].replace('>', '')
+
+        # Check to see if the up-level character ('&') has been specified
+        if self.offset.startswith('&'):
+            self.uplevel = True
+            self.offset = self.offset[1:]
+        else:
+            self.uplevel = False
+
+        # Check if the offset is an indirect offset
+        self.is_indirect_offset = self.offset.startswith('(')
+
         try:
             self.offset = int(self.offset, 0)
         except ValueError as e:
@@ -439,7 +450,9 @@ class Magic(object):
             v = expression
 
         # Evaluate the final expression
-        return binwalk.core.common.MathExpression(v).value
+        value = binwalk.core.common.MathExpression(v).value
+
+        return value
 
     def _analyze(self, signature, offset):
         '''
@@ -453,6 +466,7 @@ class Magic(object):
         description = []
         tag_strlen = None
         max_line_level = 0
+        last_indirect_offset = 0
         tags = {'id' : signature.id, 'offset' : offset, 'invalid' : False}
 
         # Apply each line of the signature to self.data, starting at the specified offset
@@ -465,6 +479,11 @@ class Magic(object):
                 # Else, evaluate the complex expression
                 else:
                     line_offset = self._do_math(offset, line.offset)
+
+                # If the uplevel delimiter was set in the signature line, add the last indirect
+                # offset to the line's specified offset.
+                if line.uplevel:
+                    line_offset += last_indirect_offset
 
                 # The start of the data needed by this line is at offset + line_offset.
                 # The end of the data will be line.size bytes later.
@@ -581,6 +600,10 @@ class Magic(object):
                     if not self.show_invalid and tags['invalid']:
                         break
 
+                    # Track the last indirect offset value
+                    if line.is_indirect_offset:
+                        last_indirect_offset = line_offset
+
                     # If this line satisfied its comparison, +1 the max indentation level
                     max_line_level = line.level + 1
                 else:
@@ -680,8 +703,9 @@ class Magic(object):
         for line in lines:
             # Split at the first comment delimiter (if any) and strip the result
             line = line.split('#')[0].strip()
-            # Ignore blank lines and lines that are nothing but comments
-            if line:
+            # Ignore blank lines and lines that are nothing but comments.
+            # We also don't support the !mime style line entries.
+            if line and line[0] != '!':
                 # Parse this signature line
                 sigline = SignatureLine(line)
                 # Level 0 means the first line of a signature entry
