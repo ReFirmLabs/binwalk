@@ -106,7 +106,7 @@ class SignatureLine(object):
         # AND the data with 0xFF before the comparison is performed).
         #
         # We support the following operators:
-        for operator in ['&', '|', '*', '+', '-', '/']:
+        for operator in ['&', '|', '*', '+', '-', '/', '~', '^']:
             # Look for each operator in self.type
             if operator in self.type:
                 # If found, split self.type into the type and operator value
@@ -146,7 +146,7 @@ class SignatureLine(object):
 
         # Check the comparison value for the type of comparison to be performed (e.g.,
         # '=0x1234', '>0x1234', etc). If no operator is specified, '=' is implied.
-        if parts[2][0] in ['=', '!', '>', '<', '&', '|']:
+        if parts[2][0] in ['=', '!', '>', '<', '&', '|', '^', '~']:
             self.condition = parts[2][0]
             self.value = parts[2][1:]
         else:
@@ -517,6 +517,10 @@ class Magic(object):
                         dvalue -= opval
                     elif line.operator == '/':
                         dvalue /= opval
+                    elif line.operator == '~':
+                        dvalue = ~opval
+                    elif line.operator == '^':
+                        dvalue ^= opval
 
                 # Does the data (dvalue) match the specified comparison?
                 if ((line.value is None) or
@@ -524,6 +528,8 @@ class Magic(object):
                     (line.condition == '>' and dvalue > line.value) or
                     (line.condition == '<' and dvalue < line.value) or
                     (line.condition == '!' and dvalue != line.value) or
+                    (line.condition == '~' and (dvalue == ~line.value)) or
+                    (line.condition == '^' and (dvalue ^ line.value)) or
                     (line.condition == '&' and (dvalue & line.value)) or
                     (line.condition == '|' and (dvalue | line.value))):
 
