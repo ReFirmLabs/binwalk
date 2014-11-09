@@ -1,5 +1,4 @@
 import os
-import lzma
 import binwalk.core.plugin
 
 class LZMAExtractPlugin(binwalk.core.plugin.Plugin):
@@ -9,6 +8,9 @@ class LZMAExtractPlugin(binwalk.core.plugin.Plugin):
     MODULES = ['Signature']
 
     def init(self):
+        import lzma
+        self.decompressor = lzma.decompress
+
         # If the extractor is enabled for the module we're currently loaded
         # into, then register self.extractor as a zlib extraction rule.
         if self.module.extractor.enabled:
@@ -26,8 +28,7 @@ class LZMAExtractPlugin(binwalk.core.plugin.Plugin):
             compressed = fpin.read()
             fpin.close()
 
-            decompressed = lzma.decompress(compressed)
-            print ("Decompressed %d bytes" % len(decompressed))
+            decompressed = self.decompressor(compressed)
 
             fpout = open(outfile, "wb")
             fpout.write(decompressed)
