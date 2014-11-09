@@ -174,6 +174,10 @@ class SignatureLine(object):
             except ValueError as e:
                 raise ParserException("Failed to convert value '%s' to an integer on line '%s'" % (self.value, line))
 
+        # Sanity check to make sure the first line of a signature has an explicit value
+        if self.level == 0 and self.value is None:
+            raise ParserException("First element of a signature must specify a non-wildcard value: '%s'" % (line))
+
         # Set the size and struct format value for the specified data type.
         # This must be done, obviously, after the value has been parsed out above.
         if self.type == 'string':
