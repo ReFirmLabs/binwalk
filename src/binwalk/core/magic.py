@@ -93,13 +93,6 @@ class SignatureLine(object):
         # value (e.g., '(4.l+16)').
         self.offset = parts[0].replace('>', '')
 
-        # Check to see if the up-level character ('&') has been specified
-        if self.offset.startswith('&'):
-            self.uplevel = True
-            self.offset = self.offset[1:]
-        else:
-            self.uplevel = False
-
         # Check if the offset is an indirect offset
         self.is_indirect_offset = self.offset.startswith('(')
 
@@ -369,6 +362,8 @@ class Magic(object):
         self.printable = re.compile("[ -~]*")
         # Regex rule to find format strings
         self.fmtstr = re.compile("%[^%]")
+        # Regex rule to find periods (see self._do_math)
+        self.period = re.compile("\.")
 
     def _filtered(self, text):
         '''
@@ -417,35 +412,54 @@ class Magic(object):
         Returns an integer value that is the result of the evaluated expression.
         '''
         # Does the expression contain an offset (e.g., "(4.l+12)")?
-        if '.' in expression:
-            # Split the offset field into the integer offset and type values (o and t respsectively)
-            (o, t) = expression.split('.', 1)
-            o = offset + int(o.split('(', 1)[1], 0)
-            t = t[0]
+        if '.' in expression and '(' in expression:
+            replacements = {}
 
-            try:
-                # Big and little endian byte format
-                if t in ['b', 'B']:
-                    v = struct.unpack('b', binwalk.core.compat.str2bytes(self.data[o:o+1]))[0]
-                # Little endian short format
-                elif t == 's':
-                    v = struct.unpack('<h', binwalk.core.compat.str2bytes(self.data[o:o+2]))[0]
-                # Little endian long format
-                elif t == 'l':
-                    v = struct.unpack('<i', binwalk.core.compat.str2bytes(self.data[o:o+4]))[0]
-                # Big endian short format
-                elif t == 'S':
-                    v = struct.unpack('>h', binwalk.core.compat.str2bytes(self.data[o:o+2]))[0]
-                # Bit endian long format
-                elif t == 'L':
-                    v = struct.unpack('>i', binwalk.core.compat.str2bytes(self.data[o:o+4]))[0]
-            # struct.error is thrown if there is not enough bytes in self.data for the specified format type
-            except struct.error as e:
-                v = 0
+            for period in [match.start() for match in self.period.finditer(expression)]:
+                # Separate the offset field into the integer offset and type values (o and t respsectively)
+                s = expression[:period].rfind('(') + 1
+                o = int(expression[s:period], 0)
+                t = expression[period+1]
 
-            # Once the value at the specified offset is read from self.data, re-build the expression
-            # (e.g., "(4.l+12)" might be converted into "(256+12)".
-            v = "(%d%s" % (v, expression.split(t, 1)[1])
+                # Re-build just the parsed offset portion of the expression
+                text = "%s.%c" % (expression[s:period], t)
+
+                # Have we already evaluated this offset expression? If so, skip it.
+                if binwalk.core.common.has_key(replacements, text):
+                    continue
+
+                # The offset specified in the expression is relative to the starting offset inside self.data
+                o += offset
+
+                # Read the value from self.data at the specified offset
+                try:
+                    # Big and little endian byte format
+                    if t in ['b', 'B']:
+                        v = struct.unpack('b', binwalk.core.compat.str2bytes(self.data[o:o+1]))[0]
+                    # Little endian short format
+                    elif t == 's':
+                        v = struct.unpack('<h', binwalk.core.compat.str2bytes(self.data[o:o+2]))[0]
+                    # Little endian long format
+                    elif t == 'l':
+                        v = struct.unpack('<i', binwalk.core.compat.str2bytes(self.data[o:o+4]))[0]
+                    # Big endian short format
+                    elif t == 'S':
+                        v = struct.unpack('>h', binwalk.core.compat.str2bytes(self.data[o:o+2]))[0]
+                    # Bit endian long format
+                    elif t == 'L':
+                        v = struct.unpack('>i', binwalk.core.compat.str2bytes(self.data[o:o+4]))[0]
+                # struct.error is thrown if there is not enough bytes in self.data for the specified format type
+                except struct.error as e:
+                    v = 0
+
+                # Keep track of all the recovered values from self.data
+                replacements[text] = v
+
+            # Finally, replace all offset expressions with their corresponding text value
+            v = expression
+            for (text, value) in binwalk.core.common.iterator(replacements):
+                v = v.replace(text, "%d" % value)
+
         # If no offset, then it's just an evaluatable math expression (e.g., "(32+0x20)")
         else:
             v = expression
@@ -481,16 +495,19 @@ class Magic(object):
                     line_offset = line.offset
                 # Else, evaluate the complex expression
                 else:
-                    line_offset = self._do_math(offset, line.offset)
+                    # Format the previous_line_end value into a string. Add the '+' sign to explicitly
+                    # state that this value is to be added to any subsequent values in the expression
+                    # (e.g., '&0' becomes '4+0').
+                    ple = '%d+' % previous_line_end
+                    # Allow users to use either the '&0' (libmagic) or '&+0' (explcit addition) sytaxes;
+                    # replace both with the ple text.
+                    line_offset_text = line.offset.replace('&+', ple).replace('&', ple)
+                    # Evaluate the expression
+                    line_offset = self._do_math(offset, line_offset_text)
 
                 # Sanity check
                 if not isinstance(line_offset, int):
                     raise ParserException("Failed to convert offset '%s' to a number" % line.offset)
-
-                # If the uplevel delimiter was set in the signature line, then the specified offset
-                # is relative to the end of the last line's data (the '>>&0' offset syntax).
-                if line.uplevel:
-                    line_offset += previous_line_end
 
                 # The start of the data needed by this line is at offset + line_offset.
                 # The end of the data will be line.size bytes later.
