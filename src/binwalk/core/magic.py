@@ -418,7 +418,9 @@ class Magic(object):
             for period in [match.start() for match in self.period.finditer(expression)]:
                 # Separate the offset field into the integer offset and type values (o and t respsectively)
                 s = expression[:period].rfind('(') + 1
-                o = int(expression[s:period], 0)
+                # The offset address may be an evaluatable expression, such as '(4+0.L)', typically the result
+                # of the original offset being something like '(&0.L)'.
+                o = binwalk.core.common.MathExpression(expression[s:period]).value
                 t = expression[period+1]
 
                 # Re-build just the parsed offset portion of the expression

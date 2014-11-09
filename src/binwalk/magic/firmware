@@ -576,8 +576,7 @@
 >(198.L+202)    belong      3
 >>&4            string      @(RECENT_FIRMWARE)/     \b, alias:
 >>&23           string      x                       "%s"
-#>>(&0.L(0)) belong     x
-#>>>&4 belong            x                   \b, file size: %d bytes
+>>(&0.L+4)      belong      x                       \b, file size: %d bytes
 
 # Signatures to identify the start of a VxWorks symbol table
 8       string      \x00\x00\x05\x00\x00\x00\x00\x00    VxWorks symbol table, big endian,
