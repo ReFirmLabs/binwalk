@@ -39,6 +39,13 @@ All args and kwargs keys/values correspond to binwalk's command line options. Ei
 * All command line switches passed via args must be preceeded by hyphens
 * All file names must be passed via args, not kwargs
 
+There is one available API argument which is not exposed via the command line, which is the `string` argument. When `string` is set to True, data to be scanned can be passed directly to the binwalk module, rather than a file name:
+
+```python
+data = "This is some data to scan for signatures"
+binwalk.scan(data, signature=True, string=True)
+```
+
 Accessing Scan Results
 ======================
 
