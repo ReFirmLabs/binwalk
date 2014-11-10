@@ -477,13 +477,13 @@
 >8      leshort         <0x2911         {invalid}
 >8      leshort         >0x2e92         {invalid}
 
-0       string          \x23!/      Executable script,
+0       string          \x23\x21/       Executable script,
 >6      byte            !0x2F
->>7     byte            !0x2F       {invalid}
->2      string          x           shebang: "%s"
+>>7     byte            !0x2F           {invalid}
+>2      string          x               shebang: "%s"
 
-0       string          \x23!\x20/  Executable script,
+0       string          \x23\x21\x20/   Executable script,
 >7      byte            !0x2F
->>8     byte            !0x2F       {invalid}
->3      string          x           shebang: "%s"
+>>8     byte            !0x2F           {invalid}
+>3      string          x               shebang: "%s"
 

@@ -744,7 +744,7 @@ class Magic(object):
             # Split at the first comment delimiter (if any) and strip the result
             line = line.split('#')[0].strip()
             # Ignore blank lines and lines that are nothing but comments.
-            # We also don't support the !mime style line entries.
+            # We also don't support the '!mime' style line entries.
             if line and line[0] != '!':
                 # Parse this signature line
                 sigline = SignatureLine(line)
