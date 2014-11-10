@@ -537,7 +537,7 @@ class Magic(object):
                             dvalue = self.data[start:(start+tags['strlen'])]
                         # Else, just terminate the string at the first newline, carriage return, or NULL byte
                         else:
-                            dvalue = self.data[start:end].split('\x00')[0].split('\r')[0].split('\r')[0]
+                            dvalue = self.data[start:end].split('\x00')[0].split('\r')[0].split('\n')[0]
                     # Non-wildcard strings have a known length, specified in the signature line
                     else:
                         dvalue = self.data[start:end]
