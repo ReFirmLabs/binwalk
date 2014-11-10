@@ -1,7 +1,7 @@
 Before You Start
 ================
 
-Binwalk supports Python 2.7 - 3.x. The following installation procedures assume that you are installing binwalk to be run using Python 2.7. If you want to use binwalk in Python 3, some package names and installation procedures may differ slightly.
+Binwalk supports Python 2.7 - 3.x. Although most systems have Python2.7 set as their default Python interpreter, binwalk does run faster in Python3. Installation procedures for both are provided below.
 
 Installation
 ============
@@ -9,27 +9,38 @@ Installation
 Installation follows the typical Python installation procedure:
 
 ```bash
+# Python2.7
 $ sudo python setup.py install
+```
+
+```bash
+# Python3.x
+$ sudo python3 setup.py install
 ```
 
 Dependencies
 ============
 
-Binwalk's only required run-time dependencies are libmagic and python-lzma:
+Binwalk's only required run-time dependency is `python-lzma`. This module is included by default in Python3, but must be installed separately for Python2.7:
 
 ```bash
-$ sudo apt-get install libmagic1 python-lzma
+$ sudo apt-get install python-lzma
 ```
 
-Note that the libmagic development package is *not* required, and almost all Linux systems will already have libmagic installed. Additionally, python-lzma is a standard package in Python3, and thus requires no additional installation if running binwalk in Python3.
-
-The remaining run-time dependencies are only required for optional binwalk features, such as file extraction and graphing capabilities. Unless otherwise specified, these dependencies are available from most Linux package managers.
+**The remaining run-time dependencies are only required for optional binwalk features**, such as file extraction and graphing capabilities. Unless otherwise specified, these dependencies are available from most Linux package managers.
 
 Binwalk uses [pyqtgraph](http://www.pyqtgraph.org) to generate graphs and visualizations, which requires the following: 
 
 ```bash
+# Python2.7
 $ sudo apt-get install libqt4-opengl python-opengl python-qt4 python-qt4-gl python-numpy python-scipy python-pip
 $ sudo pip install pyqtgraph
+```
+
+```bash
+# Python3.x
+$ sudo apt-get install libqt4-opengl python3-opengl python3-pyqt4 python3-pyqt4.qtopengl python3-numpy python3-scipy python3-pip
+$ sudo pip3 install pyqtgraph
 ```
 
 Binwalk's `--disasm` option requires the [Capstone](http://www.capstone-engine.org/) disassembly framework and its corresponding Python bindings:
