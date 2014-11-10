@@ -189,6 +189,8 @@
 # Berkeley Lab Checkpoint Restart (BLCR) checkpoint context files
 # http://ftg.lbl.gov/checkpoint
 0       string  Ck0\0\0R\0\0\0  BLCR
+>16     lelong  0               {invalid}
+>16     ulelong >7              {invalid}
 >16     lelong  1               x86
 >16     lelong  3               alpha
 >16     lelong  5               x86-64
@@ -196,6 +198,8 @@
 >8      lelong  x               context data (little endian, version %d)
 
 0       string  \0\0\0C\0\0\0R  BLCR
+>16     lelong  <2              {invalid}
+>16     ulelong >8              {invalid}
 >16     belong  2               SPARC
 >16     belong  4               ppc
 >16     belong  6               ppc64
