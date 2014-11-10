@@ -71,3 +71,20 @@ Installing the IDA Plugin
 
 If IDA is installed on your system, you may optionally install the binwalk IDA plugin by simply copying the `src/scripts/binida.py` file into IDA's `plugins` directory.
 
+
+Uninstalling Binwalk
+====================
+
+If binwalk has been installed to a standard system location (e.g., via `setup.py install`), it can be removed by running:
+
+```bash
+# Python2.7
+$ sudo python setup.py uninstall
+```
+
+```bash
+# Python3
+$ sudo python3 setup.py uninstall
+```
+
+Note that this does _not_ remove any of the installed dependencies.
