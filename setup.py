@@ -100,11 +100,6 @@ class CleanCommand(Command):
 
     def run(self):
         try:
-            os.remove("%s/magic/%s" % (MODULE_NAME, MODULE_NAME))
-        except Exception:
-            pass
-
-        try:
             remove_tree("build")
         except KeyboardInterrupt as e:
             raise e
