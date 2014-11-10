@@ -21,10 +21,12 @@
 # From: Gert Hulselmans <hulselmansgert@gmail.com>
 0       string          \x30\x82        Private key in DER format (PKCS#8),
 >4      string          !\x02\x01\x00   {invalid}
+>2      beshort         <0              {invalid}
 >2      beshort         x               header length: 4, sequence length: %d
 
 0       string          \x30\x82        Certificate in DER format (x509 v3),
 >4      string          !\x30\x82       {invalid}
+>2      beshort         <0              {invalid}
 >2      beshort         x               header length: 4, sequence length: %d
 
 # GnuPG

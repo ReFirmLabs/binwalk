@@ -62,6 +62,7 @@
 
 # PFS file system
 0       string    PFS/      PFS filesystem,
+>5      byte      !0x2E     {invalid}
 >4      string    x         version %s,
 >14     leshort   x         %d files
 

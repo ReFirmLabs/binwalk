@@ -179,6 +179,8 @@
 # RPM: file(1) magic for Red Hat Packages   Erik Troan (ewt@redhat.com)
 #
 0     ubelong       0xedabeedb   RPM
+>4    byte          <1           {invalid}
+>4    byte          >99          {invalid}
 >4    byte          x            v%d
 >6    beshort       0            bin
 >6    beshort       1            src
