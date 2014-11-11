@@ -405,7 +405,7 @@ class Magic(object):
         text = text.lower()
 
         for include in self.includes:
-            if include.match(text):
+            if include.search(text):
                 filtered = False
                 break
 
