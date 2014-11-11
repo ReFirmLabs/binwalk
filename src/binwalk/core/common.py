@@ -178,11 +178,13 @@ class MathExpression(object):
     '''
 
     OPERATORS = {
-        ast.Add: op.add,
-        ast.Sub: op.sub,
-        ast.Mult: op.mul,
-        ast.Div: op.truediv,
-        ast.Pow: op.pow,
+        ast.Add:    op.add,
+        ast.UAdd:   op.add,
+        ast.USub:   op.sub,
+        ast.Sub:    op.sub,
+        ast.Mult:   op.mul,
+        ast.Div:    op.truediv,
+        ast.Pow:    op.pow,
         ast.BitXor: op.xor
     }
 
@@ -195,7 +197,7 @@ class MathExpression(object):
                 self.value = self.evaluate(self.expression)
             except KeyboardInterrupt as e:
                 raise e
-            except Exception:
+            except Exception as e:
                 pass
 
     def evaluate(self, expr):
@@ -205,9 +207,11 @@ class MathExpression(object):
         if isinstance(node, ast.Num): # <number>
             return node.n
         elif isinstance(node, ast.operator): # <operator>
-            return self.OPERATORS[type(node)]
+            return self.OPERATORS[type(node.op)]
+        elif isinstance(node, ast.UnaryOp):
+            return self.OPERATORS[type(node.op)](0, self._eval(node.operand))
         elif isinstance(node, ast.BinOp): # <left> <operator> <right>
-            return self._eval(node.op)(self._eval(node.left), self._eval(node.right))
+            return self.OPERATORS[type(node.op)](self._eval(node.left), self._eval(node.right))
         else:
             raise TypeError(node)
 

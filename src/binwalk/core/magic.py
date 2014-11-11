@@ -513,7 +513,7 @@ class Magic(object):
 
                 # Sanity check
                 if not isinstance(line_offset, int):
-                    raise ParserException("Failed to convert offset '%s' to a number" % line.offset)
+                    raise ParserException("Failed to convert offset '%s' to a number: '%s'" % (line.offset, line.text))
 
                 # The start of the data needed by this line is at offset + line_offset.
                 # The end of the data will be line.size bytes later.
