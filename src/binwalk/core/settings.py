@@ -29,7 +29,6 @@ class Settings:
     PLUGINS = "plugins"
     EXTRACT_FILE = "extract.conf"
     BINARCH_MAGIC_FILE = "binarch"
-    BINCAST_MAGIC_FILE = "bincast"
 
     def __init__(self):
         '''
@@ -54,6 +53,14 @@ class Settings:
                                               plugins=self._system_path(self.BINWALK_PLUGINS_DIR))
 
     def _magic_signature_files(self, system_only=False, user_only=False):
+        '''
+        Find all user/system magic signature files.
+
+        @system_only - If True, only the system magic file directory will be searched.
+        @user_only   - If True, only the user magic file directory will be searched.
+
+        Returns a list of user/system magic signature files.
+        '''
         files = []
         user_binarch = self._user_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
         system_binarch = self._system_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
@@ -65,6 +72,8 @@ class Settings:
             system_dir = os.path.join(self.system_dir, self.BINWALK_MAGIC_DIR)
             files += [os.path.join(system_dir, x) for x in os.listdir(system_dir)]
 
+        # Don't include binarch signatures in the default list of signature files.
+        # It is specifically loaded when -A is specified on the command line.
         if user_binarch in files:
             files.remove(user_binarch)
         if system_binarch in files:
