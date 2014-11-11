@@ -20,7 +20,6 @@ $ sudo apt-get install python-lzma
 
 For instructions on installing optional dependencies, see [INSTALL.md](https://github.com/devttys0/binwalk/blob/master/INSTALL.md).
 
-For advanced installation options, see [INSTALL.md](https://github.com/devttys0/binwalk/blob/master/INSTALL.md).
 
 Usage
 =====

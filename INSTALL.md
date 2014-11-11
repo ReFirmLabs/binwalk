@@ -87,4 +87,4 @@ $ sudo python setup.py uninstall
 $ sudo python3 setup.py uninstall
 ```
 
-Note that this does _not_ remove any of the installed dependencies.
+Note that this does _not_ remove any of the manually installed dependencies.
