@@ -71,6 +71,7 @@ class SignatureLine(object):
         '''
         self.tags = []
         self.text = line
+        self.regex = False
 
         # Split the line on any white space; for this to work, backslash-escaped
         # spaces ('\ ') are replaced with their escaped hex value ('\x20').
@@ -167,6 +168,16 @@ class SignatureLine(object):
                 self.value = binwalk.core.compat.string_decode(self.value)
             except ValueError as e:
                 raise ParserException("Failed to decode string value '%s' in line '%s'" % (self.value, line))
+        # If a regex was specified, compile it
+        elif self.type == 'regex':
+            self.regex = True
+
+            try:
+                self.value = re.compile(self.value)
+            except KeyboardInterrupt as e:
+                raise e
+            except Exception as e:
+                raise ParserException("Invalid regular expression '%s': %s" % (self.value, str(e)))
         # Non-string types are integer values
         else:
             try:
@@ -190,6 +201,11 @@ class SignatureLine(object):
             # Else, truncate the string to self.MAX_STRING_SIZE
             else:
                 self.size = self.MAX_STRING_SIZE
+        elif self.type == 'regex':
+            # Regular expressions don't have a struct format value, since they don't have to be unpacked
+            self.fmt = None
+            # The size of a matching regex is unknown until it is applied to some data
+            self.size = self.MAX_STRING_SIZE
         elif self.type == 'byte':
             self.fmt = 'b'
             self.size = 1
@@ -280,7 +296,11 @@ class Signature(object):
         # Strings and single byte signatures are taken at face value;
         # multi-byte integer values are turned into regex strings based
         # on their data type size and endianess.
-        if line.type in ['string']:
+        #
+        # Regex types are already compiled expressions.
+        if line.type == 'regex':
+            return line.value
+        if line.type == 'string':
             restr = re.escape(line.value)
         elif line.size == 1:
             restr = re.escape(chr(line.value))
@@ -573,6 +593,7 @@ class Magic(object):
 
                 # Does the data (dvalue) match the specified comparison?
                 if ((line.value is None) or
+                    (line.regex and line.value.match(dvalue)) or
                     (line.condition == '=' and dvalue == line.value) or
                     (line.condition == '>' and dvalue > line.value) or
                     (line.condition == '<' and dvalue < line.value) or
