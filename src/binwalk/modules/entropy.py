@@ -2,6 +2,7 @@
 
 import os
 import math
+import zlib
 import binwalk.core.common
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg
@@ -23,12 +24,16 @@ class Entropy(Module):
 
     TITLE = "Entropy Analysis"
     ORDER = 8
-    
+
     CLI = [
             Option(short='E',
                    long='entropy',
                    kwargs={'enabled' : True},
                    description='Calculate file entropy'),
+            Option(short='H',
+                   long='zlib',
+                   kwargs={'use_zlib' : True},
+                   description='Use zlib compression ratios instead of Shannon algorithm'),
             Option(short='J',
                    long='save',
                    kwargs={'save_plot' : True},
@@ -46,6 +51,7 @@ class Entropy(Module):
     KWARGS = [
             Kwarg(name='enabled', default=False),
             Kwarg(name='save_plot', default=False),
+            Kwarg(name='use_zlib', default=False),
             Kwarg(name='display_results', default=True),
             Kwarg(name='do_plot', default=True),
             Kwarg(name='show_legend', default=True),
@@ -57,9 +63,13 @@ class Entropy(Module):
 
     def init(self):
         self.HEADER[-1] = "ENTROPY"
-        self.algorithm = self.shannon
         self.max_description_length = 0
         self.file_markers = {}
+
+        if self.use_zlib:
+            self.algorithm = self.gzip
+        else:
+            self.algorithm = self.shannon
 
         # Get a list of all other module's results to mark on the entropy graph
         for (module, obj) in iterator(self.modules):
@@ -95,8 +105,8 @@ class Entropy(Module):
 
             if self.display_results:
                 self.footer()
-    
-        if self.do_plot and not self.save_plot:    
+
+        if self.do_plot and not self.save_plot:
             from pyqtgraph.Qt import QtGui
             QtGui.QApplication.instance().exec_()
 
@@ -114,7 +124,11 @@ class Entropy(Module):
             i = 0
             while i < dlen:
                 entropy = self.algorithm(data[i:i+self.block_size])
-                r = self.result(offset=(file_offset + i), file=fp, entropy=entropy, description=("%f" % entropy), display=self.display_results)
+                r = self.result(offset=(file_offset + i),
+                                file=fp,
+                                entropy=entropy,
+                                description=("%f" % entropy),
+                                display=self.display_results)
                 i += self.block_size
 
         if self.do_plot:
@@ -128,7 +142,7 @@ class Entropy(Module):
 
         if data:
             length = len(data)
-            
+
             seen = dict(((chr(x), 0) for x in range(0, 256)))
             for byte in data:
                 seen[byte] += 1
@@ -136,7 +150,7 @@ class Entropy(Module):
             for x in range(0, 256):
                 p_x = float(seen[chr(x)]) / length
                 if p_x > 0:
-                    entropy += - p_x*math.log(p_x, 2)
+                    entropy -= p_x * math.log(p_x, 2)
 
         return (entropy / 8)
 
@@ -146,7 +160,7 @@ class Entropy(Module):
         This is faster than the shannon entropy analysis, but not as accurate.
         '''
         # Entropy is a simple ratio of: <zlib compressed size> / <original size>
-        e = float(float(len(zlib.compress(data, 9))) / float(len(data)))
+        e = float(float(len(zlib.compress(str2bytes(data), 9))) / float(len(data)))
 
         if truncate and e > 1.0:
             e = 1.0
@@ -173,7 +187,7 @@ class Entropy(Module):
             plt.addLegend(size=(self.max_description_length*10, 0))
 
             for (offset, description) in self.file_markers[fname]:
-                # If this description has already been plotted at a different offset, we need to 
+                # If this description has already been plotted at a different offset, we need to
                 # use the same color for the marker, but set the description to None to prevent
                 # duplicate entries in the graph legend.
                 #

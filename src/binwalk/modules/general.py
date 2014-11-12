@@ -71,6 +71,7 @@ class General(Module):
 
         # Hidden, API-only arguments
         Option(long="string",
+               hidden=True,
                kwargs={'subclass' : binwalk.core.common.StringFile}),
     ]
 

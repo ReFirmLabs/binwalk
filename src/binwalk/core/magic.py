@@ -242,9 +242,9 @@ class SignatureLine(object):
             retag = re.compile(r'\{.*?\}')
 
             # Parse out tag keywords from the format string
-            for tag in [m.group() for m in retag.finditer(self.format)]:
+            for match in retag.finditer(self.format):
                 # Get rid of the curly braces.
-                tag = tag.replace('{', '').replace('}', '')
+                tag = match.group().replace('{', '').replace('}', '')
 
                 # If the tag specifies a value, it will be colon delimited (e.g., '{name:%s}')
                 if ':' in tag:
@@ -553,7 +553,7 @@ class Magic(object):
                     if line.value is None:
                         # Check to see if this is a string whose size is known and has been specified on a previous
                         # signature line.
-                        if [x for x in line.tags if x.name == 'string'] and binwalk.core.compat.has_key(tags, 'strlen'):
+                        if binwalk.core.compat.has_key(tags, 'strlen') and [x for x in line.tags if x.name == 'string']:
                             dvalue = self.data[start:(start+tags['strlen'])]
                         # Else, just terminate the string at the first newline, carriage return, or NULL byte
                         else:
@@ -718,7 +718,7 @@ class Magic(object):
             for match in signature.regex.finditer(self.data):
                 # Take the offset of the start of the signature into account
                 offset = match.start() - signature.offset
-                # Signatures are orderd based on the length of their magic bytes (largest first).
+                # Signatures are ordered based on the length of their magic bytes (largest first).
                 # If this offset has already been matched to a previous signature, ignore it unless
                 # self.show_invalid has been specified. Also ignore obviously invalid offsets (<1)
                 # as well as those outside the specified self.data range (dlen).
@@ -774,16 +774,16 @@ class Magic(object):
                     # If there is an existing signature, append it to the signature list,
                     # unless the text in its title field has been filtered by user-defined
                     # filter rules.
-                    if signature:
-                        if not self._filtered(signature.title):
-                            self.signatures.append(signature)
+                    if signature and not self._filtered(signature.title):
+                        self.signatures.append(signature)
 
                     # Create a new signature object; use the size of self.signatures to
                     # assign each signature a unique ID.
                     signature = Signature(len(self.signatures), sigline)
                 # Else, just append this line to the existing signature
                 elif signature:
-                    signature.append(sigline)
+                    #signature.append(sigline)
+                    signature.lines.append(sigline)
                 # If this is not the first line of a signature entry and there is no other
                 # existing signature entry, something is very wrong with the signature file.
                 else:

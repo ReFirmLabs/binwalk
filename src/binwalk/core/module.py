@@ -19,7 +19,7 @@ class Option(object):
     A container class that allows modules to declare command line options.
     '''
 
-    def __init__(self, kwargs={}, priority=0, description="", short="", long="", type=None, dtype=None):
+    def __init__(self, kwargs={}, priority=0, description="", short="", long="", type=None, dtype=None, hidden=False):
         '''
         Class constructor.
 
@@ -30,6 +30,7 @@ class Option(object):
         @long        - The long option to use (if None, this option will not be displayed in help output).
         @type        - The accepted data type (one of: io.FileIO/argparse.FileType/binwalk.core.common.BlockFile, list, str, int, float).
         @dtype       - The displayed accepted type string, to be shown in help output.
+        @hidden      - If set to True, this option will not be displayed in the help output.
 
         Returns None.
         '''
@@ -40,6 +41,7 @@ class Option(object):
         self.long = long
         self.type = type
         self.dtype = dtype
+        self.hidden = hidden
 
         if not self.dtype and self.type:
             if self.type in [io.FileIO, argparse.FileType, binwalk.core.common.BlockFile]:
@@ -627,7 +629,7 @@ class Modules(object):
             help_string += "\n%s Options:\n" % module.TITLE
 
             for module_option in module.CLI:
-                if module_option.long:
+                if module_option.long and not module_option.hidden:
                     long_opt = '--' + module_option.long
 
                     if module_option.dtype:
