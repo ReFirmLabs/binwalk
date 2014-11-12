@@ -23,33 +23,26 @@ class SignatureTag(object):
         for (k,v) in binwalk.core.compat.iterator(kwargs):
             setattr(self, k, v)
 
-class SignatureResult(object):
+class SignatureResult(binwalk.core.module.Result):
     '''
     Container class for signature results.
     '''
     def __init__(self, **kwargs):
-        # These are set by signature keyword tags
+        # These are set by signature keyword tags.
+        # Keyword tags can also set any other object attributes,
+        # including those in binwalk.core.module.Result.
         self.jump = 0
         self.many = False
-        self.size = 0
-        self.name = None
-        self.offset = 0
         self.adjust = 0
         self.strlen = 0
         self.string = False
         self.invalid = False
-        self.extract = True
 
         # These are set by code internally
         self.id = 0
-        self.file = None
-        self.valid = True
-        self.display = True
-        self.description = ""
 
         # Kwargs overrides the defaults set above
-        for (k,v) in binwalk.core.compat.iterator(kwargs):
-            setattr(self, k, v)
+        super(self.__class__, self).__init__(**kwargs)
 
         self.valid = (not self.invalid)
 

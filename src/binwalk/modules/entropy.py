@@ -3,6 +3,7 @@
 import os
 import math
 import zlib
+import numpy as np
 import binwalk.core.common
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg
@@ -21,19 +22,21 @@ class Entropy(Module):
     COLORS = ['r', 'g', 'c', 'b', 'm']
 
     DEFAULT_BLOCK_SIZE = 1024
+    DEFAULT_DATA_POINTS = 2048
 
     TITLE = "Entropy Analysis"
     ORDER = 8
 
+    # TODO: Add --dpoints option to set the number of data points?
     CLI = [
             Option(short='E',
                    long='entropy',
                    kwargs={'enabled' : True},
                    description='Calculate file entropy'),
             Option(short='H',
-                   long='zlib',
+                   long='fast',
                    kwargs={'use_zlib' : True},
-                   description='Use zlib compression ratios instead of Shannon algorithm'),
+                   description='Use faster, but less detailed, entropy analysis'),
             Option(short='J',
                    long='save',
                    kwargs={'save_plot' : True},
@@ -93,7 +96,7 @@ class Entropy(Module):
             if self.config.block:
                 self.block_size = self.config.block
             else:
-                self.block_size = self.DEFAULT_BLOCK_SIZE
+                self.block_size = None
 
     def run(self):
         for fp in iter(self.next_file, None):
@@ -119,6 +122,16 @@ class Entropy(Module):
         # Clear results from any previously analyzed files
         self.clear(results=True)
 
+        # If -K was not specified, calculate the block size to create DEFAULT_DATA_POINTS data points
+        if self.block_size is None:
+            block_size = fp.size / self.DEFAULT_DATA_POINTS
+            # Round up to the nearest DEFAULT_BLOCK_SIZE (1024)
+            block_size = int(block_size + ((self.DEFAULT_BLOCK_SIZE - block_size) % self.DEFAULT_BLOCK_SIZE))
+        else:
+            block_size = self.block_size
+
+        binwalk.core.common.debug("Entropy block size (%d data points): %d" % (self.DEFAULT_DATA_POINTS, block_size))
+
         while True:
             file_offset = fp.tell()
 
@@ -128,13 +141,13 @@ class Entropy(Module):
 
             i = 0
             while i < dlen:
-                entropy = self.algorithm(data[i:i+self.block_size])
+                entropy = self.algorithm(data[i:i+block_size])
                 r = self.result(offset=(file_offset + i),
                                 file=fp,
                                 entropy=entropy,
                                 description=("%f" % entropy),
                                 display=self.display_results)
-                i += self.block_size
+                i += block_size
 
         if self.do_plot:
             self.plot_entropy(fp.name)
