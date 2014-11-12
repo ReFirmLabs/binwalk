@@ -106,9 +106,14 @@ class Entropy(Module):
             if self.display_results:
                 self.footer()
 
-        if self.do_plot and not self.save_plot:
-            from pyqtgraph.Qt import QtGui
-            QtGui.QApplication.instance().exec_()
+        if self.do_plot:
+            import pyqtgraph as pg
+
+            if not self.save_plot:
+                from pyqtgraph.Qt import QtGui
+                QtGui.QApplication.instance().exec_()
+
+            pg.exit()
 
     def calculate_file_entropy(self, fp):
         # Clear results from any previously analyzed files
