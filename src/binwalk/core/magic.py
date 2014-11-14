@@ -37,6 +37,7 @@ class SignatureResult(binwalk.core.module.Result):
         self.strlen = 0
         self.string = False
         self.invalid = False
+        self.once = False
 
         # These are set by code internally
         self.id = 0
@@ -374,6 +375,8 @@ class Magic(object):
         self.data = ""
         # A list of Signature class objects, populated by self.parse (see also: self.load)
         self.signatures = []
+        # A set of signatures with the 'once' keyword that have already been displayed once
+        self.display_once = set()
 
         self.show_invalid = invalid
         self.includes = [re.compile(x) for x in include]
@@ -509,7 +512,7 @@ class Magic(object):
         tag_strlen = None
         max_line_level = 0
         previous_line_end = 0
-        tags = {'id' : signature.id, 'offset' : offset, 'invalid' : False}
+        tags = {'id' : signature.id, 'offset' : offset, 'invalid' : False, 'once' : False}
 
         # Apply each line of the signature to self.data, starting at the specified offset
         for n in range(0, len(signature.lines)):
@@ -735,7 +738,16 @@ class Magic(object):
                     # Generate a SignatureResult object and append it to the results list if the
                     # signature is valid, or if invalid results were requested.
                     if not tags['invalid'] or self.show_invalid:
+                        # Only display results with the 'once' tag once.
+                        if tags['once']:
+                            if signature.title in self.display_once:
+                                continue
+                            else:
+                                self.display_once.add(signature.title)
+
+                        # Append the result to the results list
                         results.append(SignatureResult(**tags))
+
                         # Add this offset to the matched_offsets set, so that it can be ignored by
                         # subsequent loops.
                         matched_offsets.add(offset)
