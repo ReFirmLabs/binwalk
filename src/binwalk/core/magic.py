@@ -86,10 +86,6 @@ class SignatureLine(object):
         # characters to an integer offset. This will fail if the offset is a complex
         # value (e.g., '(4.l+16)').
         self.offset = parts[0].replace('>', '')
-
-        # Check if the offset is an indirect offset
-        self.is_indirect_offset = self.offset.startswith('(')
-
         try:
             self.offset = int(self.offset, 0)
         except ValueError as e:
@@ -157,6 +153,17 @@ class SignatureLine(object):
             self.value = None
         # String values need to be decoded, as they may contain escape characters (e.g., '\x20')
         elif self.type == 'string':
+            # String types support multiplication to easily match large repeating byte sequences
+            if '*' in self.value:
+                try:
+                    p = self.value.split('*')
+                    self.value = p[0]
+                    for n in p[1:]:
+                        self.value *= int(n, 0)
+                except KeyboardInterrupt as e:
+                    raise e
+                except Exception as e:
+                    raise ParserException("Failed to expand string '%s' with integer '%s' in line '%s'" % (self.value, n, line))
             try:
                 self.value = binwalk.core.compat.string_decode(self.value)
             except ValueError as e:
@@ -258,6 +265,7 @@ class Signature(object):
     '''
     Class to hold signature data and generate signature regular expressions.
     '''
+
     def __init__(self, id, first_line):
         '''
         Class constructor.
@@ -558,31 +566,37 @@ class Magic(object):
                 # Some integer values have special operations that need to be performed on them
                 # before comparison (e.g., "belong&0x0000FFFF"). Complex math expressions are
                 # supported here as well.
-                if isinstance(dvalue, int) and line.operator:
-                    # If the operator value of this signature line is just an integer value, use it
-                    if isinstance(line.opvalue, int):
-                        opval = line.opvalue
-                    # Else, evaluate the complex expression
-                    else:
-                        opval = self._do_math(offset, line.opvalue)
+                #if isinstance(dvalue, int) and line.operator:
+                if line.operator:
+                    try:
+                        # If the operator value of this signature line is just an integer value, use it
+                        if isinstance(line.opvalue, int):
+                            opval = line.opvalue
+                        # Else, evaluate the complex expression
+                        else:
+                            opval = self._do_math(offset, line.opvalue)
 
-                    # Perform the specified operation
-                    if line.operator == '&':
-                        dvalue &= opval
-                    elif line.operator == '|':
-                        dvalue |= opval
-                    elif line.operator == '*':
-                        dvalue *= opval
-                    elif line.operator == '+':
-                        dvalue += opval
-                    elif line.operator == '-':
-                        dvalue -= opval
-                    elif line.operator == '/':
-                        dvalue /= opval
-                    elif line.operator == '~':
-                        dvalue = ~opval
-                    elif line.operator == '^':
-                        dvalue ^= opval
+                        # Perform the specified operation
+                        if line.operator == '&':
+                            dvalue &= opval
+                        elif line.operator == '|':
+                            dvalue |= opval
+                        elif line.operator == '*':
+                            dvalue *= opval
+                        elif line.operator == '+':
+                            dvalue += opval
+                        elif line.operator == '-':
+                            dvalue -= opval
+                        elif line.operator == '/':
+                            dvalue /= opval
+                        elif line.operator == '~':
+                            dvalue = ~opval
+                        elif line.operator == '^':
+                            dvalue ^= opval
+                    except KeyboardInterrupt as e:
+                        raise e
+                    except Exception as e:
+                        raise ParserException("Failed to apply operator " + line.operator + " to " + dvalue + ": " + str(e))
 
                 # Does the data (dvalue) match the specified comparison?
                 if ((line.value is None) or

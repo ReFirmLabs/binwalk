@@ -105,7 +105,41 @@
 >4      belong      x               {jump:%u}
 >4      belong      x               {size:%u}
 
-
+# Tentative UbiFS signature; needs more parsing and better validation
+# http://lxr.free-electrons.com/source/fs/ubifs/ubifs-media.h
+0       lelong      0x06101831      UBIFS filesystem, superblock node,
+>20     ubyte       !6              {invalid} # Only look for the superblock node
+>4      lelong      x               CRC: 0x%X,
+>8      lequad      x               sqnum: %ld,
+>16     lelong      x               node length: %d,{size:%d}{jump:%d}
+>20     ubyte       x               node type: %d,
+>21     ubyte       x               group type: %d,
+>22     lelong      !0              invalid padding,{invalid}
+>26     byte        x               key hash: 0x%X,
+>27     byte        x               key format: 0x%X,
+>28     lelong      x               flags: 0x%X,
+>32     lelong      x               minimum I/O unit size: %d,
+>36     lelong      x               logical erase block size: %d,
+>40     lelong      x               number of logical erase blocks: %d,
+>44     lelong      x               maximum number of erase blocks: %d,
+>48     lelong      x               maximum data stored in buds: %d,
+>52     lelong      x               erase block log size: %d,
+>56     lelong      x               LEBs used for lprops table: %d,
+>60     lelong      x               LEBs used for recording orphans: %d,
+>64     lelong      x               journal head count: %d,
+>68     lelong      x               maximum number of links per indexing node: %d,
+>72     lelong      x               number of LEBs in LPT's save table: %d,
+>76     lelong      x               UBIFS on-flash format version: %d,
+>80     leshort     x               default compression type: 0x%X,
+>82     leshort     !0              invalid padding,{invalid}
+>84     lelong      x               reserve pool UID: %d,
+>88     lelong      x               reserve pool GID: %d,
+>92     lequad      x               reserve pool size: %ld,
+>100    lelong      x               time granularity in nanoseconds: %d,
+>104    lequad      x               UUID: 0x%X
+>112    lequad      x               \b%X,
+>120    lelong      x               UBIFS R/O compatibility version: %d
+>124    string      !\x00*3968      invalid padding{invalid}
 
 # JFFS2 file system
 # If used with binwalk's smart signature feature (on by default, -S to disable)
