@@ -123,7 +123,14 @@
 >20     ubelong     x               data offset: 0x%X
 
 # http://lxr.free-electrons.com/source/fs/ubifs/ubifs-media.h
-0       lelong      0x06101831      UBIFS superblock,
+0       lelong      0x06101831      UBIFS master node,
+>20     ubyte       !7              {invalid} # Only look for the master node
+>22     leshort     !0              {invalid}
+>24     lequad      x               highest inode: %d,
+>32     lequad      x               commit number: %d
+
+# http://lxr.free-electrons.com/source/fs/ubifs/ubifs-media.h
+0       lelong      0x06101831      UBIFS superblock node,
 >20     ubyte       !6              {invalid} # Only look for the superblock node
 >4      ulelong     x               CRC: 0x%X,
 #>8      lequad      x               sqnum: %ld,
