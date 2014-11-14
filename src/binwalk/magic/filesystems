@@ -105,11 +105,25 @@
 >4      belong      x               {jump:%u}
 >4      belong      x               {size:%u}
 
-# TODO: Validate flags field.
-#       Add signatures for other node types so that they can be skipped
-#       and we don't print out a ton of stuff internal to each node.
+# http://www.dubeiko.com/development/FileSystems/UBI/ubidesign.pdf
+0       string      UBI!            UBI volume ID header,
+>4      ubyte       x               version: %d,
+>5      ubyte       x               type: %d,
+>8      ubelong     x               volume id: %d,
+>8      ubelong     >256            {invalid}
+>12     ubelong     x               size: %d
+>12     ubelong     !0              {invalid}
+>28     string      !\x00*12        {invalid}
+
+0       string      UBI\x23         UBI erase count header,
+>4      ubyte       x               version: %d,
+>5      string      !\x00*3         {invalid}
+>8      ubequad     x               EC: 0x%lX,
+>16     ubelong     x               VID header offset: 0x%X,
+>20     ubelong     x               data offset: 0x%X
+
 # http://lxr.free-electrons.com/source/fs/ubifs/ubifs-media.h
-0       lelong      0x06101831      UBIFS filesystem, superblock node,
+0       lelong      0x06101831      UBIFS superblock,
 >20     ubyte       !6              {invalid} # Only look for the superblock node
 >4      ulelong     x               CRC: 0x%X,
 #>8      lequad      x               sqnum: %ld,
