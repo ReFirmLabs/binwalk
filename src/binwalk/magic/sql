@@ -45,7 +45,7 @@
 # from other GDBM files.
 #
 # Version 2 used this format:
-0       string  **\x20This\x20file\x20contains\x20an\x20SQLite  SQLite 2.x database
+0       string  \x2A\x2A\x20This\x20file\x20contains\x20an\x20SQLite  SQLite 2.x database
 
 # Version 3 of SQLite allows applications to embed their own "user version"
 # number in the database.  Detect this and distinguish those files.
