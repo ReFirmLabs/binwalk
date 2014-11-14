@@ -16,24 +16,28 @@ class LZMAPlugin(binwalk.core.plugin.Plugin):
     MAX_DATA_SIZE = 64 * 1024
 
     def init(self):
-        import lzma
-        self.decompressor = lzma.decompress
+        try:
+            import lzma
+            self.decompressor = lzma.decompress
+        except ImportError as e:
+            self.decompressor = None
 
     def is_valid_lzma(self, data):
         valid = True
 
-        # The only acceptable exceptions are those indicating that the input data was truncated.
-        try:
-            self.decompressor(binwalk.core.compat.str2bytes(data))
-        except IOError as e:
-            # The Python2 module gives this error on truncated input data.
-            if str(e) != "unknown BUF error":
-                valid = False
-        except Exception as e:
-            # The Python3 module gives this error on truncated input data.
-            # The inconsistency between modules is a bit worrisome.
-            if str(e) != "Compressed data ended before the end-of-stream marker was reached":
-                valid = False
+        if self.decompressor is not None:
+            # The only acceptable exceptions are those indicating that the input data was truncated.
+            try:
+                self.decompressor(binwalk.core.compat.str2bytes(data))
+            except IOError as e:
+                # The Python2 module gives this error on truncated input data.
+                if str(e) != "unknown BUF error":
+                    valid = False
+            except Exception as e:
+                # The Python3 module gives this error on truncated input data.
+                # The inconsistency between modules is a bit worrisome.
+                if str(e) != "Compressed data ended before the end-of-stream marker was reached":
+                    valid = False
 
         return valid
 

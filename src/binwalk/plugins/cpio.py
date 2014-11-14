@@ -19,6 +19,7 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
                                            cmd=self.extractor)
 
     def extractor(self, fname):
+        result = None
         fname = os.path.abspath(fname)
         out_dir = os.path.join(os.path.dirname(fname), self.CPIO_OUT_DIR)
 
@@ -36,16 +37,21 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
             return
 
         try:
-            subprocess.call(['cpio', '-d', '-i', '--no-absolute-filenames'],
-                            stdin=fpin,
-                            stderr=fperr,
-                            stdout=fperr)
+            result = subprocess.call(['cpio', '-d', '-i', '--no-absolute-filenames'],
+                                     stdin=fpin,
+                                     stderr=fperr,
+                                     stdout=fperr)
         except OSError:
-            pass
+            result = -1
 
         os.chdir(curdir)
         fpin.close()
         fperr.close()
+
+        if result == 0:
+            return True
+        else:
+            return False
 
     def pre_scan(self):
         # Be sure to re-set this at the beginning of every scan

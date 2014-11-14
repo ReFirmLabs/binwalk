@@ -1,8 +1,4 @@
 # Basic signature scan module. This is the default (and primary) feature of binwalk.
-
-# This module does not directly use the lzma module, but some plugins for this module do.
-# If the lzma import fails, this module won't be loaded at all.
-import lzma
 import binwalk.core.magic
 from binwalk.core.module import Module, Option, Kwarg
 

@@ -22,12 +22,6 @@ class LZMAModPlugin(binwalk.core.plugin.Plugin):
             self.original_cmd = rule['cmd']
             rule['cmd'] = self.lzma_cable_extractor
             break
-        #rules = self.module.extractor.get_rules()
-        #for i in range(0, len(rules)):
-        #    if rules[i]['regex'] and rules[i]['cmd'] and rules[i]['regex'].match(self.SIGNATURE):
-        #        self.original_cmd = rules[i]['cmd']
-        #        rules[i]['cmd'] = self.lzma_cable_extractor
-        #        break
 
     def lzma_cable_extractor(self, fname):
         # Try extracting the LZMA file without modification first
@@ -59,7 +53,9 @@ class LZMAModPlugin(binwalk.core.plugin.Plugin):
 
             # Overwrite the original file so that it can be cleaned up if -r was specified
             shutil.move(out_name, fname)
-            self.module.extractor.execute(self.original_cmd, fname)
+            result = self.module.extractor.execute(self.original_cmd, fname)
+
+        return result
 
     def scan(self, result):
         # The modified cable modem LZMA headers all have valid dictionary sizes and a properties byte of 0x5D.
