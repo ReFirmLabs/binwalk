@@ -21,13 +21,13 @@ $ sudo python3 setup.py install
 Dependencies
 ============
 
-Binwalk's only required run-time dependency is `python-lzma`. This module is included by default in Python3, but must be installed separately for Python2.7:
+Besides a Python interpreter, there are no installation dependencies for binwalk. All dependencies are optional run-time dependencies, and unless otherwise specified, are available from most Linux package managers.
+
+Although all binwalk run-time dependencies are optional, the `python-lzma` module is highly recommended for improving the reliability of signature scans. This module is included by default in Python3, but must be installed separately for Python2.7:
 
 ```bash
 $ sudo apt-get install python-lzma
 ```
-
-**The remaining run-time dependencies are only required for optional binwalk features**, such as file extraction and graphing capabilities. Unless otherwise specified, these dependencies are available from most Linux package managers.
 
 Binwalk uses [pyqtgraph](http://www.pyqtgraph.org) to generate graphs and visualizations, which requires the following: 
 
@@ -56,7 +56,7 @@ Binwalk relies on multiple external utilties in order to automatically extract/d
 
 ```bash
 # Install standard extraction utilities
-$ sudo apt-get install mtd-utils zlib1g-dev liblzma-dev gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract openjdk-6-jdk cramfsprogs cramfsswap squashfs-tools
+$ sudo apt-get install mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract openjdk-6-jdk cramfsprogs cramfsswap squashfs-tools
 ```
 
 ```bash
@@ -88,3 +88,4 @@ $ sudo python3 setup.py uninstall
 ```
 
 Note that this does _not_ remove any of the manually installed dependencies.
+
