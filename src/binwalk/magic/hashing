@@ -1,7 +1,7 @@
-# Base64 index tables
-0   string  ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/    Standard base64 index table
-0   string  ACEGIKMOQSUWYBDFHJLNPRTVXZacegikmoqsuwybdfhjlnprtvxz0246813579=+/   SerComm base64 index table
-
 # CRC32 polynomial table
 0   string  \x00\x00\x00\x00\x77\x07\x30\x96\xEE\x0E\x61\x2C\x99\x09\x51\xBA    CRC32 polynomial table, big endian
 0   string  \x00\x00\x00\x00\x96\x30\x07\x77\x2C\x61\x0E\xEE\xBA\x51\x09\x99    CRC32 polynomial table, little endian
+
+# MD5
+0   string  \xD7\x6A\xA4\x78\xE8\xC7\xB7\x56\x24\x20\x70\xDB\xC1\xBD\xCE\xEE    MD5 table, big endian
+0   string  \x78\xA4\x6A\xD7\x56\xB7\xC7\xE8\xDB\x70\x20\x24\xEE\xCE\xBD\xC1    MD5 table, little endian

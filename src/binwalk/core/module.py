@@ -393,7 +393,11 @@ class Module(object):
         if r is None:
             r = Result(**kwargs)
 
+        # Add the name of the current module to the result
         r.module = self.__class__.__name__
+
+        # Add any specified base address to the reported offset
+        r.offset += self.config.base
 
         # Any module that is reporting results, valid or not, should be marked as enabled
         if not self.enabled:
