@@ -1,5 +1,20 @@
 
 #------------------Compression Formats-----------------------------
+# Stuffit archives are the de facto standard of compression for Macintosh
+# # files obtained from most archives. (franklsm@tuns.ca)
+0   string      SIT!            StuffIt Archive (data)
+!:mime      application/x-stuffit
+!:apple     SIT!SIT!
+>2  string      x               : %s
+0   string      SITD            StuffIt Deluxe (data)
+>2  string      x               : %s
+0   string      Sef             StuffIt Deluxe Segment (data)
+>2  string      x               : %s
+
+# Newer StuffIt archives (grant@netbsd.org)
+0   string      StuffIt         StuffIt Archive
+!:mime      application/x-stuffit
+!:apple     SIT!SIT!
 
 # AFX compressed files (Wolfram Kleff)
 2    string        -afx         AFX compressed file data
@@ -55,7 +70,7 @@
 >>17    byte            =0x0B                                   os: WinNT
 >>17    byte            =0x0E                                   os: Win32
 
-# lzip  
+# lzip
 0       string          LZIP            lzip compressed data,
 >4      ubyte           0               {invalid}
 # Current version is still 1.x
@@ -69,11 +84,11 @@
 0    string        \211LZO\000\015\012\032\012    LZO compressed data
 
 # 7-zip archiver, from Thomas Klausner (wiz@danbala.tuwien.ac.at)
-# http://www.7-zip.org or DOC/7zFormat.txt 
+# http://www.7-zip.org or DOC/7zFormat.txt
 #
 0     string    7z\274\257\047\034      7-zip archive data,
 >6    byte      <0                      {invalid}
->6    byte      0            
+>6    byte      0
 >>7   byte      0                       {invalid}
 >6    byte      >20                     {invalid}
 >6    byte      x                       version %d
@@ -127,7 +142,7 @@
 # case you don't know how to set a date in your gzip files. Brilliant.
 >4      lelong          =0              \b, NULL date:
 >4      lelong          <0              {invalid}
->4      lelong          >0        
+>4      lelong          >0
 >>4     lelong          <694224000      {invalid}
 >>4     lelong          =694224000      {invalid}
 >>4     lelong          >694224000      \b, last modified:
