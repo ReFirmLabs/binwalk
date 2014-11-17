@@ -7,6 +7,7 @@ __all__ = ['Magic']
 import re
 import struct
 import datetime
+import binwalk.core.common
 import binwalk.core.compat
 
 class ParserException(Exception):
@@ -14,14 +15,6 @@ class ParserException(Exception):
     Exception thrown specifically for signature file parsing errors.
     '''
     pass
-
-class SignatureTag(object):
-    '''
-    Conatiner class for each signature tag entry.
-    '''
-    def __init__(self, **kwargs):
-        for (k,v) in binwalk.core.compat.iterator(kwargs):
-            setattr(self, k, v)
 
 class SignatureResult(binwalk.core.module.Result):
     '''
@@ -38,6 +31,7 @@ class SignatureResult(binwalk.core.module.Result):
         self.string = False
         self.invalid = False
         self.once = False
+        self.overlap = False
 
         # These are set by code internally
         self.id = 0
@@ -63,7 +57,7 @@ class SignatureLine(object):
 
         Returns None.
         '''
-        self.tags = []
+        self.tags = {}
         self.text = line
         self.regex = False
 
@@ -255,7 +249,7 @@ class SignatureLine(object):
                     v = True
 
                 # Create a new SignatureTag instance and append it to self.tags
-                self.tags.append(SignatureTag(name=n, value=v))
+                self.tags[n] = v
 
             # Remove all tags from the printable format string
             self.format = retag.sub('', self.format).strip()
@@ -298,33 +292,34 @@ class Signature(object):
         # Strings and single byte signatures are taken at face value;
         # multi-byte integer values are turned into regex strings based
         # on their data type size and endianess.
-        #
-        # Regex types are already compiled expressions.
         if line.type == 'regex':
+            # Regex types are already compiled expressions.
+            # Note that since re.finditer is used, unless the specified
+            # regex accounts for it, overlapping signatures will be ignored.
             return line.value
         if line.type == 'string':
-            restr = re.escape(line.value)
+            restr = line.value
         elif line.size == 1:
-            restr = re.escape(chr(line.value))
+            restr = chr(line.value)
         elif line.size == 2:
             if line.endianess == '<':
-                restr = re.escape(chr(line.value & 0xFF) + chr(line.value >> 8))
+                restr = chr(line.value & 0xFF) + chr(line.value >> 8)
             elif line.endianess == '>':
-                restr = re.escape(chr(line.value >> 8) + chr(line.value & 0xFF))
+                restr = chr(line.value >> 8) + chr(line.value & 0xFF)
         elif line.size == 4:
             if line.endianess == '<':
-                restr = re.escape(chr(line.value & 0xFF) +
+                restr =          (chr(line.value & 0xFF) +
                                   chr((line.value >> 8) & 0xFF) +
                                   chr((line.value >> 16) & 0xFF) +
                                   chr(line.value >> 24))
             elif line.endianess == '>':
-                restr = re.escape(chr(line.value >> 24) +
+                restr =          (chr(line.value >> 24) +
                                   chr((line.value >> 16) & 0xFF) +
                                   chr((line.value >> 8) & 0xFF) +
                                   chr(line.value & 0xFF))
         elif line.size == 8:
             if line.endianess == '<':
-                restr = re.escape(chr(line.value & 0xFF) +
+                restr =          (chr(line.value & 0xFF) +
                                   chr((line.value >> 8) & 0xFF) +
                                   chr((line.value >> 16) & 0xFF) +
                                   chr((line.value >> 24) & 0xFF) +
@@ -333,7 +328,7 @@ class Signature(object):
                                   chr((line.value >> 48) & 0xFF) +
                                   chr(line.value >> 56))
             elif line.endianess == '>':
-                restr = re.escape(chr(line.value >> 56) +
+                restr =          (chr(line.value >> 56) +
                                   chr((line.value >> 48) & 0xFF) +
                                   chr((line.value >> 40) & 0xFF) +
                                   chr((line.value >> 32) & 0xFF) +
@@ -342,7 +337,21 @@ class Signature(object):
                                   chr((line.value >> 8) & 0xFF) +
                                   chr(line.value & 0xFF))
 
-        return re.compile(restr)
+        # Since re.finditer is used on a per-signature basis, signatures should be crafted carefully
+        # to ensure that they aren't potentially self-overlapping (e.g., a signature of "ABCDAB" could
+        # be confused by the byte sequence "ABCDABCDAB"). The longer the signature, the less likely an
+        # unintentional overlap is, although files could still be maliciously crafted to cause false
+        # negative results.
+        #
+        # Thus, unless a signature has been explicitly marked as knowingly overlapping ('{overlap}'),
+        # spit out a warning about any self-overlapping signatures.
+        if not binwalk.core.compat.has_key(line.tags, 'overlap'):
+            for i in range(1, line.size):
+                if restr[i:] == restr[0:(line.size-i)]:
+                    binwalk.core.common.warning("Signature '%s' is a self-overlapping signature!" % line.text)
+                    break
+
+        return re.compile(re.escape(restr))
 
     def append(self, line):
         '''
@@ -377,6 +386,7 @@ class Magic(object):
         self.signatures = []
         # A set of signatures with the 'once' keyword that have already been displayed once
         self.display_once = set()
+        self.dirty = True
 
         self.show_invalid = invalid
         self.includes = [re.compile(x) for x in include]
@@ -557,7 +567,7 @@ class Magic(object):
                     if line.value is None:
                         # Check to see if this is a string whose size is known and has been specified on a previous
                         # signature line.
-                        if binwalk.core.compat.has_key(tags, 'strlen') and [x for x in line.tags if x.name == 'string']:
+                        if binwalk.core.compat.has_key(tags, 'strlen') and binwalk.core.compat.has_key(line.tags, 'string'):
                             dvalue = self.data[start:(start+tags['strlen'])]
                         # Else, just terminate the string at the first newline, carriage return, or NULL byte
                         else:
@@ -633,23 +643,23 @@ class Magic(object):
 
                     # Process tag keywords specified in the signature line. These have already been parsed out of the
                     # original format string so that they can be processed separately from the printed description string.
-                    for tag in line.tags:
+                    for (tag_name, tag_value) in binwalk.core.compat.iterator(line.tags):
                         # If the tag value is a string, try to format it
-                        if isinstance(tag.value, str):
+                        if isinstance(tag_value, str):
                             # Generate the tuple for the format string
                             dvalue_tuple = ()
-                            for x in self.fmtstr.finditer(tag.value):
+                            for x in self.fmtstr.finditer(tag_value):
                                 dvalue_tuple += (dvalue,)
 
                             # Format the tag string
-                            tags[tag.name] = tag.value % dvalue_tuple
+                            tags[tag_name] = tag_value % dvalue_tuple
                         # Else, just use the raw tag value
                         else:
-                            tags[tag.name] = tag.value
+                            tags[tag_name] = tag_value
 
                         # Some tag values are intended to be integer values, so try to convert them as such
                         try:
-                            tags[tag.name] = int(tags[tag.name], 0)
+                            tags[tag_name] = int(tags[tag_name], 0)
                         except KeyboardInterrupt as e:
                             raise e
                         except Exception as e:
@@ -722,7 +732,6 @@ class Magic(object):
         results = []
         matched_offsets = set()
 
-        # It's expensive in Python to pass large strings around to various functions.
         # Since data can potentially be quite a large string, make it available to other
         # methods via a class attribute so that it doesn't need to be passed around to
         # different methods over and over again.
@@ -730,14 +739,14 @@ class Magic(object):
 
         # If dlen wasn't specified, search all of self.data
         if dlen is None:
-            dlen = len(self.data)
+            dlen = len(data)
 
-        # Loop through each loaded signature
         for signature in self.signatures:
             # Use regex to search the data block for potential signature matches (fast)
-            for match in signature.regex.finditer(self.data):
+            for match in signature.regex.finditer(data):
                 # Take the offset of the start of the signature into account
                 offset = match.start() - signature.offset
+
                 # Signatures are ordered based on the length of their magic bytes (largest first).
                 # If this offset has already been matched to a previous signature, ignore it unless
                 # self.show_invalid has been specified. Also ignore obviously invalid offsets (<1)

@@ -163,7 +163,8 @@
 >23     byte            x               header checksum: 0x%X
 
 # PackImg tag, somtimes used as a delimiter between the kernel and rootfs in firmware images.
-0       string        --PaCkImGs--    PackImg section delimiter tag,
+0       string        --PaCkImGs      PackImg section delimiter tag,
+>10     string        !--             {invalid}
 # If the size in both big and little endian is greater than 512MB, consider this a false positive
 >16     ulelong       >0x20000000
 >>16    ubelong       >0x20000000    {invalid}
@@ -517,7 +518,8 @@
 >18         beshort+16 x                        data offset from start of block: %d
 
 # Obfuscated Arcadyan firmware
-0x68    belong  0x00D50800                      Obfuscated Arcadyan firmware,
+0x68    belong  0x00D508                        Obfuscated Arcadyan firmware,
+>3      byte    !0                              {invalid}
 >0      ubelong x                               signature bytes: 0x%X,
 >0x70   string  !\x00\x00\x00\x00\x00\x00\x00   {invalid},
 >0x70   belong  0x00000000                      see https://github.com/devttys0/wrt120n/deobfuscator

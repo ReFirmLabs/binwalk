@@ -2,7 +2,8 @@
 #---------------------------Bootloaders--------------------------------
 
 # CFE bootloader
-0	string	CFE1CFE1	CFE boot loader
+0	string	CFE1	    CFE boot loader
+>4  string  !CFE1       {invalid}
 >40	string	CFE1CFE1	{invalid}
 
 # U-Boot boot loader

@@ -3,7 +3,6 @@
 import os
 import math
 import zlib
-import numpy as np
 import binwalk.core.common
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg

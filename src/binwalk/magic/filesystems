@@ -573,7 +573,7 @@
 >8      belong      x               {jump:%d}
 
 # Wind River MemFS file system, found in some VxWorks devices
-0       string    owowowowowowowowowowowowowowow    Wind River management filesystem,
+0       string    owowowowowowowowowowowowowowow    Wind River management filesystem,{overlap}
 >30     string    !ow                               {invalid},
 >32     belong    1                                 compressed,
 >32     belong    2                                 plain text,

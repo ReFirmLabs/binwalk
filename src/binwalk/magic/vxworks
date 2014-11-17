@@ -1,6 +1,6 @@
 
 # Signatures to identify the start of a VxWorks symbol table
-8       string      \x00\x00\x05\x00\x00\x00\x00\x00    VxWorks symbol table, big endian,
+8       string      \x00\x00\x05\x00\x00\x00\x00\x00    VxWorks symbol table, big endian,{overlap}
 >4      belong      0                                   {invalid} 
 >4      ubelong     x                                   first entry: [type: function, code address: 0x%X,
 >0      belong      0                                   {invalid}
@@ -33,7 +33,7 @@
 >>152   belong      !0x700
 >>>152  belong      !0x900                              \b, {invalid}
 
-8       string      \x00\x00\x07\x00\x00\x00\x00\x00    VxWorks symbol table, big endian,
+8       string      \x00\x00\x07\x00\x00\x00\x00\x00    VxWorks symbol table, big endian,{overlap}
 >4      belong      0                                   {invalid}
 >4      ubelong     x                                   first entry: [type: initialized data, code address: 0x%X,
 >0      belong      0                                   {invalid}
@@ -66,7 +66,7 @@
 >>152   belong      !0x700
 >>>152  belong      !0x900                              \b, {invalid}
 
-8       string      \x00\x00\x09\x00\x00\x00\x00\x00    VxWorks symbol table, big endian,
+8       string      \x00\x00\x09\x00\x00\x00\x00\x00    VxWorks symbol table, big endian,{overlap}
 >4      belong      0                                   {invalid}
 >4      ubelong     x                                   first entry: [type: uninitialized data, code address: 0x%X,
 >0      belong      0                                   {invalid}
@@ -99,7 +99,7 @@
 >>152   belong      !0x700
 >>>152  belong      !0x900                              \b, {invalid}
 
-8       string      \x00\x05\x00\x00\x00\x00\x00\x00    VxWorks symbol table, little endian,
+8       string      \x00\x05\x00\x00\x00\x00\x00\x00    VxWorks symbol table, little endian,{overlap}
 >4      lelong      0                                   {invalid}
 >4      ulelong     x                                   first entry: [type: function, code address: 0x%X,
 >0      lelong      0                                   {invalid}
@@ -132,7 +132,7 @@
 >>152   lelong      !0x700
 >>>152  lelong      !0x900                              \b, {invalid}
 
-8       string      \x00\x07\x00\x00\x00\x00\x00\x00    VxWorks symbol table, little endian,
+8       string      \x00\x07\x00\x00\x00\x00\x00\x00    VxWorks symbol table, little endian,{overlap}
 >4      lelong      0                                   {invalid}
 >4      ulelong     x                                   first entry: [type: initialized data, code address: 0x%X,
 >0      lelong      0                                   {invalid}
@@ -165,7 +165,7 @@
 >>152   lelong      !0x700
 >>>152  lelong      !0x900                              \b, {invalid}
 
-8       string      \x00\x09\x00\x00\x00\x00\x00\x00    VxWorks symbol table, little endian,
+8       string      \x00\x09\x00\x00\x00\x00\x00\x00    VxWorks symbol table, little endian,{overlap}
 >4      lelong      0                                   {invalid}
 >4      ulelong     x                                   first entry: [type: uninitialized data, code address: 0x%X,
 >0      lelong      0                                   {invalid}

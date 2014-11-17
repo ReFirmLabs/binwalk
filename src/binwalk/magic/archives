@@ -125,15 +125,24 @@
 0    string        \351,\001JAM    JAM archive
 
 # LHARC/LHA archiver (Greg Roelofs, newt@uchicago.edu)
-2    string        -lzs-        LHa 2.x? archive data [lzs] [NSRL|LHA2]
-2    string        -lh\40-      LHa 2.x? archive data [lh ] [NSRL|LHA2]
-2    string        -lhd-        LHa 2.x? archive data [lhd] [NSRL|LHA2]
-2    string        -lh2-        LHa 2.x? archive data [lh2] [NSRL|LHA2]
-2    string        -lh3-        LHa 2.x? archive data [lh3] [NSRL|LHA2]
-2    string        -lh4-        LHa (2.x) archive data [lh4] [NSRL|LHA2]
-2    string        -lh5-        LHa (2.x) archive data [lh5] [NSRL|LHA2]
-2    string        -lh6-        LHa (2.x) archive data [lh6] [NSRL|LHA2]
-2    string        -lh7-        LHa (2.x) archive data [lh7] [NSRL|LHA2]
+2    string        -lzs         LHa 2.x? archive data [lzs] [NSRL|LHA2]
+>6   string        !-           {invalid}
+2    string        -lh\40       LHa 2.x? archive data [lh ] [NSRL|LHA2]
+>6   string        !-           {invalid}
+2    string        -lhd         LHa 2.x? archive data [lhd] [NSRL|LHA2]
+>6   string        !-           {invalid}
+2    string        -lh2         LHa 2.x? archive data [lh2] [NSRL|LHA2]
+>6   string        !-           {invalid}
+2    string        -lh3         LHa 2.x? archive data [lh3] [NSRL|LHA2]
+>6   string        !-           {invalid}
+2    string        -lh4         LHa (2.x) archive data [lh4] [NSRL|LHA2]
+>6   string        !-           {invalid}
+2    string        -lh5         LHa (2.x) archive data [lh5] [NSRL|LHA2]
+>6   string        !-           {invalid}
+2    string        -lh6         LHa (2.x) archive data [lh6] [NSRL|LHA2]
+>6   string        !-           {invalid}
+2    string        -lh7         LHa (2.x) archive data [lh7] [NSRL|LHA2]
+>6   string        !-           {invalid}
 
 
 # cpio archives
@@ -290,7 +299,8 @@
 >56     leshort         1               \b, 1 registry entry
 >56     leshort         >1              \b, %u registry entries
 
-0       string  \0\ \ \ \ \ \ \ \ \ \ \ \0\0    LBR archive data
+0       string  \x00\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20        LBR archive data
+>12     string  !\x00x00                                                {invalid}
 
 # Parity archive reconstruction file, the 'par' file format now used on Usenet.
 0       string          PAR\0   PARity archive data

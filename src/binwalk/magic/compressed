@@ -2,7 +2,8 @@
 #------------------Compression Formats-----------------------------
 
 # AFX compressed files (Wolfram Kleff)
-2    string        -afx-        AFX compressed file data
+2    string        -afx         AFX compressed file data
+>6   string        !-           {invalid}
 
 # bzip2
 0    string BZh91AY&SY    bzip2 compressed data, block size = 900k
