@@ -275,8 +275,11 @@ class Signature(object):
         self.lines = [first_line]
         self.title = first_line.format
         self.offset = first_line.offset
-        self.confidence = first_line.size
         self.regex = self._generate_regex(first_line)
+        try:
+            self.confidence = first_line.tags['confidence']
+        except KeyError:
+            self.confidence = first_line.size
 
     def _generate_regex(self, line):
         '''

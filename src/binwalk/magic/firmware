@@ -518,10 +518,10 @@
 >18         beshort+16 x                        data offset from start of block: %d
 
 # Obfuscated Arcadyan firmware
-0x68    belong  0x00D508                        Obfuscated Arcadyan firmware,
->3      byte    !0                              {invalid}
+0x68    string  \x00\xD5\x08                    Obfuscated Arcadyan firmware,
+>0x6B   byte    !0                              invalid signature trailing byte [0x%X],{invalid}
 >0      ubelong x                               signature bytes: 0x%X,
->0x70   string  !\x00\x00\x00\x00\x00\x00\x00   {invalid},
+>0x70   string  !\x00\x00\x00\x00\x00\x00       invalid padding bytes,{invalid}
 >0x70   belong  0x00000000                      see https://github.com/devttys0/wrt120n/deobfuscator
 
 # Digi firmware images

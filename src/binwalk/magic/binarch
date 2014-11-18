@@ -120,5 +120,10 @@
 # push esi
 0	string	\x55\x89\xE5\x83\xEC				Intel x86 instructions, function prologue
 0	string	\x55\x89\xE5\x57\x56				Intel x86 instructions, function prologue
-0	string	\x90\x90\x90\x90\x90\x90\x90\x90	Intel x86 instructions, nops{jump:8}
+0	string	\x90\x90\x90\x90\x90\x90\x90\x90	Intel x86 instructions, nops{jump:8}{overlap}
+
+# unlk a6
+# rts
+# link a6, XX
+0   string  N^NuNV      Motorola Coldfire instructions, function prologue/epilogue
 
