@@ -244,6 +244,10 @@ class Entropy(Module):
 
         plt = pg.plot(title=fname, clear=True)
 
+        # Disable auto-ranging, as it can cause some very un-intuitive graphs,
+        # particularly for files with only high-entropy data.
+        plt.disableAutoRange()
+
         if self.show_legend and has_key(self.file_markers, fname):
             plt.addLegend(size=(self.max_description_length*10, 0))
 
