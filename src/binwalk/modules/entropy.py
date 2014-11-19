@@ -68,6 +68,9 @@ class Entropy(Module):
         self.max_description_length = 0
         self.file_markers = {}
 
+        self.trigger_high = .95
+        self.trigger_low = .85
+
         if self.use_zlib:
             self.algorithm = self.gzip
         else:
@@ -118,6 +121,8 @@ class Entropy(Module):
             pg.exit()
 
     def calculate_file_entropy(self, fp):
+        last_edge = None
+
         # Clear results from any previously analyzed files
         self.clear(results=True)
 
@@ -141,11 +146,28 @@ class Entropy(Module):
             i = 0
             while i < dlen:
                 entropy = self.algorithm(data[i:i+block_size])
+                display = self.display_results
+                description = "%f" % entropy
+
+                if not self.config.verbose:
+                    if last_edge in [None, 0] and entropy > self.trigger_high:
+                        description = "Rising entropy edge (%f)" % entropy
+                        display = self.display_results
+                        last_edge = 1
+                    elif last_edge in [None, 1] and entropy < self.trigger_low:
+                        description = "Falling entropy edge (%f)" % entropy
+                        display = self.display_results
+                        last_edge = 0
+                    else:
+                        display = False
+                        description = "%f" % entropy
+
                 r = self.result(offset=(file_offset + i),
                                 file=fp,
                                 entropy=entropy,
-                                description=("%f" % entropy),
-                                display=self.display_results)
+                                description=description,
+                                display=display)
+
                 i += block_size
 
         if self.do_plot:
