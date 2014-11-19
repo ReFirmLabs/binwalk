@@ -432,7 +432,7 @@ class Magic(object):
             return True
 
         for exclude in self.excludes:
-            if exclude.match(text):
+            if exclude.search(text):
                 filtered = True
                 break
 
@@ -759,7 +759,7 @@ class Magic(object):
                     tags = self._analyze(signature, offset)
                     # Generate a SignatureResult object and append it to the results list if the
                     # signature is valid, or if invalid results were requested.
-                    if not tags['invalid'] or self.show_invalid:
+                    if (not tags['invalid'] or self.show_invalid) and not self._filtered(tags['description']):
                         # Only display results with the 'once' tag once.
                         if tags['once']:
                             if signature.title in self.display_once:
