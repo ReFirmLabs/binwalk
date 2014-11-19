@@ -43,24 +43,24 @@ class Entropy(Module):
                    long='save',
                    kwargs={'save_plot' : True},
                    description='Save plot as a PNG'),
+            Option(short='Q',
+                   long='nlegend',
+                   kwargs={'show_legend' : False},
+                   description='Omit the legend from the entropy plot graph'),
             Option(short='N',
                    long='nplot',
                    kwargs={'do_plot' : False},
                    description='Do not generate an entropy plot graph'),
             Option(short='H',
                    long='high',
-                   type=int,
+                   type=float,
                    kwargs={'trigger_high' : DEFAULT_TRIGGER_HIGH},
                    description='Set the rising edge entropy trigger threshold (default: %.2f)' % DEFAULT_TRIGGER_HIGH),
             Option(short='L',
                    long='low',
-                   type=int,
+                   type=float,
                    kwargs={'trigger_low' : DEFAULT_TRIGGER_LOW},
                    description='Set the falling edge entropy trigger threshold (default: %.2f)' % DEFAULT_TRIGGER_LOW),
-            Option(short='Q',
-                   long='nlegend',
-                   kwargs={'show_legend' : False},
-                   description='Omit the legend from the entropy plot graph'),
     ]
 
     KWARGS = [
@@ -133,7 +133,10 @@ class Entropy(Module):
             pg.exit()
 
     def calculate_file_entropy(self, fp):
+        # Tracks the last displayed rising/falling edge (0 for falling, 1 for rising, None if nothing has been printed yet)
         last_edge = None
+        # Auto-reset the trigger; if True, an entropy above/below self.trigger_high/self.trigger_low will be printed
+        trigger_reset = True
 
         # Clear results from any previously analyzed files
         self.clear(results=True)
@@ -162,17 +165,24 @@ class Entropy(Module):
                 description = "%f" % entropy
 
                 if not self.config.verbose:
-                    if last_edge in [None, 0] and entropy > self.trigger_high:
+                    if trigger_reset and entropy >= self.trigger_high:
                         description = "Rising entropy edge (%f)" % entropy
                         display = self.display_results
                         last_edge = 1
-                    elif last_edge in [None, 1] and entropy < self.trigger_low:
+                        trigger_reset = False
+                    elif trigger_reset and entropy <= self.trigger_low:
                         description = "Falling entropy edge (%f)" % entropy
                         display = self.display_results
                         last_edge = 0
+                        trigger_reset = False
                     else:
                         display = False
                         description = "%f" % entropy
+
+                    if last_edge in [None, 0] and entropy > self.trigger_low:
+                        trigger_reset = True
+                    elif last_edge in [None, 1] and entropy < self.trigger_high:
+                        trigger_reset = True
 
                 r = self.result(offset=(file_offset + i),
                                 file=fp,
