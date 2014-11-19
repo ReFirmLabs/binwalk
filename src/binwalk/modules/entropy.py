@@ -23,6 +23,9 @@ class Entropy(Module):
     DEFAULT_BLOCK_SIZE = 1024
     DEFAULT_DATA_POINTS = 2048
 
+    DEFAULT_TRIGGER_HIGH = 0.95
+    DEFAULT_TRIGGER_LOW = 0.85
+
     TITLE = "Entropy Analysis"
     ORDER = 8
 
@@ -32,7 +35,7 @@ class Entropy(Module):
                    long='entropy',
                    kwargs={'enabled' : True},
                    description='Calculate file entropy'),
-            Option(short='H',
+            Option(short='F',
                    long='fast',
                    kwargs={'use_zlib' : True},
                    description='Use faster, but less detailed, entropy analysis'),
@@ -44,6 +47,16 @@ class Entropy(Module):
                    long='nplot',
                    kwargs={'do_plot' : False},
                    description='Do not generate an entropy plot graph'),
+            Option(short='H',
+                   long='high',
+                   type=int,
+                   kwargs={'trigger_high' : DEFAULT_TRIGGER_HIGH},
+                   description='Set the rising edge entropy trigger threshold (default: %.2f)' % DEFAULT_TRIGGER_HIGH),
+            Option(short='L',
+                   long='low',
+                   type=int,
+                   kwargs={'trigger_low' : DEFAULT_TRIGGER_LOW},
+                   description='Set the falling edge entropy trigger threshold (default: %.2f)' % DEFAULT_TRIGGER_LOW),
             Option(short='Q',
                    long='nlegend',
                    kwargs={'show_legend' : False},
@@ -53,6 +66,8 @@ class Entropy(Module):
     KWARGS = [
             Kwarg(name='enabled', default=False),
             Kwarg(name='save_plot', default=False),
+            Kwarg(name='trigger_high', default=DEFAULT_TRIGGER_HIGH),
+            Kwarg(name='trigger_low', default=DEFAULT_TRIGGER_LOW),
             Kwarg(name='use_zlib', default=False),
             Kwarg(name='display_results', default=True),
             Kwarg(name='do_plot', default=True),
@@ -67,9 +82,6 @@ class Entropy(Module):
         self.HEADER[-1] = "ENTROPY"
         self.max_description_length = 0
         self.file_markers = {}
-
-        self.trigger_high = .95
-        self.trigger_low = .85
 
         if self.use_zlib:
             self.algorithm = self.gzip
