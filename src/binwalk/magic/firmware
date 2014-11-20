@@ -319,7 +319,7 @@
 >24    lelong        x        image size: %d bytes
 
 # Firmware header used by several D-Link routers (and probably others)
-0               string  \x5e\xa3\xa4\x17        DLOB firmware header,
+0               string  \x5e\xa3\xa4\x17        DLOB firmware header,{jump:108}
 >(7.b+12)       string  !\x5e\xa3\xa4\x17       {invalid},
 #>>12           string  x                       %s,
 >(7.b+40)       string  x                       boot partition: "%s"
@@ -429,14 +429,16 @@
 >32     string      x           version: "%s"
 
 0       belong      0x5EA3A417      SEAMA firmware header, big endian,
+>4      beshort     !0              {invalid}
 >6      beshort     x               meta size: %d,
 >8      belong      <1              {invalid}
->8      belong      x               size: %d
+>8      belong      x               image size: %d
 
 0       lelong      0x5EA3A417      SEAMA firmware header, little endian,
+>4      leshort     !0              {invalid}
 >6      leshort     x               meta size: %d,
 >8      lelong      <1              {invalid}
->8      lelong      x               size: %d
+>8      lelong      x               image size: %d
 
 0       belong      0x4D544443      NSP firmware header, big endian,
 >16     belong      <1              {invalid}
