@@ -23,8 +23,8 @@ class Entropy(Module):
     DEFAULT_BLOCK_SIZE = 1024
     DEFAULT_DATA_POINTS = 2048
 
-    DEFAULT_TRIGGER_HIGH = 0.95
-    DEFAULT_TRIGGER_LOW = 0.85
+    DEFAULT_TRIGGER_HIGH = .95
+    DEFAULT_TRIGGER_LOW = .85
 
     TITLE = "Entropy Analysis"
     ORDER = 8
@@ -244,9 +244,10 @@ class Entropy(Module):
 
         plt = pg.plot(title=fname, clear=True)
 
-        # Disable auto-ranging, as it can cause some very un-intuitive graphs,
-        # particularly for files with only high-entropy data.
-        plt.disableAutoRange()
+        # Disable auto-ranging of the Y (entropy) axis, as it
+        # can cause some very un-intuitive graphs, particularly
+        #for files with only high-entropy data.
+        plt.setYRange(0, 8)
 
         if self.show_legend and has_key(self.file_markers, fname):
             plt.addLegend(size=(self.max_description_length*10, 0))
