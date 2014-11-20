@@ -77,7 +77,7 @@
 >4      lelong      <0              {invalid}
 >4      lelong      >1073741824     {invalid}
 >4      ulelong     x               size: %u
->8      lelong      &1              version #2
+>8      lelong      &1              version 2
 >8      lelong      &2              sorted_dirs
 >8      lelong      &4              hole_support
 >32     lelong      x               CRC 0x%x,
@@ -516,37 +516,37 @@
 # ext4 filesystem - Eric Sandeen <sandeen@sandeen.net>
 # volume label and UUID Russell Coker
 # http://etbe.coker.com.au/2008/07/08/label-vs-uuid-vs-device/
-0x438   leshort         0xEF53          Linux EXT filesystem,
->2      leshort         >4              {invalid}invalid state
->2      leshort         3               {invalid}invalid state
->2      leshort         <0              {invalid}invalid state
->4      leshort         >3              {invalid}invalid error behavior
->4      leshort         <0              {invalid}invalid error behavior
->4      lelong          >1              {invalid}invalid major revision
->4      lelong          <0              {invalid}invalid major revision
->4      lelong          x               rev %d
->6      leshort         x               \b.%d
+0x438       uleshort        0xEF53          Linux EXT filesystem,
+>0x43A      leshort         >4              {invalid}invalid state
+>0x43A      leshort         3               {invalid}invalid state
+>0x43A      leshort         <0              {invalid}invalid state
+>0x43C      leshort         >3              {invalid}invalid error behavior
+>0x43C      leshort         <0              {invalid}invalid error behavior
+>0x43C      lelong          >1              {invalid}invalid major revision
+>0x43C      lelong          <0              {invalid}invalid major revision
+>0x43C      lelong          x               rev %d
+>0x43E      leshort         x               \b.%d,
 # No journal?  ext2
->36     lelong&0x04     0               ext2 filesystem data
->>2     leshort&0x01    0               (mounted or unclean)
+>0x438+36   lelong&0x04     0               ext2 filesystem data
+>>0x43A     leshort&0x01    0               (mounted or unclean)
 # Has a journal?  ext3 or ext4
->36     lelong          &0x0000004
+>0x438+36   lelong          &0x0000004
 #  and small INCOMPAT?
->>40    lelong          <0x0000040
+>>0x438+40  lelong          <0x0000040
 #   and small RO_COMPAT?
->>>44   lelong          <0x0000008      ext3 filesystem data
+>>>0x438+44 lelong          <0x0000008      ext3 filesystem data
 #   else large RO_COMPAT?
->>>44   lelong          >0x0000007      ext4 filesystem data
+>>>0x438+44 lelong          >0x0000007      ext4 filesystem data
 #  else large INCOMPAT?
->>40    lelong          >0x000003f      ext4 filesystem data
->48     belong          x               \b, UUID=%08x
->52     beshort         x               \b-%04x
->54     beshort         x               \b-%04x
->56     beshort         x               \b-%04x
->58     belong          x               \b-%08x
->60     beshort         x               \b%04x
->64     byte            !0
->>64    string          x               \b, volume name "%s"
+>>0x438+40  lelong          >0x000003f      ext4 filesystem data
+>0x438+48   ubelong         x               \b, UUID=%08x
+>0x438+52   ubeshort        x               \b-%04x
+>0x438+54   ubeshort        x               \b-%04x
+>0x438+56   ubeshort        x               \b-%04x
+>0x438+58   ubelong         x               \b-%08x
+>0x438+60   ubeshort        x               \b%04x
+>0x438+64   byte            !0
+>>0x438+64  string          x               \b, volume name "%s"
 
 
 #romfs filesystems - Juan Cespedes <cespedes@debian.org>

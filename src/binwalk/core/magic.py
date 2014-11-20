@@ -612,7 +612,7 @@ class Magic(object):
                     except KeyboardInterrupt as e:
                         raise e
                     except Exception as e:
-                        raise ParserException("Failed to apply operator " + line.operator + " to " + dvalue + ": " + str(e))
+                        raise ParserException("Failed to apply operator " + line.operator + " to " + str(dvalue) + ": " + str(e))
 
                 # Does the data (dvalue) match the specified comparison?
                 if ((line.value is None) or
