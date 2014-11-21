@@ -754,9 +754,11 @@ class Magic(object):
                 # If this offset has already been matched to a previous signature, ignore it unless
                 # self.show_invalid has been specified. Also ignore obviously invalid offsets (<1)
                 # as well as those outside the specified self.data range (dlen).
-                if (offset not in matched_offsets or self.show_invalid) and offset >= 0 and offset < dlen:
+                #if (offset not in matched_offsets or self.show_invalid) and offset >= 0 and offset < dlen:
+                if offset >= 0 and offset < dlen:
                     # Analyze the data at this offset using the current signature rule
                     tags = self._analyze(signature, offset)
+
                     # Generate a SignatureResult object and append it to the results list if the
                     # signature is valid, or if invalid results were requested.
                     if (not tags['invalid'] or self.show_invalid) and not self._filtered(tags['description']):

@@ -85,7 +85,6 @@ class Signature(Module):
 
         # Create a signature from the raw bytes, if any
         if self.raw_bytes:
-            print (self.raw_bytes)
             raw_signatures = []
             for raw_bytes in self.raw_bytes:
                 raw_signatures.append("0    string    %s    %s" % (raw_bytes, raw_bytes))
@@ -139,7 +138,6 @@ class Signature(Module):
 
             # Scan this data block for magic signatures
             for r in self.magic.scan(data, dlen):
-
                 # current_block_offset is set when a jump-to-offset keyword is encountered while
                 # processing signatures. This points to an offset inside the current data block
                 # that scanning should jump to, so ignore any subsequent candidate signatures that

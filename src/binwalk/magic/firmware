@@ -89,34 +89,22 @@
 >48     string        x         root device: "%s"
 
 # trx image file
-0       string        HDR0    TRX firmware header, little endian, header size: 28 bytes,
->4      ulelong       x       image size: %d bytes,
->8      ulelong       x       CRC32: 0x%X
->12     uleshort      x       flags: 0x%X,
->14     uleshort      1       version: %d,
->>16    ulelong       x       loader offset: 0x%X,
->>20    ulelong       x       linux kernel offset: 0x%X,
->>24    ulelong       x       rootfs offset: 0x%X
->>24    ulelong       0       {invalid}
-
-0       string        HDR0    TRX firmware header, little endian, header size: 28 bytes,
->4      ulelong       x       image size: %d bytes,
->8      ulelong       x       CRC32: 0x%X
->12     uleshort      x       flags: 0x%X,
->14     uleshort      1       version: %d,
->>16    ulelong       x       kernel offset: 0x%X,
->>20    ulelong       x       rootfs offset: 0x%X
->>24    ulelong       !0      {invalid}
-
 0       string        HDR0    TRX firmware header, little endian, header size: 32 bytes,
+>4      lelong        <1      {invalid}
 >4      ulelong       x       image size: %d bytes,
 >8      ulelong       x       CRC32: 0x%X
 >12     uleshort      x       flags: 0x%X,
+>14     uleshort      !1
+>>14    uleshort      !2      {invalid}
 >14     uleshort      2       version: %d,
 >>16    ulelong       x       loader offset: 0x%X,
 >>20    ulelong       x       linux kernel offset: 0x%X,
 >>24    ulelong       x       rootfs offset: 0x%X,
 >>28    ulelong       x       bin-header offset: 0x%X
+>14     uleshort      1       version: %d,
+>>16    ulelong       x       kernel offset: 0x%X,
+>>20    ulelong       x       rootfs offset: 0x%X
+>>24    ulelong       !0      {invalid}
 
 # Ubicom firmware image
 0       belong    0xFA320080    Ubicom firmware header,
