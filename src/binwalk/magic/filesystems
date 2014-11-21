@@ -80,7 +80,7 @@
 >8      lelong      &1              version 2
 >8      lelong      &2              sorted_dirs
 >8      lelong      &4              hole_support
->32     lelong      x               CRC 0x%x,
+>32     ulelong     x               CRC 0x%.8X,
 >36     ulelong     x               edition %u,
 >40     lelong      <0              {invalid}
 >40     ulelong     x               %u blocks,
@@ -93,17 +93,17 @@
 >4      belong      <0              {invalid}
 >4      belong      >1073741824     {invalid}
 >4      belong      x               size %u
->8      belong      &1              version #2
+>8      belong      &1              version 2
 >8      belong      &2              sorted_dirs
 >8      belong      &4              hole_support
->32     belong      x               CRC 0x%x,
+>32     ubelong     x               CRC 0x%.8X,
 >36     belong      x               edition %u,
 >40     belong      <0              {invalid}
->40     belong      x               %u blocks,
+>40     ubelong     x               %u blocks,
 >44     belong      <0              {invalid}
->44     belong      x               %u files
->4      belong      x               {jump:%u}
->4      belong      x               {size:%u}
+>44     ubelong     x               %u files
+>4      ubelong     x               {jump:%u}
+>4      ubelong     x               {size:%u}
 
 # http://www.dubeiko.com/development/FileSystems/UBI/ubidesign.pdf
 0       string      UBI!            UBI volume ID header,
