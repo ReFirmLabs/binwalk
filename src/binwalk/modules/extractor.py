@@ -562,7 +562,7 @@ class Extractor(Module):
                 except KeyboardInterrupt as e:
                     raise e
                 except Exception as e:
-                    binwalk.core.common.warning("Extractor.execute failed to run internal extractor '%s': %s" % (str(cmd), str(e)))
+                    binwalk.core.common.warning("Internal extractor '%s' failed with exception: '%s'" % (str(cmd), str(e)))
             else:
                 # If not in debug mode, create a temporary file to redirect stdout and stderr to
                 if not binwalk.core.common.DEBUG:

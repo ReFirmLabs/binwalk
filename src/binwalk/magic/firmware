@@ -522,6 +522,11 @@
 # Obfuscated Arcadyan firmware
 0x68    string  \x00\xD5\x08                    Obfuscated Arcadyan firmware,
 >0x6B   byte    !0                              invalid signature trailing byte [0x%X],{invalid}
+# None of the known Arcadyan signatures bytes have a NULL byte
+>0      byte    0                               {invalid}
+>1      byte    0                               {invalid}
+>2      byte    0                               {invalid}
+>3      byte    0                               {invalid}
 >0      ubelong x                               signature bytes: 0x%X,
 >0x70   string  !\x00\x00\x00\x00\x00\x00       invalid padding bytes,{invalid}
 >0x70   belong  0x00000000                      see https://github.com/devttys0/wrt120n/deobfuscator
