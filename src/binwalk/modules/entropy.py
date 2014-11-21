@@ -165,6 +165,11 @@ class Entropy(Module):
                 description = "%f" % entropy
 
                 if not self.config.verbose:
+                    if last_edge in [None, 0] and entropy > self.trigger_low:
+                        trigger_reset = True
+                    elif last_edge in [None, 1] and entropy < self.trigger_high:
+                        trigger_reset = True
+
                     if trigger_reset and entropy >= self.trigger_high:
                         description = "Rising entropy edge (%f)" % entropy
                         display = self.display_results
@@ -178,11 +183,6 @@ class Entropy(Module):
                     else:
                         display = False
                         description = "%f" % entropy
-
-                    if last_edge in [None, 0] and entropy > self.trigger_low:
-                        trigger_reset = True
-                    elif last_edge in [None, 1] and entropy < self.trigger_high:
-                        trigger_reset = True
 
                 r = self.result(offset=(file_offset + i),
                                 file=fp,
