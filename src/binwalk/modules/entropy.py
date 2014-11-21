@@ -247,7 +247,7 @@ class Entropy(Module):
         # Disable auto-ranging of the Y (entropy) axis, as it
         # can cause some very un-intuitive graphs, particularly
         #for files with only high-entropy data.
-        plt.setYRange(0, 8)
+        plt.setYRange(0, 1)
 
         if self.show_legend and has_key(self.file_markers, fname):
             plt.addLegend(size=(self.max_description_length*10, 0))
