@@ -6,7 +6,7 @@
 0      belong    0x27051956     uImage header, header size: 64 bytes,
 >4     ubelong   x              header CRC: 0x%X,
 >8     bedate    x              created: %s,
->12    ubelong   <1             {invalid}
+>12    belong    <1             {invalid}
 >12    ubelong   x              image size: %d bytes,
 >16    ubelong   x              Data Address: 0x%X,
 >20    ubelong   x              Entry Point: 0x%X,
