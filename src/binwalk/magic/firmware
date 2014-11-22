@@ -311,12 +311,12 @@
 
 # Firmware header used by some TV's
 0      string        FNIB     ZBOOT firmware header, header size: 32 bytes,
->8     lelong        x        load address: 0x%.8X,
->12    lelong        x        start address: 0x%.8X,
->16    lelong        x        checksum: 0x%.8X,
->20    lelong        x        version: 0x%.8X,
+>8     ulelong       x        load address: 0x%.8X,
+>12    ulelong       x        start address: 0x%.8X,
+>16    ulelong       x        checksum: 0x%.8X,
+>20    ulelong       x        version: 0x%.8X,
 >24    lelong        <1       {invalid}
->24    lelong        x        image size: %d bytes
+>24    ulelong       x        image size: %d bytes
 
 # Firmware header used by several D-Link routers (and probably others)
 0               string  \x5e\xa3\xa4\x17        DLOB firmware header,{jump:108}
@@ -378,10 +378,10 @@
 >7      leshort        x                version control: %d,
 >9      leshort        x                download control: %d,
 >11     string         x                hardware ID: "%s",
->44     leshort        x                hardware version: 0x%X,
->58     leshort        x                firmware version: 0x%X,
->60     leshort        x                starting code segment: 0x%X,
->62     leshort        x                code size: 0x%X
+>44     uleshort       x                hardware version: 0x%X,
+>58     uleshort       x                firmware version: 0x%X,
+>60     uleshort       x                starting code segment: 0x%X,
+>62     uleshort       x                code size: 0x%X
 
 # NPK firmware header, used by Mikrotik
 0           belong        0x1EF1D0BA   NPK firmware header,
@@ -413,12 +413,12 @@
 >0  byte        x                       header size: 56 bytes,
 >8  byte        0                       {invalid}
 >8  string      x                       name: "%s",
->44 belong      x                       base address: 0x%.8X,
+>44 ubelong     x                       base address: 0x%.8X,
 >52 belong      x                       data size: %d bytes{size:%d}
 
 4   string      \x00\x00\x00\x00END\x2e Ubiquiti end header, header size: 12 bytes,
 >12 belong      !0                      {invalid},
->8  belong      x                       cumulative ~CRC32: 0x%.8X
+>8  ubelong     x                       cumulative ~CRC32: 0x%.8X
 
 
 # Found in DIR-100 firmware
@@ -542,8 +542,8 @@
 >>>>>>>0xC8     beshort !0x4f43
 >>>>>>>>0xC8    beshort !0x4646
 >>>>>>>>>0xC8   beshort !0x5350         {invalid}invalid header,
->0xD4           belong  x               load address: 0x%.8X,
->0xDC           belong  x               entry point: 0x%.8X,
+>0xD4           ubelong x               load address: 0x%.8X,
+>0xDC           ubelong x               entry point: 0x%.8X,
 
 # Lancom firmware signatures, courtesy of christophvw
 0    string            ELSF              LANCOM firmware header,

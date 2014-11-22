@@ -138,7 +138,7 @@
 # Superblock node
 >20      ubyte       6
 >>24     leshort     !0             {invalid}
->>28     lelong      x              flags: 0x%X,
+>>28     ulelong      x             flags: 0x%X,
 >>32     lelong      x              min I/O unit size: %d,
 >>36     lelong      x              erase block size: %d,
 >>40     lelong      x              erase block count: %d,

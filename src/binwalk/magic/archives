@@ -209,7 +209,7 @@
 
 # IBM AIX Backup File Format header and entry signatures
 0     ulelong    0xea6b0009   BFF volume header,
->4    leshort    x            checksum: 0x%.4X,
+>4    uleshort   x            checksum: 0x%.4X,
 >6    leshort    <0           {invalid}
 >6    leshort    0            {invalid}
 >6    leshort    x            volume number: %d,
