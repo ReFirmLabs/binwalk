@@ -1,20 +1,17 @@
 
 #------------------Compression Formats-----------------------------
 # Stuffit archives are the de facto standard of compression for Macintosh
-# # files obtained from most archives. (franklsm@tuns.ca)
+# files obtained from most archives. (franklsm@tuns.ca)
+# Found in some firmware updates.
 0   string      SIT!            StuffIt Archive (data)
-!:mime      application/x-stuffit
-!:apple     SIT!SIT!
->2  string      x               : %s
+>2  string      x               \b: %s
 0   string      SITD            StuffIt Deluxe (data)
->2  string      x               : %s
+>2  string      x               \b: %s
 0   string      Sef             StuffIt Deluxe Segment (data)
->2  string      x               : %s
+>2  string      x               \b: %s
 
 # Newer StuffIt archives (grant@netbsd.org)
 0   string      StuffIt         StuffIt Archive
-!:mime      application/x-stuffit
-!:apple     SIT!SIT!
 
 # AFX compressed files (Wolfram Kleff)
 2    string        -afx         AFX compressed file data
