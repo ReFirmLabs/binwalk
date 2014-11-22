@@ -66,6 +66,12 @@ $ git clone https://github.com/devttys0/sasquatch
 $ (cd sasquatch && make && sudo make install)
 ```
 
+```bash
+# Install unstuff (closed source) to extract StuffIt archive files
+$ wget -O - http://my.smithmicro.com/downloads/files/stuffit520.611linux-i386.tar.gz | tar -zxv
+$ sudo cp bin/unstuff /usr/local/bin/
+```
+
 Installing the IDA Plugin
 =========================
 
