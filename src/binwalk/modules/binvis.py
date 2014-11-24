@@ -98,7 +98,7 @@ class Plotter(Module):
 
         # If the number of data points exceeds the maximum number of allowed data points, use a
         # weighting system to eliminate data points that occur less freqently.
-        if sum(data_points.itervalues()) > self.max_points:
+        if sum(data_points.values()) > self.max_points:
 
             # First, generate a set of weight values 1 - 10
             for i in range(1, 11):
