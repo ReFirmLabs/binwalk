@@ -83,6 +83,8 @@ class Extractor(Module):
     def load(self):
         # Holds a list of extraction rules loaded either from a file or when manually specified.
         self.extract_rules = []
+        # The base extraction directory (to be determined at runtime)
+        self.directory = None
 
         if self.load_default_rules:
             self.load_defaults()
@@ -126,7 +128,7 @@ class Extractor(Module):
         # explicitly excluded via the -y/-x options.
         if r.valid and r.extract and r.display:
             # Attempt extraction
-            (extraction_directory, dd_file) = self.extract(r.offset, r.description, r.file.name, size, r.name)
+            (extraction_directory, dd_file) = self.extract(r.offset, r.description, r.file.path, size, r.name)
 
             # If the extraction was successful, self.extract will have returned the output directory and name of the dd'd file
             if extraction_directory and dd_file:
@@ -299,7 +301,10 @@ class Extractor(Module):
         '''
         # If we have not already created an output directory for this target file, create one now
         if not has_key(self.extraction_directories, path):
-            output_directory = os.path.join(os.path.dirname(path), unique_file_name('_' + os.path.basename(path), extension='extracted'))
+            basedir = os.path.dirname(path)
+            basename = os.path.basename(path)
+            outdir = os.path.join(basedir, '_' + basename)
+            output_directory = unique_file_name(outdir, extension='extracted')
 
             if not os.path.exists(output_directory):
                 os.mkdir(output_directory)
@@ -310,6 +315,7 @@ class Extractor(Module):
             output_directory = self.extraction_directories[path]
 
         # Set the initial base extraction directory for later determining the level of recusion
+        # TODO: This is no longer needed since self.directory has the same information. Update code accordingly.
         if not self.base_recursion_dir:
             self.base_recursion_dir = os.path.realpath(output_directory) + os.path.sep
 
@@ -357,6 +363,10 @@ class Extractor(Module):
             binwalk.core.common.debug("Found %d matching extraction rules" % len(rules))
 
         output_directory = self.build_output_directory(file_name)
+
+        # Update self.directory with the first output_directory path
+        if self.directory is None:
+            self.directory = output_directory
 
         # Extract to end of file if no size was specified
         if not size:

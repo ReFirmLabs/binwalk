@@ -365,7 +365,7 @@ class Module(object):
             self.status.total = fp.length
 
         if fp is not None:
-            self.current_target_file_name = fp.name
+            self.current_target_file_name = fp.path
         else:
             self.current_target_file_name = None
 

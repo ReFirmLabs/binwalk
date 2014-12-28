@@ -364,6 +364,7 @@ def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
             except AttributeError:
                 self._name = fname
 
+            self.path = os.path.abspath(self.name)
             self.seek(self.offset)
 
         def _swap_data_block(self, block):
