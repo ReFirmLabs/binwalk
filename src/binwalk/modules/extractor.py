@@ -163,7 +163,7 @@ class Extractor(Module):
     def append_rule(self, r):
         self.extract_rules.append(r.copy())
 
-    def add_rule(self, txtrule=None, regex=None, extension=None, cmd=None):
+    def add_rule(self, txtrule=None, regex=None, extension=None, cmd=None, codes=[0, None]):
         '''
         Adds a set of rules to the extraction rule list.
 
@@ -172,6 +172,7 @@ class Extractor(Module):
         @extension - If rule string is not specified, this is the file extension to use.
         @cmd       - If rule string is not specified, this is the command to run.
                      Alternatively a callable object may be specified, which will be passed one argument: the path to the file to extract.
+        @codes     - A list of valid return codes for the extractor.
 
         Returns None.
         '''
@@ -180,7 +181,8 @@ class Extractor(Module):
         r = {
             'extension'     : '',
             'cmd'           : '',
-            'regex'         : None
+            'regex'         : None,
+            'codes'         : codes
         }
 
         # Process single explicitly specified rule
@@ -209,6 +211,7 @@ class Extractor(Module):
                 r['regex'] = re.compile(values[0])
                 r['extension'] = values[1]
                 r['cmd'] = values[2]
+                r['codes'] = values[3]
             except KeyboardInterrupt as e:
                 raise e
             except Exception:
@@ -397,7 +400,7 @@ class Extractor(Module):
 
                     # Execute the specified command against the extracted file
                     if self.run_extractors:
-                        extract_ok = self.execute(rule['cmd'], fname)
+                        extract_ok = self.execute(rule['cmd'], fname, rule['codes'])
                     else:
                         extract_ok = True
 
@@ -486,9 +489,20 @@ class Extractor(Module):
 
         @rule - Rule string.
 
-        Returns an array of ['<case insensitive matching string>', '<file extension>', '<command to run>'].
+        Returns an array of ['<case insensitive matching string>', '<file extension>', '<command to run>', '<comma separated return codes>'].
         '''
-        return rule.strip().split(self.RULE_DELIM, 2)
+        values = rule.strip().split(self.RULE_DELIM, 3)
+
+        if len(values) == 4:
+            codes = values[3].split(',')
+            for i in range(0, len(codes)):
+                try:
+                    codes[i] = int(codes[i], 0)
+                except ValueError as e:
+                    binwalk.core.common.warning("The specified return code '%s' for extractor '%s' is not a valid number!" % (codes[i], values[0]))
+            values[3] = codes
+
+        return values
 
     def _dd(self, file_name, offset, size, extension, output_file_name=None):
         '''
@@ -550,12 +564,13 @@ class Extractor(Module):
         binwalk.core.common.debug("Carved data block 0x%X - 0x%X from '%s' to '%s'" % (offset, offset+size, file_name, fname))
         return fname
 
-    def execute(self, cmd, fname):
+    def execute(self, cmd, fname, codes=[0, None]):
         '''
         Execute a command against the specified file.
 
         @cmd   - Command to execute.
         @fname - File to run command against.
+        @codes - List of return codes indicating cmd success.
 
         Returns True on success, False on failure, or None if the external extraction utility could not be found.
         '''
@@ -592,13 +607,20 @@ class Extractor(Module):
 
                     binwalk.core.common.debug("subprocess.call(%s, stdout=%s, stderr=%s)" % (command, str(tmp), str(tmp)))
                     rval = subprocess.call(shlex.split(command), stdout=tmp, stderr=tmp)
-                    binwalk.core.common.debug('External extractor command "%s" completed with return code %d' % (cmd, rval))
 
-                    if rval == 0:
+                    if rval in codes:
                         retval = True
                     else:
                         retval = False
-                        break
+
+                    binwalk.core.common.debug('External extractor command "%s" completed with return code %d (success: %s)' % (cmd, rval, str(retval)))
+
+                    # TODO: Should errors from all commands in a command string be checked? Currently we only support
+                    #       specifying one set of error codes, so at the moment, this is not done; it is up to the
+                    #       final command to return success or failure (which presumably it will if previous necessary
+                    #       commands were not successful, but this is an assumption).
+                    #if retval == False:
+                    #    break
 
         except KeyboardInterrupt as e:
             raise e
