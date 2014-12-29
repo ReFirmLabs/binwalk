@@ -586,7 +586,7 @@ class Magic(object):
                 if line.operator:
                     try:
                         # If the operator value of this signature line is just an integer value, use it
-                        if isinstance(line.opvalue, int):
+                        if isinstance(line.opvalue, int) or isinstance(line.opvalue, long):
                             opval = line.opvalue
                         # Else, evaluate the complex expression
                         else:
@@ -612,7 +612,7 @@ class Magic(object):
                     except KeyboardInterrupt as e:
                         raise e
                     except Exception as e:
-                        raise ParserException("Failed to apply operator " + line.operator + " to " + str(dvalue) + ": " + str(e))
+                        raise ParserException("Operation '" + str(dvalue) + " " + str(line.operator) + "= " + str(line.opvalue) + "' failed: " + str(e))
 
                 # Does the data (dvalue) match the specified comparison?
                 if ((line.value is None) or
