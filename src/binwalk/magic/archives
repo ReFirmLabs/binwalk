@@ -26,9 +26,8 @@
 0       string          PK\x07\x08PK\x03\x04    Zip multi-volume archive data, at least PKZIP v2.50 to extract
 
 # ZIP compression (Greg Roelofs, c/o zip-bugs@wkuvx1.wku.edu)
-0       string      PK\003\004      Zip
+0       string      PK\003\004      Zip archive data,
 >6      leshort     &0x01           encrypted
->0      byte        x               archive data,
 >4      byte        0x00            v0.0
 >4      byte        0x09            at least v0.9 to extract,
 >4      byte        0x0a            at least v1.0 to extract,
