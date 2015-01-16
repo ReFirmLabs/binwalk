@@ -104,7 +104,7 @@
 #
 # both of which turn into "JPEG image data" here.
 #
-0       belong          0xffd8ffe0    JPEG image data, JFIF standard 
+0       ubelong         0xffd8ffe0    JPEG image data, JFIF standard 
 >6      string          !JFIF         {invalid}
 # The following added by Erik Rossen <rossen@freesurf.ch> 1999-09-06
 # in a vain attempt to add image size reporting for JFIF.  Note that these
@@ -123,7 +123,7 @@
 >>19   byte             x            \b%d
 
 
-0               belong          0xffd8ffe1      JPEG image data, EXIF standard
+0               ubelong         0xffd8ffe1      JPEG image data, EXIF standard
 # EXIF moved down here to avoid reporting a bogus version number,
 # and EXIF version number printing added.
 #   - Patrik R=E5dman <patrik+file-magic@iki.fi>
