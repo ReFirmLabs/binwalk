@@ -113,6 +113,14 @@ class Entropy(Module):
                 self.block_size = None
 
     def run(self):
+        # Sanity check and warning if pyqtgraph isn't found
+        if self.do_plot:
+            try:
+                import pyqtgraph as pg
+            except ImportError as e:
+                binwalk.core.common.warning("pyqtgraph not found, visual entropy graphing will be disabled")
+                self.do_plot = False
+
         for fp in iter(self.next_file, None):
 
             if self.display_results:
@@ -124,12 +132,9 @@ class Entropy(Module):
                 self.footer()
 
         if self.do_plot:
-            import pyqtgraph as pg
-
             if not self.save_plot:
                 from pyqtgraph.Qt import QtGui
                 QtGui.QApplication.instance().exec_()
-
             pg.exit()
 
     def calculate_file_entropy(self, fp):
@@ -229,9 +234,12 @@ class Entropy(Module):
         return e
 
     def plot_entropy(self, fname):
-        import numpy as np
-        import pyqtgraph as pg
-        import pyqtgraph.exporters as exporters
+        try:
+            import numpy as np
+            import pyqtgraph as pg
+            import pyqtgraph.exporters as exporters
+        except ImportError as e:
+            return
 
         i = 0
         x = []
