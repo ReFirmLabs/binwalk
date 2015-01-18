@@ -74,7 +74,7 @@ class Plotter(Module):
         self.window.opts['distance'] = self.VIEW_DISTANCE
 
         if len(self.config.target_files) == 1:
-            self.window.setWindowTitle(self.config.target_files[0].name)
+            self.window.setWindowTitle(self.config.target_files[0])
 
     def _print(self, message):
         '''

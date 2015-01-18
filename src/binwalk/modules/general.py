@@ -123,8 +123,9 @@ class General(Module):
                 sys.exit(0)
 
     def reset(self):
-        for fp in self.target_files:
-            fp.reset()
+        pass
+        #for fp in self.target_files:
+        #    fp.reset()
 
     def __del__(self):
         self._cleanup()
@@ -133,9 +134,10 @@ class General(Module):
         self._cleanup()
 
     def _cleanup(self):
-        if hasattr(self, 'target_files'):
-            for fp in self.target_files:
-                fp.close()
+        pass
+        #if hasattr(self, 'target_files'):
+        #    for fp in self.target_files:
+        #        fp.close()
 
     def _set_verbosity(self):
         '''
@@ -171,7 +173,9 @@ class General(Module):
             if not self.subclass == io.FileIO or not os.path.isdir(tfile):
                 # Make sure we can open the target files
                 try:
-                    self.target_files.append(self.open_file(tfile))
+                    fp = self.open_file(tfile)
+                    fp.close()
+                    self.target_files.append(tfile)
                 except KeyboardInterrupt as e:
                     raise e
                 except Exception as e:
