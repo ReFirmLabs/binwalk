@@ -141,7 +141,6 @@ class Display(object):
         delim = '\n'
         offset = 0
         self.string_parts = []
-        libmagic_newline_delim = "\\012- "
 
         # Split the line into an array of columns, e.g., ['0', '0x00000000', 'Some description here']
         line_columns = line.split(None, self.num_columns-1)
@@ -151,9 +150,6 @@ class Display(object):
             offset = line.rfind(line_columns[-1])
             # The delimiter will be a newline followed by spaces padding out the line wrap to the alignment offset.
             delim += ' ' * offset
-
-            if libmagic_newline_delim in line:
-                line = line.replace(libmagic_newline_delim, delim)
 
         if line_columns and self.fit_to_screen and len(line) > self.SCREEN_WIDTH:
             # Calculate the maximum length that each wrapped line can be

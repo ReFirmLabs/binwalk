@@ -646,7 +646,7 @@ class Modules(object):
                     else:
                         short_opt = "   "
 
-                    fmt = "    %%s %%s%%-%ds%%s\n" % (32-len(long_opt))
+                    fmt = "    %%s %%s%%-%ds%%s\n" % (25-len(long_opt))
                     help_string += fmt % (short_opt, long_opt, optargs, module_option.description)
 
         return help_string + "\n"
