@@ -588,7 +588,7 @@ class Extractor(Module):
                     raise e
                 except Exception as e:
                     binwalk.core.common.warning("Internal extractor '%s' failed with exception: '%s'" % (str(cmd), str(e)))
-            else:
+            elif cmd:
                 # If not in debug mode, create a temporary file to redirect stdout and stderr to
                 if not binwalk.core.common.DEBUG:
                     tmp = tempfile.TemporaryFile()
