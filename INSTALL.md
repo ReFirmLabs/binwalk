@@ -56,7 +56,7 @@ Binwalk relies on multiple external utilties in order to automatically extract/d
 
 ```bash
 # Install standard extraction utilities
-$ sudo apt-get install mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract openjdk-6-jdk cramfsprogs cramfsswap squashfs-tools
+$ sudo apt-get install mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools
 ```
 
 ```bash
