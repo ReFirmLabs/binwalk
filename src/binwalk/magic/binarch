@@ -127,3 +127,9 @@
 # link a6, XX
 0   string  N^NuNV      Motorola Coldfire instructions, function prologue/epilogue
 
+# mov.l   @r15+, r9
+# rts
+# mov.l   @r15
+0   string  \xF6\x69\x0B\x00\xF6\x68            SuperH instructions, little endian, function epilogue (gcc)
+0   string  \x69\xF6\x00\x0B\x68\xF6            SuperH instructions, big endian, function epilogue (gcc)
+
