@@ -326,7 +326,13 @@ class Module(object):
                 result = self.RESULT
 
             for name in result:
-                args.append(getattr(r, name))
+                value = getattr(r, name)
+
+                # Displayed offsets should be offset by the base address
+                if name == 'offset':
+                    value += self.config.base
+
+                args.append(value)
 
         return args
 
@@ -395,9 +401,6 @@ class Module(object):
 
         # Add the name of the current module to the result
         r.module = self.__class__.__name__
-
-        # Add any specified base address to the reported offset
-        r.offset += self.config.base
 
         # Any module that is reporting results, valid or not, should be marked as enabled
         if not self.enabled:

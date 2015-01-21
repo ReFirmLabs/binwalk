@@ -517,8 +517,8 @@ class Extractor(Module):
         Returns the extracted file name.
         '''
         total_size = 0
-        # Default extracted file name is <hex offset>.<extension>
-        default_bname = "%X" % offset
+        # Default extracted file name is <displayed hex offset>.<extension>
+        default_bname = "%X" % (offset + self.config.base)
 
         if self.max_size and size > self.max_size:
             size = self.max_size
