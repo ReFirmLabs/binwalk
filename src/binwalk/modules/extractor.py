@@ -532,8 +532,18 @@ class Extractor(Module):
         fname = unique_file_name(bname, extension)
 
         try:
+            # If byte swapping is enabled, we need to start reading at a swap-size
+            # aligned offset, then index in to the read data appropriately.
+            if self.config.swap_size:
+                adjust = offset % self.config.swap_size
+            else:
+                adjust = 0
+
+            offset -= adjust
+
             # Open the target file and seek to the offset
-            fdin = self.config.open_file(file_name, length=size, offset=offset)
+            fdin = self.config.open_file(file_name)
+            fdin.seek(offset)
 
             # Open the output file
             try:
@@ -550,8 +560,9 @@ class Extractor(Module):
                 if not data:
                     break
                 else:
-                    fdout.write(str2bytes(data[:dlen]))
-                    total_size += dlen
+                    fdout.write(str2bytes(data[adjust:dlen]))
+                    total_size += (dlen-adjust)
+                    adjust = 0
 
             # Cleanup
             fdout.close()

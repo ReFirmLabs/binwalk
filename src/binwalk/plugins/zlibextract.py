@@ -37,3 +37,4 @@ class ZLIBExtractPlugin(binwalk.core.plugin.Plugin):
             return False
 
         return True
+
