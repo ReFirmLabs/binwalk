@@ -11,8 +11,10 @@ class GzipExtractPlugin(binwalk.core.plugin.Plugin):
 
     def init(self):
         # If the extractor is enabled for the module we're currently loaded
-        # into, then register self.extractor as a zlib extraction rule.
-        if self.module.extractor.enabled:
+        # into, and if a rule that matches gzip signature results already exists
+        # (e.g., the default rules were loaded or a gzip rule was specified manually),
+        # then register self.extractor as a gzip extraction rule.
+        if self.module.extractor.enabled and self.module.extractor.match("gzip compressed data"):
             self.module.extractor.add_rule(txtrule=None,
                                            regex="^gzip compressed data",
                                            extension="gz",
