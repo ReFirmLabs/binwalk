@@ -106,6 +106,25 @@
 >>20    ulelong       x       linux kernel offset: 0x%X,
 >>24    ulelong       x       rootfs offset: 0x%X
 
+14      string        U2ND      BIN-Header,
+>4      ulelong       !0        {invalid}
+>22     string        !\x00*10  {invalid}
+>0      string        x         board ID: %.4s,
+>18     ubyte         0         hardware version: 4702,
+>18     ubyte         1         hardware version: 4712,
+>18     ubyte         2         hardware version: 4712L,
+>18     ubyte         3         hardware version: 4704,
+>18     ubyte         >3        hardware version: unknown (code: 0x%.2X),
+>8      ubyte         <80
+>>8     ubyte         x         firmware date: 20%.2d-
+>8      ubyte         >79
+>>8     ubyte         x         firmware date: 19%.2d-
+>9      ubyte         x         \b%.2d-
+>10     ubyte         x         \b%.2d,
+>11     ubyte         x         firmware version: %d.
+>12     ubyte         x         \b%d.
+>12     ubyte         x         \b%d
+
 # Ubicom firmware image
 0       belong    0xFA320080    Ubicom firmware header,
 >12     belong    x             checksum: 0x%X,
