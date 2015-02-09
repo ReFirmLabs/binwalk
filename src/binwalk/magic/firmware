@@ -115,15 +115,15 @@
 >18     ubyte         2         hardware version: 4712L,
 >18     ubyte         3         hardware version: 4704,
 >18     ubyte         >3        hardware version: unknown (code: 0x%.2X),
->8      ubyte         <80
->>8     ubyte         x         firmware date: 20%.2d-
->8      ubyte         >79
->>8     ubyte         x         firmware date: 19%.2d-
->9      ubyte         x         \b%.2d-
->10     ubyte         x         \b%.2d,
 >11     ubyte         x         firmware version: %d.
 >12     ubyte         x         \b%d.
->12     ubyte         x         \b%d
+>12     ubyte         x         \b%d,
+>8      ubyte         <80
+>>8     ubyte         x         build date: 20%.2d-
+>8      ubyte         >79
+>>8     ubyte         x         build date: 19%.2d-
+>9      ubyte         x         \b%.2d-
+>10     ubyte         x         \b%.2d
 
 # Ubicom firmware image
 0       belong    0xFA320080    Ubicom firmware header,
