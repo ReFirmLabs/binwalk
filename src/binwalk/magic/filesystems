@@ -235,8 +235,6 @@
 >>51    belong  x       blocksize: %d bytes,
 >28     beshort 3
 >>51    belong  x       blocksize: %d bytes,
->28     beshort >3
->>12    belong  x       blocksize: %d bytes,
 >28     beshort <4
 >>39    bedate  x       created: %s
 >28     beshort >3
@@ -274,8 +272,6 @@
 >>51    lelong  x       blocksize: %d bytes,
 >28     leshort 3
 >>51    lelong  x       blocksize: %d bytes,
->28     leshort >3    
->>12    lelong  x       blocksize: %d bytes,
 >28     leshort <4
 >>39    ledate  x       created: %s
 >28     leshort >3
@@ -319,8 +315,6 @@
 >>51    belong  x       blocksize: %d bytes,
 >28     beshort 3
 >>51    belong  x       blocksize: %d bytes,
->28     beshort >3
->>12    belong  x       blocksize: %d bytes,
 >28     beshort <4
 >>39    bedate  x       created: %s
 >28     beshort >3
@@ -364,8 +358,6 @@
 >>51    belong  x       blocksize: %d bytes,
 >28     beshort 3
 >>51    belong  x       blocksize: %d bytes,
->28     beshort >3
->>12    belong  x       blocksize: %d bytes,
 >28     beshort <4
 >>39    bedate  x       created: %s
 >28     beshort >3
@@ -409,8 +401,6 @@
 >>51    belong  x       blocksize: %d bytes,
 >28     beshort 3
 >>51    belong  x       blocksize: %d bytes,
->28     beshort >3
->>12    belong  x       blocksize: %d bytes,
 >28     beshort <4
 >>39    bedate  x       created: %s
 >28     beshort >3
@@ -454,8 +444,6 @@
 >>51    lelong  x       blocksize: %d bytes,
 >28     leshort 3
 >>51    lelong  x       blocksize: %d bytes,
->28     leshort >3
->>12    lelong  x       blocksize: %d bytes,
 >28     leshort <4
 >>39    ledate  x       created: %s
 >28     leshort >3
@@ -499,8 +487,6 @@
 >>51    lelong  x       blocksize: %d bytes,
 >28     leshort 3
 >>51    lelong  x       blocksize: %d bytes,
->28     leshort >3
->>12    lelong  x       blocksize: %d bytes,
 >28     leshort <4
 >>39    ledate  x       created: %s
 >28     leshort >3
