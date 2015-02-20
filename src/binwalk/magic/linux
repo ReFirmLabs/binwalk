@@ -14,3 +14,13 @@
 >14     byte        0                       {invalid}
 >14     byte        !0
 >>14    string      x                       "%s"
+
+# Linux ARM compressed kernel image
+# See arch/arm/boot/compressed/head.S and arch/arm/boot/compressed/vmlinux.lds.S
+0	lelong	0x016f2818	Linux kernel ARM boot executable zImage (little-endian),
+>4	lelong  x		load address: "0x%X",
+>8	lelong	x		end address: "0x%X"
+
+0	belong	0x016f2818	Linux kernel ARM boot executable zImage (big-endian),
+>4	lelong  x		load address: "0x%X",
+>8	lelong	x		end address: "0x%X"
