@@ -47,18 +47,14 @@ Binwalk's `--disasm` option requires the [Capstone](http://www.capstone-engine.o
 
 ```bash
 # Python2.7
-$ wget http://www.capstone-engine.org/download/3.0.1/capstone-3.0.1.tgz
-$ tar -zxvf capstone-3.0.1.tgz
-$ (cd capstone-3.0.1 && ./make.sh && sudo make install)
-$ (cd capstone-3.0.1/bindings/python && sudo python ./setup.py install)
+$ sudo apt-get install python-pip
+$ sudo pip install capstone
 ```
 
 ```bash
 # Python3.x
-$ wget http://www.capstone-engine.org/download/3.0.1/capstone-3.0.1.tgz
-$ tar -zxvf capstone-3.0.1.tgz
-$ (cd capstone-3.0.1 && ./make.sh && sudo make install)
-$ (cd capstone-3.0.1/bindings/python && sudo python3 ./setup.py install)
+$ sudo apt-get install python3-pip
+$ sudo pip3 install capstone
 ```
 
 Binwalk relies on multiple external utilties in order to automatically extract/decompress files and data:
