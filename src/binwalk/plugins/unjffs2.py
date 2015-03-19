@@ -151,7 +151,7 @@ class UnJFFS2Plugin(binwalk.core.plugin.Plugin):
     MODULES = ['Signature']
 
     def init(self):
-        if self.module.extractor.enabled:
+        if False: #self.module.extractor.enabled:
             self.module.extractor.add_rule(txtrule=None,
                                            regex='^jffs2 filesystem',
                                            extension='jffs2',

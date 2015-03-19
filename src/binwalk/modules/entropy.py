@@ -135,7 +135,10 @@ class Entropy(Module):
             if not self.save_plot:
                 from pyqtgraph.Qt import QtGui
                 QtGui.QApplication.instance().exec_()
-            pg.exit()
+            # Calling pg.exit causes a sys.exit. If using the binwalk module
+            # from a script, this is probably undesirable. Are there any negative
+            # side effect to *not* calling pg.exit?
+            #pg.exit()
 
     def calculate_file_entropy(self, fp):
         # Tracks the last displayed rising/falling edge (0 for falling, 1 for rising, None if nothing has been printed yet)
