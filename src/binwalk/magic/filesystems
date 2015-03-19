@@ -167,14 +167,6 @@
 >>>>>2              uleshort    !0x2006
 >>>>>>2             uleshort    !0xE008
 >>>>>>>2            uleshort    !0xE009     {invalid}
->(4.l)              uleshort    !0x1985        
->>(4.l+1)           uleshort    !0x1985    
->>>(4.l+2)          uleshort    !0x1985    
->>>>(4.l+3)         uleshort    !0x1985
->>>>>(4.l)          uleshort    !0xFFFF
->>>>>>(4.l+1)       uleshort    !0xFFFF
->>>>>>>(4.l+2)      uleshort    !0xFFFF
->>>>>>>>(4.l+3)     uleshort    !0xFFFF     {invalid}
 >4                  lelong      0           {invalid}
 >4                  lelong      <0          {invalid}
 >4                  lelong      x           {many}{jump:%d}
@@ -187,14 +179,6 @@
 >>>>>2              ubeshort    !0x2006
 >>>>>>2             ubeshort    !0xE008
 >>>>>>>2            ubeshort    !0xE009     {invalid}
->(4.L)              ubeshort    !0x1985     
->>(4.L+1)           ubeshort    !0x1985     
->>>(4.L+2)          ubeshort    !0x1985
->>>>(4.L+3)         ubeshort    !0x1985    
->>>>>(4.L)          ubeshort    !0xFFFF
->>>>>>(4.L+1)       ubeshort    !0xFFFF
->>>>>>>(4.L+2)      ubeshort    !0xFFFF
->>>>>>>>(4.L+3)     ubeshort    !0xFFFF     {invalid}
 >4                  belong      0           {invalid}
 >4                  belong      <0          {invalid}
 >4                  belong      x           {many}{jump:%d}

@@ -163,6 +163,7 @@ class Signature(Module):
                 if r.valid and r.jump > 0 and not self.dumb_scan:
                     absolute_jump_offset = r.offset + r.jump
                     current_block_offset = relative_offset + r.jump
+                    #print ("Jumping to: 0x%X (0x%X)..." % (absolute_jump_offset, current_block_offset))
 
                     # If the jump-to-offset is beyond the confines of the current block, seek the file to
                     # that offset and quit processing this block of data.
