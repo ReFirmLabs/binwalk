@@ -11,5 +11,3 @@ try:
             print ("\t%s    0x%.8X    %s [%s]" % (result.file.name, result.offset, result.description, str(result.valid)))
 except binwalk.ModuleException as e:
     pass
-
-print "Done."
