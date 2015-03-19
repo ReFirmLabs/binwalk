@@ -127,7 +127,7 @@ class Extractor(Module):
 
             # Attempt extraction
             binwalk.core.common.debug("Extractor callback for %s @%d [%s]" % (r.file.name, r.offset, r.description))
-            (extraction_directory, dd_file, recurse_into_directories) = self.extract(r.offset, r.description, r.file.path, size, r.name)
+            (extraction_directory, dd_file, scan_extracted_files) = self.extract(r.offset, r.description, r.file.path, size, r.name)
 
             # If the extraction was successful, self.extract will have returned the output directory and name of the dd'd file
             if extraction_directory and dd_file:
@@ -150,18 +150,16 @@ class Extractor(Module):
                     self.result(description=file_path, display=False)
 
                     # If recursion was specified, and the file is not the same one we just dd'd, and if it is not a directory
-                    if self.matryoshka and file_path != dd_file_path:
+                    if self.matryoshka and file_path != dd_file_path and scan_extracted_files:
                         # If the recursion level of this file is less than or equal to our desired recursion level
                         if len(real_file_path.split(self.base_recursion_dir)[1].split(os.path.sep)) <= self.matryoshka:
                             # If this is a directory and we are supposed to process directories for this extractor,
                             # then add all files under that directory to the list of pending files.
                             if os.path.isdir(file_path):
-                                if recurse_into_directories:
-                                    for root, dirs, files in os.walk(file_path):
-                                        for f in files:
-                                            full_path = os.path.join(root, f)
-                                            print ("Adding '%s' to the list of pending shit." % full_path)
-                                            self.pending.append(full_path)
+                                for root, dirs, files in os.walk(file_path):
+                                    for f in files:
+                                        full_path = os.path.join(root, f)
+                                        self.pending.append(full_path)
                             # If it's just a file, it to eh list of pending files
                             else:
                                 self.pending.append(file_path)
@@ -370,7 +368,7 @@ class Extractor(Module):
         original_dir = os.getcwd()
         rules = self.match(description)
         file_path = os.path.realpath(file_name)
-        recurse_into_directories = False
+        recurse = True
 
         # No extraction rules for this file
         if not rules:
@@ -441,7 +439,7 @@ class Extractor(Module):
                     # If the command executed OK, don't try any more rules
                     if extract_ok == True:
                         # Make sure we recurse into any extracted directories if instructed to
-                        recurse_into_directories = rule['recurse']
+                        recurse = rule['recurse']
                         break
                     # Else, remove the extracted file if this isn't the last rule in the list.
                     # If it is the last rule, leave the file on disk for the user to examine.
@@ -459,7 +457,7 @@ class Extractor(Module):
 
             os.chdir(original_dir)
 
-        return (output_directory, fname, recurse_into_directories)
+        return (output_directory, fname, recurse)
 
     def _entry_offset(self, index, entries, description):
         '''
