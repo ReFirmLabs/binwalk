@@ -75,7 +75,7 @@ $ (cd sasquatch && make && sudo make install)
 # Install jefferson to extract JFFS2 file systems
 $ sudo pip install cstruct
 $ git clone https://github.com/sviehb/jefferson
-$ sudo python setup.py install
+$ (cd jefferson && sudo python setup.py install)
 ```
 
 ```bash
