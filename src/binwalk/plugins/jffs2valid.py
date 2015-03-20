@@ -1,6 +1,6 @@
+import struct
+import binascii
 import binwalk.core.plugin
-import binwalk.core.compat
-from binwalk.core.common import BlockFile
 
 class JFFS2ValidPlugin(binwalk.core.plugin.Plugin):
     '''
@@ -12,31 +12,33 @@ class JFFS2ValidPlugin(binwalk.core.plugin.Plugin):
     '''
     MODULES = ['Signature']
 
-    MAX_DATA_SIZE = 10240
+    def _check_crc(self, node_header):
+        # Get the header's reported CRC value
+        if node_header[0:2] == "\x19\x85":
+            header_crc = struct.unpack(">I", node_header[8:12])[0]
+        else:
+            header_crc = struct.unpack("<I", node_header[8:12])[0]
 
-    def _validate(self, data):
-        return data[0:2] in ['\x19\x85', '\x85\x19']
+        # Calculate the actual CRC
+        calculated_header_crc = (binascii.crc32(node_header[0:8], -1) ^ -1) & 0xffffffff
+
+        # Make sure they match
+        return (header_crc == calculated_header_crc)
 
     def scan(self, result):
         if result.file and result.description.lower().startswith('jffs2 filesystem'):
 
-            # Seek to and read the suspected JFFS2 data
-            fd = self.module.config.open_file(result.file.name, offset=result.offset+result.jump, length=self.MAX_DATA_SIZE)
-            data = fd.read(self.MAX_DATA_SIZE)
+            # Seek to and read the suspected JFFS2 node header
+            fd = self.module.config.open_file(result.file.name, offset=result.offset)
+            # JFFS2 headers are only 12 bytes in size, but reading larger amounts of
+            # data from disk speeds up repeated disk access and decreases performance
+            # hits (disk caching?).
+            #
+            # TODO: Should this plugin validate the *entire* JFFS2 file system, rather
+            #       than letting the signature module find every single JFFS2 node?
+            node_header = fd.read(1024)
             fd.close()
 
-            # Skip any padding
-            i = 0
-            while i < self.MAX_DATA_SIZE and data[i] in ['\xFF', '\x00']:
-                i += 1
+            result.valid = self._check_crc(node_header[0:12])
 
-            # Did we get to the end of MAX_DATA_SIZE with nothing but padding? Assume valid.
-            if i == self.MAX_DATA_SIZE:
-                result.valid = True
-            # Else, explicitly check for the JFFS2 signature
-            else:
-                try:
-                    result.valid = self._validate(data[i:i+2])
-                except IndexError:
-                    result.valid = False
 
