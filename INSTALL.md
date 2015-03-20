@@ -72,6 +72,13 @@ $ (cd sasquatch && make && sudo make install)
 ```
 
 ```bash
+# Install jefferson to extract JFFS2 file systems
+$ sudo pip install cstruct
+$ git clone https://github.com/sviehb/jefferson
+$ sudo python setup.py install
+```
+
+```bash
 # Install unstuff (closed source) to extract StuffIt archive files
 $ wget -O - http://my.smithmicro.com/downloads/files/stuffit520.611linux-i386.tar.gz | tar -zxv
 $ sudo cp bin/unstuff /usr/local/bin/
