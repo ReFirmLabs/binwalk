@@ -289,7 +289,7 @@ class Entropy(Module):
         if self.save_plot:
             exporter = exporters.ImageExporter.ImageExporter(plt.plotItem)
             exporter.parameters()['width'] = self.FILE_WIDTH
-            exporter.export(binwalk.core.common.unique_file_name(os.path.basename(fname), self.FILE_FORMAT))
+            exporter.export(binwalk.core.common.unique_file_name(fname, self.FILE_FORMAT))
         else:
             plt.setLabel('left', self.YLABEL, units=self.YUNITS)
             plt.setLabel('bottom', self.XLABEL, units=self.XUNITS)
