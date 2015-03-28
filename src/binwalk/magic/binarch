@@ -104,7 +104,7 @@
 # mov r7,sp
 0	string	\xEB\xCD\x40\x80\x1A\x97	AVR32 instructions, function prologue
 
-# SPARC eiplogue
+# SPARC epilogue
 # ret
 # restore XX
 0	string	\x81\xC7\xE0\x08\x81\xE8	SPARC instructions, function epilogue
