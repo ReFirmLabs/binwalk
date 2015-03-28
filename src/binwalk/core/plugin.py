@@ -25,7 +25,7 @@ class Plugin(object):
         Returns None.
         '''
         self.module = module
-        
+
         if not self.MODULES or self.module.name in self.MODULES:
             self._enabled = True
             self.init()
@@ -79,8 +79,8 @@ class Plugins(object):
           The contents of this dictionary key may be modified as necessary by the plugin.
 
         o callback(self, results)
-          This method is called every time a valid result is found in the file being scanned. It is passed a 
-          dictionary of results. This dictionary is identical to that passed to Binwalk.single_scan's callback 
+          This method is called every time a valid result is found in the file being scanned. It is passed a
+          dictionary of results. This dictionary is identical to that passed to Binwalk.single_scan's callback
           function, and its contents may be modified as necessary by the plugin.
 
         o post_scan(self, fd)
@@ -91,7 +91,7 @@ class Plugins(object):
     Values returned by callback affect only that specific scan result.
     Values returned by post_scan are ignored since the scan of that file has already been completed.
 
-    By default, all plugins are loaded during binwalk signature scans. Plugins that wish to be disabled by 
+    By default, all plugins are loaded during binwalk signature scans. Plugins that wish to be disabled by
     default may create a class variable named 'ENABLED' and set it to False. If ENABLED is set to False, the
     plugin will only be loaded if it is explicitly named in the plugins whitelist.
     '''
@@ -107,9 +107,6 @@ class Plugins(object):
         self.post_scan = []
         self.parent = parent
         self.settings = binwalk.core.settings.Settings()
-
-    def __del__(self):
-        pass
 
     def __enter__(self):
         return self
@@ -182,8 +179,8 @@ class Plugins(object):
                 for file_name in os.listdir(plugins[key]['path']):
                     if file_name.endswith(self.MODULE_EXTENSION):
                         module = file_name[:-len(self.MODULE_EXTENSION)]
-                    
-                        try: 
+
+                        try:
                             plugin = imp.load_source(module, os.path.join(plugins[key]['path'], file_name))
                             plugin_class = self._find_plugin_class(plugin)
 
@@ -194,7 +191,7 @@ class Plugins(object):
                         except Exception as e:
                             binwalk.core.common.warning("Error loading plugin '%s': %s" % (file_name, str(e)))
                             plugins[key]['enabled'][module] = False
-                        
+
                         try:
                             plugins[key]['descriptions'][module] = plugin_class.__doc__.strip().split('\n')[0]
                         except KeyboardInterrupt as e:
@@ -245,7 +242,7 @@ class Plugins(object):
                     raise e
                 except Exception as e:
                     pass
-                            
+
             except KeyboardInterrupt as e:
                 raise e
             except Exception as e:

@@ -124,20 +124,6 @@ class General(Module):
 
     def reset(self):
         pass
-        #for fp in self.target_files:
-        #    fp.reset()
-
-    def __del__(self):
-        self._cleanup()
-
-    def __exit__(self, a, b, c):
-        self._cleanup()
-
-    def _cleanup(self):
-        pass
-        #if hasattr(self, 'target_files'):
-        #    for fp in self.target_files:
-        #        fp.close()
 
     def _set_verbosity(self):
         '''

@@ -245,9 +245,6 @@ class Module(object):
         except AttributeError as e:
             pass
 
-    def __del__(self):
-        return None
-
     def __enter__(self):
         return self
 
