@@ -369,6 +369,7 @@ class Extractor(Module):
         original_dir = os.getcwd()
         rules = self.match(description)
         file_path = os.path.realpath(file_name)
+        # Don't recurse by default; any successful extraction rule will override this.
         recurse = True
 
         # No extraction rules for this file

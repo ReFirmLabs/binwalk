@@ -13,6 +13,8 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
     MODULES = ['Signature']
 
     def init(self):
+        self.consecutive_hits = 0
+
         if self.module.extractor.enabled:
             self.module.extractor.add_rule(regex="^ascii cpio archive",
                                            extension="cpio",
@@ -49,7 +51,7 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
         fpin.close()
         fperr.close()
 
-        if result == 0:
+        if result in [0, 2]:
             return True
         else:
             return False
@@ -65,6 +67,8 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
             # Displaying each entry is useful, as it shows what files are contained in the archive,
             # but we only want to extract the archive when the first entry is found.
             if result.description.startswith('ASCII cpio archive'):
+                self.consecutive_hits += 1
+
                 if not self.found_archive or self.found_archive_in_file != result.file.name:
                     # This is the first entry. Set found_archive and allow the scan to continue normally.
                     self.found_archive_in_file = result.file.name
@@ -74,13 +78,19 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
                     # This is the last entry, un-set found_archive.
                     self.found_archive = False
                     result.extract = False
+                    self.consecutive_hits = 0
                 else:
                     # The first entry has already been found and this is not the last entry, or the last entry
                     # has not yet been found. Don't extract.
                     result.extract = False
-            else:
+            elif self.consecutive_hits < 4:
                 # If this was a valid non-CPIO archive result, reset these values; else, a previous
                 # false positive CPIO result could leave these set, causing a subsequent valid CPIO
                 # result to not be extracted.
                 self.found_archive = False
                 self.found_archive_in_file = None
+                self.consecutive_hits = 0
+            elif self.consecutive_hits >= 4:
+                # Ignore other stuff until the end of CPIO is found
+                # TODO: It would be better to jump to the end of this CPIO entry rather than make this assumption...
+                result.valid = False
