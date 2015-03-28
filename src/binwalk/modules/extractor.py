@@ -149,8 +149,8 @@ class Extractor(Module):
                     real_file_path = os.path.realpath(file_path)
                     self.result(description=file_path, display=False)
 
-                    # If recursion was specified, and the file is not the same one we just dd'd, and if it is not a directory
-                    if self.matryoshka and file_path != dd_file_path and scan_extracted_files:
+                    # If recursion was specified, and the file is not the same one we just dd'd, and if it is not a directory/symlink
+                    if self.matryoshka and file_path != dd_file_path and scan_extracted_files and not os.path.islink(file_path):
                         # If the recursion level of this file is less than or equal to our desired recursion level
                         if len(real_file_path.split(self.base_recursion_dir)[1].split(os.path.sep)) <= self.matryoshka:
                             # If this is a directory and we are supposed to process directories for this extractor,
@@ -159,7 +159,8 @@ class Extractor(Module):
                                 for root, dirs, files in os.walk(file_path):
                                     for f in files:
                                         full_path = os.path.join(root, f)
-                                        self.pending.append(full_path)
+                                        if not os.path.islink(full_path):
+                                            self.pending.append(full_path)
                             # If it's just a file, it to eh list of pending files
                             else:
                                 self.pending.append(file_path)
