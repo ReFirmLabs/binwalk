@@ -5,6 +5,7 @@
 import os
 import re
 import sys
+import stat
 import shlex
 import tempfile
 import subprocess
@@ -95,6 +96,24 @@ class Extractor(Module):
         if self.matryoshka:
             self.config.verbose = True
 
+    def add_pending(self, f):
+        # Ignore symlinks
+        if os.path.islink(f):
+            return
+
+        # Get the file mode to check and see if it's a block/char device
+        try:
+            file_mode = os.stat(f).st_mode
+        except OSError as e:
+            return
+
+        # Only add this to the pending list of files to scan
+        # if the file is a regular file or a block/character device.
+        if (stat.S_ISREG(file_mode) or
+            stat.S_ISBLK(file_mode) or
+            stat.S_ISCHR(file_mode)):
+            self.pending.append(f)
+
     def reset(self):
         # Holds a list of pending files that should be scanned; only populated if self.matryoshka == True
         self.pending = []
@@ -149,8 +168,8 @@ class Extractor(Module):
                     real_file_path = os.path.realpath(file_path)
                     self.result(description=file_path, display=False)
 
-                    # If recursion was specified, and the file is not the same one we just dd'd, and if it is not a directory/symlink
-                    if self.matryoshka and file_path != dd_file_path and scan_extracted_files and not os.path.islink(file_path):
+                    # If recursion was specified, and the file is not the same one we just dd'd
+                    if self.matryoshka and file_path != dd_file_path and scan_extracted_files:
                         # If the recursion level of this file is less than or equal to our desired recursion level
                         if len(real_file_path.split(self.base_recursion_dir)[1].split(os.path.sep)) <= self.matryoshka:
                             # If this is a directory and we are supposed to process directories for this extractor,
@@ -159,11 +178,10 @@ class Extractor(Module):
                                 for root, dirs, files in os.walk(file_path):
                                     for f in files:
                                         full_path = os.path.join(root, f)
-                                        if not os.path.islink(full_path):
-                                            self.pending.append(full_path)
-                            # If it's just a file, it to eh list of pending files
+                                        self.add_pending(full_path)
+                            # If it's just a file, it to the list of pending files
                             else:
-                                self.pending.append(file_path)
+                                self.add_pending(file_path)
 
                 # Update the last directory listing for the next time we extract a file to this same output directory
                 self.last_directory_listing[extraction_directory] = directory_listing
