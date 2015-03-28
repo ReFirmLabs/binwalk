@@ -3,6 +3,7 @@
 import os
 import math
 import zlib
+import multiprocessing
 import binwalk.core.common
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg
@@ -113,6 +114,14 @@ class Entropy(Module):
                 self.block_size = None
 
     def run(self):
+        # Need to invoke the pyqtgraph stuff via a separate process, as calling pg.exit
+        # is pretty much required. pg.exit calls os._exit though, and we don't want to
+        # exit out of the main process (especially if being run via the API).
+        p = multiprocessing.Process(target=self._run)
+        p.start()
+        p.join()
+
+    def _run(self):
         # Sanity check and warning if pyqtgraph isn't found
         if self.do_plot:
             try:
@@ -135,10 +144,7 @@ class Entropy(Module):
             if not self.save_plot:
                 from pyqtgraph.Qt import QtGui
                 QtGui.QApplication.instance().exec_()
-            # Calling pg.exit causes a sys.exit. If using the binwalk module
-            # from a script, this is probably undesirable. Are there any negative
-            # side effect to *not* calling pg.exit?
-            #pg.exit()
+            pg.exit()
 
     def calculate_file_entropy(self, fp):
         # Tracks the last displayed rising/falling edge (0 for falling, 1 for rising, None if nothing has been printed yet)
