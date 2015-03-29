@@ -150,7 +150,8 @@ class Extractor(Module):
                     self.result(description=file_path, display=False)
 
                     # If recursion was specified, and the file is not the same one we just dd'd, and if it is not a directory/symlink
-                    if self.matryoshka and file_path != dd_file_path and scan_extracted_files and not os.path.islink(file_path):
+                    if self.matryoshka and file_path != dd_file_path and scan_extracted_files and \
+                            not os.path.islink(file_path) and os.path.isfile(file_path):
                         # If the recursion level of this file is less than or equal to our desired recursion level
                         if len(real_file_path.split(self.base_recursion_dir)[1].split(os.path.sep)) <= self.matryoshka:
                             # If this is a directory and we are supposed to process directories for this extractor,
