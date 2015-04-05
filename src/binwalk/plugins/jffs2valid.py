@@ -13,8 +13,11 @@ class JFFS2ValidPlugin(binwalk.core.plugin.Plugin):
     MODULES = ['Signature']
 
     def _check_crc(self, node_header):
+        # struct and binascii want a bytes object in Python3
+        node_header = binwalk.core.compat.str2bytes(node_header)
+
         # Get the header's reported CRC value
-        if node_header[0:2] == "\x19\x85":
+        if node_header[0:2] == b"\x19\x85":
             header_crc = struct.unpack(">I", node_header[8:12])[0]
         else:
             header_crc = struct.unpack("<I", node_header[8:12])[0]
