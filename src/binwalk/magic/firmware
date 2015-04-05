@@ -610,3 +610,11 @@
 >>&23           string      x                       "%s"
 >>(&0.L+4)      belong      x                       \b, file size: %d bytes
 
+# Another Broadcom firmware header...
+# The header seems to be always 0x100 bytes lenght and there is more information than the one displayed (not sure about the meaning).
+# Used for example in the EchoLife HG556a router
+0x0	string 	\x38\x00\x00\x00	Broadcom firmware header
+>0x4	string	!Broadcom Corporatio	{invalid}
+>0x18	string	x			%s.
+>0x8E	string	x			Model: %s.
+>0xA2	string	x			Firmware version: %s.
