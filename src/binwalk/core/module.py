@@ -354,7 +354,7 @@ class Module(object):
         self.target_file_list += self.extractor.pending
         self.extractor.pending = []
 
-        if self.target_file_list:
+        while self.target_file_list:
             next_target_file = self.target_file_list.pop(0)
 
             # Values in self.target_file_list are either already open files (BlockFile instances), or paths
@@ -364,8 +364,17 @@ class Module(object):
             else:
                 fp = next_target_file
 
-            self.status.clear()
-            self.status.total = fp.length
+            if not fp:
+                break
+            else:
+                if self.config.file_name_filter(fp) == False:
+                    fp.close()
+                    fp = None
+                    continue
+                else:
+                    self.status.clear()
+                    self.status.total = fp.length
+                    break
 
         if fp is not None:
             self.current_target_file_name = fp.path

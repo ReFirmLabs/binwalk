@@ -2,6 +2,7 @@
 
 import io
 import os
+import re
 import sys
 import argparse
 import binwalk.core.idb
@@ -69,6 +70,16 @@ class General(Module):
                long='help',
                kwargs={'show_help' : True},
                description='Show help output'),
+        Option(short='a',
+               long='finclude',
+               type=str,
+               kwargs={'file_name_include_regex' : ""},
+               description='Only scan files whose names match this regex'),
+        Option(short='p',
+               long='fexclude',
+               type=str,
+               kwargs={'file_name_exclude_regex' : ""},
+               description='Do not scan files whose names match this regex'),
         Option(long=None,
                short=None,
                type=binwalk.core.common.BlockFile,
@@ -95,6 +106,8 @@ class General(Module):
         Kwarg(name='show_help', default=False),
         Kwarg(name='keep_going', default=False),
         Kwarg(name='subclass', default=io.FileIO),
+        Kwarg(name='file_name_include_regex', default=None),
+        Kwarg(name='file_name_exclude_regex', default=None),
     ]
 
     PRIMARY = False
@@ -109,6 +122,12 @@ class General(Module):
         # Order is important with these two methods
         self._open_target_files()
         self._set_verbosity()
+
+        # Build file name filter regex rules
+        if self.file_name_include_regex:
+            self.file_name_include_regex = re.compile(self.file_name_include_regex)
+        if self.file_name_exclude_regex:
+            self.file_name_exclude_regex = re.compile(self.file_name_exclude_regex)
 
         self.settings = binwalk.core.settings.Settings()
         self.display = binwalk.core.display.Display(log=self.log_file,
@@ -134,6 +153,22 @@ class General(Module):
         # nothing in some outputs to indicate which scan corresponds to which file.
         if len(self.target_files) > 1 and not self.verbose:
             self.verbose = True
+
+    def file_name_filter(self, fp):
+        '''
+        Checks to see if a file should be scanned based on file name include/exclude filters.
+        Most useful for matryoshka scans where only certian files are desired.
+
+        @fp - An instances of binwalk.common.BlockFile
+
+        Returns True if the file should be scanned, False if not.
+        '''
+        if self.file_name_include_regex and not self.file_name_include_regex.search(fp.name):
+            return False
+        if self.file_name_exclude_regex and self.file_name_exclude_regex.search(fp.name):
+            return False
+
+        return True
 
     def open_file(self, fname, length=None, offset=None, swap=None, block=None, peek=None):
         '''
