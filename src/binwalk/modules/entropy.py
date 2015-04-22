@@ -293,7 +293,11 @@ class Entropy(Module):
 
         # TODO: legend is not displayed properly when saving plots to disk
         if self.save_plot:
-            exporter = exporters.ImageExporter.ImageExporter(plt.plotItem)
+            # exporters.ImageExporter is different in different versions of pyqtgraph
+            try:
+                exporter = exporters.ImageExporter(plt.plotItem)
+            except TypeError:
+                exporter = exporters.ImageExporter.ImageExporter(plt.plotItem)
             exporter.parameters()['width'] = self.FILE_WIDTH
             exporter.export(binwalk.core.common.unique_file_name(fname, self.FILE_FORMAT))
         else:
