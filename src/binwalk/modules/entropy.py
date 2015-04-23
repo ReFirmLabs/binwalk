@@ -117,14 +117,15 @@ class Entropy(Module):
         # Need to invoke the pyqtgraph stuff via a separate process, as calling pg.exit
         # is pretty much required. pg.exit calls os._exit though, and we don't want to
         # exit out of the main process (especially if being run via the API).
-        try:
+        if not binwalk.core.common.MSWindows():
             p = multiprocessing.Process(target=self._run)
             p.start()
             p.join()
-        except IOError as e:
-            # Windows Python2.7 imp.find_module fails to find the binwalk module;
-            # this eventually leads to an Invalid Argument IOError in the multiprocessing
-            # module. This means that when run in Windows, pg.exit will cause binwalk
+        else:
+            # There seem to be all kinds of issues using the multiprocessing module in
+            # Windows, as done above.
+            #
+            # This means that when run in Windows, pg.exit will cause binwalk
             # to exit.
             self._run()
 

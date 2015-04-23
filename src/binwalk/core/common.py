@@ -6,6 +6,7 @@ import re
 import sys
 import ast
 import hashlib
+import platform
 import operator as op
 from binwalk.core.compat import *
 
@@ -15,6 +16,10 @@ if not __debug__:
     DEBUG = True
 else:
     DEBUG = False
+
+def MSWindows():
+    # Returns True if running in a Microsoft Windows OS
+    return (platform.system() == 'Windows')
 
 def debug(msg):
     '''
