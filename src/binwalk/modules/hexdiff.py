@@ -1,6 +1,5 @@
 import os
 import sys
-import curses
 import string
 import platform
 import binwalk.core.common as common
@@ -208,6 +207,7 @@ class HexDiff(Module):
 
         # Set up the tty for colorization, if it is supported
         if hasattr(sys.stderr, 'isatty') and sys.stderr.isatty() and platform.system() != 'Windows':
+            import curses
             curses.setupterm()
             self.colorize = self._colorize
         else:
