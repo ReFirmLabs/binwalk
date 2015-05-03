@@ -18,6 +18,8 @@ $ sudo python setup.py install
 $ sudo python3 setup.py install
 ```
 
+**NOTE**: Older versions of binwalk (e.g., v1.0) are not compatible with the latest version of binwalk. It is strongly recommended that you uninstall any existing binwalk installations before installing the latest version in order to avoid API conflicts.
+
 Dependencies
 ============
 
