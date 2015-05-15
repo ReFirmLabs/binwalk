@@ -10,8 +10,8 @@ class binwalk_t(idaapi.plugin_t):
     wanted_hotkey = ""
 
     def init(self):
-        self.menu_context_1 = idaapi.add_menu_item("Search/", "executable opcodes", "", 0, self.opcode_scan, (None,))
-        self.menu_context_2 = idaapi.add_menu_item("Search/", "file signatures", "", 0, self.signature_scan, (None,))
+        self.menu_context_1 = idaapi.add_menu_item("Search/", "binwalk opcodes", "", 0, self.opcode_scan, (None,))
+        self.menu_context_2 = idaapi.add_menu_item("Search/", "binwalk signatures", "", 0, self.signature_scan, (None,))
         return idaapi.PLUGIN_KEEP
 
     def term(self):

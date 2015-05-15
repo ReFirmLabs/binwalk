@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-from __future__ import print_function
 import os
 import sys
+import shutil
 import tempfile
 import subprocess
 from distutils.core import setup, Command
@@ -64,12 +64,92 @@ def remove_binwalk_module(pydir=None, pybin=None):
 
     if pybin:
         try:
-            print("removing '%s'" % pybin)
-            os.unlink(pybin)
+            sys.stdout.write("removing '%s'\n" % pybin)
+            os.remove(pybin)
         except KeyboardInterrupt as e:
             pass
         except Exception as e:
             pass
+
+class IDAUnInstallCommand(Command):
+    description = "Uninstalls the binwalk IDA plugin module"
+    user_options = [
+                    ('idadir=', None, 'Specify the path to your IDA install directory.'),
+    ]
+
+    def initialize_options(self):
+        self.idadir = None
+        self.mydir = os.path.dirname(os.path.realpath(__file__))
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        if self.idadir is None:
+            sys.stderr.write("Please specify the path to your IDA install directory with the '--idadir' option!\n")
+            return
+
+        binida_dst_path = os.path.join(self.idadir, 'plugins', 'binida.py')
+        binwalk_dst_path = os.path.join(self.idadir, 'python', 'binwalk')
+
+        if os.path.exists(binida_dst_path):
+            sys.stdout.write("removing %s\n" % binida_dst_path)
+            os.remove(binida_dst_path)
+        if os.path.exists(binwalk_dst_path):
+            sys.stdout.write("removing %s\n" % binwalk_dst_path)
+            shutil.rmtree(binwalk_dst_path)
+
+class IDAInstallCommand(Command):
+    description = "Installs the binwalk IDA plugin module"
+    user_options = [
+                    ('idadir=', None, 'Specify the path to your IDA install directory.'),
+    ]
+
+    def initialize_options(self):
+        self.idadir = None
+        self.mydir = os.path.dirname(os.path.realpath(__file__))
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        if self.idadir is None:
+            sys.stderr.write("Please specify the path to your IDA install directory with the '--idadir' option!\n")
+            return
+
+        binida_src_path = os.path.join(self.mydir, 'scripts', 'binida.py')
+        binida_dst_path = os.path.join(self.idadir, 'plugins')
+
+        if not os.path.exists(binida_src_path):
+            sys.stderr.write("ERROR: could not locate IDA plugin file '%s'!\n" % binida_src_path)
+            return
+        if not os.path.exists(binida_dst_path):
+            sys.stderr.write("ERROR: could not locate the IDA plugins directory '%s'! Check your --idadir option.\n" % binida_dst_path)
+            return
+
+        binwalk_src_path = os.path.join(self.mydir, 'binwalk')
+        binwalk_dst_path = os.path.join(self.idadir, 'python')
+
+        if not os.path.exists(binwalk_src_path):
+            sys.stderr.write("ERROR: could not locate binwalk source directory '%s'!\n" % binwalk_src_path)
+            return
+        if not os.path.exists(binwalk_dst_path):
+            sys.stderr.write("ERROR: could not locate the IDA python directory '%s'! Check your --idadir option.\n" % binwalk_dst_path)
+            return
+
+        binida_dst_path = os.path.join(binida_dst_path, 'binida.py')
+        binwalk_dst_path = os.path.join(binwalk_dst_path, 'binwalk')
+
+        if os.path.exists(binida_dst_path):
+            os.remove(binida_dst_path)
+        if os.path.exists(binwalk_dst_path):
+            shutil.rmtree(binwalk_dst_path)
+
+        sys.stdout.write("copying %s -> %s\n" % (binida_src_path, binida_dst_path))
+        shutil.copyfile(binida_src_path, binida_dst_path)
+
+        sys.stdout.write("copying %s -> %s\n" % (binwalk_src_path, binwalk_dst_path))
+        shutil.copytree(binwalk_src_path, binwalk_dst_path)
 
 class UninstallCommand(Command):
     description = "Uninstalls the Python module"
@@ -130,6 +210,6 @@ setup(name = MODULE_NAME,
       package_data = {MODULE_NAME : install_data_files},
       scripts = [os.path.join("scripts", MODULE_NAME)],
 
-      cmdclass = {'clean' : CleanCommand, 'uninstall' : UninstallCommand}
+      cmdclass = {'clean' : CleanCommand, 'uninstall' : UninstallCommand, 'idainstall' : IDAInstallCommand, 'idauninstall' : IDAUnInstallCommand}
 )
 

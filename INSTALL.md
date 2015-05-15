@@ -89,7 +89,17 @@ $ sudo cp bin/unstuff /usr/local/bin/
 Installing the IDA Plugin
 =========================
 
-If IDA is installed on your system, you may optionally install the binwalk IDA plugin by simply copying the `src/scripts/binida.py` file into IDA's `plugins` directory.
+If IDA is installed on your system, you may optionally install the binwalk IDA plugin:
+
+```bash
+$ python setup.py idainstall --idadir=/home/user/ida
+```
+
+Likewise, the binwalk IDA plugin can be uninstalled:
+
+```bash
+$ python setup.py idauninstall --idadir=/home/user/ida
+```
 
 
 Uninstalling Binwalk
