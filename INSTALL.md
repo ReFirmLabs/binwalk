@@ -86,6 +86,12 @@ $ wget -O - http://my.smithmicro.com/downloads/files/stuffit520.611linux-i386.ta
 $ sudo cp bin/unstuff /usr/local/bin/
 ```
 
+Note that for Debian/Ubuntu users, all of the above dependencies can be installed automatically using the included `deps.sh` script:
+
+```bash
+$ sudo ./deps.sh
+```
+
 Installing the IDA Plugin
 =========================
 
