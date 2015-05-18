@@ -171,6 +171,10 @@ class Entropy(Module):
         else:
             block_size = self.block_size
 
+        # Make sure block size is greater than 0
+        if block_size <= 0:
+            block_size = self.DEFAULT_BLOCK_SIZE
+
         binwalk.core.common.debug("Entropy block size (%d data points): %d" % (self.DEFAULT_DATA_POINTS, block_size))
 
         while True:
@@ -301,13 +305,16 @@ class Entropy(Module):
 
         # TODO: legend is not displayed properly when saving plots to disk
         if self.save_plot:
+            # Save graph to CWD
+            out_file = os.path.join(os.getcwd(), os.path.basename(fname))
+
             # exporters.ImageExporter is different in different versions of pyqtgraph
             try:
                 exporter = exporters.ImageExporter(plt.plotItem)
             except TypeError:
                 exporter = exporters.ImageExporter.ImageExporter(plt.plotItem)
             exporter.parameters()['width'] = self.FILE_WIDTH
-            exporter.export(binwalk.core.common.unique_file_name(fname, self.FILE_FORMAT))
+            exporter.export(binwalk.core.common.unique_file_name(out_file, self.FILE_FORMAT))
         else:
             plt.setLabel('left', self.YLABEL, units=self.YUNITS)
             plt.setLabel('bottom', self.XLABEL, units=self.XUNITS)
