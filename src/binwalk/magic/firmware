@@ -354,7 +354,7 @@
 >0x3C      belong          x                       product ID: 0x%X,
 >0x40      belong          x                       product version: %d,
 >0x70      belong          x                       kernel load address: 0x%X,
->0x74      belong          x                       kernel entry point: 0x%X,
+>0x74      ubelong         x                       kernel entry point: 0x%X,
 >0x7C      belong          x                       kernel offset: %d,
 >0x80      belong          x                       kernel length: %d,
 >0x84      belong          x                       rootfs offset: %d,
