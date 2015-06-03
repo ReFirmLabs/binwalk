@@ -208,3 +208,14 @@
 >>152   lelong      !0x700
 >>>152  lelong      !0x900                              \b, {invalid}
 
+0       string      WIND\x20version\x20     VxWorks WIND kernel version
+>13     byte        0                       {invalid}
+>13     byte        !0
+>>13    string      x                       "%s"
+
+0       string      VxWorks\00              VxWorks operating system version
+>8      byte        0                       {invalid}
+>8      byte        !0
+>>8     string      x                       "%s"
+>32     byte        !0
+>>32    string      x                       , compiled: "%s"
