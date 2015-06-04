@@ -127,7 +127,7 @@
 
 # Ubicom firmware image
 0       belong    0xFA320080    Ubicom firmware header,
->12     belong    x             checksum: 0x%X,
+>12     ubelong   x             checksum: 0x%X,
 >24     belong    <0            {invalid}
 >24     belong    x             image size: %d
 
@@ -178,8 +178,8 @@
 #year
 >8      beshort         x               \b%d,
 >16     belong          x               image size: %d bytes,
->22     byte            x               body checksum: 0x%X,
->23     byte            x               header checksum: 0x%X
+>22     ubyte           x               body checksum: 0x%X,
+>23     ubyte           x               header checksum: 0x%X
 
 # PackImg tag, somtimes used as a delimiter between the kernel and rootfs in firmware images.
 0       string        --PaCkImGs      PackImg section delimiter tag,
@@ -265,7 +265,7 @@
 #http://forum.xda-developers.com/showthread.php?t=801167
 0    string    B000FF    Windows CE image header,
 >7   ulelong   x         image start: 0x%X,
->11  lelong    x         image length: %d
+>11  ulelong   x         image length: %d
 
 
 #Windows CE RomImage
@@ -353,14 +353,14 @@
 #>0x74  belong          x                       image size: %d bytes,
 >0x3C      belong          x                       product ID: 0x%X,
 >0x40      belong          x                       product version: %d,
->0x70      belong          x                       kernel load address: 0x%X,
+>0x70      ubelong         x                       kernel load address: 0x%X,
 >0x74      ubelong         x                       kernel entry point: 0x%X,
->0x7C      belong          x                       kernel offset: %d,
->0x80      belong          x                       kernel length: %d,
->0x84      belong          x                       rootfs offset: %d,
->0x88      belong          x                       rootfs length: %d,
->0x8C      belong          x                       bootloader offset: %d,
->0x90      belong          x                       bootloader length: %d
+>0x7C      ubelong         x                       kernel offset: %d,
+>0x80      ubelong         x                       kernel length: %d,
+>0x84      ubelong         x                       rootfs offset: %d,
+>0x88      ubelong         x                       rootfs length: %d,
+>0x8C      ubelong         x                       bootloader offset: %d,
+>0x90      ubelong         x                       bootloader length: %d
 
 # Header format from: http://skaya.enix.org/wiki/FirmwareFormat
 0       string        \x36\x00\x00\x00          Broadcom 96345 firmware header, header size: 256,
@@ -372,8 +372,8 @@
 >45     beshort       !0x0202
 >>45    beshort       !0x0000
 >>>45   string        x                         board id: "%s",
->236    belong        x                         ~CRC32 header checksum: 0x%X,
->216    belong        x                         ~CRC32 data checksum: 0x%X
+>236    ubelong       x                         ~CRC32 header checksum: 0x%X,
+>216    ubelong       x                         ~CRC32 data checksum: 0x%X
 
 # Xerox MFP DLM signatures
 0       string        %%XRXbegin                Xerox DLM firmware start of header
@@ -466,7 +466,7 @@
 >20     belong      x               image size: %d,
 >20     belong      x               {size:%d}
 >4      belong      <1              {invalid}
->4      belong      x               kernel offset: %d,
+>4      ubelong     x               kernel offset: %d,
 >12     belong      <1              {invalid}
 >12     belong      x               header version: %d,
 
@@ -477,7 +477,7 @@
 >20     lelong      x               image size: %d,
 >20     lelong      x               {size:%d}
 >4      lelong      <1              {invalid}
->4      lelong      x               kernel offset: %d,
+>4      ulelong     x               kernel offset: %d,
 >12     lelong      <1              {invalid}
 >12     lelong      x               header version: %d,
 
@@ -523,20 +523,20 @@
 >0       string    x                       "%s"
 
 # ZyXEL config signatures
-6           string     dbgarea                  ZyXEL rom-0 configuration block, name: "%s",
->16         beshort    x                        compressed size: %d,
->14         beshort    x                        uncompressed size: %d,
->18         beshort+16 x                        data offset from start of block: %d
+6           string      dbgarea                  ZyXEL rom-0 configuration block, name: "%s",
+>16         ubeshort    x                        compressed size: %d,
+>14         ubeshort    x                        uncompressed size: %d,
+>18         ubeshort+16 x                        data offset from start of block: %d
 
-6           string     spt.dat                  ZyXEL rom-0 configuration block, name: "%s",
->16         beshort    x                        compressed size: %d,
->14         beshort    x                        uncompressed size: %d,
->18         beshort+16 x                        data offset from start of block: %d
+6           string      spt.dat                  ZyXEL rom-0 configuration block, name: "%s",
+>16         ubeshort    x                        compressed size: %d,
+>14         ubeshort    x                        uncompressed size: %d,
+>18         ubeshort+16 x                        data offset from start of block: %d
 
-6           string     autoexec.net             ZyXEL rom-0 configuration block, name: "%s",
->16         beshort    x                        compressed size: %d,
->14         beshort    x                        uncompressed size: %d,
->18         beshort+16 x                        data offset from start of block: %d
+6           string      autoexec.net             ZyXEL rom-0 configuration block, name: "%s",
+>16         ubeshort    x                        compressed size: %d,
+>14         ubeshort    x                        uncompressed size: %d,
+>18         ubeshort+16 x                        data offset from start of block: %d
 
 # Obfuscated Arcadyan firmware
 0x68    string  \x00\xD5\x08                    Obfuscated Arcadyan firmware,
