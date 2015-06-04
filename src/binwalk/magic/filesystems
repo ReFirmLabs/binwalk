@@ -535,8 +535,17 @@
 >32     belong    1                                 compressed,
 >32     belong    2                                 plain text,
 >32     belong    <1                                {invalid}
-32      belong    >2                                {invalid}
+>32     belong    >2                                {invalid}
 >36     belong    x                                 %d files
+
+# Wind River MemFS file system, found in some VxWorks devices
+0       string    OWOWOWOWOWOWOWOWOWOWOWOWOWOWOW    Wind River management filesystem,{overlap}
+>30     string    !OW                               {invalid},
+>32     lelong    1                                 compressed,
+>32     lelong    2                                 plain text,
+>32     lelong    <1                                {invalid}
+>32     lelong    >2                                {invalid}
+>36     lelong    x                                 %d files
 
 # netboot image - Juan Cespedes <cespedes@debian.org>
 0       lelong              0x1b031336      Netboot image,
