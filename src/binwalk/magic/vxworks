@@ -217,5 +217,6 @@
 >8      byte        0                       {invalid}
 >8      byte        !0
 >>8     string      x                       "%s"
+>16     string      !VxWorks                {invalid}
 >32     byte        !0
 >>32    string      x                       , compiled: "%s"
