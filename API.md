@@ -36,7 +36,7 @@ binwalk.scan(*['--signature', 'firmware1.bin', 'firmware2.bin',])
 
 All args and kwargs keys/values correspond to binwalk's command line options. Either args or kwargs, or a combination of the two may be used, with the following caveats:
 
-* All command line switches passed via args must be preceeded by hyphens
+* All command line switches passed via args must be preceded by hyphens
 * All file names must be passed via args, not kwargs
 
 There is one available API argument which is not exposed via the command line: the `string` argument. When `string` is set to True, data to be scanned can be passed directly to the binwalk module, rather than a file name:
@@ -51,7 +51,7 @@ Accessing Scan Results
 
 `binwalk.scan` returns a list of objects. Each object corresponds to a module that was run. For example, if you specified `--signature` and `--entropy`, then both the Signature and Entropy modules would be executed and you would be returned a list of two objects.
 
-The two attributes of interest for each object are the `results` and `errors` objects. Each is a list of binwalk.core.module.Result and binwalk.core.module.Error objects respectively. Each Result or Error object may contain custom attributes set by each module, but are guarunteed to have at least the following attributes (though modules are not required to populate all attributes):
+The two attributes of interest for each object are the `results` and `errors` objects. Each is a list of binwalk.core.module.Result and binwalk.core.module.Error objects respectively. Each Result or Error object may contain custom attributes set by each module, but are guaranteed to have at least the following attributes (though modules are not required to populate all attributes):
 
 |  Attribute  | Description |
 |-------------|-------------|
@@ -62,13 +62,13 @@ The two attributes of interest for each object are the `results` and `errors` ob
 | valid       | Set to True if the result if value, False if invalid (usually unused for errors) |
 | display     | Set to True to display the result to the user, False to hide it (usually unused for errors) |
 | extract     | Set to True to flag this result for extraction (not used for errors) |
-| plot        | Set to Flase to exclude this result from entropy plots (not used for errors) |
+| plot        | Set to False to exclude this result from entropy plots (not used for errors) |
 
-binwalk.core.module.Error has the additional guarunteed attribute:
+binwalk.core.module.Error has the additional guaranteed attribute:
 
 |  Attribute  | Description |
 |-------------|-------------|
-| exception   | Contains the Python execption object if the encountered error was an exception |
+| exception   | Contains the Python exception object if the encountered error was an exception |
 
 Thus, scan results and errors can be programatically accessed rather easily:
 
