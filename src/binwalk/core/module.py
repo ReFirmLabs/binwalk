@@ -307,6 +307,9 @@ class Module(object):
     def _plugins_pre_scan(self):
         self.plugins.pre_scan_callbacks(self)
 
+    def _plugins_new_file(self, fp):
+        self.plugins.new_file_callbacks(fp)
+
     def _plugins_post_scan(self):
         self.plugins.post_scan_callbacks(self)
 
@@ -387,6 +390,9 @@ class Module(object):
             self.current_target_file_name = None
 
         self.previous_next_file_fp = fp
+
+        self._plugins_new_file(fp)
+
         return fp
 
     def clear(self, results=True, errors=True):
