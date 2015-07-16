@@ -81,14 +81,16 @@ for module in binwalk.scan('firmware1.bin', 'firmware2.bin', signature=True, qui
 
 Note the above use of the `--quiet` option which prevents the binwalk module from printing its normal output to screen.
 
-Each module object will also have an additional `extractor` attribute, which is an instance of the `binwalk.modules.extractor` object used to extract files if `--extract` was specified. In particular, `binwalk.modules.extractor.output` is a dictionary containing information about carved/extracted data:
+Each module object will also have an additional `extractor` attribute, which is an instance of the `binwalk.modules.extractor.Extractor` class. Of particular use is `binwalk.modules.extractor.Extrctor.output`, a dictionary containing information about carved/extracted data:
 
 ```python
 for module in binwalk.scan('firmware1.bin', 'firmware2.bin', signature=True, quiet=True, extract=True):
     for result in module.results:
         if module.extractor.output.has_key(result.file.path):
+            # These are files that binwalk carved out of the original firmware image, a la dd
             if module.extractor.output[result.file.path].carved.has_key(result.offset):
                 print "Carved data from offset 0x%X to %s" % (module.extractor.output[result.file.path].carved[result.offset])
+            # These are files/directories created by extraction utilities (gunzip, tar, unsquashfs, etc)
             if module.extractor.output[result.file.path].extracted.has_key(result.offset):
                 print "Extracted data from offset 0x%X to %s" % (module.extractor.output[result.file.path].extracted[result.offset][0])
 ```
