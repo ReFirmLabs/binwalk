@@ -415,7 +415,6 @@ class Extractor(Module):
         Returns the name of the extracted file (blank string if nothing was extracted).
         '''
         fname = ''
-        cleanup_extracted_fname = True
         original_dir = os.getcwd()
         rules = self.match(description)
         file_path = os.path.realpath(file_name)
@@ -448,15 +447,12 @@ class Extractor(Module):
                 # If execution fails, the next rule will be attempted.
                 if rule['cmd']:
 
-                    # Many extraction utilities will extract the file to a new file, just without
-                    # the file extension (i.e., myfile.7z -> myfile). If the presumed resulting
-                    # file name already exists before executing the extract command, do not attempt
-                    # to clean it up even if its resulting file size is 0.
+                    # Note the hash of the original file; if --rm is specified and the
+                    # extraction utility modifies the original file rather than creating
+                    # a new one (AFAIK none currently do, but could happen in the future),
+                    # we don't want to remove this file.
                     if self.remove_after_execute:
                         fname_md5 = file_md5(fname)
-                        extracted_fname = os.path.splitext(fname)[0]
-                        if os.path.exists(extracted_fname):
-                            cleanup_extracted_fname = False
 
                     # Execute the specified command against the extracted file
                     if self.run_extractors:
