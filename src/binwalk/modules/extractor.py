@@ -14,6 +14,12 @@ from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg
 from binwalk.core.common import file_size, file_md5, unique_file_name, BlockFile
 
+class ExtractInfo(object):
+    def __init__(self):
+        self.carved = {}
+        self.extracted = {}
+        self.directory = None
+
 class Extractor(Module):
     '''
     Extractor class, responsible for extracting files from the target file and executing external applications, if requested.
@@ -151,6 +157,9 @@ class Extractor(Module):
         # Note that r.display is still True even if --quiet has been specified; it is False if the result has been
         # explicitly excluded via the -y/-x options.
         if r.valid and r.extract and r.display:
+            # Create some extract output for this file, it it doesn't already exist
+            if not binwalk.core.common.has_key(self.output, r.file.path):
+                self.output[r.file.path] = ExtractInfo()
 
             # Attempt extraction
             binwalk.core.common.debug("Extractor callback for %s @%d [%s]" % (r.file.name, r.offset, r.description))
@@ -158,8 +167,10 @@ class Extractor(Module):
 
             # If the extraction was successful, self.extract will have returned the output directory and name of the dd'd file
             if extraction_directory and dd_file:
-                # Get the full path to the dd'd file
+                # Get the full path to the dd'd file and save it in the output info for this file
                 dd_file_path = os.path.join(extraction_directory, dd_file)
+                self.output[r.file.path].carved[r.offset] = dd_file_path
+                self.output[r.file.path].extracted[r.offset] = []
 
                 # Do a directory listing of the output directory
                 directory_listing = set(os.listdir(extraction_directory))
@@ -175,6 +186,10 @@ class Extractor(Module):
                     file_path = os.path.join(extraction_directory, f)
                     real_file_path = os.path.realpath(file_path)
                     self.result(description=file_path, display=False)
+
+                    # Also keep a list of files created by the extraction utility
+                    if real_file_path != dd_file_path:
+                        self.output[r.file.path].extracted[r.offset].append(real_file_path)
 
                     # If recursion was specified, and the file is not the same one we just dd'd
                     if self.matryoshka and file_path != dd_file_path and scan_extracted_files:
@@ -367,7 +382,7 @@ class Extractor(Module):
         # Set the initial base extraction directory for later determining the level of recusion
         if self.directory is None:
             self.directory = os.path.realpath(output_directory) + os.path.sep
-            self.output[path] = self.directory
+            self.output[path].directory = self.directory
 
         return output_directory
 

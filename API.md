@@ -81,15 +81,16 @@ for module in binwalk.scan('firmware1.bin', 'firmware2.bin', signature=True, qui
 
 Note the above use of the `--quiet` option which prevents the binwalk module from printing its normal output to screen.
 
-Each module object will also have an additional `extractor` attribute, which is an instance of the `binwalk.modules.extractor` object used to extract files if `--extract` was specified. In particular, `binwalk.modules.extractor.output` is a dictionary containing the base extraction directory for each scanned file:
+Each module object will also have an additional `extractor` attribute, which is an instance of the `binwalk.modules.extractor` object used to extract files if `--extract` was specified. In particular, `binwalk.modules.extractor.output` is a dictionary containing information about carved/extracted data:
 
 ```python
 for module in binwalk.scan('firmware1.bin', 'firmware2.bin', signature=True, quiet=True, extract=True):
-    print ("%s Results:" % module.name)
     for result in module.results:
-        print ("\t%s    0x%.8X    %s" % (result.file.path, result.offset, result.description))
-    for (file_path, output_dir) in module.extractor.output:
-        print ("%s data was extracted to: %s" % (file_path, output_dir))
+        if module.extractor.output.has_key(result.file.path):
+            if module.extractor.output[result.file.path].carved.has_key(result.offset):
+                print "Carved data from offset 0x%X to %s" % (module.extractor.output[result.file.path].carved[result.offset])
+            if module.extractor.output[result.file.path].extracted.has_key(result.offset):
+                print "Extracted data from offset 0x%X to %s" % (module.extractor.output[result.file.path].extracted[result.offset][0])
 ```
 
 Module Exceptions
