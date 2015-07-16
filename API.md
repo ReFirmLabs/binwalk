@@ -76,7 +76,7 @@ Thus, scan results and errors can be programatically accessed rather easily:
 for module in binwalk.scan('firmware1.bin', 'firmware2.bin', signature=True, quiet=True):
     print ("%s Results:" % module.name)
     for result in module.results:
-        print ("\t%s    0x%.8X    %s" % (result.file.name, result.offset, result.description))
+        print ("\t%s    0x%.8X    %s" % (result.file.path, result.offset, result.description))
 ```
 
 Note the above use of the `--quiet` option which prevents the binwalk module from printing its normal output to screen.
@@ -87,7 +87,7 @@ Each module object will also have an additional `extractor` attribute, which is 
 for module in binwalk.scan('firmware1.bin', 'firmware2.bin', signature=True, quiet=True, extract=True):
     print ("%s Results:" % module.name)
     for result in module.results:
-        print ("\t%s    0x%.8X    %s" % (result.file.name, result.offset, result.description))
+        print ("\t%s    0x%.8X    %s" % (result.file.path, result.offset, result.description))
     for (file_path, output_dir) in module.extractor.output:
         print ("%s data was extracted to: %s" % (file_path, output_dir))
 ```
