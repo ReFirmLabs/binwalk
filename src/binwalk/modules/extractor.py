@@ -12,7 +12,7 @@ import subprocess
 import binwalk.core.common
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg
-from binwalk.core.common import file_size, unique_file_name, BlockFile
+from binwalk.core.common import file_size, file_md5, unique_file_name, BlockFile
 
 class Extractor(Module):
     '''
@@ -69,7 +69,7 @@ class Extractor(Module):
             Option(short='r',
                    long='rm',
                    kwargs={'remove_after_execute' : True},
-                   description='Cleanup extracted / zero-size files after extraction'),
+                   description='Delete carved files after extraction'),
             Option(short='z',
                    long='carve',
                    kwargs={'run_extractors' : False},
@@ -371,7 +371,6 @@ class Extractor(Module):
 
         return output_directory
 
-
     def cleanup_extracted_files(self, tf=None):
         '''
         Set the action to take after a file is extracted.
@@ -439,6 +438,7 @@ class Extractor(Module):
                     # file name already exists before executing the extract command, do not attempt
                     # to clean it up even if its resulting file size is 0.
                     if self.remove_after_execute:
+                        fname_md5 = file_md5(fname)
                         extracted_fname = os.path.splitext(fname)[0]
                         if os.path.exists(extracted_fname):
                             cleanup_extracted_fname = False
@@ -452,23 +452,15 @@ class Extractor(Module):
                     # Only clean up files if remove_after_execute was specified
                     if extract_ok == True and self.remove_after_execute:
 
-                        # Remove the original file that we extracted
+                        # Remove the original file that we extracted,
+                        # if it has not been modified by the extractor.
                         try:
-                            os.unlink(fname)
+                            if file_md5(fname) == fname_md5:
+                                os.unlink(fname)
                         except KeyboardInterrupt as e:
                             raise e
                         except Exception as e:
                             pass
-
-                        # If the command worked, assume it removed the file extension from the extracted file
-                        # If the extracted file name file exists and is empty, remove it
-                        if cleanup_extracted_fname and os.path.exists(extracted_fname) and file_size(extracted_fname) == 0:
-                            try:
-                                os.unlink(extracted_fname)
-                            except KeyboardInterrupt as e:
-                                raise e
-                            except Exception as e:
-                                pass
 
                     # If the command executed OK, don't try any more rules
                     if extract_ok == True:
