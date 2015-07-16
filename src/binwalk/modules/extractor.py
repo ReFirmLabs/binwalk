@@ -56,6 +56,11 @@ class Extractor(Module):
                    type=int,
                    kwargs={'matryoshka' : 0},
                    description='Limit matryoshka recursion depth (default: 8 levels deep)'),
+            Option(short='C',
+                   long='directory',
+                   type=str,
+                   kwargs={'base_directory' : 0},
+                   description='Extract files/folders to a custom directory (default: current working directory)'),
             Option(short='j',
                    long='size',
                    type=int,
@@ -73,6 +78,7 @@ class Extractor(Module):
 
     KWARGS = [
             Kwarg(name='max_size', default=None),
+            Kwarg(name='base_directory', default=None),
             Kwarg(name='remove_after_execute', default=False),
             Kwarg(name='load_default_rules', default=False),
             Kwarg(name='run_extractors', default=True),
@@ -336,7 +342,12 @@ class Extractor(Module):
 
             # Make sure we put the initial extracted file in the CWD
             if self.directory is None:
-                basedir = os.getcwd()
+                if self.base_directory is None:
+                    basedir = os.getcwd()
+                else:
+                    basedir = self.base_directory
+                    if not os.path.exists(basedir):
+                        os.mkdir(basedir)
 
             outdir = os.path.join(basedir, '_' + basename)
             output_directory = unique_file_name(outdir, extension='extracted')
@@ -352,7 +363,6 @@ class Extractor(Module):
         # Set the initial base extraction directory for later determining the level of recusion
         if self.directory is None:
             self.directory = os.path.realpath(output_directory) + os.path.sep
-
 
         return output_directory
 
