@@ -51,7 +51,7 @@ Accessing Scan Results
 
 `binwalk.scan` returns a list of objects. Each object corresponds to a module that was run. For example, if you specified `--signature` and `--entropy`, then both the Signature and Entropy modules would be executed and you would be returned a list of two objects.
 
-The two attributes of interest for each object are the `results` and `errors` objects. Each is a list of binwalk.core.module.Result and binwalk.core.module.Error objects respectively. Each Result or Error object may contain custom attributes set by each module, but are guaranteed to have at least the following attributes (though modules are not required to populate all attributes):
+The two attributes of greatest interest for each object are the `results` and `errors` objects. Each is a list of binwalk.core.module.Result and binwalk.core.module.Error objects respectively. Each Result or Error object may contain custom attributes set by each module, but are guaranteed to have at least the following attributes (though modules are not required to populate all attributes):
 
 |  Attribute  | Description |
 |-------------|-------------|
@@ -80,6 +80,17 @@ for module in binwalk.scan('firmware1.bin', 'firmware2.bin', signature=True, qui
 ```
 
 Note the above use of the `--quiet` option which prevents the binwalk module from printing its normal output to screen.
+
+Each module object will also have an additional `extractor` attribute, which is an instance of the `binwalk.modules.extractor` object used to extract files if `--extract` was specified. In particular, `binwalk.modules.extractor.output` is a dictionary containing the base extraction directory for each scanned file:
+
+```python
+for module in binwalk.scan('firmware1.bin', 'firmware2.bin', signature=True, quiet=True, extract=True):
+    print ("%s Results:" % module.name)
+    for result in module.results:
+        print ("\t%s    0x%.8X    %s" % (result.file.name, result.offset, result.description))
+    for (file_path, output_dir) in module.extractor.output:
+        print ("%s data was extracted to: %s" % (file_path, output_dir))
+```
 
 Module Exceptions
 =================

@@ -90,8 +90,10 @@ class Extractor(Module):
     def load(self):
         # Holds a list of extraction rules loaded either from a file or when manually specified.
         self.extract_rules = []
-        # The base extraction directory (to be determined at runtime)
+        # The input file specific output directory path (to be determined at runtime)
         self.directory = None
+        # Key value pairs of input file path and output extraction path
+        self.output = {}
 
         if self.load_default_rules:
             self.load_defaults()
@@ -128,6 +130,8 @@ class Extractor(Module):
         # Holds a dictionary of the last directory listing for a given directory; used for identifying
         # newly created/extracted files that need to be appended to self.pending.
         self.last_directory_listing = {}
+        # Reset the base output directory
+        self.directory = None
 
     def callback(self, r):
         # Make sure the file attribute is set to a compatible instance of binwalk.core.common.BlockFile
@@ -363,6 +367,7 @@ class Extractor(Module):
         # Set the initial base extraction directory for later determining the level of recusion
         if self.directory is None:
             self.directory = os.path.realpath(output_directory) + os.path.sep
+            self.output[path] = self.directory
 
         return output_directory
 

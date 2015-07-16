@@ -352,7 +352,12 @@ class Module(object):
 
         # Add any pending extracted files to the target_files list and reset the extractor's pending file list
         self.target_file_list += self.extractor.pending
-        self.extractor.pending = []
+
+        # Reset all dependencies prior to continuing with another file.
+        # This is particularly important for the extractor module, which must be reset
+        # in order to reset it's base output directory path for each file, and the
+        # list of pending files.
+        self.reset_dependencies()
 
         while self.target_file_list:
             next_target_file = self.target_file_list.pop(0)
@@ -482,6 +487,12 @@ class Module(object):
         '''
         self.config.display.footer()
 
+    def reset_dependencies(self):
+        # Reset all dependency modules
+        for dependency in self.dependencies:
+            if hasattr(self, dependency.attribute):
+                getattr(self, dependency.attribute).reset()
+
     def main(self, parent):
         '''
         Responsible for calling self.init, initializing self.config.display, and calling self.run.
@@ -496,14 +507,11 @@ class Module(object):
         if hasattr(self, "extractor") and self.extractor.config.verbose:
             self.config.verbose = self.config.display.verbose = True
 
-        # Reset all dependency modules
-        for dependency in self.dependencies:
-            if hasattr(self, dependency.attribute):
-                getattr(self, dependency.attribute).reset()
-
         if not self.config.files:
             binwalk.core.common.debug("No target files specified, module %s terminated" % self.name)
             return False
+
+        self.reset_dependencies()
 
         try:
             self.init()
