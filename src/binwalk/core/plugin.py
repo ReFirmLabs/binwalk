@@ -51,7 +51,7 @@ class Plugin(object):
         '''
         pass
 
-    def scan(self, result):
+    def scan(self, module):
         '''
         Child class should override this if needed.
         '''
@@ -98,14 +98,14 @@ class Plugins(object):
     def __exit__(self, t, v, traceback):
         pass
 
-    def _call_plugins(self, callback_list, arg):
+    def _call_plugins(self, callback_list, obj=None):
         for callback in callback_list:
             try:
                 try:
                     callback()
                 except TypeError:
-                    if arg is not None:
-                        callback(arg)
+                    if obj is not None:
+                        callback(obj)
             except KeyboardInterrupt as e:
                 raise e
             except Exception as e:
@@ -241,13 +241,13 @@ class Plugins(object):
                 binwalk.core.common.warning("Failed to load plugin module '%s': %s" % (module, str(e)))
 
     def pre_scan_callbacks(self, obj):
-        return self._call_plugins(self.pre_scan, None)
+        return self._call_plugins(self.pre_scan)
 
     def new_file_callbacks(self, fp):
         return self._call_plugins(self.new_file, fp)
 
     def post_scan_callbacks(self, obj):
-        return self._call_plugins(self.post_scan, None)
+        return self._call_plugins(self.post_scan)
 
     def scan_callbacks(self, obj):
         return self._call_plugins(self.scan, obj)
