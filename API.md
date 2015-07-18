@@ -49,9 +49,9 @@ binwalk.scan(data, signature=True, string=True)
 Accessing Scan Results
 ======================
 
-`binwalk.scan` returns a list of objects. Each object corresponds to a module that was run. For example, if you specified `--signature` and `--entropy`, then both the Signature and Entropy modules would be executed and you would be returned a list of two objects.
+`binwalk.scan` returns a list of objects. Each object corresponds to a module that was run. For example, if you specified `--signature` and `--entropy`, then both the `Signature` and `Entropy` modules would be executed and you would be returned a list of two objects.
 
-The two attributes of greatest interest for each object are the `results` and `errors` objects. Each is a list of binwalk.core.module.Result and binwalk.core.module.Error objects respectively. Each Result or Error object may contain custom attributes set by each module, but are guaranteed to have at least the following attributes (though modules are not required to populate all attributes):
+The two attributes of greatest interest for each object are the `results` and `errors` objects. Each is a list of `binwalk.core.module.Result` and `binwalk.core.module.Error` instances, respectively. Each `Result` or `Error` instance may contain custom attributes set by each module, but are guaranteed to have at least the following attributes (though modules are not required to populate all attributes):
 
 |  Attribute  | Description |
 |-------------|-------------|
@@ -59,7 +59,7 @@ The two attributes of greatest interest for each object are the `results` and `e
 | description | The result/error description, as displayed to the user |
 | module      | Name of the module that generated the result/error |
 | file        | The file object of the scanned file |
-| valid       | Set to True if the result if value, False if invalid (usually unused for errors) |
+| valid       | Set to True if the result is valid, False if invalid (usually unused for errors) |
 | display     | Set to True to display the result to the user, False to hide it (usually unused for errors) |
 | extract     | Set to True to flag this result for extraction (not used for errors) |
 | plot        | Set to False to exclude this result from entropy plots (not used for errors) |
