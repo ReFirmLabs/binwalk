@@ -644,7 +644,7 @@
 >8 lelong >1 invalid
 >8 lelong x Version %d
 
-0 string BBBB Boot section
+0 string BBBB Boot section{overlap}
 >8 lelong x Start 0x%X
 >12 lelong x End 0x%X
 >16 lelong &0x1 Load-by-Bootrom
