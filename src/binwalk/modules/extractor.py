@@ -416,8 +416,6 @@ class Extractor(Module):
         original_dir = os.getcwd()
         rules = self.match(description)
         file_path = os.path.realpath(file_name)
-        # Don't recurse by default; any successful extraction rule will override this.
-        recurse = False
 
         # No extraction rules for this file
         if not rules:
@@ -437,6 +435,12 @@ class Extractor(Module):
             # Loop through each extraction rule until one succeeds
             for i in range(0, len(rules)):
                 rule = rules[i]
+
+                # Make sure we don't recurse into any extracted directories if instructed not to
+                if rule['recurse'] in [True, False]:
+                    recurse = rule['recurse']
+                else:
+                    recurse = True
 
                 # Copy out the data to disk, if we haven't already
                 fname = self._dd(file_path, offset, size, rule['extension'], output_file_name=name)
@@ -473,8 +477,6 @@ class Extractor(Module):
 
                     # If the command executed OK, don't try any more rules
                     if extract_ok == True:
-                        # Make sure we recurse into any extracted directories if instructed to
-                        recurse = rule['recurse']
                         break
                     # Else, remove the extracted file if this isn't the last rule in the list.
                     # If it is the last rule, leave the file on disk for the user to examine.
