@@ -137,7 +137,7 @@ class Extractor(Module):
         # newly created/extracted files that need to be appended to self.pending.
         self.last_directory_listing = {}
         # Reset the base output directory
-        self.directory = None
+        #self.directory = None
 
     def callback(self, r):
         # Make sure the file attribute is set to a compatible instance of binwalk.core.common.BlockFile
