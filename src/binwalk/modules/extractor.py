@@ -136,8 +136,6 @@ class Extractor(Module):
         # Holds a dictionary of the last directory listing for a given directory; used for identifying
         # newly created/extracted files that need to be appended to self.pending.
         self.last_directory_listing = {}
-        # Reset the base output directory
-        #self.directory = None
 
     def callback(self, r):
         # Make sure the file attribute is set to a compatible instance of binwalk.core.common.BlockFile
@@ -419,7 +417,7 @@ class Extractor(Module):
         rules = self.match(description)
         file_path = os.path.realpath(file_name)
         # Don't recurse by default; any successful extraction rule will override this.
-        recurse = True
+        recurse = False
 
         # No extraction rules for this file
         if not rules:
