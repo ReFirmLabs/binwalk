@@ -97,6 +97,11 @@ do
         NEEDED_UTILS="$NEEDED_UTILS $UTIL"
     fi
 done
+find_path $APTCMD
+if [$? -eq 1]
+then
+       NEEDED_UTILS="$NEEDED_UTILS $APTCMD"
+fi
 
 if [ "$NEEDED_UTILS" != "" ]
 then
