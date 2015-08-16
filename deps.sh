@@ -1,10 +1,14 @@
 #!/bin/bash
 
-REQUIRED_UTILS="apt-get wget tar python2"
+REQUIRED_UTILS="wget tar python"
+APTCMD="yum"
 APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev"
 PYTHON2_APT_CANDIDATES="python-lzma python-pip python-opengl python-qt4 python-qt4-gl python-numpy python-scipy"
 PYTHON3_APT_CANDIDATES="python3-pip python3-opengl python3-pyqt4 python3-pyqt4.qtopengl python3-numpy python3-scipy"
+YUM_CANDIDATES="git gcc gcc-c++ make openssl-devel qtwebkit-devel qt-devel gzip bzip2 tar arj p7zip p7zip-plugins cabextract squashfs-tools zlib zlib-devel lzo lzo-devel xz xz-compat-libs xz-libs xz-devel xz-lzma-compat python-backports-lzma lzip pyliblzma perl-Compress-Raw-Lzma"
+PYTHON2_YUM_CANDIDATES="python-pip python-opengl python-qt4 numpy python-numdisplay numpy-2f python-Bottleneck scipy"
 APT_CANDIDATES="$APT_CANDIDATES $PYTHON2_APT_CANDIDATES"
+YUM_CANDIDATES="$YUM_CANDIDATES $PYTHON2_YUM_CANDIDATES"
 PIP_COMMANDS="pip"
 
 # Check for root privileges
@@ -109,7 +113,12 @@ then
 fi
 
 cd /tmp
-$SUDO apt-get install -y $APT_CANDIDATES
+if [ "$APTCMD" != "yum" ]
+then
+	$SUDO apt-get install -y $APT_CANDIDATES
+else
+	$SUDO yum -y install $YUM_CANDIDATES
+fi
 install_pip_package pyqtgraph
 install_pip_package capstone
 install_sasquatch
