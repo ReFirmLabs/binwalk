@@ -312,7 +312,7 @@ class Entropy(Module):
             try:
                 exporter = exporters.ImageExporter(plt.plotItem)
             except TypeError:
-                exporter = exporters.ImageExporter.ImageExporter(plt.plotItem)
+                exporter = exporters.ImageExporter(plt.plotItem)
             exporter.parameters()['width'] = self.FILE_WIDTH
             exporter.export(binwalk.core.common.unique_file_name(out_file, self.FILE_FORMAT))
         else:
