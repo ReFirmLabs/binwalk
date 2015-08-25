@@ -540,14 +540,14 @@
 
 # Obfuscated Arcadyan firmware
 0x68    string  \x00\xD5\x08                    Obfuscated Arcadyan firmware,
->0x6B   byte    !0                              invalid signature trailing byte [0x%X],{invalid}
+>0x6B   byte    !0                              {invalid} signature trailing byte [0x%X],{invalid}
 # None of the known Arcadyan signatures bytes have a NULL byte
 >0      byte    0                               {invalid}
 >1      byte    0                               {invalid}
 >2      byte    0                               {invalid}
 >3      byte    0                               {invalid}
 >0      ubelong x                               signature bytes: 0x%X,
->0x70   string  !\x00\x00\x00\x00\x00\x00       invalid padding bytes{invalid}
+>0x70   string  !\x00\x00\x00\x00\x00\x00       {invalid} padding bytes{invalid}
 
 # Digi firmware images
 0xC0            string  Digi            Digi International firmware,
@@ -627,21 +627,21 @@
 
 # Mediatek
 0   string  SF_BOOT\x00\x00\x00\x00\x00  Mediatek Serial Flash Image
->12 lelong <1 invalid
->12 lelong >1 invalid
+>12 lelong <1 {invalid}
+>12 lelong >1 {invalid}
 >12 lelong x  Version %d
 0   string  EMMC_BOOT\x00\x00\x00    Mediatek EMMC Flash Image
->12 lelong <1 invalid
->12 lelong >1 invalid
+>12 lelong <1 {invalid}
+>12 lelong >1 {invalid}
 >12 lelong x  Version %d
 0   string  NOR_BOOT\x00\x00\x00\x00 Mediatek NOR Flash Image
->12 lelong <1 invalid
->12 lelong >1 invalid
+>12 lelong <1 {invalid}
+>12 lelong >1 {invalid}
 >12 lelong x  Version %d
 
 0  string BRLYT\x00\x00\x00 Mediatek Boot Header
->8 lelong <1 invalid
->8 lelong >1 invalid
+>8 lelong <1 {invalid}
+>8 lelong >1 {invalid}
 >8 lelong x Version %d
 
 0 string BBBB Boot section{overlap}
@@ -649,11 +649,11 @@
 >12 lelong x End 0x%X
 >16 lelong &0x1 Load-by-Bootrom
 >16 lelong &0x80000000 Internal-RAM
->16 lelong &0x7ffffff0 invalid
+>16 lelong &0x7ffffff0 {invalid}
 
 0 string FILE_INFO\x00\x00\x00 Mediatek File Info
->12 lelong <1 invalid
->12 lelong >1 invalid
+>12 lelong <1 {invalid}
+>12 lelong >1 {invalid}
 >16 leshort 0 File Type: NONE
 >16 leshort 1 File Type: ARM-Bootloader 
 >16 leshort 2 File Type: ARM-External-Bootloader
@@ -670,7 +670,7 @@
 >18 byte 6 EMMC-Data-Region
 >18 byte 7 Flash Type: Serial Flash
 >18 byte 255 Flash Type: Device-End
->18 byte >20 invalid
+>18 byte >20 {invalid}
 >19 byte 0 No Signature
 >19 byte 1 Signature Type: PHASH
 >19 byte 2 Signature Type: SINGLE
@@ -678,7 +678,7 @@
 >19 byte 4 Signature Type: MULTI
 >19 byte 5 Signature Type: TYPE_NUM
 >19 byte 255 Signature Type: TYE_END
->19 byte >20 invalid
+>19 byte >20 {invalid}
 >20 lelong x Load Address: 0x%X
 >24 lelong x File Length: %d
 >28 lelong x Maximum Size: %d
@@ -688,7 +688,7 @@
 >44 lelong &0x1 POST_BUILD_DONE
 >44 lelong &0x2 XIP (Execute In Place)
 >44 lelong &0x4 SLT
->44 lelong &0xffffff00 invalid
+>44 lelong &0xffffff00 {invalid}
 
 
 
