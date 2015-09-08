@@ -12,9 +12,9 @@ class CompressdPlugin(binwalk.core.plugin.Plugin):
     READ_SIZE = 64
 
     COMPRESS42 = "compress42"
-    COMPRESS42_FUNCTIONS = [
-        binwalk.core.C.Function(name="is_compressed", type=bool),
-    ]
+    #COMPRESS42_FUNCTIONS = [
+    #    binwalk.core.C.Function(name="is_compressed", type=bool),
+    #]
 
     comp = None
 
