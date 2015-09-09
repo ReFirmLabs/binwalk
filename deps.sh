@@ -1,10 +1,12 @@
 #!/bin/bash
 
 REQUIRED_UTILS="wget tar python"
-APTCMD="yum"
+APTCMD="apt-get"
+YUMCMD="yum"
 APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev"
 PYTHON2_APT_CANDIDATES="python-lzma python-pip python-opengl python-qt4 python-qt4-gl python-numpy python-scipy"
 PYTHON3_APT_CANDIDATES="python3-pip python3-opengl python3-pyqt4 python3-pyqt4.qtopengl python3-numpy python3-scipy"
+PYTHON3_YUM_CANDIDATES=""
 YUM_CANDIDATES="git gcc gcc-c++ make openssl-devel qtwebkit-devel qt-devel gzip bzip2 tar arj p7zip p7zip-plugins cabextract squashfs-tools zlib zlib-devel lzo lzo-devel xz xz-compat-libs xz-libs xz-devel xz-lzma-compat python-backports-lzma lzip pyliblzma perl-Compress-Raw-Lzma"
 PYTHON2_YUM_CANDIDATES="python-pip python-opengl python-qt4 numpy python-numdisplay numpy-2f python-Bottleneck scipy"
 APT_CANDIDATES="$APT_CANDIDATES $PYTHON2_APT_CANDIDATES"
@@ -97,10 +99,26 @@ do
         NEEDED_UTILS="$NEEDED_UTILS $UTIL"
     fi
 done
+
+# Check for supported package managers and set the PKG_* envars appropriately
 find_path $APTCMD
-if [$? -eq 1]
+if [ $? -eq 1 ]
 then
-       NEEDED_UTILS="$NEEDED_UTILS $APTCMD"
+    find_path $YUMCMD
+    if [ $? -eq 1 ]
+    then
+        NEEDED_UTILS="$NEEDED_UTILS $APTCMD/$YUMCMD"
+    else
+        PKGCMD="$YUMCMD"
+        PKGCMD_OPTS="-y install"
+        PKG_CANDIDATES="$YUM_CANDIDATES"
+        PKG_PYTHON3_CANDIDATES="$PYTHON3_YUM_CANDIDATES"
+    fi
+else
+    PKGCMD="$APTCMD"
+    PKGCMD_OPTS="install -y"
+    PKG_CANDIDATES="$APT_CANDIDATES"
+    PKG_PYTHON3_CANDIDATES="$PYTHON3_APT_CANDIDATES"
 fi
 
 if [ "$NEEDED_UTILS" != "" ]
@@ -113,17 +131,13 @@ fi
 find_path python3
 if [ $? -eq 0 ]
 then
-    APT_CANDIDATES="$APT_CANDIDATES $PYTHON3_APT_CANDIDATES"
-    PIP_COMMANDS="pip3 $PIP_COMMANDS"
+     PKG_CANDIDATES="$PKG_CANDIDATES $PKG_PYTHON3_CANDIDATES"
+     PIP_COMMANDS="pip3 $PIP_COMMANDS"
 fi
 
+# Do the install(s)
 cd /tmp
-if [ "$APTCMD" != "yum" ]
-then
-	$SUDO apt-get install -y $APT_CANDIDATES
-else
-	$SUDO yum -y install $YUM_CANDIDATES
-fi
+sudo $PKGCMD $PKGCMD_OPTS $PKG_CANDIDTES
 install_pip_package pyqtgraph
 install_pip_package capstone
 install_sasquatch
