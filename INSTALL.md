@@ -81,6 +81,13 @@ $ (cd jefferson && sudo python setup.py install)
 ```
 
 ```bash
+# Install ubi_reader to extract UBIFS file systems
+$ sudo apt-get install liblzo2-dev python-lzo
+$ git clone https://github.com/jrspruitt/ubi_reader
+$ (cd ubi_reader && sudo python setup.py install)
+```
+
+```bash
 # Install unstuff (closed source) to extract StuffIt archive files
 $ wget -O - http://my.smithmicro.com/downloads/files/stuffit520.611linux-i386.tar.gz | tar -zxv
 $ sudo cp bin/unstuff /usr/local/bin/
