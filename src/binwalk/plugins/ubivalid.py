@@ -62,6 +62,3 @@ class UBIValidPlugin(binwalk.core.plugin.Plugin):
             result.valid = self._check_crc(ec_header[0:64])
             if result.valid:
                 self._process_result(result)
-
-            print result.jump
-            print result.valid
