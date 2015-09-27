@@ -116,12 +116,14 @@
 >28     string      !\x00*12        {invalid}
 
 # http://lxr.free-electrons.com/source/fs/ubifs/ubifs-media.h
-#0       string      UBI\x23         UBI erase count header,
-#>4      ubyte       x               version: %d,
-#>5      string      !\x00*3         {invalid}
-#>8      ubequad     x               EC: 0x%lX,
-#>16     ubelong     x               VID header offset: 0x%X,
-#>20     ubelong     x               data offset: 0x%X
+0       string      UBI\x23         UBI erase count header,
+>4      ubyte       x               version: %d,
+>5      string      !\x00*3         {invalid}
+>8      ubequad     x               EC: 0x%lX,
+>16     ubelong     x               VID header offset: 0x%X,
+>20     ubelong     x               data offset: 0x%X
+# dummy jump - actual jump value is determined in UBIValidPlugin
+>20       ubyte       x               {jump:0}
 
 # http://lxr.free-electrons.com/source/fs/ubifs/ubifs-media.h
 0        lelong      0x06101831     UBIFS
