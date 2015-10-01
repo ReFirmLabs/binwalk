@@ -3,12 +3,11 @@ import binwalk.core.plugin
 #from binwalk.core.common import *
 
 class CompressdPlugin(binwalk.core.plugin.Plugin):
-    pass
 #    '''
 #    Searches for and validates compress'd data.
 #    '''
 
-    #MODULES = []
+    MODULES = ['Signature']
 
     #READ_SIZE = 64
 
