@@ -192,7 +192,7 @@ class Extractor(Module):
                     # If recursion was specified, and the file is not the same one we just dd'd
                     if self.matryoshka and file_path != dd_file_path and scan_extracted_files:
                         # If the recursion level of this file is less than or equal to our desired recursion level
-                        if len(real_file_path.split(self.directory)[1].split(os.path.sep)) <= self.matryoshka:
+                        if len(real_file_path.split(self.directory)[0].split(os.path.sep)) <= self.matryoshka:
                             # If this is a directory and we are supposed to process directories for this extractor,
                             # then add all files under that directory to the list of pending files.
                             if os.path.isdir(file_path):
