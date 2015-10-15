@@ -3,8 +3,8 @@
 REQUIRED_UTILS="wget tar python"
 APTCMD="apt-get"
 YUMCMD="yum"
-APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev"
-PYTHON2_APT_CANDIDATES="python-lzma python-pip python-opengl python-qt4 python-qt4-gl python-numpy python-scipy"
+APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit"
+PYTHON2_APT_CANDIDATES="python-lzo python-lzma python-pip python-opengl python-qt4 python-qt4-gl python-numpy python-scipy"
 PYTHON3_APT_CANDIDATES="python3-pip python3-opengl python3-pyqt4 python3-pyqt4.qtopengl python3-numpy python3-scipy"
 PYTHON3_YUM_CANDIDATES=""
 YUM_CANDIDATES="git gcc gcc-c++ make openssl-devel qtwebkit-devel qt-devel gzip bzip2 tar arj p7zip p7zip-plugins cabextract squashfs-tools zlib zlib-devel lzo lzo-devel xz xz-compat-libs xz-libs xz-devel xz-lzma-compat python-backports-lzma lzip pyliblzma perl-Compress-Raw-Lzma"
@@ -45,6 +45,13 @@ function install_unstuff
     $SUDO cp bin/unstuff /usr/local/bin/
     cd -
     rm -rf /tmp/unstuff
+}
+
+function install_ubireader
+{
+    git clone https://github.com/jrspruitt/ubi_reader
+    (cd ubi_reader && $SUDO python setup.py install)
+    rm -rf ubi_reader
 }
 
 function install_pip_package
@@ -143,4 +150,5 @@ install_pip_package capstone
 install_sasquatch
 install_jefferson
 install_unstuff
+install_ubireader
 
