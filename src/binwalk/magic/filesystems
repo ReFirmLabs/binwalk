@@ -126,7 +126,7 @@
 >20       ubyte       x               {jump:0}
 
 # http://lxr.free-electrons.com/source/fs/ubifs/ubifs-media.h
-0        lelong      0x06101831     UBIFS
+0        lelong      0x06101831     UBIFS filesystem
 >20      ubyte       <6             {invalid}
 >20      ubyte       >7             {invalid} # Only look for superblock and master nodes
 >22      leshort     !0             {invalid} # 2 bytes of padding should be filled with NULLs
