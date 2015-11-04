@@ -690,5 +690,13 @@
 >44 lelong &0x4 SLT
 >44 lelong &0xffffff00 {invalid}
 
+# Android bootimg
+# https://android.googlesource.com/platform/system/core.git/+/master/mkbootimg/bootimg.h
+0     string     ANDROID!      Android bootimg
+>8    ulelong    x             \b, kernel size: %d bytes
+>12   ulelong    x             \b, kernel addr: 0x%X
+>16   ulelong    x             \b, ramdisk size: %d bytes
+>20   ulelong    x             \b, ramdisk addr: 0x%X
+>48   string     x             \b, product name: "%s"
 
 
