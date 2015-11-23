@@ -407,11 +407,9 @@ class Module(object):
 
         if fp is not None:
             self.current_target_file_name = fp.path
-            print "self.status.fp = %s" % fp.path
             self.status.fp = fp
         else:
             self.current_target_file_name = None
-            print "self.status.fp = None"
             self.status.fp = None
 
         self.previous_next_file_fp = fp
