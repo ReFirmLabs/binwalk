@@ -1,5 +1,6 @@
 # Provides scan status information via a TCP socket service.
 
+import sys
 import time
 import threading
 import SocketServer
@@ -7,7 +8,7 @@ import SocketServer
 class StatusRequestHandler(SocketServer.BaseRequestHandler):
 
     def handle(self):
-        message_format = 'Binwalk scan progress: %3d%%   Currently at byte %d of %d total bytes in file %s'
+        message_format = "%s     %3d%%     [ %d / %d ]"
         last_status_message_len = 0
         status_message = ''
 
@@ -20,16 +21,17 @@ class StatusRequestHandler(SocketServer.BaseRequestHandler):
                 self.request.send('\b' * last_status_message_len)
 
                 percentage = ((float(self.server.binwalk.status.completed) / float(self.server.binwalk.status.total)) * 100)
-                status_message = message_format % (percentage,
+                status_message = message_format % (self.server.binwalk.status.fp.path,
+                                                   percentage,
                                                    self.server.binwalk.status.completed,
-                                                   self.server.binwalk.status.total,
-                                                   self.server.binwalk.status.fp.path)
+                                                   self.server.binwalk.status.total)
                 last_status_message_len = len(status_message)
 
                 self.request.send(status_message)
             except KeyboardInterrupt as e:
                 raise e
             except Exception as e:
+                #sys.stderr.write(str(e) + "\n")
                 pass
 
         return

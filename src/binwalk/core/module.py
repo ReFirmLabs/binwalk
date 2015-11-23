@@ -379,7 +379,7 @@ class Module(object):
 
         # Reset all dependencies prior to continuing with another file.
         # This is particularly important for the extractor module, which must be reset
-        # in order to reset it's base output directory path for each file, and the
+        # in order to reset its base output directory path for each file, and the
         # list of pending files.
         self.reset_dependencies()
 
@@ -407,10 +407,12 @@ class Module(object):
 
         if fp is not None:
             self.current_target_file_name = fp.path
+            print "self.status.fp = %s" % fp.path
             self.status.fp = fp
         else:
             self.current_target_file_name = None
-            self.status.fp = fp
+            print "self.status.fp = None"
+            self.status.fp = None
 
         self.previous_next_file_fp = fp
 
@@ -462,6 +464,7 @@ class Module(object):
             if r.offset and r.file and self.AUTO_UPDATE_STATUS:
                 self.status.total = r.file.length
                 self.status.completed = r.offset
+                self.status.fp = r.file
 
             if r.display:
                 display_args = self._build_display_args(r)
@@ -609,7 +612,7 @@ class Modules(object):
         self.arguments = []
         self.executed_modules = {}
         self.default_dependency_modules = {}
-        self.status = Status(completed=0, total=0, file=None)
+        self.status = Status(completed=0, total=0, fp=None)
         self.status_server_started = False
         self.status_service = None
 
