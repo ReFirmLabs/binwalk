@@ -1,9 +1,16 @@
 # Provides scan status information via a TCP socket service.
+# Currently only works for signature scans.
 
 import sys
 import time
 import threading
-import SocketServer
+import binwalk.core.compat
+
+# Python 2/3 compatibility
+try:
+    import SocketServer
+except ImportError:
+    import socketserver as SocketServer
 
 class StatusRequestHandler(SocketServer.BaseRequestHandler):
 
@@ -16,9 +23,9 @@ class StatusRequestHandler(SocketServer.BaseRequestHandler):
             time.sleep(0.1)
 
             try:
-                self.request.send('\b' * last_status_message_len)
-                self.request.send(' ' * last_status_message_len)
-                self.request.send('\b' * last_status_message_len)
+                self.request.send(binwalk.core.compat.str2bytes('\b' * last_status_message_len))
+                self.request.send(binwalk.core.compat.str2bytes(' ' * last_status_message_len))
+                self.request.send(binwalk.core.compat.str2bytes('\b' * last_status_message_len))
 
                 percentage = ((float(self.server.binwalk.status.completed) / float(self.server.binwalk.status.total)) * 100)
                 status_message = message_format % (self.server.binwalk.status.fp.path,
@@ -27,7 +34,7 @@ class StatusRequestHandler(SocketServer.BaseRequestHandler):
                                                    self.server.binwalk.status.total)
                 last_status_message_len = len(status_message)
 
-                self.request.send(status_message)
+                self.request.send(binwalk.core.compat.str2bytes(status_message))
             except KeyboardInterrupt as e:
                 raise e
             except Exception as e:
