@@ -2,6 +2,7 @@
 # This is automatically invoked by core.module code if extraction has been
 # enabled by the user; other modules need not reference this module directly.
 
+import codecs
 import os
 import re
 import sys
@@ -317,7 +318,7 @@ class Extractor(Module):
         '''
         try:
             # Process each line from the extract file, ignoring comments
-            with open(fname, 'r') as f:
+            with codecs.open(fname, 'r', encoding='utf-8') as f:
                 for rule in f.readlines():
                     self.add_rule(rule.split(self.COMMENT_DELIM, 1)[0])
         except KeyboardInterrupt as e:
