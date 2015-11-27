@@ -4,6 +4,7 @@
 
 __all__ = ['Magic']
 
+import codecs
 import re
 import struct
 import datetime
@@ -789,7 +790,7 @@ class Magic(object):
 
         Returns None.
         '''
-        fp = open(fname, "r")
+        fp = codecs.open(fname, "r", encoding='utf-8')
         lines = fp.readlines()
         self.parse(lines)
         fp.close()

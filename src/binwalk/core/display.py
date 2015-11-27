@@ -1,6 +1,7 @@
 # Code to handle displaying and logging of results.
 # Anything in binwalk that prints results to screen should use this class.
 
+import codecs
 import sys
 import csv as pycsv
 import datetime
@@ -29,7 +30,7 @@ class Display(object):
         self._configure_formatting()
 
         if log:
-            self.fp = open(log, "a")
+            self.fp = codecs.open(log, "a", encoding='utf-8')
             if csv:
                 self.csv = pycsv.writer(self.fp)
 
