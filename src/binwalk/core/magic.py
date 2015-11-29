@@ -790,6 +790,8 @@ class Magic(object):
 
         Returns None.
         '''
+        # Open file as UTF-8 to prevent decoding issues for non-ASCII bytes
+        # that may inadvertantly be in the signature file.
         fp = codecs.open(fname, "r", encoding='utf-8')
         lines = fp.readlines()
         self.parse(lines)
@@ -806,6 +808,8 @@ class Magic(object):
         signature = None
 
         for line in lines:
+            # The signature lines were read in as UTF-8 unicode; be sure to treat them as strings.
+            line = str(line)
             # Split at the first comment delimiter (if any) and strip the result
             line = line.split('#')[0].strip()
             # Ignore blank lines and lines that are nothing but comments.
