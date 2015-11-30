@@ -33,6 +33,31 @@ class Display(object):
             if csv:
                 self.csv = pycsv.writer(self.fp)
 
+    def _fix_unicode(self, line):
+        '''
+        This is a hack, there must be a better way to handle it.
+        In Python3, if the environment variable LANG=C is set, indicating
+        that the terminal is ASCII only, but unicode characters need to be
+        printed to the screen or to a file (e.g., file path, magic result
+        format string), then an UnicodeEncodError exception will be raised.
+
+        This converts the given line to ASCII, ignoring conversion errors,
+        and returns a str.
+        '''
+        return bytes2str(line.encode('ascii', 'ignore'))
+
+    def _fix_unicode_list(self, columns):
+        '''
+        Convenience wrapper for self.log which is passed a list of format arguments.
+        '''
+        if type(columns) in [list, tuple]:
+            for i in range(0, len(columns)):
+                try:
+                    columns[i] = self._fix_unicode(columns[i])
+                except AttributeError:
+                    pass
+        return columns
+
     def format_strings(self, header, result):
         self.result_format = result
         self.header_format = header
@@ -43,9 +68,15 @@ class Display(object):
     def log(self, fmt, columns):
         if self.fp:
             if self.csv:
-                self.csv.writerow(columns)
+                try:
+                    self.csv.writerow(columns)
+                except UnicodeEncodeError:
+                    self.csv.writerow(self._fix_unicode_list(columns))
             else:
-                self.fp.write(fmt % tuple(columns))
+                try:
+                    self.fp.write(fmt % tuple(columns))
+                except UnicodeEncodeError:
+                    self.fp.write(fmt % tuple(self._fix_unicode_list(columns)))
 
             self.fp.flush()
 
@@ -100,7 +131,11 @@ class Display(object):
 
         if not self.quiet and stdout:
             try:
-                sys.stdout.write(self._format_line(line.strip()) + "\n")
+                try:
+                    sys.stdout.write(self._format_line(line.strip()) + "\n")
+                except UnicodeEncodeError:
+                    line = self._fix_unicode(line)
+                    sys.stdout.write(self._format_line(line.strip()) + "\n")
                 sys.stdout.flush()
             except IOError as e:
                 pass
