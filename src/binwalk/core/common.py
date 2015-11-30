@@ -483,3 +483,4 @@ def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
             return (data, dlen)
 
     return InternalBlockFile(fname, mode=mode, **kwargs)
+

@@ -449,6 +449,12 @@ class Module(object):
         self.validate(r)
         self._plugins_result(r)
 
+        # Update the progress status automatically if it is not being done manually by the module
+        if r.offset and r.file and self.AUTO_UPDATE_STATUS:
+            self.status.total = r.file.length
+            self.status.completed = r.offset
+            self.status.fp = r.file
+
         for dependency in self.dependencies:
             try:
                 getattr(self, dependency.attribute).callback(r)
@@ -457,12 +463,6 @@ class Module(object):
 
         if r.valid:
             self.results.append(r)
-
-            # Update the progress status automatically if it is not being done manually by the module
-            if r.offset and r.file and self.AUTO_UPDATE_STATUS:
-                self.status.total = r.file.length
-                self.status.completed = r.offset
-                self.status.fp = r.file
 
             if r.display:
                 display_args = self._build_display_args(r)

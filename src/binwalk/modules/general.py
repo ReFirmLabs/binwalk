@@ -191,7 +191,13 @@ class General(Module):
         if swap is None:
             swap = self.swap_size
 
-        return binwalk.core.common.BlockFile(fname, subclass=self.subclass, length=length, offset=offset, swap=swap, block=block, peek=peek)
+        return binwalk.core.common.BlockFile(fname,
+                                             subclass=self.subclass,
+                                             length=length,
+                                             offset=offset,
+                                             swap=swap,
+                                             block=block,
+                                             peek=peek)
 
     def _open_target_files(self):
         '''
