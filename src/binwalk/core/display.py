@@ -31,7 +31,7 @@ class Display(object):
         self._configure_formatting()
 
         if log:
-            self.fp = codecs.open(log, "a", encoding='utf-8')
+            self.fp = open(log, "a")
             if csv:
                 self.csv = pycsv.writer(self.fp)
 
