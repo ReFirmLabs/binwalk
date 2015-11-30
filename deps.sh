@@ -1,10 +1,16 @@
 #!/bin/bash
 
-REQUIRED_UTILS="apt-get wget tar python2"
-APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev"
-PYTHON2_APT_CANDIDATES="python-lzma python-pip python-opengl python-qt4 python-qt4-gl python-numpy python-scipy"
+REQUIRED_UTILS="wget tar python"
+APTCMD="apt-get"
+YUMCMD="yum"
+APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit"
+PYTHON2_APT_CANDIDATES="python-lzo python-lzma python-pip python-opengl python-qt4 python-qt4-gl python-numpy python-scipy"
 PYTHON3_APT_CANDIDATES="python3-pip python3-opengl python3-pyqt4 python3-pyqt4.qtopengl python3-numpy python3-scipy"
+PYTHON3_YUM_CANDIDATES=""
+YUM_CANDIDATES="git gcc gcc-c++ make openssl-devel qtwebkit-devel qt-devel gzip bzip2 tar arj p7zip p7zip-plugins cabextract squashfs-tools zlib zlib-devel lzo lzo-devel xz xz-compat-libs xz-libs xz-devel xz-lzma-compat python-backports-lzma lzip pyliblzma perl-Compress-Raw-Lzma"
+PYTHON2_YUM_CANDIDATES="python-pip python-opengl python-qt4 numpy python-numdisplay numpy-2f python-Bottleneck scipy"
 APT_CANDIDATES="$APT_CANDIDATES $PYTHON2_APT_CANDIDATES"
+YUM_CANDIDATES="$YUM_CANDIDATES $PYTHON2_YUM_CANDIDATES"
 PIP_COMMANDS="pip"
 
 # Check for root privileges
@@ -39,6 +45,13 @@ function install_unstuff
     $SUDO cp bin/unstuff /usr/local/bin/
     cd -
     rm -rf /tmp/unstuff
+}
+
+function install_ubireader
+{
+    git clone https://github.com/jrspruitt/ubi_reader
+    (cd ubi_reader && $SUDO python setup.py install)
+    rm -rf ubi_reader
 }
 
 function install_pip_package
@@ -94,6 +107,27 @@ do
     fi
 done
 
+# Check for supported package managers and set the PKG_* envars appropriately
+find_path $APTCMD
+if [ $? -eq 1 ]
+then
+    find_path $YUMCMD
+    if [ $? -eq 1 ]
+    then
+        NEEDED_UTILS="$NEEDED_UTILS $APTCMD/$YUMCMD"
+    else
+        PKGCMD="$YUMCMD"
+        PKGCMD_OPTS="-y install"
+        PKG_CANDIDATES="$YUM_CANDIDATES"
+        PKG_PYTHON3_CANDIDATES="$PYTHON3_YUM_CANDIDATES"
+    fi
+else
+    PKGCMD="$APTCMD"
+    PKGCMD_OPTS="install -y"
+    PKG_CANDIDATES="$APT_CANDIDATES"
+    PKG_PYTHON3_CANDIDATES="$PYTHON3_APT_CANDIDATES"
+fi
+
 if [ "$NEEDED_UTILS" != "" ]
 then
     echo "Please install the following required utilities: $NEEDED_UTILS"
@@ -104,15 +138,17 @@ fi
 find_path python3
 if [ $? -eq 0 ]
 then
-    APT_CANDIDATES="$APT_CANDIDATES $PYTHON3_APT_CANDIDATES"
-    PIP_COMMANDS="pip3 $PIP_COMMANDS"
+     PKG_CANDIDATES="$PKG_CANDIDATES $PKG_PYTHON3_CANDIDATES"
+     PIP_COMMANDS="pip3 $PIP_COMMANDS"
 fi
 
+# Do the install(s)
 cd /tmp
-$SUDO apt-get install -y $APT_CANDIDATES
+sudo $PKGCMD $PKGCMD_OPTS $PKG_CANDIDTES
 install_pip_package pyqtgraph
 install_pip_package capstone
 install_sasquatch
 install_jefferson
 install_unstuff
+install_ubireader
 

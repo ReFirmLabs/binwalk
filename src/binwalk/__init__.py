@@ -1,9 +1,11 @@
-__all__ = ['scan', 'execute', 'Modules', 'ModuleException']
+__all__ = ['scan', 'execute', 'ModuleException']
 
 from binwalk.core.module import Modules, ModuleException
 
 # Convenience functions
 def scan(*args, **kwargs):
-    return Modules(*args, **kwargs).execute()
+    with Modules(*args, **kwargs) as m:
+        objs = m.execute()
+    return objs
 def execute(*args, **kwargs):
-    return Modules(*args, **kwargs).execute()
+    return scan(*args, **kwargs)

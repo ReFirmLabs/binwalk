@@ -8,6 +8,7 @@ from distutils.core import setup, Command
 from distutils.dir_util import remove_tree
 
 MODULE_NAME = "binwalk"
+SCRIPT_NAME = MODULE_NAME
 
 # Python2/3 compliance
 try:
@@ -208,7 +209,7 @@ setup(name = MODULE_NAME,
       requires = [],
       packages = [MODULE_NAME],
       package_data = {MODULE_NAME : install_data_files},
-      scripts = [os.path.join("scripts", MODULE_NAME)],
+      scripts = [os.path.join("scripts", SCRIPT_NAME)],
 
       cmdclass = {'clean' : CleanCommand, 'uninstall' : UninstallCommand, 'idainstall' : IDAInstallCommand, 'idauninstall' : IDAUnInstallCommand}
 )

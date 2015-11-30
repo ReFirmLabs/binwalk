@@ -75,7 +75,7 @@
 >113    string  x               (%s)
 
 #------------------------------------------------------------------------------
-## Microsoft Xbox executables .xbe (Esa HyytiÃ¤ <ehyytia@cc.hut.fi>)
+## Microsoft Xbox executables .xbe (Esa Hyyti <ehyytia@cc.hut.fi>)
 0                       string              XBEH            Microsoft Xbox executable (XBE),
 ## probabilistic checks whether signed or not
 >0x0004                 ulelong             =0

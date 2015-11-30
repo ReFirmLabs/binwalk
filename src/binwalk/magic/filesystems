@@ -68,8 +68,11 @@
 
 # MPFS file system
 0       string      MPFS     MPFS filesystem, Microchop,
+>4      byte        <0       {invalid}
+>5      byte        <0       {invalid}
 >4      byte        x        version %d.
 >5      byte        x        \b%d,
+>6      leshort     <0       {invalid}
 >6      leshort     x        %d file entries
 
 # cramfs filesystem - russell@coker.com.au
@@ -116,15 +119,17 @@
 >28     string      !\x00*12        {invalid}
 
 # http://lxr.free-electrons.com/source/fs/ubifs/ubifs-media.h
-#0       string      UBI\x23         UBI erase count header,
-#>4      ubyte       x               version: %d,
-#>5      string      !\x00*3         {invalid}
-#>8      ubequad     x               EC: 0x%lX,
-#>16     ubelong     x               VID header offset: 0x%X,
-#>20     ubelong     x               data offset: 0x%X
+0       string      UBI\x23         UBI erase count header,
+>4      ubyte       x               version: %d,
+>5      string      !\x00*3         {invalid}
+>8      ubequad     x               EC: 0x%lX,
+>16     ubelong     x               VID header offset: 0x%X,
+>20     ubelong     x               data offset: 0x%X
+# dummy jump - actual jump value is determined in UBIValidPlugin
+>20       ubyte       x               {jump:0}
 
 # http://lxr.free-electrons.com/source/fs/ubifs/ubifs-media.h
-0        lelong      0x06101831     UBIFS
+0        lelong      0x06101831     UBIFS filesystem
 >20      ubyte       <6             {invalid}
 >20      ubyte       >7             {invalid} # Only look for superblock and master nodes
 >22      leshort     !0             {invalid} # 2 bytes of padding should be filled with NULLs

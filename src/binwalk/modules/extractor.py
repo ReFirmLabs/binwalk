@@ -2,6 +2,7 @@
 # This is automatically invoked by core.module code if extraction has been
 # enabled by the user; other modules need not reference this module directly.
 
+import codecs
 import os
 import re
 import sys
@@ -12,7 +13,13 @@ import subprocess
 import binwalk.core.common
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg
-from binwalk.core.common import file_size, unique_file_name, BlockFile
+from binwalk.core.common import file_size, file_md5, unique_file_name, BlockFile
+
+class ExtractInfo(object):
+    def __init__(self):
+        self.carved = {}
+        self.extracted = {}
+        self.directory = None
 
 class Extractor(Module):
     '''
@@ -56,6 +63,11 @@ class Extractor(Module):
                    type=int,
                    kwargs={'matryoshka' : 0},
                    description='Limit matryoshka recursion depth (default: 8 levels deep)'),
+            Option(short='C',
+                   long='directory',
+                   type=str,
+                   kwargs={'base_directory' : 0},
+                   description='Extract files/folders to a custom directory (default: current working directory)'),
             Option(short='j',
                    long='size',
                    type=int,
@@ -64,7 +76,7 @@ class Extractor(Module):
             Option(short='r',
                    long='rm',
                    kwargs={'remove_after_execute' : True},
-                   description='Cleanup extracted / zero-size files after extraction'),
+                   description='Delete carved files after extraction'),
             Option(short='z',
                    long='carve',
                    kwargs={'run_extractors' : False},
@@ -73,6 +85,7 @@ class Extractor(Module):
 
     KWARGS = [
             Kwarg(name='max_size', default=None),
+            Kwarg(name='base_directory', default=None),
             Kwarg(name='remove_after_execute', default=False),
             Kwarg(name='load_default_rules', default=False),
             Kwarg(name='run_extractors', default=True),
@@ -84,8 +97,10 @@ class Extractor(Module):
     def load(self):
         # Holds a list of extraction rules loaded either from a file or when manually specified.
         self.extract_rules = []
-        # The base extraction directory (to be determined at runtime)
+        # The input file specific output directory path (to be determined at runtime)
         self.directory = None
+        # Key value pairs of input file path and output extraction path
+        self.output = {}
 
         if self.load_default_rules:
             self.load_defaults()
@@ -141,6 +156,9 @@ class Extractor(Module):
         # Note that r.display is still True even if --quiet has been specified; it is False if the result has been
         # explicitly excluded via the -y/-x options.
         if r.valid and r.extract and r.display:
+            # Create some extract output for this file, it it doesn't already exist
+            if not binwalk.core.common.has_key(self.output, r.file.path):
+                self.output[r.file.path] = ExtractInfo()
 
             # Attempt extraction
             binwalk.core.common.debug("Extractor callback for %s @%d [%s]" % (r.file.name, r.offset, r.description))
@@ -148,8 +166,10 @@ class Extractor(Module):
 
             # If the extraction was successful, self.extract will have returned the output directory and name of the dd'd file
             if extraction_directory and dd_file:
-                # Get the full path to the dd'd file
+                # Get the full path to the dd'd file and save it in the output info for this file
                 dd_file_path = os.path.join(extraction_directory, dd_file)
+                self.output[r.file.path].carved[r.offset] = dd_file_path
+                self.output[r.file.path].extracted[r.offset] = []
 
                 # Do a directory listing of the output directory
                 directory_listing = set(os.listdir(extraction_directory))
@@ -166,8 +186,15 @@ class Extractor(Module):
                     real_file_path = os.path.realpath(file_path)
                     self.result(description=file_path, display=False)
 
+                    # Also keep a list of files created by the extraction utility
+                    if real_file_path != dd_file_path:
+                        self.output[r.file.path].extracted[r.offset].append(real_file_path)
+
                     # If recursion was specified, and the file is not the same one we just dd'd
-                    if self.matryoshka and file_path != dd_file_path and scan_extracted_files:
+                    if (self.matryoshka and
+                        file_path != dd_file_path and
+                        scan_extracted_files and
+                        self.directory in real_file_path):
                         # If the recursion level of this file is less than or equal to our desired recursion level
                         if len(real_file_path.split(self.directory)[1].split(os.path.sep)) <= self.matryoshka:
                             # If this is a directory and we are supposed to process directories for this extractor,
@@ -291,7 +318,7 @@ class Extractor(Module):
         '''
         try:
             # Process each line from the extract file, ignoring comments
-            with open(fname, 'r') as f:
+            with codecs.open(fname, 'r', encoding='utf-8') as f:
                 for rule in f.readlines():
                     self.add_rule(rule.split(self.COMMENT_DELIM, 1)[0])
         except KeyboardInterrupt as e:
@@ -336,7 +363,12 @@ class Extractor(Module):
 
             # Make sure we put the initial extracted file in the CWD
             if self.directory is None:
-                basedir = os.getcwd()
+                if self.base_directory is None:
+                    basedir = os.getcwd()
+                else:
+                    basedir = self.base_directory
+                    if not os.path.exists(basedir):
+                        os.mkdir(basedir)
 
             outdir = os.path.join(basedir, '_' + basename)
             output_directory = unique_file_name(outdir, extension='extracted')
@@ -352,10 +384,9 @@ class Extractor(Module):
         # Set the initial base extraction directory for later determining the level of recusion
         if self.directory is None:
             self.directory = os.path.realpath(output_directory) + os.path.sep
-
+            self.output[path].directory = self.directory
 
         return output_directory
-
 
     def cleanup_extracted_files(self, tf=None):
         '''
@@ -386,12 +417,9 @@ class Extractor(Module):
         Returns the name of the extracted file (blank string if nothing was extracted).
         '''
         fname = ''
-        cleanup_extracted_fname = True
         original_dir = os.getcwd()
         rules = self.match(description)
         file_path = os.path.realpath(file_name)
-        # Don't recurse by default; any successful extraction rule will override this.
-        recurse = True
 
         # No extraction rules for this file
         if not rules:
@@ -412,6 +440,12 @@ class Extractor(Module):
             for i in range(0, len(rules)):
                 rule = rules[i]
 
+                # Make sure we don't recurse into any extracted directories if instructed not to
+                if rule['recurse'] in [True, False]:
+                    recurse = rule['recurse']
+                else:
+                    recurse = True
+
                 # Copy out the data to disk, if we haven't already
                 fname = self._dd(file_path, offset, size, rule['extension'], output_file_name=name)
 
@@ -419,14 +453,12 @@ class Extractor(Module):
                 # If execution fails, the next rule will be attempted.
                 if rule['cmd']:
 
-                    # Many extraction utilities will extract the file to a new file, just without
-                    # the file extension (i.e., myfile.7z -> myfile). If the presumed resulting
-                    # file name already exists before executing the extract command, do not attempt
-                    # to clean it up even if its resulting file size is 0.
+                    # Note the hash of the original file; if --rm is specified and the
+                    # extraction utility modifies the original file rather than creating
+                    # a new one (AFAIK none currently do, but could happen in the future),
+                    # we don't want to remove this file.
                     if self.remove_after_execute:
-                        extracted_fname = os.path.splitext(fname)[0]
-                        if os.path.exists(extracted_fname):
-                            cleanup_extracted_fname = False
+                        fname_md5 = file_md5(fname)
 
                     # Execute the specified command against the extracted file
                     if self.run_extractors:
@@ -437,28 +469,18 @@ class Extractor(Module):
                     # Only clean up files if remove_after_execute was specified
                     if extract_ok == True and self.remove_after_execute:
 
-                        # Remove the original file that we extracted
+                        # Remove the original file that we extracted,
+                        # if it has not been modified by the extractor.
                         try:
-                            os.unlink(fname)
+                            if file_md5(fname) == fname_md5:
+                                os.unlink(fname)
                         except KeyboardInterrupt as e:
                             raise e
                         except Exception as e:
                             pass
 
-                        # If the command worked, assume it removed the file extension from the extracted file
-                        # If the extracted file name file exists and is empty, remove it
-                        if cleanup_extracted_fname and os.path.exists(extracted_fname) and file_size(extracted_fname) == 0:
-                            try:
-                                os.unlink(extracted_fname)
-                            except KeyboardInterrupt as e:
-                                raise e
-                            except Exception as e:
-                                pass
-
                     # If the command executed OK, don't try any more rules
                     if extract_ok == True:
-                        # Make sure we recurse into any extracted directories if instructed to
-                        recurse = rule['recurse']
                         break
                     # Else, remove the extracted file if this isn't the last rule in the list.
                     # If it is the last rule, leave the file on disk for the user to examine.
@@ -671,7 +693,7 @@ class Extractor(Module):
         except KeyboardInterrupt as e:
             raise e
         except Exception as e:
-            binwalk.core.common.warning("Extractor.execute failed to run external extrator '%s': %s" % (str(cmd), str(e)))
+            binwalk.core.common.warning("Extractor.execute failed to run external extractor '%s': %s" % (str(cmd), str(e)))
             retval = None
 
         if tmp is not None:

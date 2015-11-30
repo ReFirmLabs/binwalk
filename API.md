@@ -49,9 +49,9 @@ binwalk.scan(data, signature=True, string=True)
 Accessing Scan Results
 ======================
 
-`binwalk.scan` returns a list of objects. Each object corresponds to a module that was run. For example, if you specified `--signature` and `--entropy`, then both the Signature and Entropy modules would be executed and you would be returned a list of two objects.
+`binwalk.scan` returns a list of objects. Each object corresponds to a module that was run. For example, if you specified `--signature` and `--entropy`, then both the `Signature` and `Entropy` modules would be executed and you would be returned a list of two objects.
 
-The two attributes of interest for each object are the `results` and `errors` objects. Each is a list of binwalk.core.module.Result and binwalk.core.module.Error objects respectively. Each Result or Error object may contain custom attributes set by each module, but are guaranteed to have at least the following attributes (though modules are not required to populate all attributes):
+The two attributes of greatest interest for each object are the `results` and `errors` objects. Each is a list of `binwalk.core.module.Result` and `binwalk.core.module.Error` instances, respectively. Each `Result` or `Error` instance may contain custom attributes set by each module, but are guaranteed to have at least the following attributes (though modules are not required to populate all attributes):
 
 |  Attribute  | Description |
 |-------------|-------------|
@@ -59,7 +59,7 @@ The two attributes of interest for each object are the `results` and `errors` ob
 | description | The result/error description, as displayed to the user |
 | module      | Name of the module that generated the result/error |
 | file        | The file object of the scanned file |
-| valid       | Set to True if the result if value, False if invalid (usually unused for errors) |
+| valid       | Set to True if the result is valid, False if invalid (usually unused for errors) |
 | display     | Set to True to display the result to the user, False to hide it (usually unused for errors) |
 | extract     | Set to True to flag this result for extraction (not used for errors) |
 | plot        | Set to False to exclude this result from entropy plots (not used for errors) |
@@ -76,10 +76,24 @@ Thus, scan results and errors can be programatically accessed rather easily:
 for module in binwalk.scan('firmware1.bin', 'firmware2.bin', signature=True, quiet=True):
     print ("%s Results:" % module.name)
     for result in module.results:
-        print ("\t%s    0x%.8X    %s" % (result.file.name, result.offset, result.description))
+        print ("\t%s    0x%.8X    %s" % (result.file.path, result.offset, result.description))
 ```
 
 Note the above use of the `--quiet` option which prevents the binwalk module from printing its normal output to screen.
+
+Each module object will also have an additional `extractor` attribute, which is an instance of the `binwalk.modules.extractor.Extractor` class. Of particular use is `binwalk.modules.extractor.Extrctor.output`, a dictionary containing information about carved/extracted data:
+
+```python
+for module in binwalk.scan('firmware1.bin', 'firmware2.bin', signature=True, quiet=True, extract=True):
+    for result in module.results:
+        if module.extractor.output.has_key(result.file.path):
+            # These are files that binwalk carved out of the original firmware image, a la dd
+            if module.extractor.output[result.file.path].carved.has_key(result.offset):
+                print "Carved data from offset 0x%X to %s" % (module.extractor.output[result.file.path].carved[result.offset])
+            # These are files/directories created by extraction utilities (gunzip, tar, unsquashfs, etc)
+            if module.extractor.output[result.file.path].extracted.has_key(result.offset):
+                print "Extracted data from offset 0x%X to %s" % (module.extractor.output[result.file.path].extracted[result.offset][0])
+```
 
 Module Exceptions
 =================

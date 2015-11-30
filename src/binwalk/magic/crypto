@@ -6,6 +6,7 @@
 0       string  -----BEGIN\x20CERTIFICATE\x20REQ    PEM certificate request
 0       string  -----BEGIN\x20RSA\x20PRIVATE        PEM RSA private key
 0       string  -----BEGIN\x20DSA\x20PRIVATE        PEM DSA private key
+0       string  -----BEGIN\x20EC\x20PRIVATE         PEM EC private key
 
 # Type: OpenSSH key files
 # From: Nicolas Collignon <tsointsoin@gmail.com>
@@ -17,6 +18,9 @@
 
 0       string  ssh-dss\x20             OpenSSH DSA public key
 0       string  ssh-rsa\x20             OpenSSH RSA public key
+0       string  ecdsa-sha2-nistp256\x20 OpenSSH ECDSA (Curve P-256) public key
+0       string  ecdsa-sha2-nistp384\x20 OpenSSH ECDSA (Curve P-384) public key
+0       string  ecdsa-sha2-nistp521\x20 OpenSSH ECDSA (Curve P-521) public key
 
 # Type: Certificates/key files in DER format
 # From: Gert Hulselmans <hulselmansgert@gmail.com>
