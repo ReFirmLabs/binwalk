@@ -1,9 +1,7 @@
 # Code to handle displaying and logging of results.
 # Anything in binwalk that prints results to screen should use this class.
 
-import codecs
 import sys
-import codecs
 import csv as pycsv
 import datetime
 import binwalk.core.common
