@@ -3,7 +3,6 @@
 import os
 import math
 import zlib
-import multiprocessing
 import binwalk.core.common
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg
@@ -113,24 +112,14 @@ class Entropy(Module):
             else:
                 self.block_size = None
 
+    def _entropy_sigterm_handler(self, *args):
+        print ("FUck it all.")
+
     def run(self):
-        # Need to invoke the pyqtgraph stuff via a separate process, as calling pg.exit
-        # is pretty much required. pg.exit calls os._exit though, and we don't want to
-        # exit out of the main process (especially if being run via the API).
-        #
-        # TODO: This is a nasty hack. Find a better way. Until then, just know that
-        #       pg.exit will quite the current process.
-        if False: #not binwalk.core.common.MSWindows():
-            p = multiprocessing.Process(target=self._run)
-            p.start()
-            p.join()
-        else:
-            # There seem to be all kinds of issues using the multiprocessing module in
-            # Windows, as done above.
-            #
-            # This means that when run in Windows, pg.exit will cause binwalk
-            # to exit.
-            self._run()
+        # If generating a graphical plot, this function will never return, as it invokes
+        # pg.exit. Calling pg.exit is pretty much required, but pg.exit calls os._exit in
+        # order to work around QT cleanup issues.
+        self._run()
 
     def _run(self):
         # Sanity check and warning if pyqtgraph isn't found
