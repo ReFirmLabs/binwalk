@@ -117,7 +117,10 @@ class Entropy(Module):
         # Need to invoke the pyqtgraph stuff via a separate process, as calling pg.exit
         # is pretty much required. pg.exit calls os._exit though, and we don't want to
         # exit out of the main process (especially if being run via the API).
-        if not binwalk.core.common.MSWindows():
+        #
+        # TODO: This is a nasty hack. Find a better way. Until then, just know that
+        #       pg.exit will quite the current process.
+        if False: #not binwalk.core.common.MSWindows():
             p = multiprocessing.Process(target=self._run)
             p.start()
             p.join()
@@ -135,7 +138,7 @@ class Entropy(Module):
             try:
                 import pyqtgraph as pg
             except ImportError as e:
-                binwalk.core.common.warning("pyqtgraph not found, visual entropy graphing will be disabled")
+                binwalk.core.common.warning("Failed to import pyqtgraph module, visual entropy graphing will be disabled")
                 self.do_plot = False
 
         for fp in iter(self.next_file, None):

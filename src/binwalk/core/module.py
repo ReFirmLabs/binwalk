@@ -6,6 +6,7 @@
 import io
 import os
 import sys
+import time
 import inspect
 import argparse
 import traceback
@@ -610,7 +611,7 @@ class Modules(object):
         self.arguments = []
         self.executed_modules = {}
         self.default_dependency_modules = {}
-        self.status = Status(completed=0, total=0, fp=None)
+        self.status = Status(completed=0, total=0, fp=None, running=False, shutdown=False, finished=False)
         self.status_server_started = False
         self.status_service = None
 
@@ -741,21 +742,29 @@ class Modules(object):
         '''
         Runs a specific module.
         '''
-        obj = self.load(module, kwargs)
+        try:
+            obj = self.load(module, kwargs)
 
-        if isinstance(obj, binwalk.core.module.Module) and obj.enabled:
-            obj.main()
-            self.status.clear()
+            if isinstance(obj, binwalk.core.module.Module) and obj.enabled:
+                obj.main()
+                self.status.clear()
 
-        # If the module is not being loaded as a dependency, add it to the executed modules dictionary.
-        # This is used later in self.execute to determine which objects should be returned.
-        if not dependency:
-            self.executed_modules[module] = obj
+            # If the module is not being loaded as a dependency, add it to the executed modules dictionary.
+            # This is used later in self.execute to determine which objects should be returned.
+            if not dependency:
+                self.executed_modules[module] = obj
 
-            # The unload method tells the module that we're done with it, and gives it a chance to do
-            # any cleanup operations that may be necessary. We still retain the object instance in self.executed_modules.
-            obj._unload_dependencies()
-            obj.unload()
+                # The unload method tells the module that we're done with it, and gives it a chance to do
+                # any cleanup operations that may be necessary. We still retain the object instance in self.executed_modules.
+                obj._unload_dependencies()
+                obj.unload()
+        except KeyboardInterrupt as e:
+            # Tell the status server to shut down, and give it time to clean up.
+            if self.status.running:
+                self.status.shutdown = True
+                while not self.status.finished:
+                    time.sleep(0.1)
+            raise e
 
         return obj
 
