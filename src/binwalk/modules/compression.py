@@ -159,18 +159,38 @@ class Deflate(object):
             self.module.extractor.add_rule(regex='^%s' % self.DESCRIPTION.lower(), extension="deflate", cmd=self.extractor)
 
     def extractor(self, file_name):
+        in_data = ""
+        out_data = ""
+        retval = False
         out_file = os.path.splitext(file_name)[0]
+
+        with binwalk.core.common.BlockFile(file_name, 'r') as fp_in:
+            while True:
+                (data, dlen) = fp_in.read_block()
+                if not data or dlen == 0:
+                    break
+                else:
+                    in_data += data
+
+                try:
+                    out_data = zlib.decompress(binwalk.core.compat.str2bytes(in_data), -15)
+                    with binwalk.core.common.BlockFile(out_file, 'w') as fp_out:
+                        fp_out.write(out_data)
+                    retval = True
+                    break
+                except zlib.error as e:
+                    pass
+
+        return retval
 
     def decompress(self, data):
         valid = True
         description = None
 
-        # Prepend data with a standard zlib header
-        data = "\x78\x9C" + data
-
         # Looking for either a valid decompression, or an error indicating truncated input data
         try:
-            zlib.decompress(binwalk.core.compat.str2bytes(data))
+            # Negative window size (e.g., -15) indicates that raw decompression should be performed
+            zlib.decompress(binwalk.core.compat.str2bytes(data), -15)
         except zlib.error as e:
             if not str(e).startswith("Error -5"):
                 # Bad data.
