@@ -201,7 +201,7 @@ for data_dir in ["magic", "config", "plugins", "modules", "core"]:
 
 # Install the module, script, and support files
 setup(name = MODULE_NAME,
-      version = "2.1.0",
+      version = "2.1.1",
       description = "Firmware analysis tool",
       author = "Craig Heffner",
       url = "https://github.com/devttys0/%s" % MODULE_NAME,
