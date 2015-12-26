@@ -137,14 +137,12 @@
 >3      byte            &0x20           \b, encrypted{invalid}
 # Dates before 1992 are {invalid}, unless of course you're DD-WRT in which
 # case you don't know how to set a date in your gzip files. Brilliant.
->4      lelong          =0              \b, NULL date (1970-01-01 00:00:00)
->4      lelong          <0              {invalid}
->4      lelong          >0
->>4     lelong          <694224000      {invalid}
->>4     lelong          =694224000      {invalid}
->>4     lelong          >694224000      \b, last modified:
->>>4    ledate          x               %s
->>>4    lelong          x               {epoch:%d}
+>4      ledate          x               \b, last modified: %s
+>4      lelong          =0              (null date)
+>4      lelong          !0
+>>4     lelong          <694224000      (bogus date)
+>>4     lelong          =694224000      (bogus date)
+
 
 # Supplementary magic data for the file(1) command to support
 # rzip(1).  The format is described in magic(5).
