@@ -25,7 +25,7 @@ fi
 function install_sasquatch
 {
     git clone https://github.com/devttys0/sasquatch
-    (cd sasquatch && make && $SUDO make install)
+    (cd sasquatch && $SUDO ./build.sh)
     $SUDO rm -rf sasquatch
 }
 
