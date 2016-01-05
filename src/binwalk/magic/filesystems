@@ -36,7 +36,7 @@
 # YAFFS
 0    string     \x03\x00\x00\x00\x01\x00\x00\x00\xFF\xFF\x00\x00    YAFFS filesystem, little endian
 # The big endian signature has to be done a bit differently to prevent it from being self-overlapping
-4    string     \x00\x00\x00\x01\xFF\xFF                            YAFFS file system, big endian
+4    string     \x00\x00\x00\x01\xFF\xFF                            YAFFS filesystem, big endian
 >0   string     !\x00\x00\x00\x03                                   {invalid}(first object is not a directory)
 >10  string     !\x00                                               {invalid}(unexpected name in the first object entry)
 
