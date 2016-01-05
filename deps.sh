@@ -51,7 +51,7 @@ function install_ubireader
 {
     git clone https://github.com/jrspruitt/ubi_reader
     (cd ubi_reader && $SUDO python setup.py install)
-    rm -rf ubi_reader
+    $SUDO rm -rf ubi_reader
 }
 
 function install_pip_package
