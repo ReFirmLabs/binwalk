@@ -2,11 +2,14 @@
 
 import os
 import zlib
-import lzma
 import struct
 import binwalk.core.compat
 import binwalk.core.common
 from binwalk.core.module import Option, Kwarg, Module
+try:
+    import lzma
+except ImportError:
+    from backports import lzma
 
 class LZMAHeader(object):
     def __init__(self, **kwargs):

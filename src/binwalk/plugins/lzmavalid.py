@@ -17,7 +17,10 @@ class LZMAPlugin(binwalk.core.plugin.Plugin):
 
     def init(self):
         try:
-            import lzma
+            try:
+                import lzma
+            except ImportError:
+                from backports import lzma
             self.decompressor = lzma.decompress
         except ImportError as e:
             self.decompressor = None
