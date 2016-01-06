@@ -427,6 +427,7 @@ class Extractor(Module):
         Returns the name of the extracted file (blank string if nothing was extracted).
         '''
         fname = ''
+        recurse = False
         original_dir = os.getcwd()
         rules = self.match(description)
         file_path = os.path.realpath(file_name)
