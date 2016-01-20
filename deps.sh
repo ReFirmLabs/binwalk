@@ -1,6 +1,5 @@
 #!/bin/bash
 set -o nounset
-set -o errexit
 
 REQUIRED_UTILS="wget tar python"
 APTCMD="apt-get"
