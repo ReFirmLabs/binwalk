@@ -1,4 +1,5 @@
 #!/bin/bash
+set -o nounset
 
 REQUIRED_UTILS="wget tar python"
 APTCMD="apt-get"
@@ -144,7 +145,7 @@ fi
 
 # Do the install(s)
 cd /tmp
-sudo $PKGCMD $PKGCMD_OPTS $PKG_CANDIDTES
+sudo $PKGCMD $PKGCMD_OPTS $PKG_CANDIDATES
 install_pip_package pyqtgraph
 install_pip_package capstone
 install_sasquatch
