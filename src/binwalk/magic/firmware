@@ -495,7 +495,20 @@
 >35     byte        x           try decryption tool from:
 >35     byte        x           http://download.modem-help.co.uk/mfcs-A/Alcatel/Modems/Misc/
 
-16    string        \xd9\x54\x93\x7a\x68\x04\x4a\x44\x81\xce\x0b\xf6\x17\xd8\x90\xdf    UEFI PI firmware volume
+# http://blogs.phoenix.com/phoenix_technologies_bios/\
+# 2007/02/uefi_pi_10_firm.html
+# (The GUID possibly refer to the official UEFI PI filesystem.)
+# GUID: 7A9354D9-0468-444A-81CE0BF617D890D
+
+16      lelong     0x7a9354d9        UEFI PI Firmware Volume
+>20     leshort    0x0468
+>22     leshort    0x444a
+>24     string     \x81\xce\x0b\xf6\x17\xd8\x90\xdf
+>32     ulequad    x                 \b, volume size: %d
+>40     string     _FVH
+>44     ulequad    >0
+>52     uleshort   x                 \b, header size: %d
+
 
 # http://www.intel.com/content/www/us/en/architecture-and-technology/\
 # unified-extensible-firmware-interface/efi-capsule-specification.html
