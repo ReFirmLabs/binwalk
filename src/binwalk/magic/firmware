@@ -495,57 +495,6 @@
 >35     byte        x           try decryption tool from:
 >35     byte        x           http://download.modem-help.co.uk/mfcs-A/Alcatel/Modems/Misc/
 
-# http://blogs.phoenix.com/phoenix_technologies_bios/\
-# 2007/02/uefi_pi_10_firm.html
-# (The GUID possibly refer to the official UEFI PI filesystem.)
-# GUID: 7A9354D9-0468-444A-81CE0BF617D890D
-
-16      lelong     0x7a9354d9        UEFI PI Firmware Volume
->20     leshort    0x0468
->22     leshort    0x444a
->24     string     \x81\xce\x0b\xf6\x17\xd8\x90\xdf
->32     ulequad    x                 \b, volume size: %d
->40     string     _FVH
->44     ulequad    >0
->52     uleshort   x                 \b, header size: %d
-
-
-# http://www.intel.com/content/www/us/en/architecture-and-technology/\
-# unified-extensible-firmware-interface/efi-capsule-specification.html
-# GUID: 3B6686BD-0D76-4030-B70E-B5519E2FC5A0
-
-0       lelong     0x3b6686bd        EFI Capsule v0.9
->4      leshort    0xd76
->6      leshort    0x4030
->8      string     \xb7\x0e\xb5\x51\x9e\x2f\xc5\xa0
->16     lelong     x                 \b, header size: %d
->20     lelong     x                 \b, flags: 0x%.8X
->24     lelong     x                 \b, capsule size: %d
-
-# EFI2 format, based on https://gist.github.com/XVilka/8163272
-# GUID: 4A3CA68B-7723-48FB-803D-578CC1FEC44D
-
-0       lelong     0x4a3ca68b        EFI Capsule v2
->4      leshort    0x7723
->6      leshort    0x48fb
->8      string     \x57\x8c\xc1\xfe\xc4\x4d
->16     lelong     x                 \b, header size: %d
->20     lelong     x                 \b, flags: 0x%.8X
->24     lelong     x                 \b, capsule size: %d
-
-# UEFI format
-# http://www.uefi.org/sites/default/files/resources/UEFI%202_5.pdf
-# GUID: 539182B9-ABB5-4391-B69A-E3A943F72FCC
-
-0       lelong     0x539182b9        UEFI Capsule
->4      leshort    0xabb5
->6      leshort    0x869a
->8      string     \xe3\xa9\x43\xf7\x2f\xcc
->16     lelong     x                 \b, header size: %d
->20     lelong     x                 \b, flags: 0x%.8X
->24     lelong     x                 \b, capsule size: %d
-
-
 # http://android.stackexchange.com/questions/23357/\
 # is-there-a-way-to-look-inside-and-modify-an-adb-backup-created-file/\
 # 23608#23608
