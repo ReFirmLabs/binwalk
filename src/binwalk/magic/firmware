@@ -495,8 +495,6 @@
 >35     byte        x           try decryption tool from:
 >35     byte        x           http://download.modem-help.co.uk/mfcs-A/Alcatel/Modems/Misc/
 
-16    string        \xd9\x54\x93\x7a\x68\x04\x4a\x44\x81\xce\x0b\xf6\x17\xd8\x90\xdf    UEFI PI firmware volume
-
 # http://android.stackexchange.com/questions/23357/\
 # is-there-a-way-to-look-inside-and-modify-an-adb-backup-created-file/\
 # 23608#23608
