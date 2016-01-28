@@ -1,17 +1,42 @@
 # http://blogs.phoenix.com/phoenix_technologies_bios/\
 # 2007/02/uefi_pi_10_firm.html
-# (The GUID possibly refer to the official UEFI PI filesystem.)
-# GUID: 7A9354D9-0468-444A-81CE0BF617D890D
 
-16      lelong     0x7a9354d9        UEFI PI Firmware Volume
->20     leshort    0x0468
->22     leshort    0x444a
->24     string     \x81\xce\x0b\xf6\x17\xd8\x90\xdf
->32     ulequad    x                 \b, volume size: %d
->40     string     _FVH
->44     ulequad    >0
->52     uleshort   x                 \b, header size: %d
+40      string     _FVH
+>32     ulequad    <0xFFFFFFFF       UEFI PI Firmware Volume
+>>32    ulequad    x                 \b, volume size: %d
+>>52    uleshort   x                 \b, header size: %d
 
+# GUID: 7A9354D9-0468-444A-81CE-0BF617D890D
+>>16    string     \xd9\x54\x93\x7a\x68\x04\x4a\x44\x81\xce\x0b\xf6\x17\xd8\x90\xdf  \b, EFI Firmware File System
+
+# GUID: 8C8CE578-8A3D-4F1C-9935-896185C32DD3
+>>16    string     \x78\xe5\x8c\x8c\x3d\x8a\x1c\x4f\x99\x35\x89\x61\x85\xc3\x2d\xd3  \b, EFI Firmware File System v2
+
+# GUID: 04ADEEAD-61FF-4D31-B6BA-64F8BF901F5A
+>>16    string     \xad\xee\xad\x04\xff\x61\x31\x4d\xb6\xba\x64\xf8\xbf\x90\x1f\x5a  \b, Apple Boot Volume
+
+# GUID: 8C1B00BD-716A-7B48-A14F-0C2A2DCF7A5D
+>>16    string     \x8c\x1b\x00\xbd\x71\x6a\x7b\x48\xa1\x4f\x0c\x2a\x2d\xcf\x7a\x5d  \b, Apple Boot Volume v2
+
+# GUID: AD3FFFFF-D28B-44C4-9F13-9EA98A97F9F0
+>>16    string     \xff\xff\x3f\xad\x8b\xd2\xc4\x44\x9f\x13\x9e\xa9\x8a\x97\xf9\xf0  \b, Intel v1
+
+# GUID: D6A1CD70-4B33-4994-A6EA-375F2CCC5437
+>>16    string     \x70\xcd\xa1\xd6\x33\x4b\x94\x49\xa6\xea\x37\x5f\x2c\xcc\x54\x37  \b, Intel v2
+
+# GUID: 4F494156-AED6-4D64-A537-B8A5557BCEEC
+>>16    string     \x56\x41\x49\x4f\xd6\xae\x64\x4d\xa5\x37\xb8\xa5\x55\x7b\xce\xec  \b, Sony v1
+
+>>16    ulelong    x                 \b, GUID: %.8X-
+>>>20   uleshort   x                 \b%.4X-
+>>>22   uleshort   x                 \b%.4X-
+>>>24   uleshort   x                 \b%.4X-
+>>>26   ubyte      x                 \b%.2X
+>>>27   ubyte      x                 \b%.2X
+>>>28   ubyte      x                 \b%.2X
+>>>29   ubyte      x                 \b%.2X
+>>>30   ubyte      x                 \b%.2X
+>>>31   ubyte      x                 \b%.2X
 
 # http://www.intel.com/content/www/us/en/architecture-and-technology/\
 # unified-extensible-firmware-interface/efi-capsule-specification.html
