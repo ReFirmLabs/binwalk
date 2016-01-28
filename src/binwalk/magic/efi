@@ -41,34 +41,43 @@
 # http://www.intel.com/content/www/us/en/architecture-and-technology/\
 # unified-extensible-firmware-interface/efi-capsule-specification.html
 # GUID: 3B6686BD-0D76-4030-B70E-B5519E2FC5A0
-
-0       lelong     0x3b6686bd        EFI Capsule v0.9
->4      leshort    0xd76
->6      leshort    0x4030
->8      string     \xb7\x0e\xb5\x51\x9e\x2f\xc5\xa0
+0       string     \xBD\x86\x66\x3B\x76\x0D\x30\x40\xB7\x0E\xB5\x51\x9E\x2F\xC5\xA0  EFI capsule v0.9
+>16     lelong     <0                {invalid}
 >16     lelong     x                 \b, header size: %d
 >20     lelong     x                 \b, flags: 0x%.8X
+>24     lelong     <0                {invalid}
 >24     lelong     x                 \b, capsule size: %d
 
-# EFI2 format, based on https://gist.github.com/XVilka/8163272
-# GUID: 4A3CA68B-7723-48FB-803D-578CC1FEC44D
-
-0       lelong     0x4a3ca68b        EFI Capsule v2
->4      leshort    0x7723
->6      leshort    0x48fb
->8      string     \x57\x8c\xc1\xfe\xc4\x4d
->16     lelong     x                 \b, header size: %d
->20     lelong     x                 \b, flags: 0x%.8X
->24     lelong     x                 \b, capsule size: %d
-
-# UEFI format
+# Intel/UEFI format
 # http://www.uefi.org/sites/default/files/resources/UEFI%202_5.pdf
 # GUID: 539182B9-ABB5-4391-B69A-E3A943F72FCC
-
-0       lelong     0x539182b9        UEFI Capsule
->4      leshort    0xabb5
->6      leshort    0x869a
->8      string     \xe3\xa9\x43\xf7\x2f\xcc
+0       string     \xb9\x82\x91\x53\xb5\xab\x91\x43\xb6\x9a\xe3\xa9\x43\xf7\x2f\xcc  UEFI capsule
+>16     lelong     <0                {invalid}
 >16     lelong     x                 \b, header size: %d
 >20     lelong     x                 \b, flags: 0x%.8X
+>24     lelong     <0                {invalid}
+>24     lelong     x                 \b, capsule size: %d
+
+# GUID: 4A3CA68B-7723-48FB-803D-578CC1FEC44D
+0       string     \x8b\xa6\x3c\x4a\x23\x77\xfb\x48\x80\x3d\x57\x8c\xc1\xfe\xc4\x4d  AMI Aptio extended EFI capsule
+>16     lelong     <0                {invalid}
+>16     lelong     x                 \b, header size: %d
+>20     lelong     x                 \b, flags: 0x%.8X
+>24     lelong     <0                {invalid}
+>24     lelong     x                 \b, capsule size: %d
+
+# GUID: 14EEBB90-890A-43DB-AED1-5D3C4588A418
+0       string     \x90\xbb\xee\x14\x0a\x89\xdb\x43\xae\xd1\x5d\x3c\x45\x88\xa4\x18  AMI Aptio unsigned EFI capsule
+>16     lelong     <0                {invalid}
+>16     lelong     x                 \b, header size: %d
+>20     lelong     x                 \b, flags: 0x%.8X
+>24     lelong     <0                {invalid}
+>24     lelong     x                 \b, capsule size: %d
+
+# GUID: 3BE07062-1D51-45D2-2B83-F093257ED461
+0       string     \x62\x70\xe0\x3b\x51\x1d\xd2\x45\x83\x2b\xf0\x93\x25\x7e\xd4\x61  Toshiba EFI capsule
+>16     lelong     <0                {invalid}
+>16     lelong     x                 \b, header size: %d
+>20     lelong     x                 \b, flags: 0x%.8X
+>24     lelong     <0                {invalid}
 >24     lelong     x                 \b, capsule size: %d
