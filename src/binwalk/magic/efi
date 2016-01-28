@@ -30,6 +30,9 @@
 # GUID: 4F494156-AED6-4D64-A537-B8A5557BCEEC
 >16     string     \x56\x41\x49\x4f\xd6\xae\x64\x4d\xa5\x37\xb8\xa5\x55\x7b\xce\xec  \b, Sony v1
 
+# GUID: FFF12B8D-7696-4C8B-85A9-2747075B4F50
+>16     string     \x8d\x2b\xf1\xff\x96\x76\x8b\x4c\xa9\x85\x27\x47\x07\x5b\x4f\x50  \b, Variable Storage
+
 >16     ulelong    x                 \b, GUID: %.8X-
 >>20    uleshort   x                 \b%.4X-
 >>22    uleshort   x                 \b%.4X-
