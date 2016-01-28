@@ -143,6 +143,12 @@ class SignatureLine(object):
             self.condition = '='
             self.value = parts[2]
 
+        # If a GUID was specified, convert it to a string and treat the
+        # signature as a string from here on out.
+        if self.type == 'guid':
+            self.value = self._guid2str(self.value)
+            self.type = 'string'
+
         # If this is a wildcard value, explicitly set self.value to None
         if self.value == 'x':
             self.value = None
@@ -255,6 +261,42 @@ class SignatureLine(object):
             self.format = retag.sub('', self.format).strip()
         else:
             self.format = ""
+
+    def _guid2str(self, guid):
+        '''
+        Converts a GUID formatted string to a raw byte string in the appropriate endianess.
+        '''
+        string = ""
+
+        # Loop through each hyphen separated section of the GUID string
+        # e.g., "7A9354D9-0468-444A-81CE0BF617D890D" => ['7A9354D9', '0468', '444A', '81CE0BF617D890D']
+        guid_parts =  guid.split('-')
+        for n in range(0, len(guid_parts)):
+            guid_part = guid_parts[n]
+
+            # Parse out each 2 byte value from the guid_part string,
+            # e.g., "0A1034" => ["0A", "10", "34"]
+            guid_bytes = [guid_part[i:i+2] for i in range(0, len(guid_part), 2)]
+
+            # If guid is stored little endian, flip the byte order of all parts
+            # except for the last eight bytes:
+            #
+            #   typedef struct {
+            #       unsigned long Data1;
+            #       unsigned short Data2;
+            #       unsigned short Data3;
+            #       byte Data4[8];
+            #   } GUID;
+            if self.endianess == '<' and n != (len(guid_parts)-1):
+                guid_bytes = [x for x in reversed(guid_bytes)]
+
+            # Convert each ASCII hex byte to a character and append it to self.value
+            for guid_byte in guid_bytes:
+                string += chr(int(guid_byte, 16))
+
+        #import binascii
+        #print ("Converted '%s' => '%s'" % (guid, binascii.hexlify(binwalk.core.compat.str2bytes(string))))
+        return string
 
 class Signature(object):
     '''
