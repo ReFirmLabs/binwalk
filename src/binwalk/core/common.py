@@ -5,10 +5,14 @@ import os
 import re
 import sys
 import ast
-import hashlib
 import platform
 import operator as op
+import binwalk.core.idb
 from binwalk.core.compat import *
+
+# Don't try to import hashlib when loaded into IDA; it doesn't work.
+if not binwalk.core.idb.LOADED_IN_IDA:
+    import hashlib
 
 # The __debug__ value is a bit backwards; by default it is set to True, but
 # then set to False if the Python interpreter is run with the -O option.
