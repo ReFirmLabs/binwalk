@@ -1,0 +1,20 @@
+# From: http://arm.ninja/2016/03/04/reverse-engineering-samsung-s6-modem/
+0           string      TOC\x00\x00\x00\x00     Samsung modem TOC index,
+>20         lelong      x                       size: 0x%X bytes,
+>24         lelong      !0                      invalid TOC CRC,{invalid}
+>28         lelong      !1                      invalid TOC index{invalid}
+>0x20       string      x                       TOC entries: %s
+>0x40       byte        !0
+>>0x40      string      x                       \b, %s
+>0x60       byte        !0
+>>0x60      string      x                       \b, %s
+>0x80       byte        !0
+>>0x80      string      x                       \b, %s
+>0xA0       byte        !0
+>>0xA0      string      x                       \b, %s
+>0xC0       byte        !0
+>>0xC0      string      x                       \b, %s
+>0xE0       byte        !0
+>>0xE0      string      x                       \b, %s
+>0x100      byte        !0
+>>0x100     string      x                       \b, %s
