@@ -108,6 +108,8 @@ class Extractor(Module):
         self.output = {}
         # Number of extracted files
         self.extraction_count = 0
+        # Override the directory name used for extraction output directories
+        self.output_directory_override = None
 
         if self.load_default_rules:
             self.load_defaults()
@@ -144,6 +146,8 @@ class Extractor(Module):
         # Holds a dictionary of the last directory listing for a given directory; used for identifying
         # newly created/extracted files that need to be appended to self.pending.
         self.last_directory_listing = {}
+        # Contains the path to the base output directory for extracted files
+        # self.directory = None
 
     def callback(self, r):
         # Make sure the file attribute is set to a compatible instance of binwalk.core.common.BlockFile
@@ -285,24 +289,46 @@ class Extractor(Module):
             if match:
                 self.append_rule(r)
 
-    def remove_rule(self, text):
+    def remove_rules(self, description):
         '''
-        Remove all rules that match a specified text.
+        Remove all rules that match a specified description.
 
-        @text - The text to match against.
+        @description - The description to match against.
 
         Returns the number of rules removed.
         '''
         rm = []
+        description = description.lower()
 
         for i in range(0, len(self.extract_rules)):
-            if self.extract_rules[i]['regex'].match(text):
+            if self.extract_rules[i]['regex'].search(description):
                 rm.append(i)
 
         for i in rm:
             self.extract_rules.pop(i)
 
         return len(rm)
+
+    def edit_rules(self, description, key, value):
+        '''
+        Edit all rules that match a specified description.
+
+        @description - The description to match against.
+        @key         - The key to change for each matching rule.
+        @value       - The new key value for each matching rule.
+
+        Returns the number of rules modified.
+        '''
+        count = 0
+        description = description.lower()
+
+        for i in range(0, len(self.extract_rules)):
+            if self.extract_rules[i]['regex'].search(description):
+                if has_key(self.extract_rules[i], key):
+                    self.extract_rules[i][key] = value
+                    count += 1
+
+        return count
 
     def clear_rules(self):
         '''
@@ -312,11 +338,25 @@ class Extractor(Module):
         '''
         self.extract_rules = []
 
-    def get_rules(self):
+    def get_rules(self, description=None):
         '''
-        Returns a list of all extraction rules.
+        Returns a list of extraction rules that match a given description.
+
+        @description - The description to match against.
+
+        Returns a list of extraction rules that match the given description.
+        If no description is provided, a list of all rules are returned.
         '''
-        return self.extract_rules
+        if description:
+            rules = []
+            description = description.lower()
+            for i in range(0, len(self.extract_rules)):
+                if self.extract_rules[i]['regex'].search(description):
+                    rules.append(self.extract_rules[i])
+        else:
+            rules = self.extract_rules
+
+        return rules
 
     def load_from_file(self, fname):
         '''
@@ -371,30 +411,35 @@ class Extractor(Module):
             basedir = os.path.dirname(path)
             basename = os.path.basename(path)
 
-            # Make sure we put the initial extracted file in the CWD
+            # Make sure we put the initial extraction directory in the CWD
             if self.directory is None:
-                if self.base_directory is None:
-                    basedir = os.getcwd()
-                else:
-                    basedir = self.base_directory
-                    if not os.path.exists(basedir):
-                        os.mkdir(basedir)
+                self.directory = os.getcwd()
 
-            outdir = os.path.join(basedir, '_' + basename)
-            output_directory = unique_file_name(outdir, extension='extracted')
+            if basedir != self.directory:
+                subdir = basedir.split(self.directory)[1][1:]
+            else:
+                subdir = ""
+
+            if self.output_directory_override:
+                output_directory = os.path.join(self.directory, subdir, self.output_directory_override)
+            else:
+                outdir = os.path.join(self.directory, subdir, '_' + basename)
+                output_directory = unique_file_name(outdir, extension='extracted')
 
             if not os.path.exists(output_directory):
                 os.mkdir(output_directory)
 
             self.extraction_directories[path] = output_directory
+            self.output[path].directory = os.path.realpath(output_directory) + os.path.sep
         # Else, just use the already created directory
         else:
             output_directory = self.extraction_directories[path]
 
-        # Set the initial base extraction directory for later determining the level of recusion
-        if self.directory is None:
-            self.directory = os.path.realpath(output_directory) + os.path.sep
-            self.output[path].directory = self.directory
+        # Set the initial base extraction directory for later determining the level of recusion.
+        # Note that self.directory is set to None by self.reset.
+        #if self.directory is None:
+        #    self.directory = os.path.realpath(output_directory) + os.path.sep
+        #    self.output[path].directory = self.directory
 
         return output_directory
 
@@ -438,6 +483,7 @@ class Extractor(Module):
         else:
             binwalk.core.common.debug("Found %d matching extraction rules" % len(rules))
 
+        # Generate the output directory name where extracted files will be stored
         output_directory = self.build_output_directory(file_name)
 
         # Extract to end of file if no size was specified
