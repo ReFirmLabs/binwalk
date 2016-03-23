@@ -146,8 +146,6 @@ class Extractor(Module):
         # Holds a dictionary of the last directory listing for a given directory; used for identifying
         # newly created/extracted files that need to be appended to self.pending.
         self.last_directory_listing = {}
-        # Contains the path to the base output directory for extracted files
-        # self.directory = None
 
     def callback(self, r):
         # Make sure the file attribute is set to a compatible instance of binwalk.core.common.BlockFile
@@ -398,6 +396,23 @@ class Extractor(Module):
                     if binwalk.core.common.DEBUG:
                         raise Exception("Extractor.load_defaults failed to load file '%s': %s" % (extract_file, str(e)))
 
+    def get_output_directory_override(self):
+        '''
+        Returns the current output directory basename override value.
+        '''
+        return self.output_directory_override
+
+    def override_output_directory_basename(self, dirname):
+        '''
+        Allows the overriding of the default extraction directory basename.
+
+        @dirname - The directory base name to use.
+
+        Returns the current output directory basename override value.
+        '''
+        self.output_directory_override = dirname
+        return self.output_directory_override
+
     def build_output_directory(self, path):
         '''
         Set the output directory for extracted files.
@@ -434,12 +449,6 @@ class Extractor(Module):
         # Else, just use the already created directory
         else:
             output_directory = self.extraction_directories[path]
-
-        # Set the initial base extraction directory for later determining the level of recusion.
-        # Note that self.directory is set to None by self.reset.
-        #if self.directory is None:
-        #    self.directory = os.path.realpath(output_directory) + os.path.sep
-        #    self.output[path].directory = self.directory
 
         return output_directory
 
