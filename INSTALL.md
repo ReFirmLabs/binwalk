@@ -31,6 +31,18 @@ Although all binwalk run-time dependencies are optional, the `python-lzma` modul
 $ sudo apt-get install python-lzma
 ```
 
+Binwalk uses the `pycrypto` library to decrypt some known encrypted firmware images:
+
+```bash
+# Python2.7
+$ sudo apt-get install python-crypto
+```
+
+```bash
+# Python3.x
+$ sudo apt-get install python3-crypto
+```
+
 Binwalk uses [pyqtgraph](http://www.pyqtgraph.org) to generate graphs and visualizations, which requires the following: 
 
 ```bash
