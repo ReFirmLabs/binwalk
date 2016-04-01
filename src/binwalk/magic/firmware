@@ -69,7 +69,7 @@
 
 # Hilink encrypted uImage firmware.
 # Additional validation/processing is done by the hilink.py plugin.
-0x23   string    \x4A\x52\xCA\xDA\x2D     Encrypted Hilink uImage firmware header
+0x23   string    \x4A\x52\xCA\xDA     Encrypted Hilink uImage firmware header
 
 #IMG0 header, found in VxWorks-based Mercury router firmware
 0       string        IMG0    IMG0 (VxWorks) header,
