@@ -67,8 +67,8 @@
 >31    byte      3              compression type: lzma,
 >32    string    x              image name: "%s"
 
-# Hilink encrypts thier firmware with a fixed DES key, so the uImage magic
-# bytes are encrypted to the same values every time.
+# Hilink encrypted uImage firmware.
+# Additional validation/processing is done by the hilink.py plugin.
 0x23   string    \x4A\x52\xCA\xDA\x2D     Encrypted Hilink uImage firmware header
 
 #IMG0 header, found in VxWorks-based Mercury router firmware
