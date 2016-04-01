@@ -431,7 +431,19 @@ class Extractor(Module):
                 self.directory = os.getcwd()
 
             if basedir != self.directory:
-                subdir = basedir.split(self.directory)[1][1:]
+                # During recursive extraction, extracted files will be in subdirectories
+                # of the CWD. This allows us to figure out the subdirectory by simply
+                # splitting the target file's base directory on our known CWD.
+                #
+                # However, the very *first* file being scanned is not necessarily in the
+                # CWD, so this will raise an IndexError. This is easy to handle though,
+                # since the very first file being scanned needs to have its contents
+                # extracted to ${CWD}/_basename.extracted, so we just set the subdir
+                # variable to a blank string when an IndexError is encountered.
+                try:
+                    subdir = basedir.split(self.directory)[1][1:]
+                except IndexError as e:
+                    subdir = ""
             else:
                 subdir = ""
 
