@@ -67,6 +67,10 @@
 >31    byte      3              compression type: lzma,
 >32    string    x              image name: "%s"
 
+# Hilink encrypted uImage firmware.
+# Additional validation/processing is done by the hilink.py plugin.
+0x23   string    \x4A\x52\xCA\xDA     Encrypted Hilink uImage firmware header
+
 #IMG0 header, found in VxWorks-based Mercury router firmware
 0       string        IMG0    IMG0 (VxWorks) header,
 >4      belong        <1      {invalid}
@@ -495,8 +499,6 @@
 >35     byte        x           try decryption tool from:
 >35     byte        x           http://download.modem-help.co.uk/mfcs-A/Alcatel/Modems/Misc/
 
-16    string        \xd9\x54\x93\x7a\x68\x04\x4a\x44\x81\xce\x0b\xf6\x17\xd8\x90\xdf    UEFI PI firmware volume
-
 # http://android.stackexchange.com/questions/23357/\
 # is-there-a-way-to-look-inside-and-modify-an-adb-backup-created-file/\
 # 23608#23608
@@ -690,5 +692,13 @@
 >44 lelong &0x4 SLT
 >44 lelong &0xffffff00 {invalid}
 
+# Android bootimg
+# https://android.googlesource.com/platform/system/core.git/+/master/mkbootimg/bootimg.h
+0     string     ANDROID!      Android bootimg
+>8    ulelong    x             \b, kernel size: %d bytes
+>12   ulelong    x             \b, kernel addr: 0x%X
+>16   ulelong    x             \b, ramdisk size: %d bytes
+>20   ulelong    x             \b, ramdisk addr: 0x%X
+>48   string     x             \b, product name: "%s"
 
 

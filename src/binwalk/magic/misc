@@ -41,8 +41,18 @@
 # CodeGate 2011 http://nopsrus.blogspot.com/2013/05/codegate-ctf-2011-binary-100-points.html
 0    string    \x23\x40\x7e\x5e    Windows Script Encoded Data (screnc.exe)
 
-0   regex   /[a-zA-Z0-9\.\-_]{1,25}/[a-zA-Z0-9\.\-_]{1,25}/[a-zA-Z0-9\.\-_]{1,25}/[a-zA-Z0-9\.\-_/].*       Unix path:
->0  string  x                                                                                               %s
+0           regex   /[a-zA-Z0-9\.\-_]{1,25}/[a-zA-Z0-9\.\-_]{1,25}/[a-zA-Z0-9\.\-_/].*       Unix path:
+>0          string  x                                                                        %s
+>0          string  !/home/
+>>0         string  !/bin/
+>>>0        string  !/sbin/
+>>>>0       string  !/usr/
+>>>>>0      string  !/sys/
+>>>>>>0     string  !/var/
+>>>>>>>0    string  !/opt/
+>>>>>>>>0   string  !/etc/
+>>>>>>>>>0  string  !/lib/
+>>>>>>>>>>0 string  !/dev/                                                                   {invalid}(likely false positive)
 
 0   string      neighbor           Neighborly text,
 >0  string      x                  "%s

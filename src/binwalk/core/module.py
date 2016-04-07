@@ -6,12 +6,15 @@
 import io
 import os
 import sys
+import time
 import inspect
 import argparse
 import traceback
+import binwalk.core.statuserver
 import binwalk.core.common
 import binwalk.core.settings
 import binwalk.core.plugin
+from threading import Thread
 from binwalk.core.compat import *
 
 class Option(object):
@@ -216,10 +219,11 @@ class Module(object):
     # Set to False if this is not a primary module (e.g., General, Extractor modules)
     PRIMARY = True
 
-    def __init__(self, **kwargs):
+    def __init__(self, parent, **kwargs):
         self.errors = []
         self.results = []
 
+        self.parent = parent
         self.target_file_list = []
         self.status = None
         self.enabled = False
@@ -252,6 +256,13 @@ class Module(object):
         return None
 
     def load(self):
+        '''
+        Invoked at module load time.
+        May be overridden by the module sub-class.
+        '''
+        return None
+
+    def unload(self):
         '''
         Invoked at module load time.
         May be overridden by the module sub-class.
@@ -336,6 +347,17 @@ class Module(object):
 
         return args
 
+    def _unload_dependencies(self):
+        # Calls the unload method for all dependency modules.
+        # These modules cannot be unloaded immediately after being run, as
+        # they must persist until the module that depends on them is finished.
+        # As such, this must be done separately from the Modules.run 'unload' call.
+        for dependency in self.dependencies:
+            try:
+                getattr(self, dependency.attribute).unload()
+            except AttributeError:
+                continue
+
     def next_file(self, close_previous=True):
         '''
         Gets the next file to be scanned (including pending extracted files, if applicable).
@@ -358,7 +380,7 @@ class Module(object):
 
         # Reset all dependencies prior to continuing with another file.
         # This is particularly important for the extractor module, which must be reset
-        # in order to reset it's base output directory path for each file, and the
+        # in order to reset its base output directory path for each file, and the
         # list of pending files.
         self.reset_dependencies()
 
@@ -386,8 +408,10 @@ class Module(object):
 
         if fp is not None:
             self.current_target_file_name = fp.path
+            self.status.fp = fp
         else:
             self.current_target_file_name = None
+            self.status.fp = None
 
         self.previous_next_file_fp = fp
 
@@ -426,6 +450,12 @@ class Module(object):
         self.validate(r)
         self._plugins_result(r)
 
+        # Update the progress status automatically if it is not being done manually by the module
+        if r.offset and r.file and self.AUTO_UPDATE_STATUS:
+            self.status.total = r.file.length
+            self.status.completed = r.offset
+            self.status.fp = r.file
+
         for dependency in self.dependencies:
             try:
                 getattr(self, dependency.attribute).callback(r)
@@ -434,11 +464,6 @@ class Module(object):
 
         if r.valid:
             self.results.append(r)
-
-            # Update the progress status automatically if it is not being done manually by the module
-            if r.offset and r.file and self.AUTO_UPDATE_STATUS:
-                self.status.total = r.file.length
-                self.status.completed = r.offset
 
             if r.display:
                 display_args = self._build_display_args(r)
@@ -499,14 +524,14 @@ class Module(object):
             if hasattr(self, dependency.attribute):
                 getattr(self, dependency.attribute).reset()
 
-    def main(self, parent):
+    def main(self):
         '''
         Responsible for calling self.init, initializing self.config.display, and calling self.run.
 
         Returns the value returned from self.run.
         '''
-        self.status = parent.status
-        self.modules = parent.loaded_modules
+        self.status = self.parent.status
+        self.modules = self.parent.executed_modules
 
         # A special exception for the extractor module, which should be allowed to
         # override the verbose setting, e.g., if --matryoshka has been specified
@@ -584,11 +609,24 @@ class Modules(object):
         Returns None.
         '''
         self.arguments = []
-        self.loaded_modules = {}
+        self.executed_modules = {}
         self.default_dependency_modules = {}
-        self.status = Status(completed=0, total=0)
+        self.status = Status(completed=0, total=0, fp=None, running=False, shutdown=False, finished=False)
+        self.status_server_started = False
+        self.status_service = None
 
         self._set_arguments(list(argv), kargv)
+
+    def cleanup(self):
+        if self.status_service:
+            self.status_service.server.socket.shutdown(1)
+            self.status_service.server.socket.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, t, v, b):
+        self.cleanup()
 
     def _set_arguments(self, argv=[], kargv={}):
         for (k,v) in iterator(kargv):
@@ -691,7 +729,7 @@ class Modules(object):
             obj = self.run(module)
 
         # Add all loaded modules that marked themselves as enabled to the run_modules list
-        for (module, obj) in iterator(self.loaded_modules):
+        for (module, obj) in iterator(self.executed_modules):
             # Report the results if the module is enabled and if it is a primary module or if it reported any results/errors
             if obj.enabled and (obj.PRIMARY or obj.results or obj.errors):
                 run_modules.append(obj)
@@ -704,15 +742,29 @@ class Modules(object):
         '''
         Runs a specific module.
         '''
-        obj = self.load(module, kwargs)
+        try:
+            obj = self.load(module, kwargs)
 
-        if isinstance(obj, binwalk.core.module.Module) and obj.enabled:
-            obj.main(parent=self)
-            self.status.clear()
+            if isinstance(obj, binwalk.core.module.Module) and obj.enabled:
+                obj.main()
+                self.status.clear()
 
-        # If the module is not being loaded as a dependency, add it to the loaded modules dictionary
-        if not dependency:
-            self.loaded_modules[module] = obj
+            # If the module is not being loaded as a dependency, add it to the executed modules dictionary.
+            # This is used later in self.execute to determine which objects should be returned.
+            if not dependency:
+                self.executed_modules[module] = obj
+
+                # The unload method tells the module that we're done with it, and gives it a chance to do
+                # any cleanup operations that may be necessary. We still retain the object instance in self.executed_modules.
+                obj._unload_dependencies()
+                obj.unload()
+        except KeyboardInterrupt as e:
+            # Tell the status server to shut down, and give it time to clean up.
+            if self.status.running:
+                self.status.shutdown = True
+                while not self.status.finished:
+                    time.sleep(0.1)
+            raise e
 
         return obj
 
@@ -720,7 +772,7 @@ class Modules(object):
         argv = self.argv(module, argv=self.arguments)
         argv.update(kwargs)
         argv.update(self.dependencies(module, argv['enabled']))
-        return module(**argv)
+        return module(self, **argv)
 
     def dependencies(self, module, module_enabled):
         import binwalk.modules
@@ -859,6 +911,21 @@ class Modules(object):
         else:
             raise Exception("binwalk.core.module.Modules.process_kwargs: %s has no attribute 'KWARGS'" % str(obj))
 
+    def status_server(self, port):
+        '''
+        Starts the progress bar TCP service on the specified port.
+        This service will only be started once per instance, regardless of the
+        number of times this method is invoked.
+
+        Failure to start the status service is considered non-critical; that is,
+        a warning will be displayed to the user, but normal operation will proceed.
+        '''
+        if self.status_server_started == False:
+            self.status_server_started = True
+            try:
+                self.status_service = binwalk.core.statuserver.StatusServer(port, self)
+            except Exception as e:
+                binwalk.core.common.warning("Failed to start status server on port %d: %s" % (port, str(e)))
 
 def process_kwargs(obj, kwargs):
     '''
@@ -869,7 +936,9 @@ def process_kwargs(obj, kwargs):
 
     Returns None.
     '''
-    return Modules().kwargs(obj, kwargs)
+    with Modules() as m:
+        kwargs = m.kwargs(obj, kwargs)
+    return kwargs
 
 def show_help(fd=sys.stdout):
     '''
@@ -879,6 +948,7 @@ def show_help(fd=sys.stdout):
 
     Returns None.
     '''
-    fd.write(Modules().help())
+    with Modules() as m:
+        fd.write(m.help())
 
 

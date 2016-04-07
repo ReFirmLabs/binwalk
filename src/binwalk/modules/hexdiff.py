@@ -118,6 +118,13 @@ class HexDiff(Module):
         loop_count = 0
         sep_count = 0
 
+        # Figure out the maximum diff size (largest file size)
+        self.status.total = 0
+        for i in range(0, len(target_files)):
+            if target_files[i].size > self.status.total:
+                self.status.total = target_files[i].size
+                self.status.fp = target_files[i]
+
         while True:
             line = ""
             done_files = 0
@@ -168,6 +175,7 @@ class HexDiff(Module):
 
             last_line = line
             loop_count += 1
+            self.status.completed += self.block
 
     def init(self):
         # To mimic expected behavior, if all options are False, we show everything

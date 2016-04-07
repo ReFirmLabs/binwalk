@@ -3,7 +3,7 @@
 
 # Linux kernel boot images, from Albert Cahalan <acahalan@cs.uml.edu>
 # and others such as Axel Kohlmeyer <akohlmey@rincewind.chemie.uni-ulm.de>
-# and Nicolás Lichtmaier <nick@debian.org>
+# and Nicolas Lichtmaier <nick@debian.org>
 # All known start with: b8 c0 07 8e d8 b8 00 90 8e c0 b9 00 01 29 f6 29
 0       string      \xb8\xc0\x07\x8e\xd8\xb8\x00\x90\x8e\xc0\xb9\x00\x01\x29\xf6\x29    Linux kernel boot image
 >514    string      !HdrS                                                               {invalid}
@@ -16,14 +16,23 @@
 >>14    string      x                       "%s"
 
 # Linux ARM compressed kernel image
-# See arch/arm/boot/compressed/head.S and arch/arm/boot/compressed/vmlinux.lds.S
-0	ulelong	0x016f2818	Linux kernel ARM boot executable zImage (little-endian),
->4	ulelong x		    load address: "0x%.8X",
->8	ulelong	x		    end address: "0x%.8X"
->12 ulelong !0x04030201 {invalid}
+# Starts with 8 NOPs, with 0x016F2818 at offset 0x24
+36  ulelong 0x016F2818                      Linux kernel ARM boot executable zImage (little-endian)
+>0  ulelong !0xE1A00000                     {invalid}(invalid)
+>4  ulelong !0xE1A00000                     {invalid}(invalid)
+>8  ulelong !0xE1A00000                     {invalid}(invalid)
+>12 ulelong !0xE1A00000                     {invalid}(invalid)
+>16 ulelong !0xE1A00000                     {invalid}(invalid)
+>20 ulelong !0xE1A00000                     {invalid}(invalid)
+>24 ulelong !0xE1A00000                     {invalid}(invalid)
+>28 ulelong !0xE1A00000                     {invalid}(invalid)
 
-0	ubelong	0x016f2818	Linux kernel ARM boot executable zImage (big-endian),
->4	ubelong x		    load address: "0x%.8X",
->8	ubelong	x		    end address: "0x%.8X"
->12 ubelong !0x04030201 {invalid}
-
+36  ubelong 0x016F2818                      Linux kernel ARM boot executable zImage (big-endian)
+>0  ubelong !0xE1A00000                     {invalid}(invalid)
+>4  ubelong !0xE1A00000                     {invalid}(invalid)
+>8  ubelong !0xE1A00000                     {invalid}(invalid)
+>12 ubelong !0xE1A00000                     {invalid}(invalid)
+>16 ubelong !0xE1A00000                     {invalid}(invalid)
+>20 ubelong !0xE1A00000                     {invalid}(invalid)
+>24 ubelong !0xE1A00000                     {invalid}(invalid)
+>28 ubelong !0xE1A00000                     {invalid}(invalid)

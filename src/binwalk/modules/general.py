@@ -80,6 +80,11 @@ class General(Module):
                type=str,
                kwargs={'file_name_exclude_regex' : ""},
                description='Do not scan files whose names match this regex'),
+        Option(short='s',
+               long='status',
+               type=int,
+               kwargs={'status_server_port' : 0},
+               description='Enable the status server on the specified port'),
         Option(long=None,
                short=None,
                type=binwalk.core.common.BlockFile,
@@ -96,6 +101,7 @@ class General(Module):
         Kwarg(name='offset', default=0),
         Kwarg(name='base', default=0),
         Kwarg(name='block', default=0),
+        Kwarg(name='status_server_port', default=0),
         Kwarg(name='swap_size', default=0),
         Kwarg(name='log_file', default=None),
         Kwarg(name='csv', default=False),
@@ -113,6 +119,7 @@ class General(Module):
     PRIMARY = False
 
     def load(self):
+        self.threads_active = False
         self.target_files = []
 
         # A special case for when we're loaded into IDA
@@ -140,6 +147,9 @@ class General(Module):
             show_help()
             if not binwalk.core.idb.LOADED_IN_IDA:
                 sys.exit(0)
+
+        if self.status_server_port > 0:
+            self.parent.status_server(self.status_server_port)
 
     def reset(self):
         pass
@@ -181,7 +191,13 @@ class General(Module):
         if swap is None:
             swap = self.swap_size
 
-        return binwalk.core.common.BlockFile(fname, subclass=self.subclass, length=length, offset=offset, swap=swap, block=block, peek=peek)
+        return binwalk.core.common.BlockFile(fname,
+                                             subclass=self.subclass,
+                                             length=length,
+                                             offset=offset,
+                                             swap=swap,
+                                             block=block,
+                                             peek=peek)
 
     def _open_target_files(self):
         '''

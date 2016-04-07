@@ -9,7 +9,14 @@ class LZMAExtractPlugin(binwalk.core.plugin.Plugin):
 
     def init(self):
         try:
-            import lzma
+            # lzma package in Python 2.0 decompress() does not handle multiple
+            # compressed streams, only first stream is extracted.
+            # backports.lzma package could be used to keep consistent behaviour.
+            try:
+                import lzma
+            except ImportError:
+                from backports import lzma
+
             self.decompressor = lzma.decompress
 
             # If the extractor is enabled for the module we're currently loaded
@@ -18,6 +25,10 @@ class LZMAExtractPlugin(binwalk.core.plugin.Plugin):
                 self.module.extractor.add_rule(txtrule=None,
                                                regex="^lzma compressed data",
                                                extension="7z",
+                                               cmd=self.extractor)
+                self.module.extractor.add_rule(txtrule=None,
+                                               regex="^xz compressed data",
+                                               extension="xz",
                                                cmd=self.extractor)
         except ImportError as e:
             pass

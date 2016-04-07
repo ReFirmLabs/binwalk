@@ -8,6 +8,7 @@ from distutils.core import setup, Command
 from distutils.dir_util import remove_tree
 
 MODULE_NAME = "binwalk"
+SCRIPT_NAME = MODULE_NAME
 
 # Python2/3 compliance
 try:
@@ -200,7 +201,7 @@ for data_dir in ["magic", "config", "plugins", "modules", "core"]:
 
 # Install the module, script, and support files
 setup(name = MODULE_NAME,
-      version = "2.1.0",
+      version = "2.1.2b",
       description = "Firmware analysis tool",
       author = "Craig Heffner",
       url = "https://github.com/devttys0/%s" % MODULE_NAME,
@@ -208,7 +209,7 @@ setup(name = MODULE_NAME,
       requires = [],
       packages = [MODULE_NAME],
       package_data = {MODULE_NAME : install_data_files},
-      scripts = [os.path.join("scripts", MODULE_NAME)],
+      scripts = [os.path.join("scripts", SCRIPT_NAME)],
 
       cmdclass = {'clean' : CleanCommand, 'uninstall' : UninstallCommand, 'idainstall' : IDAInstallCommand, 'idauninstall' : IDAUnInstallCommand}
 )
