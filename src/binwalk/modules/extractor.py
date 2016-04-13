@@ -695,8 +695,10 @@ class Extractor(Module):
                 if not data:
                     break
                 else:
-                    fdout.write(str2bytes(data[adjust:dlen]))
                     total_size += (dlen-adjust)
+                    if total_size > size:
+                        dlen -= (total_size - size)
+                    fdout.write(str2bytes(data[adjust:dlen]))
                     adjust = 0
 
             # Cleanup
