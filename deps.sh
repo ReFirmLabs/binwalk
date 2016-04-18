@@ -145,7 +145,7 @@ fi
 
 # Do the install(s)
 cd /tmp
-sudo $PKGCMD $PKGCMD_OPTS $PKG_CANDIDATES
+$SUDO $PKGCMD $PKGCMD_OPTS $PKG_CANDIDATES
 if [ $? -ne 0 ]
     then
     echo "Package installation failed: $PKG_CANDIDATES"
