@@ -1,4 +1,13 @@
 #!/bin/bash
+
+# Check for the --yes command line argument to skip yes/no prompts
+if [ "$1" = "--yes" ]
+then
+    YES=1
+else
+    YES=0
+fi
+
 set -o nounset
 
 REQUIRED_UTILS="wget tar python"
@@ -13,14 +22,6 @@ PYTHON2_YUM_CANDIDATES="python-pip python-opengl python-qt4 numpy python-numdisp
 APT_CANDIDATES="$APT_CANDIDATES $PYTHON2_APT_CANDIDATES"
 YUM_CANDIDATES="$YUM_CANDIDATES $PYTHON2_YUM_CANDIDATES"
 PIP_COMMANDS="pip"
-
-# Check for the --yes command line argument
-if [ "$1" == "--yes" ]
-then
-    YES=1
-else
-    YES=0
-fi
 
 # Check for root privileges
 if [ $UID -eq 0 ]
