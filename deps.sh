@@ -14,6 +14,14 @@ APT_CANDIDATES="$APT_CANDIDATES $PYTHON2_APT_CANDIDATES"
 YUM_CANDIDATES="$YUM_CANDIDATES $PYTHON2_YUM_CANDIDATES"
 PIP_COMMANDS="pip"
 
+# Check for the --yes command line argument
+if [ "$1" == "--yes" ]
+then
+    YES=1
+else
+    YES=0
+fi
+
 # Check for root privileges
 if [ $UID -eq 0 ]
 then
@@ -82,19 +90,22 @@ function find_path
 }
 
 # Make sure the user really wants to do this
-echo ""
-echo "WARNING: This script will download and install all required and optional dependencies for binwalk."
-echo "         This script has only been tested on, and is only intended for, Debian based systems."
-echo "         Some dependencies are downloaded via unsecure (HTTP) protocols."
-echo "         This script requires internet access."
-echo "         This script requires root privileges."
-echo ""
-echo -n "Continue [y/N]? "
-read YN
-if [ "$(echo "$YN" | grep -i -e 'y' -e 'yes')" == "" ]
+if [ $YES -eq 0 ]
 then
-    echo "Quitting..."
-    exit 1
+    echo ""
+    echo "WARNING: This script will download and install all required and optional dependencies for binwalk."
+    echo "         This script has only been tested on, and is only intended for, Debian based systems."
+    echo "         Some dependencies are downloaded via unsecure (HTTP) protocols."
+    echo "         This script requires internet access."
+    echo "         This script requires root privileges."
+    echo ""
+    echo -n "Continue [y/N]? "
+    read YN
+    if [ "$(echo "$YN" | grep -i -e 'y' -e 'yes')" == "" ]
+    then
+        echo "Quitting..."
+        exit 1
+    fi
 fi
 
 # Check to make sure we have all the required utilities installed
