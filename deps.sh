@@ -32,6 +32,13 @@ else
     REQUIRED_UTILS="sudo $REQUIRED_UTILS"
 fi
 
+function install_yaffshiv
+{
+    git clone https://github.com/devttys0/yaffshiv
+    (cd yaffshiv && $SUDO python2 setup.py install)
+    $SUDO rm -rf yaffshiv
+}
+
 function install_sasquatch
 {
     git clone https://github.com/devttys0/sasquatch
@@ -163,10 +170,11 @@ if [ $? -ne 0 ]
     echo "Package installation failed: $PKG_CANDIDATES"
     exit 1
 fi
-install_pip_package pyqtgraph
-install_pip_package capstone
-install_sasquatch
-install_jefferson
-install_unstuff
-install_ubireader
+#install_pip_package pyqtgraph
+#install_pip_package capstone
+#install_sasquatch
+install_yaffshiv
+#install_jefferson
+#install_unstuff
+#install_ubireader
 
