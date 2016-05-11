@@ -81,17 +81,17 @@
 
 # cramfs filesystem - russell@coker.com.au
 0       lelong      0x28cd3d45      CramFS filesystem, little endian,
->4      lelong      <0              {invalid}
->4      lelong      >1073741824     {invalid}
+>4      lelong      <0              invalid size,{invalid}
+>4      lelong      >1073741824     invalid size,{invalid}
 >4      ulelong     x               size: %u
 >8      lelong      &1              version 2
 >8      lelong      &2              sorted_dirs
 >8      lelong      &4              hole_support
 >32     ulelong     x               CRC 0x%.8X,
 >36     ulelong     x               edition %u,
->40     lelong      <0              {invalid}
+>40     lelong      <0              invalid blocks,{invalid}
 >40     ulelong     x               %u blocks,
->44     lelong      <0              {invalid}
+>44     lelong      <0              invalid file count,{invalid}
 >44     ulelong     x               %u files
 >4      ulelong     x               {jump:%u}
 >4      ulelong     x               {size:%u}
