@@ -65,12 +65,16 @@ class Settings:
         user_binarch = self._user_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
         system_binarch = self._system_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
 
+        def list_files(dir_path):
+            # Restrict files list to names starting with an alphanumeric
+            return [os.path.join(dir_path, x) for x in os.listdir(dir_path) if x[0].isalnum()]
+
         if not system_only:
             user_dir = os.path.join(self.user_dir, self.BINWALK_USER_DIR, self.BINWALK_MAGIC_DIR)
-            files += [os.path.join(user_dir, x) for x in os.listdir(user_dir)]
+            files += list_files(user_dir)
         if not user_only:
             system_dir = os.path.join(self.system_dir, self.BINWALK_MAGIC_DIR)
-            files += [os.path.join(system_dir, x) for x in os.listdir(system_dir)]
+            files += list_files(system_dir)
 
         # Don't include binarch signatures in the default list of signature files.
         # It is specifically loaded when -A is specified on the command line.
