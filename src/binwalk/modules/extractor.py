@@ -102,8 +102,11 @@ class Extractor(Module):
     def load(self):
         # Holds a list of extraction rules loaded either from a file or when manually specified.
         self.extract_rules = []
-        # The input file specific output directory path (to be determined at runtime)
-        self.directory = None
+        # The input file specific output directory path (default to CWD)
+        if self.base_directory:
+            self.directory = os.path.realpath(self.base_directory)
+        else:
+            self.directory = os.getcwd()
         # Key value pairs of input file path and output extraction path
         self.output = {}
         # Number of extracted files
@@ -425,10 +428,6 @@ class Extractor(Module):
         if not has_key(self.extraction_directories, path):
             basedir = os.path.dirname(path)
             basename = os.path.basename(path)
-
-            # Make sure we put the initial extraction directory in the CWD
-            if self.directory is None:
-                self.directory = os.getcwd()
 
             if basedir != self.directory:
                 # During recursive extraction, extracted files will be in subdirectories
