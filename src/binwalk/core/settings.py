@@ -66,8 +66,8 @@ class Settings:
         system_binarch = self._system_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
 
         def list_files(dir_path):
-            # Restrict files list to names starting with an alphanumeric
-            return [os.path.join(dir_path, x) for x in os.listdir(dir_path) if x[0].isalnum()]
+            # Ignore hidden dotfiles.
+            return [os.path.join(dir_path, x) for x in os.listdir(dir_path) if not x.startswith('.')]
 
         if not system_only:
             user_dir = os.path.join(self.user_dir, self.BINWALK_USER_DIR, self.BINWALK_MAGIC_DIR)
