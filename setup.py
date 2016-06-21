@@ -16,9 +16,6 @@ try:
 except NameError:
     raw_input = input
 
-# cd into the src directory, no matter where setup.py was invoked from
-os.chdir(os.path.join(os.path.dirname(os.path.realpath(__file__)), "src"))
-
 def which(command):
     # /usr/local/bin is usually the default install path, though it may not be in $PATH
     usr_local_bin = os.path.sep.join([os.path.sep, 'usr', 'local', 'bin', command])
@@ -197,7 +194,7 @@ class CleanCommand(Command):
 # The data files to install along with the module
 install_data_files = []
 for data_dir in ["magic", "config", "plugins", "modules", "core"]:
-        install_data_files.append("%s%s*" % (data_dir, os.path.sep))
+        install_data_files.append("src%s%s%s*" % (os.path.sep, data_dir, os.path.sep))
 
 # Install the module, script, and support files
 setup(name = MODULE_NAME,
@@ -208,8 +205,10 @@ setup(name = MODULE_NAME,
 
       requires = [],
       packages = [MODULE_NAME],
+      package_dir = {MODULE_NAME : "src%s%s" % (os.path.sep, MODULE_NAME) },
       package_data = {MODULE_NAME : install_data_files},
-      scripts = [os.path.join("scripts", SCRIPT_NAME)],
+      scripts = [os.path.join("src%sscripts" % os.path.sep, SCRIPT_NAME)],
+
 
       cmdclass = {'clean' : CleanCommand, 'uninstall' : UninstallCommand, 'idainstall' : IDAInstallCommand, 'idauninstall' : IDAUnInstallCommand}
 )
