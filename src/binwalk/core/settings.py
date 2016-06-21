@@ -20,7 +20,7 @@ class Settings:
     VERSION = "2.1.2b"
 
     # Sub directories
-    BINWALK_USER_DIR = ".binwalk"
+    BINWALK_USER_DIR = "binwalk"
     BINWALK_MAGIC_DIR = "magic"
     BINWALK_CONFIG_DIR = "config"
     BINWALK_PLUGINS_DIR = "plugins"
@@ -35,7 +35,7 @@ class Settings:
         Class constructor. Enumerates file paths and populates self.paths.
         '''
         # Path to the user binwalk directory
-        self.user_dir = self._get_user_dir()
+        self.user_dir = self._get_user_config_dir()
         # Path to the system wide binwalk directory
         self.system_dir = common.get_module_path()
 
@@ -106,6 +106,16 @@ class Settings:
                 loc = fpath
 
         return fpath
+
+    def _get_user_config_dir(self):
+        try:
+            xdg_path = os.getenv('XDG_CONFIG_HOME')
+            if xdg_path is not None:
+                return xdg_path
+        except Exception:
+            pass
+
+        return os.path.join(self._get_user_dir(), '.config')
 
     def _get_user_dir(self):
         '''
