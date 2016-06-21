@@ -17,7 +17,7 @@ except NameError:
     raw_input = input
 
 # cd into the src directory, no matter where setup.py was invoked from
-os.chdir(os.path.join(os.path.dirname(os.path.realpath(__file__)), "src"))
+#os.chdir(os.path.join(os.path.dirname(os.path.realpath(__file__)), "src"))
 
 def which(command):
     # /usr/local/bin is usually the default install path, though it may not be in $PATH
@@ -80,7 +80,7 @@ class IDAUnInstallCommand(Command):
 
     def initialize_options(self):
         self.idadir = None
-        self.mydir = os.path.dirname(os.path.realpath(__file__))
+        self.mydir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "src")
 
     def finalize_options(self):
         pass
@@ -108,7 +108,7 @@ class IDAInstallCommand(Command):
 
     def initialize_options(self):
         self.idadir = None
-        self.mydir = os.path.dirname(os.path.realpath(__file__))
+        self.mydir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "src")
 
     def finalize_options(self):
         pass
@@ -207,9 +207,10 @@ setup(name = MODULE_NAME,
       url = "https://github.com/devttys0/%s" % MODULE_NAME,
 
       requires = [],
+      package_dir = {"" : "src"},
       packages = [MODULE_NAME],
       package_data = {MODULE_NAME : install_data_files},
-      scripts = [os.path.join("scripts", SCRIPT_NAME)],
+      scripts = [os.path.join("src", "scripts", SCRIPT_NAME)],
 
       cmdclass = {'clean' : CleanCommand, 'uninstall' : UninstallCommand, 'idainstall' : IDAInstallCommand, 'idauninstall' : IDAUnInstallCommand}
 )
