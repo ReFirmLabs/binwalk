@@ -722,4 +722,10 @@
 # https://github.com/grub4android/lk/blob/master-uboot/app/aboot/aboot.c#L2710
 0     string     MotoLogo\x00  Motorola bootlogo container
 
+# Motorola RLE bootlogo
+# https://github.com/grub4android/lk/blob/master-uboot/app/aboot/aboot.c#L2710
+0     string     MotoRun\x00   Motorola RLE bootlogo
+>8    ubeshort   x             \b, width: %u
+>10   ubeshort   x             \b, height: %u
+
 
