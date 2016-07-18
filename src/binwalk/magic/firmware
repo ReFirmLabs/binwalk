@@ -718,4 +718,8 @@
 >8    ulelong    x             \b, num images: %u
 >12   ulelong    x             \b, bootldr size: %u
 
+# Motorola bootlogo container
+# https://github.com/grub4android/lk/blob/master-uboot/app/aboot/aboot.c#L2710
+0     string     MotoLogo\x00  Motorola bootlogo container
+
 
