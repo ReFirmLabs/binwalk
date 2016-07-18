@@ -728,4 +728,11 @@
 >8    ubeshort   x             \b, width: %u
 >10   ubeshort   x             \b, height: %u
 
+# Motorola UTAGS
+# https://github.com/MotorolaMobilityLLC/kernel-msm/blob/marshmallow-6.0.0-release/drivers/misc/utag/utags.c
+0     string     __UTAG_HEAD__\x00   Motorola UTAGS
+>32   ulelong    x                   \b, size: %u
+>36   ulelong    x                   \b, flags: %x
+>40   ulelong    x                   \b, crc32: %x
+
 
