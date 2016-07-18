@@ -711,4 +711,11 @@
 >4    ulelong    x             \b, version: %u
 >8    ulelong    x             \b, DTB entries: %u
 
+# Nexus BOOTLDR
+# https://github.com/NVISO-BE/nexus_5_bootloader_unpacker
+0     string     BOOTLDR!      Nexus bootloader image
+>8    ulelong    <1            {invalid}
+>8    ulelong    x             \b, num images: %u
+>12   ulelong    x             \b, bootldr size: %u
+
 
