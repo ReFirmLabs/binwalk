@@ -10,6 +10,7 @@ import time
 import inspect
 import argparse
 import traceback
+from copy import copy
 import binwalk.core.statuserver
 import binwalk.core.common
 import binwalk.core.settings
@@ -901,7 +902,7 @@ class Modules(object):
                 if has_key(kwargs, module_argument.name):
                     arg_value = kwargs[module_argument.name]
                 else:
-                    arg_value = module_argument.default
+                    arg_value = copy(module_argument.default)
 
                 setattr(obj, module_argument.name, arg_value)
 
