@@ -718,6 +718,12 @@
 >8    ulelong    x             \b, num images: %u
 >12   ulelong    x             \b, bootldr size: %u
 
+# Nexus IMGDATA
+# https://github.com/bitdomo/imgdata/tree/hammerhead
+0     string     IMGDATA!      Nexus IMGDATA
+>12   ulelong    >100          {invalid}
+>12   ulelong    x             \b, entries: %u
+
 # Motorola bootlogo container
 # https://github.com/grub4android/lk/blob/master-uboot/app/aboot/aboot.c#L2710
 0     string     MotoLogo\x00  Motorola bootlogo container
