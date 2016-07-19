@@ -743,4 +743,14 @@
 >16   ulelong    x             \b, type: %u
 >20   ulelong    x             \b, blocks: %u
 
+# Qualcomm SBL1
+0     string     \xd1\xdc\x4b\x84\x34\x10\xd7\x73      Qualcomm SBL1
+>24   ulelong    x                                     \b, image addr: %x
+>28   ulelong    x                                     \b, image size: %u
+>32   ulelong    x                                     \b, code size: %u
+>40   ulelong    x                                     \b, sig size: %u
+>48   ulelong    x                                     \b, cert chain size: %u
+>52   ulelong    x                                     \b, oem_root_cert_sel: %u
+>56   ulelong    x                                     \b, oem_num_root_certs: %u
+
 
