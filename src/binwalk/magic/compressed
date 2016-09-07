@@ -174,3 +174,6 @@
 0    beshort        0x78da        Zlib compressed data, best compression
 0    beshort        0x785e        Zlib compressed data, compressed
 
+# http://justsolve.archiveteam.org/wiki/LZ4
+0    belong         0x04224D18    LZ4 compressed data
+0    belong         0x02214C18    LZ4 compressed data, legacy
