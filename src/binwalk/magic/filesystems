@@ -1,4 +1,6 @@
 #--------------------File Systems---------------------
+#Iso
+0x8028   string     CDROM                       CDROM ISO filesystem
 
 # Minix filesystems
 0x410   string      \x7f\x13\x00\x00\x00\x00    Minix filesystem, V1, little endian,
@@ -253,7 +255,7 @@
 >28     leshort 3
 >>63    lequad  x       size: %ld bytes,
 >>63    lequad  x       {size:%ld}
->28     leshort >3    
+>28     leshort >3
 >>40    lequad  x       size: %ld bytes,
 >>40    lequad  x       {size:%ld}
 >4      lelong  x       %d inodes,
@@ -277,7 +279,7 @@
 >>40    lequad  x       {jump:%ld}
 
 # Squashfs with LZMA compression
-0       string  sqlz    Squashfs filesystem, big endian, lzma compression, 
+0       string  sqlz    Squashfs filesystem, big endian, lzma compression,
 >28     beshort >10     {invalid}
 >28     beshort <1      {invalid}
 >30     beshort >10     {invalid}
@@ -449,7 +451,7 @@
 >>40    lequad  x       {jump:%ld}
 
 # Non-standard Squashfs signature found on some D-Link routers
-0       string  shsq    Squashfs filesystem, little endian, non-standard signature, 
+0       string  shsq    Squashfs filesystem, little endian, non-standard signature,
 >28     leshort >10     {invalid}
 >28     leshort <1      {invalid}
 >30     leshort >10     {invalid}
