@@ -25,7 +25,7 @@ class Plotter(Module):
                    long='2D',
                    kwargs={'axis' : 2, 'enabled' : True},
                    description='Project data points onto 3D cube walls only'),
-            Option(short='Z',
+            Option(short='V',
                    long='points',
                    type=int,
                    kwargs={'max_points' : 0},
