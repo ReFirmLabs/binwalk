@@ -501,7 +501,7 @@
 >0x43A      leshort         <0              {invalid}invalid state
 >0x43C      leshort         >3              {invalid}invalid error behavior
 >0x43C      leshort         <0              {invalid}invalid error behavior
->0x43C      lelong          >1              {invalid}invalid major revision
+>0x43C      lelong          >4              {invalid}invalid major revision
 >0x43C      lelong          <0              {invalid}invalid major revision
 >0x43C      lelong          x               rev %d
 >0x43E      leshort         x               \b.%d,
