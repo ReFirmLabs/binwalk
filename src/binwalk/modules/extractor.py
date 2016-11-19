@@ -105,6 +105,8 @@ class Extractor(Module):
         # The input file specific output directory path (default to CWD)
         if self.base_directory:
             self.directory = os.path.realpath(self.base_directory)
+            if not os.path.exists(self.directory):
+                os.makedirs(self.directory)
         else:
             self.directory = os.getcwd()
         # Key value pairs of input file path and output extraction path
