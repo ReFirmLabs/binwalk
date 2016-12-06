@@ -1,7 +1,7 @@
 # ----------------------------Archive Formats--------------------------------------
 
 # POSIX tar archives
-257     string      ustar\000   POSIX tar archive
+257     string      ustar\00000   POSIX tar archive
 >8      byte        !0
 >>8     string      x           \b, owner user name: "%.32s"
 >40     byte        !0
