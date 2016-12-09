@@ -23,6 +23,7 @@ class Settings:
     BINWALK_USER_DIR = "binwalk"
     BINWALK_MAGIC_DIR = "magic"
     BINWALK_CONFIG_DIR = "config"
+    BINWALK_MODULES_DIR = "modules"
     BINWALK_PLUGINS_DIR = "plugins"
 
     # File names
@@ -43,6 +44,7 @@ class Settings:
         self.user = common.GenericContainer(binarch=self._user_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE),
                                             magic=self._magic_signature_files(user_only=True),
                                             extract=self._user_path(self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE),
+                                            modules=self._user_path(self.BINWALK_MODULES_DIR),
                                             plugins=self._user_path(self.BINWALK_PLUGINS_DIR))
 
 
