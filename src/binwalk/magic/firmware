@@ -408,8 +408,9 @@
 
 # Sercomm firmware header
 0       string         sErCoMm          Sercomm firmware signature,
->7      leshort        x                version control: %d,
->9      leshort        x                download control: %d,
+>7      uleshort       x                version control: %d,
+>9      uleshort       x                download control: %d,
+>11     byte           0                {invalid}
 >11     string         x                hardware ID: "%s",
 >44     uleshort       x                hardware version: 0x%X,
 >58     uleshort       x                firmware version: 0x%X,
