@@ -448,7 +448,7 @@
 0       string      AIH0        AIH0 firmware header, header size: 48,
 >12     ubelong     0           {invalid}
 >12     ubelong+48  x           {size:%d}
->12     ubelong+48  x           size: %d,
+>12     ubelong     x           data size: %d,
 >8      ubelong     !0          executable code,
 >>8     ubelong&3   !0          {invalid}
 >>8     ubelong     x           load address: 0x%X,
