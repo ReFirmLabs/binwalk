@@ -261,7 +261,17 @@
 #
 # Motorola S-Records, from Gerd Truschinski <gt@freebsd.first.gmd.de>
 # Improved by Martin Sundhaug <martinsundhaug@gmail.com>
-0   regex      (S[0-35-9]([0-9A-F]{4})([0-9A-F]{2})+\n)+          Motorola S-Record; binary data in text format
+0   regex       (S[0-35-9]([0-9A-F]{4})([0-9A-F]{2})+\n)+       Motorola S-Record{many}; binary data in text format, record type:
+>1  string      0                                               header
+>1  string      1                                               data (16-bit)
+>1  string      2                                               data (24-bit)
+>1  string      3                                               data (32-bit)
+>1  string      4                                               reserved
+>1  string      5                                               count (16-bit)
+>1  string      6                                               count (24-bit)
+>1  string      7                                               start address (32-bit)
+>1  string      8                                               start address (24-bit)
+>1  string      9                                               start address (16-bit)
 
 #Windows CE Binary Image Data Format aka B000FF
 #More information on the format:
@@ -756,4 +766,12 @@
 
 
 # Intel HEX
-0   regex      (\:([0-9A-F]{2}){5,}\n)+    Intel HEX
+0   regex       (\:([0-9A-F]{2}){5,}\n)+    Intel HEX data{many}, record type:
+>7  string      00                          data
+>7  string      01                          end of file
+>7  string      02                          extended segment address
+>7  string      03                          start segment address
+>7  string      04                          extended linear address
+>7  string      05                          start linear address
+>7  ubeshort    >0x3035                     unknown {invalid}
+

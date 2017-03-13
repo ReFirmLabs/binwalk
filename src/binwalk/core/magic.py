@@ -210,7 +210,7 @@ class SignatureLine(object):
         elif self.type == 'quad':
             self.fmt = 'q'
             self.size = 8
-        # Assume 4 byte length for all other data types
+        # Assume 4 byte length for all other supported data types
         elif self.type in ['long', 'date']:
             self.fmt = 'i'
             self.size = 4
