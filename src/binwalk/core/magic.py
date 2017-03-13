@@ -211,9 +211,11 @@ class SignatureLine(object):
             self.fmt = 'q'
             self.size = 8
         # Assume 4 byte length for all other data types
-        else:
+        elif self.type in ['long', 'date']:
             self.fmt = 'i'
             self.size = 4
+        else:
+            raise ParserException("Unknown data type '%s' in line '%s'" % (self.type, line))
 
         # The struct module uses the same characters for specifying signed and unsigned data types,
         # except that signed data types are upper case. The above if-else code sets self.fmt to the
