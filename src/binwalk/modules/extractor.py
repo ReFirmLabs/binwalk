@@ -752,14 +752,14 @@ class Extractor(Module):
                 if not binwalk.core.common.DEBUG:
                     tmp = tempfile.TemporaryFile()
 
+                # Generate unique file paths for all paths in the current command that are surrounded by UNIQUE_PATH_DELIMITER
+                while self.UNIQUE_PATH_DELIMITER in cmd:
+                    need_unique_path = cmd.split(self.UNIQUE_PATH_DELIMITER)[1].split(self.UNIQUE_PATH_DELIMITER)[0]
+                    unique_path = binwalk.core.common.unique_file_name(need_unique_path)
+                    cmd = cmd.replace(self.UNIQUE_PATH_DELIMITER + need_unique_path + self.UNIQUE_PATH_DELIMITER, unique_path)
+
                 # Execute.
                 for command in cmd.split("&&"):
-
-                    # Generate unique file paths for all paths in the current command that are surrounded by UNIQUE_PATH_DELIMITER
-                    while self.UNIQUE_PATH_DELIMITER in command:
-                        need_unique_path = command.split(self.UNIQUE_PATH_DELIMITER)[1].split(self.UNIQUE_PATH_DELIMITER)[0]
-                        unique_path = binwalk.core.common.unique_file_name(need_unique_path)
-                        command = command.replace(self.UNIQUE_PATH_DELIMITER + need_unique_path + self.UNIQUE_PATH_DELIMITER, unique_path)
 
                     # Replace all instances of FILE_NAME_PLACEHOLDER in the command with fname
                     command = command.strip().replace(self.FILE_NAME_PLACEHOLDER, fname)
