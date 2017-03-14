@@ -17,6 +17,7 @@ import binwalk.core.settings
 import binwalk.core.plugin
 from threading import Thread
 from binwalk.core.compat import *
+from binwalk.core.exceptions import *
 
 class Option(object):
     '''
@@ -319,6 +320,13 @@ class Module(object):
     def _plugins_pre_scan(self):
         self.plugins.pre_scan_callbacks(self)
 
+    def _plugins_load_file(self, fp):
+        try:
+            self.plugins.load_file_callbacks(fp)
+            return True
+        except IgnoreFileException:
+            return False
+
     def _plugins_new_file(self, fp):
         self.plugins.new_file_callbacks(fp)
 
@@ -398,7 +406,8 @@ class Module(object):
             if not fp:
                 break
             else:
-                if self.config.file_name_filter(fp) == False:
+                if (self.config.file_name_filter(fp) == False or
+                    self._plugins_load_file(fp) == False):
                     fp.close()
                     fp = None
                     continue
@@ -587,13 +596,6 @@ class Status(object):
     def clear(self):
         for (k,v) in iterator(self.kwargs):
             setattr(self, k, v)
-
-class ModuleException(Exception):
-    '''
-    Module exception class.
-    Nothing special here except the name.
-    '''
-    pass
 
 class Modules(object):
     '''
