@@ -1,6 +1,3 @@
-Build Status
-============
-
 [![Build Status](https://travis-ci.org/devttys0/binwalk.png)](https://travis-ci.org/devttys0/binwalk)
 
 Description
