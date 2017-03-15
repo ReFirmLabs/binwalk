@@ -1,1 +1,4 @@
 build/
+.coverage
+*.extracted/
+*.pyc
