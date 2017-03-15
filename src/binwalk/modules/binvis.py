@@ -5,7 +5,9 @@ from binwalk.core.compat import *
 from binwalk.core.common import BlockFile
 from binwalk.core.module import Module, Option, Kwarg
 
+
 class Plotter(Module):
+
     '''
     Base class for visualizing binaries in Qt.
     Other plotter classes are derived from this.
@@ -17,33 +19,34 @@ class Plotter(Module):
     TITLE = "Binary Visualization"
 
     CLI = [
-            Option(short='3',
-                   long='3D',
-                   kwargs={'axis' : 3, 'enabled' : True},
-                   description='Generate a 3D binary visualization'),
-            Option(short='2',
-                   long='2D',
-                   kwargs={'axis' : 2, 'enabled' : True},
-                   description='Project data points onto 3D cube walls only'),
-            Option(short='V',
-                   long='points',
-                   type=int,
-                   kwargs={'max_points' : 0},
-                   description='Set the maximum number of plotted data points'),
-#            Option(short='V',
-#                   long='grids',
-#                   kwargs={'show_grids' : True},
-#                   description='Display the x-y-z grids in the resulting plot'),
+        Option(short='3',
+               long='3D',
+               kwargs={'axis': 3, 'enabled': True},
+               description='Generate a 3D binary visualization'),
+        Option(short='2',
+               long='2D',
+               kwargs={'axis': 2, 'enabled': True},
+               description='Project data points onto 3D cube walls only'),
+        Option(short='V',
+               long='points',
+               type=int,
+               kwargs={'max_points': 0},
+               description='Set the maximum number of plotted data points'),
+        #            Option(short='V',
+        #                   long='grids',
+        #                   kwargs={'show_grids' : True},
+        # description='Display the x-y-z grids in the resulting plot'),
     ]
 
     KWARGS = [
-            Kwarg(name='axis', default=3),
-            Kwarg(name='max_points', default=0),
-            Kwarg(name='show_grids', default=False),
-            Kwarg(name='enabled', default=False),
+        Kwarg(name='axis', default=3),
+        Kwarg(name='max_points', default=0),
+        Kwarg(name='show_grids', default=False),
+        Kwarg(name='enabled', default=False),
     ]
 
-    # There isn't really any useful data to print to console. Disable header and result output.
+    # There isn't really any useful data to print to console. Disable header
+    # and result output.
     HEADER = None
     RESULT = None
 
@@ -64,7 +67,8 @@ class Plotter(Module):
             self.MAX_PLOT_POINTS = self.MAX_3D_PLOT_POINTS
             self._generate_data_point = self._generate_3d_data_point
         else:
-            raise Exception("Invalid Plotter axis specified: %d. Must be one of: [2,3]" % self.axis)
+            raise Exception(
+                "Invalid Plotter axis specified: %d. Must be one of: [2,3]" % self.axis)
 
         if not self.max_points:
             self.max_points = self.MAX_PLOT_POINTS
@@ -106,7 +110,8 @@ class Plotter(Module):
 
             # Go through every data point and how many times that point occurs
             for (point, count) in iterator(data_points):
-                # For each data point, compare it to each remaining weight value
+                # For each data point, compare it to each remaining weight
+                # value
                 for w in get_keys(weightings):
 
                     # If the number of times this data point occurred is >= the weight value,
@@ -119,18 +124,21 @@ class Plotter(Module):
                     else:
                         break
 
-                    # Throw out weight values that exceed the maximum number of data points
+                    # Throw out weight values that exceed the maximum number of
+                    # data points
                     if weightings[w] > self.max_points:
                         del weightings[w]
 
-                # If there's only one weight value left, no sense in continuing the loop...
+                # If there's only one weight value left, no sense in continuing
+                # the loop...
                 if len(weightings) == 1:
                     break
 
             # The least weighted value is our minimum weight
             min_weight = min(weightings)
 
-            # Get rid of all data points that occur less frequently than our minimum weight
+            # Get rid of all data points that occur less frequently than our
+            # minimum weight
             for point in get_keys(data_points):
                 if data_points[point] < min_weight:
                     del data_points[point]
@@ -138,7 +146,8 @@ class Plotter(Module):
         for point in sorted(data_points, key=data_points.get, reverse=True):
             plot_points[point] = data_points[point]
             # Register this as a result in case future modules need access to the raw point information,
-            # but mark plot as False to prevent the entropy module from attempting to overlay this data on its graph.
+            # but mark plot as False to prevent the entropy module from
+            # attempting to overlay this data on its graph.
             self.result(point=point, plot=False)
             total += 1
             if total >= self.max_points:
@@ -154,7 +163,7 @@ class Plotter(Module):
 
         Returns a data point tuple.
         '''
-        return (0,0,0)
+        return (0, 0, 0)
 
     def _generate_data_points(self, fp):
         '''
@@ -178,8 +187,8 @@ class Plotter(Module):
                 break
 
             i = 0
-            while (i+(self.axis-1)) < dlen:
-                point = self._generate_data_point(data[i:i+self.axis])
+            while (i + (self.axis - 1)) < dlen:
+                point = self._generate_data_point(data[i:i + self.axis])
                 if has_key(data_points, point):
                     data_points[point] += 1
                 else:
@@ -208,7 +217,8 @@ class Plotter(Module):
             frequency_percentage = (weight / nitems)
 
             # Give points that occur more frequently a brighter color and larger point size.
-            # Frequency is determined as a percentage of total unique data points.
+            # Frequency is determined as a percentage of total unique data
+            # points.
             if frequency_percentage > .010:
                 size[i] = .20
                 r = 1.0
@@ -227,7 +237,8 @@ class Plotter(Module):
 
             i += 1
 
-        scatter_plot = gl.GLScatterPlotItem(pos=pos, size=size, color=color, pxMode=False)
+        scatter_plot = gl.GLScatterPlotItem(
+            pos=pos, size=size, color=color, pxMode=False)
         scatter_plot.translate(-127.5, -127.5, -127.5)
 
         return scatter_plot
@@ -258,12 +269,14 @@ class Plotter(Module):
         for fd in iter(self.next_file, None):
             data_points = self._generate_data_points(fd)
 
-            self._print("Generating plot points from %d data points" % len(data_points))
+            self._print("Generating plot points from %d data points" %
+                        len(data_points))
 
             self.plot_points = self._generate_plot_points(data_points)
             del data_points
 
-            self._print("Generating graph from %d plot points" % len(self.plot_points))
+            self._print("Generating graph from %d plot points" %
+                        len(self.plot_points))
 
             self.window.addItem(self._generate_plot(self.plot_points))
 
@@ -307,4 +320,3 @@ class Plotter(Module):
     def run(self):
         self.plot()
         return True
-

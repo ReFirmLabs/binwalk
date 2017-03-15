@@ -5,13 +5,13 @@ import binwalk.core.common as common
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg
 
+
 class HexDiff(Module):
 
-
     COLORS = {
-        'red'   : '31',
-        'green' : '32',
-        'blue'  : '34',
+        'red': '31',
+        'green': '32',
+        'blue': '34',
     }
 
     SEPERATORS = ['\\', '/']
@@ -23,34 +23,34 @@ class HexDiff(Module):
     TITLE = "Binary Diffing"
 
     CLI = [
-            Option(short='W',
-                   long='hexdump',
-                   kwargs={'enabled' : True},
-                   description='Perform a hexdump / diff of a file or files'),
-            Option(short='G',
-                   long='green',
-                   kwargs={'show_green' : True},
-                   description='Only show lines containing bytes that are the same among all files'),
-            Option(short='i',
-                   long='red',
-                   kwargs={'show_red' : True},
-                   description='Only show lines containing bytes that are different among all files'),
-            Option(short='U',
-                   long='blue',
-                   kwargs={'show_blue' : True},
-                   description='Only show lines containing bytes that are different among some files'),
-            Option(short='w',
-                   long='terse',
-                   kwargs={'terse' : True},
-                   description='Diff all files, but only display a hex dump of the first file'),
+        Option(short='W',
+               long='hexdump',
+               kwargs={'enabled': True},
+               description='Perform a hexdump / diff of a file or files'),
+        Option(short='G',
+               long='green',
+               kwargs={'show_green': True},
+               description='Only show lines containing bytes that are the same among all files'),
+        Option(short='i',
+               long='red',
+               kwargs={'show_red': True},
+               description='Only show lines containing bytes that are different among all files'),
+        Option(short='U',
+               long='blue',
+               kwargs={'show_blue': True},
+               description='Only show lines containing bytes that are different among some files'),
+        Option(short='w',
+               long='terse',
+               kwargs={'terse': True},
+               description='Diff all files, but only display a hex dump of the first file'),
     ]
 
     KWARGS = [
-            Kwarg(name='show_red', default=False),
-            Kwarg(name='show_blue', default=False),
-            Kwarg(name='show_green', default=False),
-            Kwarg(name='terse', default=False),
-            Kwarg(name='enabled', default=False),
+        Kwarg(name='show_red', default=False),
+        Kwarg(name='show_blue', default=False),
+        Kwarg(name='show_green', default=False),
+        Kwarg(name='terse', default=False),
+        Kwarg(name='enabled', default=False),
     ]
 
     RESULT_FORMAT = "%s\n"
@@ -98,7 +98,7 @@ class HexDiff(Module):
                 except IndexError as e:
                     diff_count += 1
 
-            if diff_count == len(target_data)-1:
+            if diff_count == len(target_data) - 1:
                 color = "red"
             elif diff_count > 0:
                 color = "blue"
@@ -149,7 +149,8 @@ class HexDiff(Module):
                         hexbyte = "XX"
                         asciibyte = "."
                     else:
-                        (hexbyte, asciibyte) = self.hexascii(block_data, block_data[fp][i], i)
+                        (hexbyte, asciibyte) = self.hexascii(
+                            block_data, block_data[fp][i], i)
 
                     hexline += "%s " % hexbyte
                     asciiline += "%s" % asciibyte
@@ -178,11 +179,13 @@ class HexDiff(Module):
             self.status.completed += self.block
 
     def init(self):
-        # To mimic expected behavior, if all options are False, we show everything
+        # To mimic expected behavior, if all options are False, we show
+        # everything
         if not any([self.show_red, self.show_green, self.show_blue]):
             self.show_red = self.show_green = self.show_blue = True
 
-        # Always disable terminal formatting, as it won't work properly with colorized output
+        # Always disable terminal formatting, as it won't work properly with
+        # colorized output
         self.config.display.fit_to_screen = False
 
         # Set the block size (aka, hexdump line size)
@@ -205,7 +208,8 @@ class HexDiff(Module):
             file_count = 1
         else:
             file_count = len(self.hex_target_files)
-        self.HEADER_FORMAT = "OFFSET      " + (("%%-%ds   " % header_width) * file_count) + "\n"
+        self.HEADER_FORMAT = "OFFSET      " + \
+            (("%%-%ds   " % header_width) * file_count) + "\n"
 
         # Build the header argument list
         self.HEADER = [fp.name for fp in self.hex_target_files]
@@ -225,4 +229,3 @@ class HexDiff(Module):
             self.header()
             self.diff_files(self.hex_target_files)
             self.footer()
-

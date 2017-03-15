@@ -7,6 +7,7 @@ import binwalk.core.common
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg
 
+
 class Entropy(Module):
 
     XLABEL = 'Offset'
@@ -31,51 +32,52 @@ class Entropy(Module):
 
     # TODO: Add --dpoints option to set the number of data points?
     CLI = [
-            Option(short='E',
-                   long='entropy',
-                   kwargs={'enabled' : True},
-                   description='Calculate file entropy'),
-            Option(short='F',
-                   long='fast',
-                   kwargs={'use_zlib' : True},
-                   description='Use faster, but less detailed, entropy analysis'),
-            Option(short='J',
-                   long='save',
-                   kwargs={'save_plot' : True},
-                   description='Save plot as a PNG'),
-            Option(short='Q',
-                   long='nlegend',
-                   kwargs={'show_legend' : False},
-                   description='Omit the legend from the entropy plot graph'),
-            Option(short='N',
-                   long='nplot',
-                   kwargs={'do_plot' : False},
-                   description='Do not generate an entropy plot graph'),
-            Option(short='H',
-                   long='high',
-                   type=float,
-                   kwargs={'trigger_high' : DEFAULT_TRIGGER_HIGH},
-                   description='Set the rising edge entropy trigger threshold (default: %.2f)' % DEFAULT_TRIGGER_HIGH),
-            Option(short='L',
-                   long='low',
-                   type=float,
-                   kwargs={'trigger_low' : DEFAULT_TRIGGER_LOW},
-                   description='Set the falling edge entropy trigger threshold (default: %.2f)' % DEFAULT_TRIGGER_LOW),
+        Option(short='E',
+               long='entropy',
+               kwargs={'enabled': True},
+               description='Calculate file entropy'),
+        Option(short='F',
+               long='fast',
+               kwargs={'use_zlib': True},
+               description='Use faster, but less detailed, entropy analysis'),
+        Option(short='J',
+               long='save',
+               kwargs={'save_plot': True},
+               description='Save plot as a PNG'),
+        Option(short='Q',
+               long='nlegend',
+               kwargs={'show_legend': False},
+               description='Omit the legend from the entropy plot graph'),
+        Option(short='N',
+               long='nplot',
+               kwargs={'do_plot': False},
+               description='Do not generate an entropy plot graph'),
+        Option(short='H',
+               long='high',
+               type=float,
+               kwargs={'trigger_high': DEFAULT_TRIGGER_HIGH},
+               description='Set the rising edge entropy trigger threshold (default: %.2f)' % DEFAULT_TRIGGER_HIGH),
+        Option(short='L',
+               long='low',
+               type=float,
+               kwargs={'trigger_low': DEFAULT_TRIGGER_LOW},
+               description='Set the falling edge entropy trigger threshold (default: %.2f)' % DEFAULT_TRIGGER_LOW),
     ]
 
     KWARGS = [
-            Kwarg(name='enabled', default=False),
-            Kwarg(name='save_plot', default=False),
-            Kwarg(name='trigger_high', default=DEFAULT_TRIGGER_HIGH),
-            Kwarg(name='trigger_low', default=DEFAULT_TRIGGER_LOW),
-            Kwarg(name='use_zlib', default=False),
-            Kwarg(name='display_results', default=True),
-            Kwarg(name='do_plot', default=True),
-            Kwarg(name='show_legend', default=True),
-            Kwarg(name='block_size', default=0),
+        Kwarg(name='enabled', default=False),
+        Kwarg(name='save_plot', default=False),
+        Kwarg(name='trigger_high', default=DEFAULT_TRIGGER_HIGH),
+        Kwarg(name='trigger_low', default=DEFAULT_TRIGGER_LOW),
+        Kwarg(name='use_zlib', default=False),
+        Kwarg(name='display_results', default=True),
+        Kwarg(name='do_plot', default=True),
+        Kwarg(name='show_legend', default=True),
+        Kwarg(name='block_size', default=0),
     ]
 
-    # Run this module last so that it can process all other module's results and overlay them on the entropy graph
+    # Run this module last so that it can process all other module's results
+    # and overlay them on the entropy graph
     PRIORITY = 0
 
     def init(self):
@@ -100,9 +102,11 @@ class Entropy(Module):
                     if len(description) > self.max_description_length:
                         self.max_description_length = len(description)
 
-                    self.file_markers[result.file.name].append((result.offset, description))
+                    self.file_markers[result.file.name].append(
+                        (result.offset, description))
 
-        # If other modules have been run and they produced results, don't spam the terminal with entropy results
+        # If other modules have been run and they produced results, don't spam
+        # the terminal with entropy results
         if self.file_markers:
             self.display_results = False
 
@@ -127,7 +131,8 @@ class Entropy(Module):
             try:
                 import pyqtgraph as pg
             except ImportError as e:
-                binwalk.core.common.warning("Failed to import pyqtgraph module, visual entropy graphing will be disabled")
+                binwalk.core.common.warning(
+                    "Failed to import pyqtgraph module, visual entropy graphing will be disabled")
                 self.do_plot = False
 
         for fp in iter(self.next_file, None):
@@ -147,19 +152,23 @@ class Entropy(Module):
             pg.exit()
 
     def calculate_file_entropy(self, fp):
-        # Tracks the last displayed rising/falling edge (0 for falling, 1 for rising, None if nothing has been printed yet)
+        # Tracks the last displayed rising/falling edge (0 for falling, 1 for
+        # rising, None if nothing has been printed yet)
         last_edge = None
-        # Auto-reset the trigger; if True, an entropy above/below self.trigger_high/self.trigger_low will be printed
+        # Auto-reset the trigger; if True, an entropy above/below
+        # self.trigger_high/self.trigger_low will be printed
         trigger_reset = True
 
         # Clear results from any previously analyzed files
         self.clear(results=True)
 
-        # If -K was not specified, calculate the block size to create DEFAULT_DATA_POINTS data points
+        # If -K was not specified, calculate the block size to create
+        # DEFAULT_DATA_POINTS data points
         if self.block_size is None:
             block_size = fp.size / self.DEFAULT_DATA_POINTS
             # Round up to the nearest DEFAULT_BLOCK_SIZE (1024)
-            block_size = int(block_size + ((self.DEFAULT_BLOCK_SIZE - block_size) % self.DEFAULT_BLOCK_SIZE))
+            block_size = int(
+                block_size + ((self.DEFAULT_BLOCK_SIZE - block_size) % self.DEFAULT_BLOCK_SIZE))
         else:
             block_size = self.block_size
 
@@ -167,7 +176,8 @@ class Entropy(Module):
         if block_size <= 0:
             block_size = self.DEFAULT_BLOCK_SIZE
 
-        binwalk.core.common.debug("Entropy block size (%d data points): %d" % (self.DEFAULT_DATA_POINTS, block_size))
+        binwalk.core.common.debug("Entropy block size (%d data points): %d" %
+                                  (self.DEFAULT_DATA_POINTS, block_size))
 
         while True:
             file_offset = fp.tell()
@@ -178,7 +188,7 @@ class Entropy(Module):
 
             i = 0
             while i < dlen:
-                entropy = self.algorithm(data[i:i+block_size])
+                entropy = self.algorithm(data[i:i + block_size])
                 display = self.display_results
                 description = "%f" % entropy
 
@@ -238,8 +248,10 @@ class Entropy(Module):
         Performs an entropy analysis based on zlib compression ratio.
         This is faster than the shannon entropy analysis, but not as accurate.
         '''
-        # Entropy is a simple ratio of: <zlib compressed size> / <original size>
-        e = float(float(len(zlib.compress(str2bytes(data), 9))) / float(len(data)))
+        # Entropy is a simple ratio of: <zlib compressed size> / <original
+        # size>
+        e = float(
+            float(len(zlib.compress(str2bytes(data), 9))) / float(len(data)))
 
         if truncate and e > 1.0:
             e = 1.0
@@ -267,18 +279,19 @@ class Entropy(Module):
 
         # Disable auto-ranging of the Y (entropy) axis, as it
         # can cause some very un-intuitive graphs, particularly
-        #for files with only high-entropy data.
+        # for files with only high-entropy data.
         plt.setYRange(0, 1)
 
         if self.show_legend and has_key(self.file_markers, fname):
-            plt.addLegend(size=(self.max_description_length*10, 0))
+            plt.addLegend(size=(self.max_description_length * 10, 0))
 
             for (offset, description) in self.file_markers[fname]:
                 # If this description has already been plotted at a different offset, we need to
                 # use the same color for the marker, but set the description to None to prevent
                 # duplicate entries in the graph legend.
                 #
-                # Else, get the next color and use it to mark descriptions of this type.
+                # Else, get the next color and use it to mark descriptions of
+                # this type.
                 if has_key(plotted_colors, description):
                     color = plotted_colors[description]
                     description = None
@@ -290,7 +303,8 @@ class Entropy(Module):
                     if i >= len(self.COLORS):
                         i = 0
 
-                plt.plot(x=[offset,offset], y=[0,1.1], name=description, pen=pg.mkPen(color, width=2.5))
+                plt.plot(x=[offset, offset], y=[0, 1.1],
+                         name=description, pen=pg.mkPen(color, width=2.5))
 
         # Plot data points
         plt.plot(x, y, pen='y')
@@ -300,14 +314,15 @@ class Entropy(Module):
             # Save graph to CWD
             out_file = os.path.join(os.getcwd(), os.path.basename(fname))
 
-            # exporters.ImageExporter is different in different versions of pyqtgraph
+            # exporters.ImageExporter is different in different versions of
+            # pyqtgraph
             try:
                 exporter = exporters.ImageExporter(plt.plotItem)
             except TypeError:
                 exporter = exporters.ImageExporter.ImageExporter(plt.plotItem)
             exporter.parameters()['width'] = self.FILE_WIDTH
-            exporter.export(binwalk.core.common.unique_file_name(out_file, self.FILE_FORMAT))
+            exporter.export(
+                binwalk.core.common.unique_file_name(out_file, self.FILE_FORMAT))
         else:
             plt.setLabel('left', self.YLABEL, units=self.YUNITS)
             plt.setLabel('bottom', self.XLABEL, units=self.XUNITS)
-

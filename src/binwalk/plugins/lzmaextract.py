@@ -1,7 +1,9 @@
 import os
 import binwalk.core.plugin
 
+
 class LZMAExtractPlugin(binwalk.core.plugin.Plugin):
+
     '''
     LZMA extractor plugin.
     '''
@@ -11,7 +13,8 @@ class LZMAExtractPlugin(binwalk.core.plugin.Plugin):
         try:
             # lzma package in Python 2.0 decompress() does not handle multiple
             # compressed streams, only first stream is extracted.
-            # backports.lzma package could be used to keep consistent behaviour.
+            # backports.lzma package could be used to keep consistent
+            # behaviour.
             try:
                 import lzma
             except ImportError:

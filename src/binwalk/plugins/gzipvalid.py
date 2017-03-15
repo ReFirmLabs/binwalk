@@ -3,7 +3,9 @@ import binwalk.core.compat
 import binwalk.core.plugin
 from binwalk.core.common import BlockFile
 
+
 class GzipValidPlugin(binwalk.core.plugin.Plugin):
+
     '''
     Validates gzip compressed data. Almost identical to zlibvalid.py.
     '''
@@ -15,7 +17,8 @@ class GzipValidPlugin(binwalk.core.plugin.Plugin):
         # If this result is a gzip signature match, try to decompress the data
         if result.file and result.description.lower().startswith('gzip'):
             # Seek to and read the suspected gzip data
-            fd = self.module.config.open_file(result.file.name, offset=result.offset, length=self.MAX_DATA_SIZE)
+            fd = self.module.config.open_file(
+                result.file.name, offset=result.offset, length=self.MAX_DATA_SIZE)
             data = fd.read(self.MAX_DATA_SIZE)
             fd.close()
 
@@ -40,8 +43,7 @@ class GzipValidPlugin(binwalk.core.plugin.Plugin):
             except zlib.error as e:
                 error = str(e)
                 # Truncated input data results in error -5.
-                # gzip uses different checksums than zlib, which results in error -3.
+                # gzip uses different checksums than zlib, which results in
+                # error -3.
                 if not error.startswith("Error -5") and not error.startswith("Error -3"):
                     result.valid = False
-
-

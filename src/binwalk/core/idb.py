@@ -4,11 +4,14 @@ import io
 import os
 import logging
 
+
 class ShutUpHashlib(logging.Filter):
+
     '''
     This is used to suppress hashlib exception messages
     if using the Python interpreter bundled with IDA.
     '''
+
     def filter(self, record):
         return not record.getMessage().startswith("code for hash")
 
@@ -16,13 +19,15 @@ try:
     import idc
     import idaapi
     LOADED_IN_IDA = True
-    logger = logging.getLogger() 
+    logger = logging.getLogger()
     logger.addFilter(ShutUpHashlib())
 except ImportError:
     LOADED_IN_IDA = False
 
+
 def start_address():
     return idaapi.get_first_seg().startEA
+
 
 def end_address():
     last_ea = idc.BADADDR
@@ -34,7 +39,9 @@ def end_address():
 
     return last_ea
 
+
 class IDBFileIO(io.FileIO):
+
     '''
     A custom class to override binwalk.core.common.Blockfile in order to
     read data directly out of the IDB, rather than reading from the original
@@ -58,7 +65,7 @@ class IDBFileIO(io.FileIO):
 
             if self.args.size == 0:
                 self.args.size = end_address()
-            
+
             if self.args.offset == 0:
                 self.args.offset = start_address()
             elif self.args.offset < 0:
@@ -89,7 +96,7 @@ class IDBFileIO(io.FileIO):
                     if filler_count:
                         data += "\x00" * filler_count
                         filler_count = 0
-                    
+
                     if (self.idb_pos + n) > segment.endEA:
                         read_count = segment.endEA - self.idb_pos
                     else:
@@ -98,7 +105,8 @@ class IDBFileIO(io.FileIO):
                     try:
                         data += idc.GetManyBytes(self.idb_pos, read_count)
                     except TypeError as e:
-                        # This happens when trying to read from uninitialized segments (e.g., .bss)
+                        # This happens when trying to read from uninitialized
+                        # segments (e.g., .bss)
                         data += "\x00" * read_count
 
                     n -= read_count
@@ -116,7 +124,7 @@ class IDBFileIO(io.FileIO):
         else:
             # Don't actually write anything to the IDB, as, IMHO,
             # a binwalk plugin should never do this. But return the
-            # number of bytes we were requested to write so that 
+            # number of bytes we were requested to write so that
             # any callers are happy.
             return len(data)
 
@@ -136,4 +144,3 @@ class IDBFileIO(io.FileIO):
             return super(IDBFileIO, self).tell()
         else:
             return self.idb_pos
-

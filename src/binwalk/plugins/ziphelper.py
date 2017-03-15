@@ -1,6 +1,8 @@
 import binwalk.core.plugin
 
+
 class ZipHelperPlugin(binwalk.core.plugin.Plugin):
+
     '''
     A helper plugin for Zip files to ensure that the Zip archive
     extraction rule is only executed once when the first Zip archive

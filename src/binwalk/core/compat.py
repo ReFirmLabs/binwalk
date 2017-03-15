@@ -9,6 +9,7 @@ PY_MAJOR_VERSION = sys.version_info[0]
 if PY_MAJOR_VERSION > 2:
     string.letters = string.ascii_letters
 
+
 def iterator(dictionary):
     '''
     For cross compatibility between Python 2 and Python 3 dictionaries.
@@ -17,6 +18,7 @@ def iterator(dictionary):
         return dictionary.items()
     else:
         return dictionary.iteritems()
+
 
 def has_key(dictionary, key):
     '''
@@ -27,6 +29,7 @@ def has_key(dictionary, key):
     else:
         return dictionary.has_key(key)
 
+
 def get_keys(dictionary):
     '''
     For cross compatibility between Python 2 and Python 3 dictionaries.
@@ -35,6 +38,7 @@ def get_keys(dictionary):
         return list(dictionary.keys())
     else:
         return dictionary.keys()
+
 
 def str2bytes(string):
     '''
@@ -45,6 +49,7 @@ def str2bytes(string):
     else:
         return string
 
+
 def bytes2str(bs):
     '''
     For cross compatibility between Python 2 and Python 3 strings.
@@ -53,6 +58,7 @@ def bytes2str(bs):
         return bs.decode('latin1')
     else:
         return bs
+
 
 def string_decode(string):
     '''
@@ -63,6 +69,7 @@ def string_decode(string):
     else:
         return string.decode('string_escape')
 
+
 def user_input(prompt=''):
     '''
     For getting raw user input in Python 2 and 3.
@@ -71,4 +78,3 @@ def user_input(prompt=''):
         return input(prompt)
     else:
         return raw_input(prompt)
-

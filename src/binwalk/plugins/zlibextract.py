@@ -4,7 +4,9 @@ import binwalk.core.compat
 import binwalk.core.common
 import binwalk.core.plugin
 
+
 class ZLIBExtractPlugin(binwalk.core.plugin.Plugin):
+
     '''
     Zlib extractor plugin.
     '''
@@ -26,7 +28,8 @@ class ZLIBExtractPlugin(binwalk.core.plugin.Plugin):
             fpin = binwalk.core.common.BlockFile(fname)
             fpout = binwalk.core.common.BlockFile(outfile, 'w')
 
-            plaintext = zlib.decompress(binwalk.core.compat.str2bytes(fpin.read()))
+            plaintext = zlib.decompress(
+                binwalk.core.compat.str2bytes(fpin.read()))
             fpout.write(plaintext)
 
             fpin.close()
@@ -37,4 +40,3 @@ class ZLIBExtractPlugin(binwalk.core.plugin.Plugin):
             return False
 
         return True
-

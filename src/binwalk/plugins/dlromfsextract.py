@@ -7,21 +7,23 @@ try:
 except ImportError as e:
     pass
 
+
 class RomFSCommon(object):
 
     def _read_next_word(self):
-        value = struct.unpack("%sL" % self.endianess, self.data[self.index:self.index+4])[0]
+        value = struct.unpack(
+            "%sL" % self.endianess, self.data[self.index:self.index + 4])[0]
         self.index += 4
         return value
 
     def _read_next_uid(self):
-        uid = int(self.data[self.index:self.index+4])
+        uid = int(self.data[self.index:self.index + 4])
         self.index += 4
         return uid
 
     def _read_next_block(self, size):
         size = int(size)
-        data = self.data[self.index:self.index+size]
+        data = self.data[self.index:self.index + size]
         self.index += size
         return data
 
@@ -41,10 +43,11 @@ class RomFSCommon(object):
                 self.index += 1
         return data
 
+
 class RomFSEntry(RomFSCommon):
 
     DIR_STRUCT_MASK = 0x00000001
-    DATA_MASK       = 0x00000008
+    DATA_MASK = 0x00000008
     COMPRESSED_MASK = 0x005B0000
 
     def __init__(self, data, endianess="<"):
@@ -60,6 +63,7 @@ class RomFSEntry(RomFSCommon):
         self.offset = self._read_next_word()
         self.unknown5 = self._read_next_word()
         self.uid = self._read_next_uid()
+
 
 class RomFSDirStruct(RomFSCommon):
 
@@ -94,16 +98,19 @@ class RomFSDirStruct(RomFSCommon):
             if count == 0:
                 mod = self.SIZE - total_size
             else:
-                mod = self.SIZE - int(total_size - (count*self.SIZE))
+                mod = self.SIZE - int(total_size - (count * self.SIZE))
 
             if mod > 0:
                 remainder = self._read_next_block(mod)
 
             yield (uid, entry)
 
+
 class FileContainer(object):
+
     def __init__(self):
         pass
+
 
 class RomFS(object):
 
@@ -145,7 +152,8 @@ class RomFS(object):
 
         while True:
             try:
-                entry = RomFSEntry(self.data[offset:offset+self.FILE_ENTRY_SIZE], endianess=self.endianess)
+                entry = RomFSEntry(
+                    self.data[offset:offset + self.FILE_ENTRY_SIZE], endianess=self.endianess)
             except ValueError as e:
                 break
 
@@ -160,7 +168,8 @@ class RomFS(object):
 
             if entry.type & entry.DIR_STRUCT_MASK:
                 entries[entry.uid].type = "directory"
-                ds = RomFSDirStruct(self.data[entry.offset:entry.offset+entry.size], endianess=self.endianess)
+                ds = RomFSDirStruct(
+                    self.data[entry.offset:entry.offset + entry.size], endianess=self.endianess)
                 for (uid, name) in ds.ls:
                     if not uid in entries:
                         entries[uid] = FileContainer()
@@ -184,7 +193,9 @@ if __name__ == '__main__':
         print ("Usage: %s <input file> <output directory>" % sys.argv[0])
         sys.exit(1)
 
+
 class DlinkROMFSExtractPlugin(binwalk.core.plugin.Plugin):
+
     '''
     Gzip extractor plugin.
     '''
@@ -193,7 +204,8 @@ class DlinkROMFSExtractPlugin(binwalk.core.plugin.Plugin):
 
     def init(self):
         # If the extractor is enabled for the module we're currently loaded
-        # into, then register self.extractor as a D-Link ROMFS file system extraction rule.
+        # into, then register self.extractor as a D-Link ROMFS file system
+        # extraction rule.
         if self.module.extractor.enabled:
             self.module.extractor.add_rule(txtrule=None,
                                            regex="^d-link romfs filesystem",

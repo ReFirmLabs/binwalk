@@ -17,6 +17,6 @@ from binwalk.modules.extractor import Extractor
 from binwalk.modules.entropy import Entropy
 
 # These are depreciated.
-#from binwalk.modules.binvis import Plotter
-#from binwalk.modules.hashmatch import HashMatch
-#from binwalk.modules.heuristics import HeuristicCompressionAnalyzer
+# from binwalk.modules.binvis import Plotter
+# from binwalk.modules.hashmatch import HashMatch
+# from binwalk.modules.heuristics import HeuristicCompressionAnalyzer

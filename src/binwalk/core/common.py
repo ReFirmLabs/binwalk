@@ -21,9 +21,11 @@ if not __debug__:
 else:
     DEBUG = False
 
+
 def MSWindows():
     # Returns True if running in a Microsoft Windows OS
     return (platform.system() == 'Windows')
+
 
 def debug(msg):
     '''
@@ -33,11 +35,13 @@ def debug(msg):
         sys.stderr.write("DEBUG: " + msg + "\n")
         sys.stderr.flush()
 
+
 def warning(msg):
     '''
     Prints warning messages to stderr
     '''
     sys.stderr.write("\nWARNING: " + msg + "\n")
+
 
 def error(msg):
     '''
@@ -45,14 +49,17 @@ def error(msg):
     '''
     sys.stderr.write("\nERROR: " + msg + "\n")
 
+
 def get_module_path():
     root = __file__
     if os.path.islink(root):
         root = os.path.realpath(root)
     return os.path.dirname(os.path.dirname(os.path.abspath(root)))
 
+
 def get_libs_path():
     return os.path.join(get_module_path(), "libs")
+
 
 def file_md5(file_name):
     '''
@@ -65,10 +72,11 @@ def file_md5(file_name):
     md5 = hashlib.md5()
 
     with open(file_name, 'rb') as f:
-        for chunk in iter(lambda: f.read(128*md5.block_size), b''):
+        for chunk in iter(lambda: f.read(128 * md5.block_size), b''):
             md5.update(chunk)
 
     return md5.hexdigest()
+
 
 def file_size(filename):
     '''
@@ -85,9 +93,11 @@ def file_size(filename):
     except KeyboardInterrupt as e:
         raise e
     except Exception as e:
-        raise Exception("file_size failed to obtain the size of '%s': %s" % (filename, str(e)))
+        raise Exception(
+            "file_size failed to obtain the size of '%s': %s" % (filename, str(e)))
     finally:
         os.close(fd)
+
 
 def strip_quoted_strings(string):
     '''
@@ -101,8 +111,10 @@ def strip_quoted_strings(string):
     # Note that this removes everything in between the first and last double quote.
     # This is intentional, as printed (and quoted) strings from a target file may contain
     # double quotes, and this function should ignore those. However, it also means that any
-    # data between two quoted strings (ex: '"quote 1" you won't see me "quote 2"') will also be stripped.
+    # data between two quoted strings (ex: '"quote 1" you won't see me "quote
+    # 2"') will also be stripped.
     return re.sub(r'\"(.*)\"', "", string)
+
 
 def get_quoted_strings(string):
     '''
@@ -118,12 +130,14 @@ def get_quoted_strings(string):
         # Note that this gets everything in between the first and last double quote.
         # This is intentional, as printed (and quoted) strings from a target file may contain
         # double quotes, and this function should ignore those. However, it also means that any
-        # data between two quoted strings (ex: '"quote 1" non-quoted data "quote 2"') will also be included.
+        # data between two quoted strings (ex: '"quote 1" non-quoted data
+        # "quote 2"') will also be included.
         return re.findall(r'\"(.*)\"', string)[0]
     except KeyboardInterrupt as e:
         raise e
     except Exception:
         return ''
+
 
 def unique_file_name(base_name, extension=''):
     '''
@@ -146,6 +160,7 @@ def unique_file_name(base_name, extension=''):
         idcount += 1
 
     return fname
+
 
 def strings(filename, minimum=4):
     '''
@@ -174,13 +189,16 @@ def strings(filename, minimum=4):
                 else:
                     result = ""
 
+
 class GenericContainer(object):
 
     def __init__(self, **kwargs):
-        for (k,v) in iterator(kwargs):
+        for (k, v) in iterator(kwargs):
             setattr(self, k, v)
 
+
 class MathExpression(object):
+
     '''
     Class for safely evaluating mathematical expressions from a string.
     Stolen from: http://stackoverflow.com/questions/2371436/evaluating-a-mathematical-expression-in-a-string
@@ -213,22 +231,25 @@ class MathExpression(object):
         return self._eval(ast.parse(expr).body[0].value)
 
     def _eval(self, node):
-        if isinstance(node, ast.Num): # <number>
+        if isinstance(node, ast.Num):  # <number>
             return node.n
-        elif isinstance(node, ast.operator): # <operator>
+        elif isinstance(node, ast.operator):  # <operator>
             return self.OPERATORS[type(node.op)]
         elif isinstance(node, ast.UnaryOp):
             return self.OPERATORS[type(node.op)](0, self._eval(node.operand))
-        elif isinstance(node, ast.BinOp): # <left> <operator> <right>
+        elif isinstance(node, ast.BinOp):  # <left> <operator> <right>
             return self.OPERATORS[type(node.op)](self._eval(node.left), self._eval(node.right))
         else:
             raise TypeError(node)
 
+
 class StringFile(object):
+
     '''
     A class to allow access to strings as if they were read from a file.
     Used internally as a conditional superclass to InternalBlockFile.
     '''
+
     def __init__(self, fname, mode='r'):
         self.string = fname
         self.name = "String"
@@ -238,7 +259,7 @@ class StringFile(object):
         if n == -1:
             data = self.string[self.total_read:]
         else:
-            data = self.string[self.total_read:self.total_read+n]
+            data = self.string[self.total_read:self.total_read + n]
         return data
 
     def tell(self):
@@ -253,10 +274,12 @@ class StringFile(object):
     def close(self):
         pass
 
+
 def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
 
     # Defining a class inside a function allows it to be dynamically subclassed
     class InternalBlockFile(subclass):
+
         '''
         Abstraction class for accessing binary files.
 
@@ -289,7 +312,8 @@ def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
         DEFAULT_BLOCK_PEEK_SIZE = 8 * 1024
 
         # Max number of bytes to process at one time. This needs to be large enough to
-        # limit disk I/O, but small enough to limit the size of processed data blocks.
+        # limit disk I/O, but small enough to limit the size of processed data
+        # blocks.
         DEFAULT_BLOCK_READ_SIZE = 1 * 1024 * 1024
 
         def __init__(self, fname, mode='r', length=0, offset=0, block=DEFAULT_BLOCK_READ_SIZE, peek=DEFAULT_BLOCK_PEEK_SIZE, swap=0):
@@ -310,7 +334,8 @@ def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
             self.block_read_size = self.DEFAULT_BLOCK_READ_SIZE
             self.block_peek_size = self.DEFAULT_BLOCK_PEEK_SIZE
 
-            # This is so that custom parent classes can access/modify arguments as necessary
+            # This is so that custom parent classes can access/modify arguments
+            # as necessary
             self.args = GenericContainer(fname=fname,
                                          mode=mode,
                                          length=length,
@@ -390,7 +415,7 @@ def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
 
             if self.swap_size > 0:
                 while i < len(block):
-                    data += block[i:i+self.swap_size][::-1]
+                    data += block[i:i + self.swap_size][::-1]
                     i += self.swap_size
             else:
                 data = block
@@ -398,7 +423,8 @@ def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
             return data
 
         def reset(self):
-            self.set_block_size(block=self.base_block_size, peek=self.base_peek_size)
+            self.set_block_size(
+                block=self.base_block_size, peek=self.base_peek_size)
             self.seek(self.offset)
 
         def set_block_size(self, block=None, peek=None):
@@ -444,7 +470,7 @@ def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
                     n = self.length - self.total_read
 
                 while n < 0 or l < n:
-                    tmp = super(self.__class__, self).read(n-l)
+                    tmp = super(self.__class__, self).read(n - l)
                     if tmp:
                         data += tmp
                         l += len(tmp)
@@ -487,4 +513,3 @@ def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
             return (data, dlen)
 
     return InternalBlockFile(fname, mode=mode, **kwargs)
-

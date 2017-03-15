@@ -2,6 +2,7 @@ import idc
 import idaapi
 import binwalk
 
+
 class binwalk_t(idaapi.plugin_t):
     flags = 0
     comment = "Scan the current IDB for file signatures"
@@ -10,8 +11,10 @@ class binwalk_t(idaapi.plugin_t):
     wanted_hotkey = ""
 
     def init(self):
-        self.menu_context_1 = idaapi.add_menu_item("Search/", "binwalk opcodes", "", 0, self.opcode_scan, (None,))
-        self.menu_context_2 = idaapi.add_menu_item("Search/", "binwalk signatures", "", 0, self.signature_scan, (None,))
+        self.menu_context_1 = idaapi.add_menu_item(
+            "Search/", "binwalk opcodes", "", 0, self.opcode_scan, (None,))
+        self.menu_context_2 = idaapi.add_menu_item(
+            "Search/", "binwalk signatures", "", 0, self.signature_scan, (None,))
         return idaapi.PLUGIN_KEEP
 
     def term(self):
@@ -28,6 +31,6 @@ class binwalk_t(idaapi.plugin_t):
     def opcode_scan(self, arg):
         binwalk.scan(idc.GetIdbPath(), opcode=True)
 
+
 def PLUGIN_ENTRY():
     return binwalk_t()
-

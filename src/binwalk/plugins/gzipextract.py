@@ -2,7 +2,9 @@ import os
 import gzip
 import binwalk.core.plugin
 
+
 class GzipExtractPlugin(binwalk.core.plugin.Plugin):
+
     '''
     Gzip extractor plugin.
     '''

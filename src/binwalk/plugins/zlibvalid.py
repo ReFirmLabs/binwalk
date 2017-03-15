@@ -3,7 +3,9 @@ import binwalk.core.compat
 import binwalk.core.plugin
 from binwalk.core.common import BlockFile
 
+
 class ZlibValidPlugin(binwalk.core.plugin.Plugin):
+
     '''
     Validates zlib compressed data.
     '''
@@ -40,4 +42,3 @@ class ZlibValidPlugin(binwalk.core.plugin.Plugin):
                 # Error -5, incomplete or truncated data input
                 if not str(e).startswith("Error -5"):
                     result.valid = False
-
