@@ -79,9 +79,3 @@
 
 0       string      \x00\x53\x46\x48                                    OSX DMG image
 >0x38   string      !d\x00i\x00s\x00k\x00\x20\x00i\x00m\x00a\x00g\x00e  invalid{invalid)
-
-0   string      FWS                 Uncompressed Adobe Flash SWF file,
->3  byte        0                   {invalid}
->3  byte        x                   Version %d,
->4  ulelong     0                   {invalid}
->4  ulelong     x                   File size (header included) %d
