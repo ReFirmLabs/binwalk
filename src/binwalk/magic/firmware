@@ -290,7 +290,7 @@
 0    string    B000FF    Windows CE image header,
 >7   ulelong   x         image start: 0x%X,
 >11  ulelong   x         image length: %d
-
+>11  ulelong   x         {size:%d}
 
 #Windows CE RomImage
 63    string    \x00ECEC     Windows CE memory segment header,
