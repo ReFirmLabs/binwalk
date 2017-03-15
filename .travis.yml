@@ -1,0 +1,18 @@
+language: python
+python:
+ - "2.7"
+ - "3.3"
+ - "3.4"
+ - "3.5"
+ - "3.6"
+ - "nightly"
+ - "pypy"
+ - "pypy3"
+install:
+ - pip install coverage
+ - ./setup.py install
+script: ./setup.py test
+cache: pip
+matrix:
+  allow_failures:
+   - python: nightly
