@@ -10,10 +10,34 @@ fi
 
 set -o nounset
 
+if ! which lsb_release > /dev/null
+then
+    function lsb_release {
+        if [ -f /etc/lsb-release ]
+        then
+            cat /etc/lsb-release | grep DISTRIB_ID | cut -d= -f 2
+        else
+            echo Unknown
+        fi
+    }
+fi
+
+if [ $YES -eq 0 ]
+then
+    distro="${1:-$(lsb_release -i|cut -f 2)}"
+else
+    distro="${2:-$(lsb_release -i|cut -f 2)}"
+fi
 REQUIRED_UTILS="wget tar python"
-APTCMD="apt-get"
+APTCMD="apt"
+APTGETCMD="apt-get"
 YUMCMD="yum"
-APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord"
+if [ distro = "Kali" ]
+then
+    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract util-linux firmware-mod-kit cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop"
+else
+    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord"
+fi
 PYTHON2_APT_CANDIDATES="python-crypto python-lzo python-lzma python-pip python-opengl python-qt4 python-qt4-gl python-numpy python-scipy"
 PYTHON3_APT_CANDIDATES="python3-crypto python3-pip python3-opengl python3-pyqt4 python3-pyqt4.qtopengl python3-numpy python3-scipy"
 PYTHON3_YUM_CANDIDATES=""
@@ -107,6 +131,13 @@ then
     echo "         This script requires internet access."
     echo "         This script requires root privileges."
     echo ""
+    if [ $distro != Unknown ]
+    then
+        echo "         $distro detected"
+    else
+        echo "WARNING: Distro not detected, using package-manager defaults"
+    fi
+    echo ""
     echo -n "Continue [y/N]? "
     read YN
     if [ "$(echo "$YN" | grep -i -e 'y' -e 'yes')" == "" ]
@@ -114,6 +145,11 @@ then
         echo "Quitting..."
         exit 1
     fi
+elif [ $distro != Unknown ]
+then
+     echo "$distro detected"
+else
+    echo "WARNING: Distro not detected, using package-manager defaults"
 fi
 
 # Check to make sure we have all the required utilities installed
@@ -131,21 +167,38 @@ done
 find_path $APTCMD
 if [ $? -eq 1 ]
 then
-    find_path $YUMCMD
+    find_path $APTGETCMD
     if [ $? -eq 1 ]
     then
-        NEEDED_UTILS="$NEEDED_UTILS $APTCMD/$YUMCMD"
+        find_path $YUMCMD
+        if [ $? -eq 1 ]
+        then
+            NEEDED_UTILS="$NEEDED_UTILS $APTCMD/$APTGETCMD/$YUMCMD"
+        else
+            PKGCMD="$YUMCMD"
+            PKGCMD_OPTS="-y install"
+            PKG_CANDIDATES="$YUM_CANDIDATES"
+            PKG_PYTHON3_CANDIDATES="$PYTHON3_YUM_CANDIDATES"
+        fi
     else
-        PKGCMD="$YUMCMD"
-        PKGCMD_OPTS="-y install"
-        PKG_CANDIDATES="$YUM_CANDIDATES"
-        PKG_PYTHON3_CANDIDATES="$PYTHON3_YUM_CANDIDATES"
+        PKGCMD="$APTGETCMD"
+        PKGCMD_OPTS="install -y"
+        PKG_CANDIDATES="$APT_CANDIDATES"
+        PKG_PYTHON3_CANDIDATES="$PYTHON3_APT_CANDIDATES"
     fi
 else
-    PKGCMD="$APTCMD"
-    PKGCMD_OPTS="install -y"
-    PKG_CANDIDATES="$APT_CANDIDATES"
-    PKG_PYTHON3_CANDIDATES="$PYTHON3_APT_CANDIDATES"
+    if "$APTCMD" install -s -y dpkg > /dev/null
+    then
+        PKGCMD="$APTCMD"
+        PKGCMD_OPTS="install -y"
+        PKG_CANDIDATES="$APT_CANDIDATES"
+        PKG_PYTHON3_CANDIDATES="$PYTHON3_APT_CANDIDATES"
+    else
+        PKGCMD="$APTGETCMD"
+        PKGCMD_OPTS="install -y"
+        PKG_CANDIDATES="$APT_CANDIDATES"
+        PKG_PYTHON3_CANDIDATES="$PYTHON3_APT_CANDIDATES"
+    fi
 fi
 
 if [ "$NEEDED_UTILS" != "" ]
