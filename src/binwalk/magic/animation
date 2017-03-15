@@ -20,4 +20,4 @@
 >3  byte        x                   Version %d,
 >4  ulelong     0                   {invalid}
 >4  ulelong     x                   File size (header included) %d
-
+>4  ulelong     x                   {size:%d}
