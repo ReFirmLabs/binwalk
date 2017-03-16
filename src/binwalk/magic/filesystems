@@ -73,7 +73,10 @@
 # MPFS file system
 0       string      MPFS     MPFS filesystem, Microchop,
 >4      byte        <0       {invalid}
+>4      byte        >10      {invalid}
 >5      byte        <0       {invalid}
+>4      byte        0
+>>5     byte        0        {invalid}
 >4      byte        x        version %d.
 >5      byte        x        \b%d,
 >6      leshort     <0       {invalid}
@@ -81,33 +84,35 @@
 
 # cramfs filesystem - russell@coker.com.au
 0       lelong      0x28cd3d45      CramFS filesystem, little endian,
->4      lelong      <0              invalid size,{invalid}
+>4      lelong      <1              invalid size,{invalid}
 >4      lelong      >1073741824     invalid size,{invalid}
->4      ulelong     x               size: %u
->8      lelong      &1              version 2
->8      lelong      &2              sorted_dirs
->8      lelong      &4              hole_support
+>4      ulelong     x               size: %u,
+>8      lelong      &1              version 2,
+>8      lelong      &2              sorted_dirs,
+>8      lelong      &4              hole_support,
+>32     ulelong     0               invalid{invalid}
 >32     ulelong     x               CRC 0x%.8X,
 >36     ulelong     x               edition %u,
 >40     lelong      <0              invalid blocks,{invalid}
 >40     ulelong     x               %u blocks,
->44     lelong      <0              invalid file count,{invalid}
+>44     lelong      <1              invalid file count,{invalid}
 >44     ulelong     x               %u files
 >4      ulelong     x               {jump:%u}
 >4      ulelong     x               {size:%u}
 
 0       belong      0x28cd3d45      CramFS filesystem, big endian
->4      belong      <0              {invalid}
+>4      belong      <1              {invalid}
 >4      belong      >1073741824     {invalid}
->4      belong      x               size %u
->8      belong      &1              version 2
->8      belong      &2              sorted_dirs
->8      belong      &4              hole_support
+>4      belong      x               size %u,
+>8      belong      &1              version 2,
+>8      belong      &2              sorted_dirs,
+>8      belong      &4              hole_support,
+>32     ubelong     0               invalid{invalid}
 >32     ubelong     x               CRC 0x%.8X,
 >36     belong      x               edition %u,
->40     belong      <0              {invalid}
+>40     belong      <0              invalid blocks,{invalid}
 >40     ubelong     x               %u blocks,
->44     belong      <0              {invalid}
+>44     belong      <1              invalid file count,{invalid}
 >44     ubelong     x               %u files
 >4      ubelong     x               {jump:%u}
 >4      ubelong     x               {size:%u}

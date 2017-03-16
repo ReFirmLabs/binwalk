@@ -82,6 +82,11 @@ class Extractor(Module):
                type=int,
                kwargs={'max_count': 0},
                description='Limit the number of extracted files'),
+        #Option(short='u',
+        #       long='limit',
+        #       type=int,
+        #       kwargs={'recursive_max_size': 0},
+        #       description="Limit the total size of all extracted files"),
         Option(short='r',
                long='rm',
                kwargs={'remove_after_execute': True},
@@ -94,6 +99,7 @@ class Extractor(Module):
 
     KWARGS = [
         Kwarg(name='max_size', default=None),
+        Kwarg(name='recursive_max_size', default=None),
         Kwarg(name='max_count', default=None),
         Kwarg(name='base_directory', default=None),
         Kwarg(name='remove_after_execute', default=False),
