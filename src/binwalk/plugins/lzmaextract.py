@@ -23,16 +23,18 @@ class LZMAExtractPlugin(binwalk.core.plugin.Plugin):
             self.decompressor = lzma.decompress
 
             # If the extractor is enabled for the module we're currently loaded
-            # into, then register self.extractor as a zlib extraction rule.
+            # into, then register self.extractor as an lzma extraction rule.
             if self.module.extractor.enabled:
                 self.module.extractor.add_rule(txtrule=None,
                                                regex="^lzma compressed data",
                                                extension="7z",
-                                               cmd=self.extractor)
+                                               cmd=self.extractor,
+                                               prepend=True)
                 self.module.extractor.add_rule(txtrule=None,
                                                regex="^xz compressed data",
                                                extension="xz",
-                                               cmd=self.extractor)
+                                               cmd=self.extractor,
+                                               prepend=True)
         except ImportError as e:
             pass
 

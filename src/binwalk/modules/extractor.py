@@ -275,7 +275,18 @@ class Extractor(Module):
     def append_rule(self, r):
         self.extract_rules.append(r.copy())
 
-    def add_rule(self, txtrule=None, regex=None, extension=None, cmd=None, codes=[0, None], recurse=True):
+    def prepend_rule(self, r):
+        self.extract_rules = [r] + self.extract_rules
+
+    def add_rule(self, txtrule=None, regex=None, extension=None, cmd=None, codes=[0, None], recurse=True, prepend=False):
+        rules = self.create_rule(txtrule, regex, extension, cmd, codes, recurse)
+        for r in rules:
+            if prepend:
+                self.prepend_rule(r)
+            else:
+                self.append_rule(r)
+
+    def create_rule(self, txtrule=None, regex=None, extension=None, cmd=None, codes=[0, None], recurse=True):
         '''
         Adds a set of rules to the extraction rule list.
 
@@ -290,6 +301,7 @@ class Extractor(Module):
         Returns None.
         '''
         rules = []
+        created_rules = []
         match = False
         r = {
             'extension': '',
@@ -306,8 +318,7 @@ class Extractor(Module):
             if cmd:
                 r['cmd'] = cmd
 
-            self.append_rule(r)
-            return
+            return [r]
 
         # Process rule string, or list of rule strings
         if not isinstance(txtrule, type([])):
@@ -334,7 +345,9 @@ class Extractor(Module):
 
             # Verify that the match string was retrieved.
             if match:
-                self.append_rule(r)
+                created_rules.append(r)
+
+        return created_rules
 
     def remove_rules(self, description):
         '''
@@ -553,8 +566,7 @@ class Extractor(Module):
         if not rules:
             return (None, None, False)
         else:
-            binwalk.core.common.debug(
-                "Found %d matching extraction rules" % len(rules))
+            binwalk.core.common.debug("Found %d matching extraction rules" % len(rules))
 
         # Generate the output directory name where extracted files will be
         # stored
@@ -579,8 +591,7 @@ class Extractor(Module):
                     recurse = True
 
                 # Copy out the data to disk, if we haven't already
-                fname = self._dd(
-                    file_path, offset, size, rule['extension'], output_file_name=name)
+                fname = self._dd(file_path, offset, size, rule['extension'], output_file_name=name)
 
                 # If there was a command specified for this rule, try to execute it.
                 # If execution fails, the next rule will be attempted.
@@ -595,8 +606,7 @@ class Extractor(Module):
 
                     # Execute the specified command against the extracted file
                     if self.run_extractors:
-                        extract_ok = self.execute(
-                            rule['cmd'], fname, rule['codes'])
+                        extract_ok = self.execute(rule['cmd'], fname, rule['codes'])
                     else:
                         extract_ok = True
 
@@ -665,12 +675,22 @@ class Extractor(Module):
         Returns None if no match is found.
         '''
         rules = []
+        ordered_rules = []
         description = description.lower()
 
         for rule in self.extract_rules:
             if rule['regex'].search(description):
                 rules.append(rule)
-        return rules
+
+        # Plugin rules should take precedence over external extraction commands.
+        for rule in rules:
+            if callable(rule['cmd']):
+                ordered_rules.append(rule)
+        for rule in rules:
+            if not callable(rule['cmd']):
+                ordered_rules.append(rule)
+
+        return ordered_rules
 
     def _parse_rule(self, rule):
         '''
