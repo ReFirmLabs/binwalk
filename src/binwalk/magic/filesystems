@@ -590,8 +590,9 @@
 >>4     lelong&0x100        0x100           mode 3
 >4      lelong&0xFFFFFF00   !0              unknown mode {invalid}
 
-18    string            WDK\x202.0\x00    WDK file system, version 2.0
->4    bedate            !0                Last-Modified %s GMT
+18      string            WDK\x202.0\x00    WDK file system, version 2.0,
+>11     byte              !0                %d files,
+>4      bedate            !0                Last modified %s GMT
 
 32769   string        CD001                                         ISO
 >6144   string        !NSR0                                         9660 CD-ROM filesystem data,
