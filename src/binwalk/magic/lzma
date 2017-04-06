@@ -21,7 +21,7 @@
 ## This could technically be valid, but is unlikely.
 #>5        lequad    !-1
 #>>5        lequad    <32        {invalid}
-#>>5        lequad    >0x40000000    {invalid}
+##>>5        lequad    >0x40000000    {invalid}
 #
 ## These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 ## Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -71,7 +71,7 @@
 ## This could technically be valid, but is unlikely.
 #>5        lequad    !-1
 #>>5        lequad    <32        {invalid}
-#>>5        lequad    >0x40000000    {invalid}
+##>>5        lequad    >0x40000000    {invalid}
 #
 ## These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 ## Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -121,7 +121,7 @@
 ## This could technically be valid, but is unlikely.
 #>5        lequad    !-1
 #>>5        lequad    <32        {invalid}
-#>>5        lequad    >0x40000000    {invalid}
+##>>5        lequad    >0x40000000    {invalid}
 #
 ## These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 ## Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -171,7 +171,7 @@
 ## This could technically be valid, but is unlikely.
 #>5        lequad    !-1
 #>>5        lequad    <32        {invalid}
-#>>5        lequad    >0x40000000    {invalid}
+##>>5        lequad    >0x40000000    {invalid}
 #
 ## These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 ## Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -221,7 +221,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -271,7 +271,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -321,7 +321,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -371,7 +371,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -421,7 +421,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -471,7 +471,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -521,7 +521,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -571,7 +571,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -621,7 +621,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -671,7 +671,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -721,7 +721,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -771,7 +771,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -821,7 +821,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -871,7 +871,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -921,7 +921,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -971,7 +971,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1021,7 +1021,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1071,7 +1071,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1121,7 +1121,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1171,7 +1171,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1221,7 +1221,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1271,7 +1271,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1321,7 +1321,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1371,7 +1371,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1421,7 +1421,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1471,7 +1471,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1521,7 +1521,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1571,7 +1571,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1621,7 +1621,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1671,7 +1671,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1721,7 +1721,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1771,7 +1771,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1821,7 +1821,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1871,7 +1871,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1921,7 +1921,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -1971,7 +1971,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -2021,7 +2021,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -2071,7 +2071,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -2121,7 +2121,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -2171,7 +2171,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -2221,7 +2221,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -2271,7 +2271,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -2321,7 +2321,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -2371,7 +2371,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -2421,7 +2421,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),
@@ -2471,7 +2471,7 @@
 # This could technically be valid, but is unlikely.
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad    >0x40000000    {invalid}
+#>>5        lequad    >0x40000000    {invalid}
 
 # These are not 100%. The uncompressed size could be exactly the same as the dicionary size, but it is unlikely.
 # Since most false positives are the result of repeating sequences of bytes (such as executable instructions),

@@ -169,8 +169,14 @@
 
 0    string    \xff\x06\x00\x00\x73\x4e\x61\x50\x70\x59    Snappy compression, stream identifier
 
+# KGB Archiver http://www.garykessler.net/library/file_sigs.html
+0    string    \x4B\x47\x42\x5F\x61\x72\x63\x68\x20\x2D    KGB archive
+
 #0    beshort        0x7801        Zlib header, no compression
 0    beshort        0x789c        Zlib compressed data, default compression
 0    beshort        0x78da        Zlib compressed data, best compression
 0    beshort        0x785e        Zlib compressed data, compressed
 
+# http://justsolve.archiveteam.org/wiki/LZ4
+0    belong         0x04224D18    LZ4 compressed data
+0    belong         0x02214C18    LZ4 compressed data, legacy

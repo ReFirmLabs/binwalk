@@ -20,9 +20,10 @@ class Settings:
     VERSION = "2.1.2b"
 
     # Sub directories
-    BINWALK_USER_DIR = ".binwalk"
+    BINWALK_USER_DIR = "binwalk"
     BINWALK_MAGIC_DIR = "magic"
     BINWALK_CONFIG_DIR = "config"
+    BINWALK_MODULES_DIR = "modules"
     BINWALK_PLUGINS_DIR = "plugins"
 
     # File names
@@ -35,7 +36,7 @@ class Settings:
         Class constructor. Enumerates file paths and populates self.paths.
         '''
         # Path to the user binwalk directory
-        self.user_dir = self._get_user_dir()
+        self.user_dir = self._get_user_config_dir()
         # Path to the system wide binwalk directory
         self.system_dir = common.get_module_path()
 
@@ -43,6 +44,7 @@ class Settings:
         self.user = common.GenericContainer(binarch=self._user_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE),
                                             magic=self._magic_signature_files(user_only=True),
                                             extract=self._user_path(self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE),
+                                            modules=self._user_path(self.BINWALK_MODULES_DIR),
                                             plugins=self._user_path(self.BINWALK_PLUGINS_DIR))
 
 
@@ -65,12 +67,16 @@ class Settings:
         user_binarch = self._user_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
         system_binarch = self._system_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
 
+        def list_files(dir_path):
+            # Ignore hidden dotfiles.
+            return [os.path.join(dir_path, x) for x in os.listdir(dir_path) if not x.startswith('.')]
+
         if not system_only:
             user_dir = os.path.join(self.user_dir, self.BINWALK_USER_DIR, self.BINWALK_MAGIC_DIR)
-            files += [os.path.join(user_dir, x) for x in os.listdir(user_dir)]
+            files += list_files(user_dir)
         if not user_only:
             system_dir = os.path.join(self.system_dir, self.BINWALK_MAGIC_DIR)
-            files += [os.path.join(system_dir, x) for x in os.listdir(system_dir)]
+            files += list_files(system_dir)
 
         # Don't include binarch signatures in the default list of signature files.
         # It is specifically loaded when -A is specified on the command line.
@@ -106,6 +112,16 @@ class Settings:
                 loc = fpath
 
         return fpath
+
+    def _get_user_config_dir(self):
+        try:
+            xdg_path = os.getenv('XDG_CONFIG_HOME')
+            if xdg_path is not None:
+                return xdg_path
+        except Exception:
+            pass
+
+        return os.path.join(self._get_user_dir(), '.config')
 
     def _get_user_dir(self):
         '''

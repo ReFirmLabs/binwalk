@@ -10,6 +10,7 @@ import time
 import inspect
 import argparse
 import traceback
+from copy import copy
 import binwalk.core.statuserver
 import binwalk.core.common
 import binwalk.core.settings
@@ -672,6 +673,24 @@ class Modules(object):
             if inspect.isclass(module) and hasattr(module, attribute):
                 modules[module] = module.PRIORITY
 
+        # user-defined modules
+        import imp
+        user_modules = binwalk.core.settings.Settings().user.modules
+        for file_name in os.listdir(user_modules):
+            if not file_name.endswith('.py'):
+                continue
+            module_name = file_name[:-3]
+            try:
+                user_module = imp.load_source(module_name, os.path.join(user_modules, file_name))
+            except KeyboardInterrupt as e:
+                raise e
+            except Exception as e:
+                binwalk.core.common.warning("Error loading module '%s': %s" % (file_name, str(e)))
+
+            for (name, module) in inspect.getmembers(user_module):
+                if inspect.isclass(module) and hasattr(module, attribute):
+                    modules[module] = module.PRIORITY
+
         return sorted(modules, key=modules.get, reverse=True)
 
     def help(self):
@@ -901,7 +920,7 @@ class Modules(object):
                 if has_key(kwargs, module_argument.name):
                     arg_value = kwargs[module_argument.name]
                 else:
-                    arg_value = module_argument.default
+                    arg_value = copy(module_argument.default)
 
                 setattr(obj, module_argument.name, arg_value)
 

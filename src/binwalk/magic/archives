@@ -1,7 +1,7 @@
 # ----------------------------Archive Formats--------------------------------------
 
 # POSIX tar archives
-257     string      ustar\000   POSIX tar archive
+257     string      ustar\00000   POSIX tar archive
 >8      byte        !0
 >>8     string      x           \b, owner user name: "%.32s"
 >40     byte        !0
@@ -48,7 +48,8 @@
 >30     string      x               name: {string}%s
 
 # ZIP footer
-0       string      PK\x05\x06      End of Zip archive
+0       string      PK\x05\x06      End of Zip archive,
+>20     leshort+22  x               footer length: %d
 >20     leshort     >0
 >>20    leshort     x               \b, comment:
 >>20    leshort     x               {strlen:%d}

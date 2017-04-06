@@ -701,4 +701,62 @@
 >20   ulelong    x             \b, ramdisk addr: 0x%X
 >48   string     x             \b, product name: "%s"
 
+# DTB
+# http://elinux.org/images/c/cf/Power_ePAPR_APPROVED_v1.1.pdf
+0     string     \xd0\x0d\xfe\xed    device tree image (dtb)
+
+# QCDT
+# https://source.codeaurora.org/quic/la/device/qcom/common/tree/dtbtool?h=LA.BF64.1.2.2_rb4.42
+0     string     QCDT          Qualcomm device tree container
+>4    ulelong    x             \b, version: %u
+>8    ulelong    x             \b, DTB entries: %u
+
+# Nexus BOOTLDR
+# https://github.com/NVISO-BE/nexus_5_bootloader_unpacker
+0     string     BOOTLDR!      Nexus bootloader image
+>8    ulelong    <1            {invalid}
+>8    ulelong    x             \b, num images: %u
+>12   ulelong    x             \b, bootldr size: %u
+
+# Nexus IMGDATA
+# https://github.com/bitdomo/imgdata/tree/hammerhead
+0     string     IMGDATA!      Nexus IMGDATA
+>12   ulelong    >100          {invalid}
+>12   ulelong    x             \b, entries: %u
+
+# Motorola bootlogo container
+# https://github.com/grub4android/lk/blob/master-uboot/app/aboot/aboot.c#L2710
+0     string     MotoLogo\x00  Motorola bootlogo container
+
+# Motorola RLE bootlogo
+# https://github.com/grub4android/lk/blob/master-uboot/app/aboot/aboot.c#L2710
+0     string     MotoRun\x00   Motorola RLE bootlogo
+>8    ubeshort   x             \b, width: %u
+>10   ubeshort   x             \b, height: %u
+
+# Motorola UTAGS
+# https://github.com/MotorolaMobilityLLC/kernel-msm/blob/marshmallow-6.0.0-release/drivers/misc/utag/utags.c
+0     string     __UTAG_HEAD__\x00   Motorola UTAGS
+>32   ulelong    x                   \b, size: %u
+>36   ulelong    x                   \b, flags: %x
+>40   ulelong    x                   \b, crc32: %x
+
+# Qualcomm splash screen
+# https://source.codeaurora.org/quic/la/device/qcom/common/tree/display/logo/logo_gen.py?h=LA.BR.1.3.3-06310-8952.0
+0     string     SPLASH!!      Qualcomm splash screen
+>8    ulelong    x             \b, width: %u
+>12   ulelong    x             \b, height: %u
+>16   ulelong    x             \b, type: %u
+>20   ulelong    x             \b, blocks: %u
+
+# Qualcomm SBL1
+0     string     \xd1\xdc\x4b\x84\x34\x10\xd7\x73      Qualcomm SBL1
+>24   ulelong    x                                     \b, image addr: %x
+>28   ulelong    x                                     \b, image size: %u
+>32   ulelong    x                                     \b, code size: %u
+>40   ulelong    x                                     \b, sig size: %u
+>48   ulelong    x                                     \b, cert chain size: %u
+>52   ulelong    x                                     \b, oem_root_cert_sel: %u
+>56   ulelong    x                                     \b, oem_num_root_certs: %u
+
 

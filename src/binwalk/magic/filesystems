@@ -81,17 +81,17 @@
 
 # cramfs filesystem - russell@coker.com.au
 0       lelong      0x28cd3d45      CramFS filesystem, little endian,
->4      lelong      <0              {invalid}
->4      lelong      >1073741824     {invalid}
+>4      lelong      <0              invalid size,{invalid}
+>4      lelong      >1073741824     invalid size,{invalid}
 >4      ulelong     x               size: %u
 >8      lelong      &1              version 2
 >8      lelong      &2              sorted_dirs
 >8      lelong      &4              hole_support
 >32     ulelong     x               CRC 0x%.8X,
 >36     ulelong     x               edition %u,
->40     lelong      <0              {invalid}
+>40     lelong      <0              invalid blocks,{invalid}
 >40     ulelong     x               %u blocks,
->44     lelong      <0              {invalid}
+>44     lelong      <0              invalid file count,{invalid}
 >44     ulelong     x               %u files
 >4      ulelong     x               {jump:%u}
 >4      ulelong     x               {size:%u}
@@ -501,7 +501,7 @@
 >0x43A      leshort         <0              {invalid}invalid state
 >0x43C      leshort         >3              {invalid}invalid error behavior
 >0x43C      leshort         <0              {invalid}invalid error behavior
->0x43C      lelong          >1              {invalid}invalid major revision
+>0x43C      lelong          >4              {invalid}invalid major revision
 >0x43C      lelong          <0              {invalid}invalid major revision
 >0x43C      lelong          x               rev %d
 >0x43E      leshort         x               \b.%d,
@@ -538,6 +538,19 @@
 >8      belong      x               {size:%d}
 >8      belong      x               {jump:%d}
 
+# Not to be confused with an actual romfs image!
+# ftp://ftp.dlink.eu/Products/dir/dir-600/driver_software/DIR-600_fw_revC1_3-05B15__all_en_20120216.zip
+0x10    string          ROMFS\x20v      D-Link ROMFS filesystem,
+>0x17   string          x               version %s,
+>0      string          !\x2EmoR
+>>0     string          !Rom\x2E        {invalid} unknown endianess
+>0      string          \x2EmoR         little endian,
+>>8     lelong          x               size: <= %d
+>>8     lelong-0x20     x               {jump:%d}
+>0      string          Rom\x2E         big endian,
+>>8     belong          x               size: <= %d
+>>8     belong-0x20     x               {jump:%d}
+
 # Wind River MemFS file system, found in some VxWorks devices
 0       string    owowowowowowowowowowowowowowow    Wind River management filesystem,{overlap}
 >30     string    !ow                               {invalid},
@@ -555,6 +568,20 @@
 >32     lelong    <1                                {invalid}
 >32     lelong    >2                                {invalid}
 >36     lelong    x                                 %d files
+
+# ISO 9660 Boot Record - http://wiki.osdev.org/ISO_9660
+0       string      \x00CD001\x01                   ISO 9660 Boot Record,
+>7      byte        !0
+>>7      string      x                               Boot System Identifier: "%.32s",
+>39      byte        !0
+>>39     string      x                               Boot Identifier: "%.32s"
+
+# ISO 9660 Primary Volume - http://wiki.osdev.org/ISO_9660
+0       string      \x01CD001\x01\x00               ISO 9660 Primary Volume,
+>8      byte        !0
+>>8      string      x                               System Identifier: "%.32s",
+>40      byte        !0
+>>40     string      x                               Volume Identifier: "%.32s"
 
 # netboot image - Juan Cespedes <cespedes@debian.org>
 0       lelong              0x1b031336      Netboot image,
@@ -637,3 +664,8 @@
 >16     lelong   x       {strlen:%d}
 >20     string   x       first file name: "{string}"
 
+# QNX6 filesystem
+0       string   \xEB\x10\x90\x00    QNX6 filesystem
+
+# QNX IFS
+0       string   \xEB\x7E\xFF\x00    QNX IFS
