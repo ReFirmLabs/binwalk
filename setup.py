@@ -199,6 +199,16 @@ install_data_files = []
 for data_dir in ["magic", "config", "plugins", "modules", "core"]:
         install_data_files.append("%s%s*" % (data_dir, os.path.sep))
 
+# Verify that the lzma-module is available
+try:
+    import lzma
+except ImportError:
+    try:
+        from backports import lzma
+    except:
+        print("Error: python LZMA-module not found, please install before proceeding")
+        sys.exit(-1)
+
 # Install the module, script, and support files
 setup(name = MODULE_NAME,
       version = "2.1.2b",
