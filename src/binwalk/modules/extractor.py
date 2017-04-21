@@ -784,7 +784,7 @@ class Extractor(Module):
         except KeyboardInterrupt as e:
             raise e
         except Exception as e:
-            binwalk.core.common.warning("Extractor.execute failed to run external extractor '%s': %s" % (str(cmd), str(e)))
+            binwalk.core.common.warning("Extractor.execute failed to run external extractor '%s': %s, '%s' might not be installed correctly" % (str(cmd), str(e), str(cmd)))
             retval = None
 
         if tmp is not None:
