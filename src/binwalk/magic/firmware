@@ -500,7 +500,7 @@
 >44     belong      x           size: %d,
 >48     ubelong     x           crc: 0x%.8X,
 >35     byte        x           try decryption tool from:
->35     byte        x           http://download.modem-help.co.uk/mfcs-A/Alcatel/Modems/Misc/
+>35     byte        x           http://web.archive.org/web/20130929103301/http://download.modem-help.co.uk/mfcs-A/Alcatel/Modems/Misc/
 
 # http://android.stackexchange.com/questions/23357/\
 # is-there-a-way-to-look-inside-and-modify-an-adb-backup-created-file/\
