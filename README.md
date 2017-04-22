@@ -12,13 +12,13 @@ Binwalk follows the standard Python installation procedure:
 $ sudo python setup.py install
 ```
 
-If you're running Python 2.x, you'll also want to install the Python lzma module:
+If you're running Python 2.x, installing the optional Python lzma module is strongly recommended (but not required):
 
 ```bash
 $ sudo apt-get install python-lzma
 ```
 
-For instructions on installing optional dependencies, see [INSTALL.md](https://github.com/devttys0/binwalk/blob/master/INSTALL.md).
+For instructions on installing other optional dependencies, see [INSTALL.md](https://github.com/devttys0/binwalk/blob/master/INSTALL.md).
 
 
 Usage
