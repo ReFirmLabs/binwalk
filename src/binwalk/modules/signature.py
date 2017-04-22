@@ -112,8 +112,11 @@ class Signature(Module):
             if r.size and (r.size + r.offset) > r.file.size:
                 r.valid = False
 
-            if r.jump and (r.jump + r.offset) > r.file.size:
-                r.valid = False
+            if r.jump:
+                if r.jump > 0 and (r.jump + r.offset) > r.file.size:
+                    r.valid = False
+                elif r.jump < 0 and (r.jump + r.file.size) < 0:
+                    r.valid = False
 
         if r.valid:
             # Don't keep displaying signatures that repeat a bunch of times (e.g., JFFS2 nodes)
@@ -155,20 +158,23 @@ class Signature(Module):
                 # Provide an instance of the current file object
                 r.file = fp
 
-                # Register the result for futher processing/display
+                # Register the result for further processing/display
                 # self.result automatically calls self.validate for result validation
                 self.result(r=r)
 
                 # Is this a valid result and did it specify a jump-to-offset keyword, and are we doing a "smart" scan?
-                if r.valid and r.jump > 0 and not self.dumb_scan:
-                    absolute_jump_offset = r.offset + r.jump
-                    current_block_offset = relative_offset + r.jump
+                if r.valid and r.jump and not self.dumb_scan:
+                    if r.jump > 0:
+                        absolute_jump_offset = r.offset + r.jump
+                        current_block_offset = relative_offset + r.jump
+                    else:
+                        absolute_jump_offset = r.file.size + r.offset + r.jump
+                        current_block_offset = relative_offset + r.file.size + r.jump
                     #print ("Jumping to: 0x%X (0x%X)..." % (absolute_jump_offset, current_block_offset))
-
                     # If the jump-to-offset is beyond the confines of the current block, seek the file to
                     # that offset and quit processing this block of data.
                     if absolute_jump_offset >= fp.tell():
-                        fp.seek(r.offset + r.jump)
+                        fp.seek(absolute_jump_offset)
                         break
 
     def run(self):
