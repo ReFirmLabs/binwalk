@@ -260,8 +260,8 @@
 
 #
 # Motorola S-Records, from Gerd Truschinski <gt@freebsd.first.gmd.de>
-# Useless until forther improvements can be made to the signature.
-#0   string      S0          Motorola S-Record; binary data in text format
+# Improved by Martin Sundhaug <martinsundhaug@gmail.com>
+0   regex      (S[0-35-9]([0-9A-F]{4})([0-9A-F]{2})+\n)+          Motorola S-Record; binary data in text format
 
 #Windows CE Binary Image Data Format aka B000FF
 #More information on the format:
