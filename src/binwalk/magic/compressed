@@ -92,7 +92,7 @@
 >7    byte      x                       \b.%d
 
 # standard unix compress
-# Disabled until a python alternative can be foudn for the compress binwalk plugin.
+# Disabled until a python alternative can be found for the compress binwalk plugin.
 #0       string        \x1f\x9d\x90          compress'd data, 16 bits
 
 # http://tukaani.org/xz/xz-file-format.txt
