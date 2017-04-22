@@ -1,3 +1,11 @@
+# Simple eCos string signatures
+0        string    ecos                    eCos RTOS string reference:
+>0       string    x                       "%s"
+0        string    eCos                    eCos RTOS string reference:
+>0       string    x                       "%s"
+0        string    ECOS                    eCos RTOS string reference:
+>0       string    x                       "%s"
+
 # eCos kernel exception handlers
 #
 # mfc0    $k0, Cause       # Cause of last exception
