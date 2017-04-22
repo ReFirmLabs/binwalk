@@ -763,3 +763,5 @@
 >56   ulelong    x                                     \b, oem_num_root_certs: %u
 
 
+# Intel HEX
+0   regex      (\:([0-9A-F]{2}){5,}\n)+    Intel HEX
