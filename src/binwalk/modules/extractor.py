@@ -223,7 +223,7 @@ class Extractor(Module):
                         scan_extracted_files and
                         self.directory in real_file_path):
                         # If the recursion level of this file is less than or equal to our desired recursion level
-                        if len(real_file_path.split(self.directory)[1].split(os.path.sep)) <= self.matryoshka:
+                        if len(real_file_path.split(self.directory)[0].split(os.path.sep)) <= self.matryoshka:
                             # If this is a directory and we are supposed to process directories for this extractor,
                             # then add all files under that directory to the list of pending files.
                             if os.path.isdir(file_path):
