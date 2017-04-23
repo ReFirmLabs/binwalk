@@ -1,9 +1,9 @@
 import os
-import sys
 import errno
 import struct
 import binwalk.core.plugin
 import binwalk.core.compat
+from binwalk.core.common import BlockFile as open
 
 class PFSCommon(object):
 
@@ -23,7 +23,7 @@ class PFS(PFSCommon):
 
     def __init__(self, fname, endianess='<'):
         self.endianess = endianess
-        self.meta = binwalk.core.common.BlockFile(fname, 'rb')
+        self.meta = open(fname, 'rb')
         header = self.meta.read(self.HEADER_SIZE)
         self.file_list_start = self.meta.tell()
         
@@ -64,9 +64,8 @@ class PFSNode(PFSCommon):
     """A node in the PFS Filesystem containing meta-data about a single file."""
 
     def __init__(self, data, endianess):
-        self.fname = data[:-12]
+        self.fname, data = data[:-12], data[-12:]
         self._decode_fname()
-        data = data[-12:]
         self.inode_no = self._make_int(data[:4], endianess)
         self.foffset = self._make_int(data[4:8], endianess)
         self.fsize = self._make_int(data[8:], endianess)
@@ -78,7 +77,7 @@ class PFSNode(PFSCommon):
 
 class PFSExtractor(binwalk.core.plugin.Plugin):
     """
-    Extractor for known PSF/0.9 File System Formats.
+    Extractor for known PFS/0.9 File System Formats.
     """
     MODULES = ['Signature']
     
@@ -100,13 +99,13 @@ class PFSExtractor(binwalk.core.plugin.Plugin):
         try:
             with PFS(fname) as fs:
                 # The end of PFS meta data is the start of the actual data
-                data = binwalk.core.common.BlockFile(fname, 'rb')
+                data = open(fname, 'rb')
                 data.seek(fs.get_end_of_meta_data())
                 for entry in fs.entries():
                     self._create_dir_from_fname(entry.fname)
-                    outfile = binwalk.core.common.BlockFile(entry.fname, 'wb')
+                    outfile = open(entry.fname, 'wb')
                     outfile.write(data.read(entry.fsize))
-                    outfile.close
+                    outfile.close()
                 data.close()
         except KeyboardInterrupt as e:
             raise e
