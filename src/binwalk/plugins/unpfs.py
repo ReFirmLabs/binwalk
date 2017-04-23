@@ -7,12 +7,12 @@ import binwalk.core.compat
 
 class PFSCommon(object):
 
-    def _make_short(self,data,endianess):
+    def _make_short(self, data, endianess):
         """Returns a 2 byte integer."""
         data = binwalk.core.compat.str2bytes(data)
         return struct.unpack('%sH' % endianess, data)[0]
 
-    def _make_int(self,data,endianess):
+    def _make_int(self, data, endianess):
         """Returns a 4 byte integer."""
         data = binwalk.core.compat.str2bytes(data)
         return struct.unpack('%sI' % endianess, data)[0]
@@ -21,7 +21,7 @@ class PFS(PFSCommon):
     """Class for accessing PFS meta-data."""
     HEADER_SIZE = 16
 
-    def __init__(self,fname,endianess='<'):
+    def __init__(self, fname, endianess='<'):
         self.endianess = endianess
         self.meta = binwalk.core.common.BlockFile(fname, 'rb')
         header = self.meta.read(self.HEADER_SIZE)
@@ -51,7 +51,7 @@ class PFS(PFSCommon):
     def entries(self):
         """Returns file meta-data entries one by one."""
         self.meta.seek(self.file_list_start)
-        for i in range(0,self.num_files):
+        for i in range(0, self.num_files):
             yield self._get_node()
 
     def __enter__(self):
@@ -74,7 +74,7 @@ class PFSNode(PFSCommon):
     def _decode_fname(self):
         """Extracts the actual string from the available bytes."""
         self.fname = self.fname[:self.fname.find('\0')]
-        self.fname = self.fname.replace('\\','/')
+        self.fname = self.fname.replace('\\', '/')
 
 class PFSExtractor(binwalk.core.plugin.Plugin):
     """
@@ -88,7 +88,7 @@ class PFSExtractor(binwalk.core.plugin.Plugin):
                                            extension='pfs',
                                            cmd=self.extractor)
 
-    def _create_dir_from_fname(self,fname):
+    def _create_dir_from_fname(self, fname):
         try:
             os.makedirs(os.path.dirname(fname))
         except OSError as e:
