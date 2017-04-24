@@ -11,7 +11,8 @@ fi
 set -o nounset
 
 REQUIRED_UTILS="wget tar python"
-APTCMD="apt-get"
+APTCMD="apt"
+APTGETCMD="apt-get"
 YUMCMD="yum"
 APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord"
 PYTHON2_APT_CANDIDATES="python-crypto python-lzo python-lzma python-pip python-opengl python-qt4 python-qt4-gl python-numpy python-scipy"
@@ -131,15 +132,24 @@ done
 find_path $APTCMD
 if [ $? -eq 1 ]
 then
-    find_path $YUMCMD
+    find_path $APTGETCMD
     if [ $? -eq 1 ]
     then
-        NEEDED_UTILS="$NEEDED_UTILS $APTCMD/$YUMCMD"
+        find_path $YUMCMD
+        if [ $? -eq 1 ]
+        then
+            NEEDED_UTILS="$NEEDED_UTILS $APTCMD/$APTGETCMD/$YUMCMD"
+        else
+            PKGCMD="$YUMCMD"
+            PKGCMD_OPTS="-y install"
+            PKG_CANDIDATES="$YUM_CANDIDATES"
+            PKG_PYTHON3_CANDIDATES="$PYTHON3_YUM_CANDIDATES"
+        fi
     else
-        PKGCMD="$YUMCMD"
-        PKGCMD_OPTS="-y install"
-        PKG_CANDIDATES="$YUM_CANDIDATES"
-        PKG_PYTHON3_CANDIDATES="$PYTHON3_YUM_CANDIDATES"
+        PKGCMD="$APTGETCMD"
+        PKGCMD_OPTS="install -y"
+        PKG_CANDIDATES="$APT_CANDIDATES"
+        PKG_PYTHON3_CANDIDATES="$PYTHON3_APT_CANDIDATES"
     fi
 else
     PKGCMD="$APTCMD"
