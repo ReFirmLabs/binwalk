@@ -10,7 +10,7 @@ fi
 
 set -o nounset
 
-if ! which lsb_release
+if ! which lsb_release > /dev/null
 then
     function lsb_release {
         if [ -f /etc/lsb-release ]
@@ -131,7 +131,12 @@ then
     echo "         This script requires internet access."
     echo "         This script requires root privileges."
     echo ""
-    echo "         $distro detected"
+    if [ $distro != Unknown ]
+    then
+        echo "         $distro detected"
+    else
+        echo "WARNING: Distro not detected, using package-manager defaults"
+    fi
     echo ""
     echo -n "Continue [y/N]? "
     read YN
@@ -140,8 +145,11 @@ then
         echo "Quitting..."
         exit 1
     fi
-else
+elif [ $distro != Unknown ]
+then
      echo "$distro detected"
+else
+    echo "WARNING: Distro not detected, using package-manager defaults"
 fi
 
 # Check to make sure we have all the required utilities installed
