@@ -80,6 +80,16 @@
 #From xp-dev.com
 0    string        BOOTLOADER!    Mediatek bootloader
 
+# CSR DFU Image, References:
+# Bluez dfutool
+# Andrea Bittau's CSR Tools http://darkircop.org/bt/
+0    string        CSR-dfu2       CSR (XAP2) DFU firmware update header
+>8   uleshort      >3             {invalid}  # version consistently observed
+
+0    string        CSRbcfw1       CSR Bluecore firmware segment
+>18  uleshort      !1             {invalid}  # version consistently observed
+
+
 #CSYS header formats
 0    string        CSYS\x00    CSYS header, little endian, 
 >8   lelong        x           size: %d
@@ -408,8 +418,9 @@
 
 # Sercomm firmware header
 0       string         sErCoMm          Sercomm firmware signature,
->7      leshort        x                version control: %d,
->9      leshort        x                download control: %d,
+>7      uleshort       x                version control: %d,
+>9      uleshort       x                download control: %d,
+>11     byte           0                {invalid}
 >11     string         x                hardware ID: "%s",
 >44     uleshort       x                hardware version: 0x%X,
 >58     uleshort       x                firmware version: 0x%X,

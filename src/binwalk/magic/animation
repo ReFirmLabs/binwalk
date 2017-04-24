@@ -14,3 +14,9 @@
 >3	byte&0x10		!0x10		{invalid}
 >188	byte			!0x47		{invalid}
 
+0   string      FWS                 Uncompressed Adobe Flash SWF file,
+>3  byte        0                   {invalid}
+>3  byte        x                   Version %d,
+>4  ulelong     0                   {invalid}
+>4  ulelong     x                   File size (header included) %d
+
