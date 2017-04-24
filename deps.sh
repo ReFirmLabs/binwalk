@@ -10,11 +10,22 @@ fi
 
 set -o nounset
 
+if [ $YES -eq 0 ]
+then
+    distro="${1:-$(lsb_release -i|cut -f 2)}"
+else
+    distro="${2:-$(lsb_release -i|cut -f 2)}"
+fi
 REQUIRED_UTILS="wget tar python"
 APTCMD="apt"
 APTGETCMD="apt-get"
 YUMCMD="yum"
-APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord"
+if [ distro = "Kali" ]
+then
+    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract util-linux firmware-mod-kit cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop"
+else
+    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord"
+fi
 PYTHON2_APT_CANDIDATES="python-crypto python-lzo python-lzma python-pip python-opengl python-qt4 python-qt4-gl python-numpy python-scipy"
 PYTHON3_APT_CANDIDATES="python3-crypto python3-pip python3-opengl python3-pyqt4 python3-pyqt4.qtopengl python3-numpy python3-scipy"
 PYTHON3_YUM_CANDIDATES=""
@@ -108,6 +119,8 @@ then
     echo "         This script requires internet access."
     echo "         This script requires root privileges."
     echo ""
+    echo "         $distro detected"
+    echo ""
     echo -n "Continue [y/N]? "
     read YN
     if [ "$(echo "$YN" | grep -i -e 'y' -e 'yes')" == "" ]
@@ -115,6 +128,8 @@ then
         echo "Quitting..."
         exit 1
     fi
+else
+     echo "$distro detected"
 fi
 
 # Check to make sure we have all the required utilities installed
