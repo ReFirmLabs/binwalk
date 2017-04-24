@@ -10,6 +10,18 @@ fi
 
 set -o nounset
 
+if ! which lsb_release
+then
+    function lsb_release {
+        if [ -f /etc/lsb-release ]
+        then
+            cat /etc/lsb-release | grep DISTRIB_ID | cut -d= -f 2
+        else
+            echo Unknown
+        fi
+    }
+fi
+
 if [ $YES -eq 0 ]
 then
     distro="${1:-$(lsb_release -i|cut -f 2)}"
