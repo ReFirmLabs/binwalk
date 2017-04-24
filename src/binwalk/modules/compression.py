@@ -173,7 +173,7 @@ class Deflate(object):
                 if not data or dlen == 0:
                     break
                 else:
-                    in_data += data
+                    in_data += data[:dlen]
 
                 try:
                     out_data = zlib.decompress(binwalk.core.compat.str2bytes(in_data), -15)
