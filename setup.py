@@ -205,7 +205,7 @@ class TestCommand(Command):
         pass
 
     def run(self):
-        subprocess.call('nosetests --exe', shell=True)
+        subprocess.call('nosetests --exe --with-coverage', shell=True)
 
 # The data files to install along with the module
 install_data_files = []
