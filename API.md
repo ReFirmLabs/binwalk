@@ -81,7 +81,7 @@ for module in binwalk.scan('firmware1.bin', 'firmware2.bin', signature=True, qui
 
 Note the above use of the `--quiet` option which prevents the binwalk module from printing its normal output to screen.
 
-Each module object will also have an additional `extractor` attribute, which is an instance of the `binwalk.modules.extractor.Extractor` class. Of particular use is `binwalk.modules.extractor.Extrctor.output`, a dictionary containing information about carved/extracted data:
+Each module object will also have an additional `extractor` attribute, which is an instance of the `binwalk.modules.extractor.Extractor` class. Of particular use is `binwalk.modules.extractor.Extractor.output`, a dictionary containing information about carved/extracted data:
 
 ```python
 for module in binwalk.scan('firmware1.bin', 'firmware2.bin', signature=True, quiet=True, extract=True):
