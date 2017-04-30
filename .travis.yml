@@ -5,5 +5,8 @@ python:
  - "3.4"
  - "3.5"
  - "3.6"
-install: ./setup.py install
+install:
+ - pip install coverage
+ - ./setup.py install
 script: ./setup.py test
+

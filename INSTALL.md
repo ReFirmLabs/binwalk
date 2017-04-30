@@ -31,10 +31,10 @@ Although all binwalk run-time dependencies are optional, the `python-lzma` modul
 $ sudo apt-get install python-lzma
 ```
 
-Binwalk uses the `nosetest` library for tests:
+Binwalk uses the `nosetest` library for tests and `coverage` for test-coverage:
 
 ```bash
-$ sudo pip install nose
+$ sudo pip install nose coverage
 ```
 
 Binwalk uses the `pycrypto` library to decrypt some known encrypted firmware images:
