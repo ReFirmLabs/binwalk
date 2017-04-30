@@ -9,7 +9,7 @@ python:
  - "pypy"
  - "pypy3"
 install:
- - ./deps.sh
+ - ./deps.sh --yes
  - pip install coverage
  - ./setup.py install
 script: ./setup.py test
