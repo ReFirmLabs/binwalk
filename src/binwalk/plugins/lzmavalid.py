@@ -2,6 +2,7 @@ import binwalk.core.plugin
 import binwalk.core.compat
 from binwalk.core.common import BlockFile
 
+
 class LZMAPlugin(binwalk.core.plugin.Plugin):
     '''
     Validates lzma signature results.
@@ -29,7 +30,8 @@ class LZMAPlugin(binwalk.core.plugin.Plugin):
         valid = True
 
         if self.decompressor is not None:
-            # The only acceptable exceptions are those indicating that the input data was truncated.
+            # The only acceptable exceptions are those indicating that the
+            # input data was truncated.
             try:
                 self.decompressor(binwalk.core.compat.str2bytes(data))
             except IOError as e:
@@ -39,17 +41,20 @@ class LZMAPlugin(binwalk.core.plugin.Plugin):
             except Exception as e:
                 # The Python3 module gives this error on truncated input data.
                 # The inconsistency between modules is a bit worrisome.
-                if str(e) != "Compressed data ended before the end-of-stream marker was reached":
+                if str(
+                        e) != "Compressed data ended before the end-of-stream marker was reached":
                     valid = False
 
         return valid
 
     def scan(self, result):
         # If this result is an lzma signature match, try to decompress the data
-        if result.valid and result.file and result.description.lower().startswith('lzma compressed data'):
+        if result.valid and result.file and result.description.lower(
+        ).startswith('lzma compressed data'):
 
             # Seek to and read the suspected lzma data
-            fd = self.module.config.open_file(result.file.name, offset=result.offset, length=self.MAX_DATA_SIZE)
+            fd = self.module.config.open_file(
+                result.file.name, offset=result.offset, length=self.MAX_DATA_SIZE)
             data = fd.read(self.MAX_DATA_SIZE)
             fd.close()
 
@@ -59,4 +64,3 @@ class LZMAPlugin(binwalk.core.plugin.Plugin):
                 data = data[:5] + self.FAKE_LZMA_SIZE + data[5:]
                 if not self.is_valid_lzma(data):
                     result.valid = False
-

@@ -1,4 +1,5 @@
-# Performs raw decompression of various compression algorithms (currently, only deflate).
+# Performs raw decompression of various compression algorithms (currently,
+# only deflate).
 
 import os
 import zlib
@@ -11,17 +12,19 @@ try:
 except ImportError:
     from backports import lzma
 
+
 class LZMAHeader(object):
     def __init__(self, **kwargs):
-        for (k,v) in binwalk.core.compat.iterator(kwargs):
+        for (k, v) in binwalk.core.compat.iterator(kwargs):
             setattr(self, k, v)
+
 
 class LZMA(object):
 
     DESCRIPTION = "Raw LZMA compression stream"
     COMMON_PROPERTIES = [0x5D, 0x6E]
     MAX_PROP = ((4 * 5 + 4) * 9 + 8)
-    BLOCK_SIZE = 32*1024
+    BLOCK_SIZE = 32 * 1024
 
     def __init__(self, module):
         self.module = module
@@ -33,24 +36,30 @@ class LZMA(object):
 
         # Add an extraction rule
         if self.module.extractor.enabled:
-            self.module.extractor.add_rule(regex='^%s' % self.DESCRIPTION.lower(), extension="7z", cmd=self.extractor)
+            self.module.extractor.add_rule(
+                regex='^%s' % self.DESCRIPTION.lower(), extension="7z", cmd=self.extractor)
 
     def extractor(self, file_name):
         # Open and read the file containing the raw compressed data.
         # This is not terribly efficient, especially for large files...
         compressed_data = binwalk.core.common.BlockFile(file_name).read()
 
-        # Re-run self.decompress to detect the properties for this compressed data (stored in self.properties)
+        # Re-run self.decompress to detect the properties for this compressed
+        # data (stored in self.properties)
         if self.decompress(compressed_data[:self.BLOCK_SIZE]):
             # Build an LZMA header on top of the raw compressed data and write it back to disk.
             # Header consists of the detected properties values, the largest possible dictionary size,
             # and a fake output file size field.
-            header = chr(self.properties) + self.dictionaries[-1] + ("\xFF" * 8)
-            binwalk.core.common.BlockFile(file_name, "wb").write(header + compressed_data)
+            header = chr(self.properties) + \
+                self.dictionaries[-1] + ("\xFF" * 8)
+            binwalk.core.common.BlockFile(
+                file_name, "wb").write(header + compressed_data)
 
-            # Try to extract it with all the normal lzma extractors until one works
+            # Try to extract it with all the normal lzma extractors until one
+            # works
             for exrule in self.module.extractor.match("lzma compressed data"):
-                if self.module.extractor.execute(exrule['cmd'], file_name) == True:
+                if self.module.extractor.execute(
+                        exrule['cmd'], file_name) == True:
                     break
 
     def build_property(self, pb, lp, lc):
@@ -65,16 +74,17 @@ class LZMA(object):
         if prop > self.MAX_PROP:
             return None
 
-        pb = prop / (9 * 5);
-        prop -= pb * 9 * 5;
-        lp = prop / 9;
-        lc = prop - lp * 9;
+        pb = prop / (9 * 5)
+        prop -= pb * 9 * 5
+        lp = prop / 9
+        lc = prop - lp * 9
 
         return (pb, lp, lc)
 
     def parse_header(self, header):
         (pb, lp, lc) = self.parse_property(header[0])
-        dictionary = struct.unpack("<I", binwalk.core.compat.str2bytes(header[1:5]))[0]
+        dictionary = struct.unpack(
+            "<I", binwalk.core.compat.str2bytes(header[1:5]))[0]
         return LZMAHeader(pb=pb, lp=lp, lc=lc, dictionary=dictionary)
 
     def build_properties(self):
@@ -97,10 +107,12 @@ class LZMA(object):
 
         if self.module.partial_scan == True:
             # For partial scans, only use the largest dictionary value
-            self.dictionaries.append(binwalk.core.compat.bytes2str(struct.pack("<I", 2**25)))
+            self.dictionaries.append(
+                binwalk.core.compat.bytes2str(struct.pack("<I", 2**25)))
         else:
             for n in range(16, 26):
-                self.dictionaries.append(binwalk.core.compat.bytes2str(struct.pack("<I", 2**n)))
+                self.dictionaries.append(
+                    binwalk.core.compat.bytes2str(struct.pack("<I", 2**n)))
 
     def build_headers(self):
         self.headers = set()
@@ -116,7 +128,8 @@ class LZMA(object):
 
         for header in self.headers:
             i += 1
-            # The only acceptable exceptions are those indicating that the input data was truncated.
+            # The only acceptable exceptions are those indicating that the
+            # input data was truncated.
             try:
                 final_data = binwalk.core.compat.str2bytes(header + data)
                 lzma.decompress(final_data)
@@ -130,20 +143,23 @@ class LZMA(object):
             except Exception as e:
                 # The Python3 module gives this error on truncated input data.
                 # The inconsistency between modules is a bit worrisome.
-                if str(e) == "Compressed data ended before the end-of-stream marker was reached":
+                if str(
+                        e) == "Compressed data ended before the end-of-stream marker was reached":
                     result = self.parse_header(header)
                     break
 
         if result is not None:
-            self.properties = self.build_property(result.pb, result.lp, result.lc)
+            self.properties = self.build_property(
+                result.pb, result.lp, result.lc)
             description = "%s, properties: 0x%.2X [pb: %d, lp: %d, lc: %d], dictionary size: %d" % (self.DESCRIPTION,
-                                                                                                   self.properties,
-                                                                                                   result.pb,
-                                                                                                   result.lp,
-                                                                                                   result.lc,
-                                                                                                   result.dictionary)
+                                                                                                    self.properties,
+                                                                                                    result.pb,
+                                                                                                    result.lp,
+                                                                                                    result.lc,
+                                                                                                    result.dictionary)
 
         return description
+
 
 class Deflate(object):
     '''
@@ -151,7 +167,7 @@ class Deflate(object):
     '''
 
     ENABLED = False
-    BLOCK_SIZE = 33*1024
+    BLOCK_SIZE = 33 * 1024
     DESCRIPTION = "Raw deflate compression stream"
 
     def __init__(self, module):
@@ -159,7 +175,8 @@ class Deflate(object):
 
         # Add an extraction rule
         if self.module.extractor.enabled:
-            self.module.extractor.add_rule(regex='^%s' % self.DESCRIPTION.lower(), extension="deflate", cmd=self.extractor)
+            self.module.extractor.add_rule(
+                regex='^%s' % self.DESCRIPTION.lower(), extension="deflate", cmd=self.extractor)
 
     def extractor(self, file_name):
         in_data = ""
@@ -176,7 +193,8 @@ class Deflate(object):
                     in_data += data[:dlen]
 
                 try:
-                    out_data = zlib.decompress(binwalk.core.compat.str2bytes(in_data), -15)
+                    out_data = zlib.decompress(
+                        binwalk.core.compat.str2bytes(in_data), -15)
                     with binwalk.core.common.BlockFile(out_file, 'w') as fp_out:
                         fp_out.write(out_data)
                     retval = True
@@ -190,9 +208,11 @@ class Deflate(object):
         valid = True
         description = None
 
-        # Looking for either a valid decompression, or an error indicating truncated input data
+        # Looking for either a valid decompression, or an error indicating
+        # truncated input data
         try:
-            # Negative window size (e.g., -15) indicates that raw decompression should be performed
+            # Negative window size (e.g., -15) indicates that raw decompression
+            # should be performed
             zlib.decompress(binwalk.core.compat.str2bytes(data), -15)
         except zlib.error as e:
             if not str(e).startswith("Error -5"):
@@ -201,35 +221,36 @@ class Deflate(object):
 
         return self.DESCRIPTION
 
+
 class RawCompression(Module):
 
     TITLE = 'Raw Compression'
 
     CLI = [
-            Option(short='X',
-                   long='deflate',
-                   kwargs={'enabled' : True, 'scan_for_deflate' : True},
-                   description='Scan for raw deflate compression streams'),
-            Option(short='Z',
-                   long='lzma',
-                   kwargs={'enabled' : True, 'scan_for_lzma' : True},
-                   description='Scan for raw LZMA compression streams'),
-            Option(short='P',
-                   long='partial',
-                   kwargs={'partial_scan' : True},
-                   description='Perform a superficial, but faster, scan'),
-            Option(short='S',
-                   long='stop',
-                   kwargs={'stop_on_first_hit' : True},
-                   description='Stop after the first result'),
+        Option(short='X',
+               long='deflate',
+               kwargs={'enabled': True, 'scan_for_deflate': True},
+               description='Scan for raw deflate compression streams'),
+        Option(short='Z',
+               long='lzma',
+               kwargs={'enabled': True, 'scan_for_lzma': True},
+               description='Scan for raw LZMA compression streams'),
+        Option(short='P',
+               long='partial',
+               kwargs={'partial_scan': True},
+               description='Perform a superficial, but faster, scan'),
+        Option(short='S',
+               long='stop',
+               kwargs={'stop_on_first_hit': True},
+               description='Stop after the first result'),
     ]
 
     KWARGS = [
-            Kwarg(name='enabled', default=False),
-            Kwarg(name='partial_scan', default=False),
-            Kwarg(name='stop_on_first_hit', default=False),
-            Kwarg(name='scan_for_deflate', default=False),
-            Kwarg(name='scan_for_lzma', default=False),
+        Kwarg(name='enabled', default=False),
+        Kwarg(name='partial_scan', default=False),
+        Kwarg(name='stop_on_first_hit', default=False),
+        Kwarg(name='scan_for_deflate', default=False),
+        Kwarg(name='scan_for_lzma', default=False),
     ]
 
     def init(self):
@@ -254,9 +275,11 @@ class RawCompression(Module):
 
                 for i in range(0, dlen):
                     for decompressor in self.decompressors:
-                        description = decompressor.decompress(data[i:i+decompressor.BLOCK_SIZE])
+                        description = decompressor.decompress(
+                            data[i:i + decompressor.BLOCK_SIZE])
                         if description:
-                            self.result(description=description, file=fp, offset=fp.tell()-dlen+i)
+                            self.result(description=description,
+                                        file=fp, offset=fp.tell() - dlen + i)
                             if self.stop_on_first_hit:
                                 file_done = True
                                 break
@@ -269,4 +292,3 @@ class RawCompression(Module):
                 self.status.completed = fp.tell() - fp.offset
 
             self.footer()
-

@@ -1,5 +1,6 @@
 import binwalk.core.plugin
 
+
 class ZipHelperPlugin(binwalk.core.plugin.Plugin):
     '''
     A helper plugin for Zip files to ensure that the Zip archive

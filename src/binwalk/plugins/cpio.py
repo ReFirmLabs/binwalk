@@ -2,6 +2,7 @@ import os
 import subprocess
 import binwalk.core.plugin
 
+
 class CPIOPlugin(binwalk.core.plugin.Plugin):
     '''
     Ensures that ASCII CPIO archive entries only get extracted once.
@@ -65,12 +66,14 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
         if result.valid:
             # ASCII CPIO archives consist of multiple entries, ending with an entry named 'TRAILER!!!'.
             # Displaying each entry is useful, as it shows what files are contained in the archive,
-            # but we only want to extract the archive when the first entry is found.
+            # but we only want to extract the archive when the first entry is
+            # found.
             if result.description.startswith('ASCII cpio archive'):
                 self.consecutive_hits += 1
 
                 if not self.found_archive or self.found_archive_in_file != result.file.name:
-                    # This is the first entry. Set found_archive and allow the scan to continue normally.
+                    # This is the first entry. Set found_archive and allow the
+                    # scan to continue normally.
                     self.found_archive_in_file = result.file.name
                     self.found_archive = True
                     result.extract = True
@@ -92,5 +95,6 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
                 self.consecutive_hits = 0
             elif self.consecutive_hits >= 4:
                 # Ignore other stuff until the end of CPIO is found
-                # TODO: It would be better to jump to the end of this CPIO entry rather than make this assumption...
+                # TODO: It would be better to jump to the end of this CPIO
+                # entry rather than make this assumption...
                 result.valid = False

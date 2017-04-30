@@ -4,5 +4,6 @@
 
 import binwalk.core.plugin
 
+
 class Unjffs2DepreciatedPlugin(binwalk.core.plugin.Plugin):
     pass
