@@ -5,6 +5,7 @@ python:
  - "3.4"
  - "3.5"
  - "3.6"
+ - "nightly"
  - "pypy"
  - "pypy3"
 install:
@@ -12,3 +13,6 @@ install:
  - ./setup.py install
 script: ./setup.py test
 cache: pip
+matrix:
+  allow_failures:
+   - python: nightly
