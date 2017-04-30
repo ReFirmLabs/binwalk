@@ -194,6 +194,19 @@ class CleanCommand(Command):
         except Exception:
             pass
 
+class TestCommand(Command):
+    description = "Run unit-tests"
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        subprocess.call('nosetests --exe', shell=True)
+
 # The data files to install along with the module
 install_data_files = []
 for data_dir in ["magic", "config", "plugins", "modules", "core"]:
@@ -212,6 +225,6 @@ setup(name = MODULE_NAME,
       package_data = {MODULE_NAME : install_data_files},
       scripts = [os.path.join("src", "scripts", SCRIPT_NAME)],
 
-      cmdclass = {'clean' : CleanCommand, 'uninstall' : UninstallCommand, 'idainstall' : IDAInstallCommand, 'idauninstall' : IDAUnInstallCommand}
+      cmdclass = {'clean' : CleanCommand, 'uninstall' : UninstallCommand, 'idainstall' : IDAInstallCommand, 'idauninstall' : IDAUnInstallCommand, 'test': TestCommand }
 )
 
