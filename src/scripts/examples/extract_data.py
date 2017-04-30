@@ -10,7 +10,10 @@ for module in binwalk.scan(
     for result in module.results:
         if result.file.path in module.extractor.output:
             if result.offset in module.extractor.output[result.file.path].extracted:
-                print ("Extracted '%s' at offset 0x%X from '%s' to '%s'" % (result.description.split(',')[0],
-                                                                            result.offset,
-                                                                            result.file.path,
-                                                                            str(module.extractor.output[result.file.path].extracted[result.offset])))
+                print(
+                    "Extracted '%s' at offset 0x%X from '%s' to '%s'" %
+                    (result.description.split(',')[0],
+                     result.offset, result.file.path,
+                     str(
+                         module.extractor.output[result.file.path].extracted
+                         [result.offset])))

@@ -25,20 +25,27 @@ class Disasm(Module):
     ORDER = 10
 
     CLI = [
-        Option(short='Y',
-               long='disasm',
-               kwargs={'enabled': True},
-               description='Identify the CPU architecture of a file using the capstone disassembler'),
-        Option(short='T',
-               long='minsn',
-               type=int,
-               kwargs={'min_insn_count': 0},
-               description='Minimum number of consecutive instructions to be considered valid (default: %d)' % DEFAULT_MIN_INSN_COUNT),
-        Option(long='continue',
-               short='k',
-               kwargs={'keep_going': True},
-               description="Don't stop at the first match"),
-    ]
+        Option(
+            short='Y',
+            long='disasm',
+            kwargs={
+                'enabled': True},
+            description='Identify the CPU architecture of a file using the capstone disassembler'),
+        Option(
+                short='T',
+                long='minsn',
+                type=int,
+                kwargs={
+                    'min_insn_count': 0},
+            description='Minimum number of consecutive instructions to be considered valid (default: %d)' %
+            DEFAULT_MIN_INSN_COUNT),
+        Option(
+                        long='continue',
+                        short='k',
+                        kwargs={
+                            'keep_going': True},
+            description="Don't stop at the first match"),
+                             ]
 
     KWARGS = [
         Kwarg(name='enabled', default=False),
@@ -47,46 +54,42 @@ class Disasm(Module):
     ]
 
     ARCHITECTURES = [
-        Architecture(type=capstone.CS_ARCH_ARM,
-                     mode=capstone.CS_MODE_ARM,
-                     endianess=capstone.CS_MODE_BIG_ENDIAN,
-                     description="ARM executable code, 32-bit, big endian"),
-        Architecture(type=capstone.CS_ARCH_ARM,
-                     mode=capstone.CS_MODE_ARM,
-                     endianess=capstone.CS_MODE_LITTLE_ENDIAN,
-                     description="ARM executable code, 32-bit, little endian"),
-        Architecture(type=capstone.CS_ARCH_ARM64,
-                     mode=capstone.CS_MODE_ARM,
-                     endianess=capstone.CS_MODE_BIG_ENDIAN,
-                     description="ARM executable code, 64-bit, big endian"),
-        Architecture(type=capstone.CS_ARCH_ARM64,
-                     mode=capstone.CS_MODE_ARM,
-                     endianess=capstone.CS_MODE_LITTLE_ENDIAN,
-                     description="ARM executable code, 64-bit, little endian"),
-
-        Architecture(type=capstone.CS_ARCH_PPC,
-                     mode=capstone.CS_MODE_BIG_ENDIAN,
-                     endianess=capstone.CS_MODE_BIG_ENDIAN,
-                     description="PPC executable code, 32/64-bit, big endian"),
-
-        Architecture(type=capstone.CS_ARCH_MIPS,
-                     mode=capstone.CS_MODE_64,
-                     endianess=capstone.CS_MODE_BIG_ENDIAN,
-                     description="MIPS executable code, 32/64-bit, big endian"),
-        Architecture(type=capstone.CS_ARCH_MIPS,
-                     mode=capstone.CS_MODE_64,
-                     endianess=capstone.CS_MODE_LITTLE_ENDIAN,
-                     description="MIPS executable code, 32/64-bit, little endian"),
-
-        Architecture(type=capstone.CS_ARCH_ARM,
-                     mode=capstone.CS_MODE_THUMB,
-                     endianess=capstone.CS_MODE_LITTLE_ENDIAN,
-                     description="ARM executable code, 16-bit (Thumb), little endian"),
-        Architecture(type=capstone.CS_ARCH_ARM,
-                     mode=capstone.CS_MODE_THUMB,
-                     endianess=capstone.CS_MODE_BIG_ENDIAN,
-                     description="ARM executable code, 16-bit (Thumb), big endian"),
-    ]
+        Architecture(
+            type=capstone.CS_ARCH_ARM, mode=capstone.CS_MODE_ARM,
+            endianess=capstone.CS_MODE_BIG_ENDIAN,
+            description="ARM executable code, 32-bit, big endian"),
+        Architecture(
+            type=capstone.CS_ARCH_ARM, mode=capstone.CS_MODE_ARM,
+            endianess=capstone.CS_MODE_LITTLE_ENDIAN,
+            description="ARM executable code, 32-bit, little endian"),
+        Architecture(
+            type=capstone.CS_ARCH_ARM64, mode=capstone.CS_MODE_ARM,
+            endianess=capstone.CS_MODE_BIG_ENDIAN,
+            description="ARM executable code, 64-bit, big endian"),
+        Architecture(
+            type=capstone.CS_ARCH_ARM64, mode=capstone.CS_MODE_ARM,
+            endianess=capstone.CS_MODE_LITTLE_ENDIAN,
+            description="ARM executable code, 64-bit, little endian"),
+        Architecture(
+            type=capstone.CS_ARCH_PPC, mode=capstone.CS_MODE_BIG_ENDIAN,
+            endianess=capstone.CS_MODE_BIG_ENDIAN,
+            description="PPC executable code, 32/64-bit, big endian"),
+        Architecture(
+            type=capstone.CS_ARCH_MIPS, mode=capstone.CS_MODE_64,
+            endianess=capstone.CS_MODE_BIG_ENDIAN,
+            description="MIPS executable code, 32/64-bit, big endian"),
+        Architecture(
+            type=capstone.CS_ARCH_MIPS, mode=capstone.CS_MODE_64,
+            endianess=capstone.CS_MODE_LITTLE_ENDIAN,
+            description="MIPS executable code, 32/64-bit, little endian"),
+        Architecture(
+            type=capstone.CS_ARCH_ARM, mode=capstone.CS_MODE_THUMB,
+            endianess=capstone.CS_MODE_LITTLE_ENDIAN,
+            description="ARM executable code, 16-bit (Thumb), little endian"),
+        Architecture(
+            type=capstone.CS_ARCH_ARM, mode=capstone.CS_MODE_THUMB,
+            endianess=capstone.CS_MODE_BIG_ENDIAN,
+            description="ARM executable code, 16-bit (Thumb), big endian"), ]
 
     def init(self):
         self.disassemblers = []
@@ -98,7 +101,10 @@ class Disasm(Module):
 
         for arch in self.ARCHITECTURES:
             self.disassemblers.append(
-                (capstone.Cs(arch.type, (arch.mode + arch.endianess)), arch.description))
+                (capstone.Cs(
+                    arch.type,
+                    (arch.mode + arch.endianess)),
+                    arch.description))
 
     def scan_file(self, fp):
         total_read = 0
@@ -133,9 +139,9 @@ class Disasm(Module):
                         for (md, description) in self.disassemblers:
                             insns = [insn for insn in md.disasm_lite(
                                 code_block, (total_read + block_offset))]
-                            binwalk.core.common.debug("0x%.8X   %s, at least %d valid instructions" % ((total_read + block_offset),
-                                                                                                       description,
-                                                                                                       len(insns)))
+                            binwalk.core.common.debug(
+                                "0x%.8X   %s, at least %d valid instructions" %
+                                ((total_read + block_offset), description, len(insns)))
 
                             # Did we disassemble at least self.min_insn_count
                             # instructions?
@@ -148,24 +154,30 @@ class Disasm(Module):
                                     if result.count >= self.THRESHOLD:
                                         break
                                 else:
-                                    result = ArchResult(offset=total_read + block_offset + fp.offset,
-                                                        description=description,
-                                                        insns=insns,
-                                                        count=1)
+                                    result = ArchResult(
+                                        offset=total_read +
+                                        block_offset +
+                                        fp.offset,
+                                        description=description,
+                                        insns=insns,
+                                        count=1)
 
                     block_offset += 1
                     self.status.completed += 1
 
                 if result is not None:
-                    r = self.result(offset=result.offset,
-                                    file=fp,
-                                    description=(result.description + ", at least %d valid instructions" % len(result.insns)))
+                    r = self.result(
+                        offset=result.offset, file=fp,
+                        description=(result.description +
+                                     ", at least %d valid instructions" %
+                                     len(result.insns)))
 
                     if r.valid and r.display:
                         if self.config.verbose:
                             for (position, size, mnem, opnds) in result.insns:
-                                self.result(offset=position, file=fp,
-                                            description="%s %s" % (mnem, opnds))
+                                self.result(
+                                    offset=position, file=fp, description="%s %s" %
+                                    (mnem, opnds))
                         if not self.keep_going:
                             return
 

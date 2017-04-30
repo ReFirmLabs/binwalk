@@ -841,8 +841,9 @@ class Modules(object):
             if hasattr(binwalk.modules, dependency.name):
                 dependency.module = getattr(binwalk.modules, dependency.name)
             else:
-                raise ModuleException("%s depends on %s which was not found in binwalk.modules.__init__.py\n" % (
-                    str(module), dependency.name))
+                raise ModuleException(
+                    "%s depends on %s which was not found in binwalk.modules.__init__.py\n" %
+                    (str(module), dependency.name))
 
             # No recursive dependencies, thanks
             if dependency.module == module:
@@ -978,7 +979,8 @@ class Modules(object):
                     setattr(obj, k, v)
         else:
             raise Exception(
-                "binwalk.core.module.Modules.process_kwargs: %s has no attribute 'KWARGS'" % str(obj))
+                "binwalk.core.module.Modules.process_kwargs: %s has no attribute 'KWARGS'" %
+                str(obj))
 
     def status_server(self, port):
         '''
@@ -996,7 +998,8 @@ class Modules(object):
                     port, self)
             except Exception as e:
                 binwalk.core.common.warning(
-                    "Failed to start status server on port %d: %s" % (port, str(e)))
+                    "Failed to start status server on port %d: %s" %
+                    (port, str(e)))
 
 
 def process_kwargs(obj, kwargs):

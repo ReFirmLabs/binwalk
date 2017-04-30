@@ -35,37 +35,30 @@ class HashMatch(Module):
     TITLE = "Fuzzy Hash"
 
     CLI = [
-        Option(short='F',
-               long='fuzzy',
-               kwargs={'enabled': True},
-               description='Perform fuzzy hash matching on files/directories'),
-        Option(short='u',
-               long='cutoff',
-               priority=100,
-               type=int,
-               kwargs={'cutoff': DEFAULT_CUTOFF},
-               description='Set the cutoff percentage'),
-        Option(short='S',
-               long='strings',
-               kwargs={'strings': True},
-               description='Diff strings inside files instead of the entire file'),
-        Option(short='s',
-               long='same',
-               kwargs={'same': True, 'cutoff': CONSERVATIVE_CUTOFF},
-               description='Only show files that are the same'),
-        Option(short='p',
-               long='diff',
-               kwargs={'same': False, 'cutoff': CONSERVATIVE_CUTOFF},
-               description='Only show files that are different'),
-        Option(short='n',
-               long='name',
-               kwargs={'filter_by_name': True},
-               description='Only compare files whose base names are the same'),
-        Option(short='L',
-               long='symlinks',
-               kwargs={'symlinks': True},
-               description="Don't ignore symlinks"),
-    ]
+        Option(
+            short='F', long='fuzzy', kwargs={'enabled': True},
+            description='Perform fuzzy hash matching on files/directories'),
+        Option(
+            short='u', long='cutoff', priority=100, type=int,
+            kwargs={'cutoff': DEFAULT_CUTOFF},
+            description='Set the cutoff percentage'),
+        Option(
+            short='S', long='strings', kwargs={'strings': True},
+            description='Diff strings inside files instead of the entire file'),
+        Option(
+            short='s', long='same',
+            kwargs={'same': True, 'cutoff': CONSERVATIVE_CUTOFF},
+            description='Only show files that are the same'),
+        Option(
+            short='p', long='diff',
+            kwargs={'same': False, 'cutoff': CONSERVATIVE_CUTOFF},
+            description='Only show files that are different'),
+        Option(
+            short='n', long='name', kwargs={'filter_by_name': True},
+            description='Only compare files whose base names are the same'),
+        Option(
+            short='L', long='symlinks', kwargs={'symlinks': True},
+            description="Don't ignore symlinks"), ]
 
     KWARGS = [
         Kwarg(name='cutoff', default=DEFAULT_CUTOFF),

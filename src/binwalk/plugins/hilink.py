@@ -30,9 +30,11 @@ class HilinkDecryptor(binwalk.core.plugin.Plugin):
         if self.enabled is True and self.module.extractor.enabled is True:
             # Add an extraction rule for encrypted Hilink firmware signature
             # results
-            self.module.extractor.add_rule(regex="^%s" % self.SIGNATURE_DESCRIPTION,
-                                           extension="enc",
-                                           cmd=self._decrypt_and_extract)
+            self.module.extractor.add_rule(
+                regex="^%s" %
+                self.SIGNATURE_DESCRIPTION,
+                extension="enc",
+                cmd=self._decrypt_and_extract)
 
     def _decrypt_and_extract(self, fname):
         '''

@@ -37,7 +37,10 @@ class LZMA(object):
         # Add an extraction rule
         if self.module.extractor.enabled:
             self.module.extractor.add_rule(
-                regex='^%s' % self.DESCRIPTION.lower(), extension="7z", cmd=self.extractor)
+                regex='^%s' %
+                self.DESCRIPTION.lower(),
+                extension="7z",
+                cmd=self.extractor)
 
     def extractor(self, file_name):
         # Open and read the file containing the raw compressed data.
@@ -151,12 +154,8 @@ class LZMA(object):
         if result is not None:
             self.properties = self.build_property(
                 result.pb, result.lp, result.lc)
-            description = "%s, properties: 0x%.2X [pb: %d, lp: %d, lc: %d], dictionary size: %d" % (self.DESCRIPTION,
-                                                                                                    self.properties,
-                                                                                                    result.pb,
-                                                                                                    result.lp,
-                                                                                                    result.lc,
-                                                                                                    result.dictionary)
+            description = "%s, properties: 0x%.2X [pb: %d, lp: %d, lc: %d], dictionary size: %d" % (
+                self.DESCRIPTION, self.properties, result.pb, result.lp, result.lc, result.dictionary)
 
         return description
 
@@ -176,7 +175,10 @@ class Deflate(object):
         # Add an extraction rule
         if self.module.extractor.enabled:
             self.module.extractor.add_rule(
-                regex='^%s' % self.DESCRIPTION.lower(), extension="deflate", cmd=self.extractor)
+                regex='^%s' %
+                self.DESCRIPTION.lower(),
+                extension="deflate",
+                cmd=self.extractor)
 
     def extractor(self, file_name):
         in_data = ""

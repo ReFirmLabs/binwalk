@@ -17,10 +17,11 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
         self.consecutive_hits = 0
 
         if self.module.extractor.enabled:
-            self.module.extractor.add_rule(regex="^ascii cpio archive",
-                                           extension="cpio",
-                                           cmd=self.extractor,
-                                           recurse=False)       # Most CPIO archives are file systems, so don't recurse into the extracted contents
+            self.module.extractor.add_rule(
+                regex="^ascii cpio archive",
+                extension="cpio",
+                cmd=self.extractor,
+                recurse=False)  # Most CPIO archives are file systems, so don't recurse into the extracted contents
 
     def extractor(self, fname):
         result = None
@@ -41,10 +42,9 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
             return
 
         try:
-            result = subprocess.call(['cpio', '-d', '-i', '--no-absolute-filenames'],
-                                     stdin=fpin,
-                                     stderr=fperr,
-                                     stdout=fperr)
+            result = subprocess.call(
+                ['cpio', '-d', '-i', '--no-absolute-filenames'],
+                stdin=fpin, stderr=fperr, stdout=fperr)
         except OSError:
             result = -1
 

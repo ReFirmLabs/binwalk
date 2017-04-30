@@ -315,7 +315,8 @@ def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
         DEFAULT_BLOCK_READ_SIZE = 1 * 1024 * 1024
 
         def __init__(self, fname, mode='r', length=0, offset=0,
-                     block=DEFAULT_BLOCK_READ_SIZE, peek=DEFAULT_BLOCK_PEEK_SIZE, swap=0):
+                     block=DEFAULT_BLOCK_READ_SIZE,
+                     peek=DEFAULT_BLOCK_PEEK_SIZE, swap=0):
             '''
             Class constructor.
 

@@ -141,11 +141,9 @@ class General(Module):
                 self.file_name_exclude_regex)
 
         self.settings = binwalk.core.settings.Settings()
-        self.display = binwalk.core.display.Display(log=self.log_file,
-                                                    csv=self.csv,
-                                                    quiet=self.quiet,
-                                                    verbose=self.verbose,
-                                                    fit_to_screen=self.format_to_terminal)
+        self.display = binwalk.core.display.Display(
+            log=self.log_file, csv=self.csv, quiet=self.quiet,
+            verbose=self.verbose, fit_to_screen=self.format_to_terminal)
 
         if self.show_help:
             show_help()

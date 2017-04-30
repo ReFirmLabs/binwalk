@@ -32,9 +32,10 @@ class ArcadyanDeobfuscator(binwalk.core.plugin.Plugin):
 
     def init(self):
         if self.module.extractor.enabled:
-            self.module.extractor.add_rule(regex="^obfuscated arcadyan firmware",
-                                           extension="obfuscated",
-                                           cmd=self.extractor)
+            self.module.extractor.add_rule(
+                regex="^obfuscated arcadyan firmware",
+                extension="obfuscated",
+                cmd=self.extractor)
 
     def extractor(self, fname):
         deobfuscated = None

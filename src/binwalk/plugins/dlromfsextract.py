@@ -152,7 +152,8 @@ class RomFS(object):
         while True:
             try:
                 entry = RomFSEntry(
-                    self.data[offset:offset + self.FILE_ENTRY_SIZE], endianess=self.endianess)
+                    self.data[offset: offset + self.FILE_ENTRY_SIZE],
+                    endianess=self.endianess)
             except ValueError as e:
                 break
 
@@ -168,7 +169,8 @@ class RomFS(object):
             if entry.type & entry.DIR_STRUCT_MASK:
                 entries[entry.uid].type = "directory"
                 ds = RomFSDirStruct(
-                    self.data[entry.offset:entry.offset + entry.size], endianess=self.endianess)
+                    self.data[entry.offset: entry.offset + entry.size],
+                    endianess=self.endianess)
                 for (uid, name) in ds.ls:
                     if not uid in entries:
                         entries[uid] = FileContainer()

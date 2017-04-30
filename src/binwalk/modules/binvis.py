@@ -66,7 +66,8 @@ class Plotter(Module):
             self._generate_data_point = self._generate_3d_data_point
         else:
             raise Exception(
-                "Invalid Plotter axis specified: %d. Must be one of: [2,3]" % self.axis)
+                "Invalid Plotter axis specified: %d. Must be one of: [2,3]" %
+                self.axis)
 
         if not self.max_points:
             self.max_points = self.MAX_PLOT_POINTS

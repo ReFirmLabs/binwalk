@@ -2,7 +2,6 @@
 import os
 import sys
 import shutil
-import tempfile
 import subprocess
 from distutils.core import setup, Command
 from distutils.dir_util import remove_tree
@@ -17,7 +16,7 @@ except NameError:
     raw_input = input
 
 # cd into the src directory, no matter where setup.py was invoked from
-#os.chdir(os.path.join(os.path.dirname(os.path.realpath(__file__)), "src"))
+# os.chdir(os.path.join(os.path.dirname(os.path.realpath(__file__)), "src"))
 
 
 def which(command):
@@ -27,7 +26,8 @@ def which(command):
 
     try:
         location = subprocess.Popen(
-            ["which", command], shell=False, stdout=subprocess.PIPE).communicate()[0].strip()
+            ["which", command],
+            shell=False, stdout=subprocess.PIPE).communicate()[0].strip()
     except KeyboardInterrupt as e:
         raise e
     except Exception as e:
@@ -62,7 +62,7 @@ def remove_binwalk_module(pydir=None, pybin=None):
     for path in module_paths:
         try:
             remove_tree(path)
-        except OSError as e:
+        except OSError:
             pass
 
     if not pybin:
@@ -72,9 +72,9 @@ def remove_binwalk_module(pydir=None, pybin=None):
         try:
             sys.stdout.write("removing '%s'\n" % pybin)
             os.remove(pybin)
-        except KeyboardInterrupt as e:
+        except KeyboardInterrupt:
             pass
-        except Exception as e:
+        except Exception:
             pass
 
 
@@ -134,11 +134,13 @@ class IDAInstallCommand(Command):
 
         if not os.path.exists(binida_src_path):
             sys.stderr.write(
-                "ERROR: could not locate IDA plugin file '%s'!\n" % binida_src_path)
+                "ERROR: could not locate IDA plugin file '%s'!\n" %
+                binida_src_path)
             return
         if not os.path.exists(binida_dst_path):
             sys.stderr.write(
-                "ERROR: could not locate the IDA plugins directory '%s'! Check your --idadir option.\n" % binida_dst_path)
+                "ERROR: could not locate the IDA plugins directory '%s'! Check your --idadir option.\n" %
+                binida_dst_path)
             return
 
         binwalk_src_path = os.path.join(self.mydir, 'binwalk')
@@ -146,11 +148,13 @@ class IDAInstallCommand(Command):
 
         if not os.path.exists(binwalk_src_path):
             sys.stderr.write(
-                "ERROR: could not locate binwalk source directory '%s'!\n" % binwalk_src_path)
+                "ERROR: could not locate binwalk source directory '%s'!\n" %
+                binwalk_src_path)
             return
         if not os.path.exists(binwalk_dst_path):
             sys.stderr.write(
-                "ERROR: could not locate the IDA python directory '%s'! Check your --idadir option.\n" % binwalk_dst_path)
+                "ERROR: could not locate the IDA python directory '%s'! Check your --idadir option.\n" %
+                binwalk_dst_path)
             return
 
         binida_dst_path = os.path.join(binida_dst_path, 'binida.py')
@@ -225,7 +229,8 @@ class TestCommand(Command):
         pass
 
     def run(self):
-        subprocess.call('nosetests --exe --with-coverage --include=src/*', shell=True)
+        subprocess.call(
+            'nosetests --exe --with-coverage --include=src/*', shell=True)
 
 
 # The data files to install along with the module
@@ -234,18 +239,27 @@ for data_dir in ["magic", "config", "plugins", "modules", "core"]:
     install_data_files.append("%s%s*" % (data_dir, os.path.sep))
 
 # Install the module, script, and support files
-setup(name=MODULE_NAME,
-      version="2.1.2b",
-      description="Firmware analysis tool",
-      author="Craig Heffner",
-      url="https://github.com/devttys0/%s" % MODULE_NAME,
-
-      requires=[],
-      package_dir={"": "src"},
-      packages=[MODULE_NAME],
-      package_data={MODULE_NAME: install_data_files},
-      scripts=[os.path.join("src", "scripts", SCRIPT_NAME)],
-
-      cmdclass={'clean': CleanCommand, 'uninstall': UninstallCommand,
-                'idainstall': IDAInstallCommand, 'idauninstall': IDAUnInstallCommand, 'test': TestCommand}
-      )
+setup(
+    name=MODULE_NAME,
+    version="2.1.2b",
+    description="Firmware analysis tool",
+    author="Craig Heffner",
+    url="https://github.com/devttys0/%s" %
+    MODULE_NAME,
+    requires=[],
+    package_dir={
+        "": "src"},
+    packages=[MODULE_NAME],
+    package_data={
+        MODULE_NAME: install_data_files},
+    scripts=[
+        os.path.join(
+            "src",
+            "scripts",
+            SCRIPT_NAME)],
+    cmdclass={
+        'clean': CleanCommand,
+        'uninstall': UninstallCommand,
+        'idainstall': IDAInstallCommand,
+        'idauninstall': IDAUnInstallCommand,
+        'test': TestCommand})

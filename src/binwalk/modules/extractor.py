@@ -45,49 +45,37 @@ class Extractor(Module):
     PRIMARY = False
 
     CLI = [
-        Option(short='e',
-               long='extract',
-               kwargs={'load_default_rules': True, 'enabled': True},
-               description='Automatically extract known file types'),
-        Option(short='D',
-               long='dd',
-               type=list,
-               dtype='type:ext:cmd',
-               kwargs={'manual_rules': [], 'enabled': True},
-               description='Extract <type> signatures, give the files an extension of <ext>, and execute <cmd>'),
-        Option(short='M',
-               long='matryoshka',
-               kwargs={'matryoshka': 8},
-               description='Recursively scan extracted files'),
-        Option(short='d',
-               long='depth',
-               type=int,
-               kwargs={'matryoshka': 0},
-               description='Limit matryoshka recursion depth (default: 8 levels deep)'),
-        Option(short='C',
-               long='directory',
-               type=str,
-               kwargs={'base_directory': 0},
-               description='Extract files/folders to a custom directory (default: current working directory)'),
-        Option(short='j',
-               long='size',
-               type=int,
-               kwargs={'max_size': 0},
-               description='Limit the size of each extracted file'),
-        Option(short='n',
-               long='count',
-               type=int,
-               kwargs={'max_count': 0},
-               description='Limit the number of extracted files'),
-        Option(short='r',
-               long='rm',
-               kwargs={'remove_after_execute': True},
-               description='Delete carved files after extraction'),
-        Option(short='z',
-               long='carve',
-               kwargs={'run_extractors': False},
-               description="Carve data from files, but don't execute extraction utilities"),
-    ]
+        Option(
+            short='e', long='extract',
+            kwargs={'load_default_rules': True, 'enabled': True},
+            description='Automatically extract known file types'),
+        Option(
+            short='D', long='dd', type=list, dtype='type:ext:cmd',
+            kwargs={'manual_rules': [],
+                    'enabled': True},
+            description='Extract <type> signatures, give the files an extension of <ext>, and execute <cmd>'),
+        Option(
+            short='M', long='matryoshka', kwargs={'matryoshka': 8},
+            description='Recursively scan extracted files'),
+        Option(
+            short='d', long='depth', type=int, kwargs={'matryoshka': 0},
+            description='Limit matryoshka recursion depth (default: 8 levels deep)'),
+        Option(
+            short='C', long='directory', type=str,
+            kwargs={'base_directory': 0},
+            description='Extract files/folders to a custom directory (default: current working directory)'),
+        Option(
+            short='j', long='size', type=int, kwargs={'max_size': 0},
+            description='Limit the size of each extracted file'),
+        Option(
+            short='n', long='count', type=int, kwargs={'max_count': 0},
+            description='Limit the number of extracted files'),
+        Option(
+            short='r', long='rm', kwargs={'remove_after_execute': True},
+            description='Delete carved files after extraction'),
+        Option(
+            short='z', long='carve', kwargs={'run_extractors': False},
+            description="Carve data from files, but don't execute extraction utilities"), ]
 
     KWARGS = [
         Kwarg(name='max_size', default=None),
@@ -684,7 +672,8 @@ class Extractor(Module):
                     codes[i] = int(codes[i], 0)
                 except ValueError as e:
                     binwalk.core.common.warning(
-                        "The specified return code '%s' for extractor '%s' is not a valid number!" % (codes[i], values[0]))
+                        "The specified return code '%s' for extractor '%s' is not a valid number!" %
+                        (codes[i], values[0]))
             values[3] = codes
 
         if len(values) >= 5:
@@ -765,7 +754,8 @@ class Extractor(Module):
                 file_name, fname, str(e)))
 
         binwalk.core.common.debug(
-            "Carved data block 0x%X - 0x%X from '%s' to '%s'" % (offset, offset + size, file_name, fname))
+            "Carved data block 0x%X - 0x%X from '%s' to '%s'" %
+            (offset, offset + size, file_name, fname))
         return fname
 
     def execute(self, cmd, fname, codes=[0, None]):
@@ -792,7 +782,8 @@ class Extractor(Module):
                     raise e
                 except Exception as e:
                     binwalk.core.common.warning(
-                        "Internal extractor '%s' failed with exception: '%s'" % (str(cmd), str(e)))
+                        "Internal extractor '%s' failed with exception: '%s'" %
+                        (str(cmd), str(e)))
             elif cmd:
                 # If not in debug mode, create a temporary file to redirect
                 # stdout and stderr to
@@ -805,19 +796,24 @@ class Extractor(Module):
                     # Generate unique file paths for all paths in the current
                     # command that are surrounded by UNIQUE_PATH_DELIMITER
                     while self.UNIQUE_PATH_DELIMITER in command:
-                        need_unique_path = command.split(self.UNIQUE_PATH_DELIMITER)[
-                            1].split(self.UNIQUE_PATH_DELIMITER)[0]
+                        need_unique_path = command.split(
+                            self.UNIQUE_PATH_DELIMITER)[1].split(
+                            self.UNIQUE_PATH_DELIMITER)[0]
                         unique_path = binwalk.core.common.unique_file_name(
                             need_unique_path)
                         command = command.replace(
-                            self.UNIQUE_PATH_DELIMITER + need_unique_path + self.UNIQUE_PATH_DELIMITER, unique_path)
+                            self.UNIQUE_PATH_DELIMITER +
+                            need_unique_path +
+                            self.UNIQUE_PATH_DELIMITER,
+                            unique_path)
 
                     # Replace all instances of FILE_NAME_PLACEHOLDER in the
                     # command with fname
                     command = command.strip().replace(self.FILE_NAME_PLACEHOLDER, fname)
 
                     binwalk.core.common.debug(
-                        "subprocess.call(%s, stdout=%s, stderr=%s)" % (command, str(tmp), str(tmp)))
+                        "subprocess.call(%s, stdout=%s, stderr=%s)" %
+                        (command, str(tmp), str(tmp)))
                     rval = subprocess.call(shlex.split(
                         command), stdout=tmp, stderr=tmp)
 
@@ -827,7 +823,8 @@ class Extractor(Module):
                         retval = False
 
                     binwalk.core.common.debug(
-                        'External extractor command "%s" completed with return code %d (success: %s)' % (cmd, rval, str(retval)))
+                        'External extractor command "%s" completed with return code %d (success: %s)' %
+                        (cmd, rval, str(retval)))
 
                     # TODO: Should errors from all commands in a command string be checked? Currently we only support
                     #       specifying one set of error codes, so at the moment, this is not done; it is up to the
@@ -840,7 +837,9 @@ class Extractor(Module):
             raise e
         except Exception as e:
             binwalk.core.common.warning(
-                "Extractor.execute failed to run external extractor '%s': %s, '%s' might not be installed correctly" % (str(cmd), str(e), str(cmd)))
+                "Extractor.execute failed to run external extractor '%s': %s, '%s' might not be installed correctly" % (str(cmd),
+                                                                                                                        str(e),
+                                                                                                                        str(cmd)))
             retval = None
 
         if tmp is not None:

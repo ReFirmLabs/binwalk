@@ -126,14 +126,42 @@ class Library(object):
 
         for library in libraries:
             system_paths = {
-                'linux': [os.path.join(prefix, 'lib%s.so' % library), '/usr/local/lib/lib%s.so' % library],
-                'cygwin': [os.path.join(prefix, 'lib%s.so' % library), '/usr/local/lib/lib%s.so' % library],
-                'win32': [os.path.join(prefix, 'lib%s.dll' % library), '%s.dll' % library],
-                'darwin': [os.path.join(prefix, 'lib%s.dylib' % library),
-                           '/opt/local/lib/lib%s.dylib' % library,
-                           '/usr/local/lib/lib%s.dylib' % library,
-                           ] + glob.glob('/usr/local/Cellar/*%s*/*/lib/lib%s.dylib' % (library, library)),
-            }
+                'linux': [
+                    os.path.join(
+                        prefix,
+                        'lib%s.so' %
+                        library),
+                    '/usr/local/lib/lib%s.so' %
+                    library],
+                'cygwin': [
+                    os.path.join(
+                        prefix,
+                        'lib%s.so' %
+                        library),
+                    '/usr/local/lib/lib%s.so' %
+                    library],
+                'win32': [
+                        os.path.join(
+                            prefix,
+                            'lib%s.dll' %
+                            library),
+                    '%s.dll' %
+                    library],
+                'darwin': [
+                                os.path.join(
+                                    prefix,
+                                    'lib%s.dylib' %
+                                    library),
+                    '/opt/local/lib/lib%s.dylib' %
+                    library,
+                    '/usr/local/lib/lib%s.dylib' %
+                    library,
+                                    ] +
+                glob.glob(
+                                        '/usr/local/Cellar/*%s*/*/lib/lib%s.dylib' %
+                                        (library,
+                                         library)),
+                                         }
 
             for i in range(2, 4):
                 system_paths['linux%d' % i] = system_paths['linux']

@@ -167,8 +167,10 @@ class Entropy(Module):
         if self.block_size is None:
             block_size = fp.size / self.DEFAULT_DATA_POINTS
             # Round up to the nearest DEFAULT_BLOCK_SIZE (1024)
-            block_size = int(
-                block_size + ((self.DEFAULT_BLOCK_SIZE - block_size) % self.DEFAULT_BLOCK_SIZE))
+            block_size = int(block_size +
+                             ((self.DEFAULT_BLOCK_SIZE -
+                               block_size) %
+                              self.DEFAULT_BLOCK_SIZE))
         else:
             block_size = self.block_size
 

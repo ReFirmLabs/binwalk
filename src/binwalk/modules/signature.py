@@ -10,47 +10,37 @@ class Signature(Module):
     ORDER = 10
 
     CLI = [
-        Option(short='B',
-               long='signature',
-               kwargs={'enabled': True, 'explicit_signature_scan': True},
-               description='Scan target file(s) for common file signatures'),
-        Option(short='R',
-               long='raw',
-               kwargs={'enabled': True, 'raw_bytes': []},
-               type=list,
-               dtype=str.__name__,
-               description='Scan target file(s) for the specified sequence of bytes'),
-        Option(short='A',
-               long='opcodes',
-               kwargs={'enabled': True, 'search_for_opcodes': True},
-               description='Scan target file(s) for common executable opcode signatures'),
-        Option(short='m',
-               long='magic',
-               kwargs={'enabled': True, 'magic_files': []},
-               type=list,
-               dtype='file',
-               description='Specify a custom magic file to use'),
-        Option(short='b',
-               long='dumb',
-               kwargs={'dumb_scan': True},
-               description='Disable smart signature keywords'),
-        Option(short='I',
-               long='invalid',
-               kwargs={'show_invalid': True},
-               description='Show results marked as invalid'),
-        Option(short='x',
-               long='exclude',
-               kwargs={'exclude_filters': []},
-               type=list,
-               dtype=str.__name__,
-               description='Exclude results that match <str>'),
-        Option(short='y',
-               long='include',
-               kwargs={'include_filters': []},
-               type=list,
-               dtype=str.__name__,
-               description='Only show results that match <str>'),
-    ]
+        Option(
+            short='B', long='signature',
+            kwargs={'enabled': True, 'explicit_signature_scan': True},
+            description='Scan target file(s) for common file signatures'),
+        Option(
+            short='R', long='raw', kwargs={'enabled': True, 'raw_bytes': []},
+            type=list, dtype=str.__name__,
+            description='Scan target file(s) for the specified sequence of bytes'),
+        Option(
+            short='A', long='opcodes',
+            kwargs={'enabled': True, 'search_for_opcodes': True},
+            description='Scan target file(s) for common executable opcode signatures'),
+        Option(
+            short='m', long='magic',
+            kwargs={'enabled': True, 'magic_files': []},
+            type=list, dtype='file',
+            description='Specify a custom magic file to use'),
+        Option(
+            short='b', long='dumb', kwargs={'dumb_scan': True},
+            description='Disable smart signature keywords'),
+        Option(
+            short='I', long='invalid', kwargs={'show_invalid': True},
+            description='Show results marked as invalid'),
+        Option(
+            short='x', long='exclude', kwargs={'exclude_filters': []},
+            type=list, dtype=str.__name__,
+            description='Exclude results that match <str>'),
+        Option(
+            short='y', long='include', kwargs={'include_filters': []},
+            type=list, dtype=str.__name__,
+            description='Only show results that match <str>'), ]
 
     KWARGS = [
         Kwarg(name='enabled', default=False),
