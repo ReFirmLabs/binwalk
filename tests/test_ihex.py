@@ -6,7 +6,7 @@ from nose.tools import eq_, ok_
 
 def test_hello_world_simple_scan():
     '''
-    Test: Open hello-world ihex, scan for signatures
+    Test: Open hello-world.ihex, scan for signatures
     verify that only one signature is returned
     verify that the only signature returned is Intel HEX data-signature
     '''
