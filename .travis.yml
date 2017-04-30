@@ -9,4 +9,4 @@ install:
  - pip install coverage
  - ./setup.py install
 script: ./setup.py test
-
+cache: pip
