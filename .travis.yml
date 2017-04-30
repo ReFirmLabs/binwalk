@@ -9,12 +9,10 @@ python:
  - "pypy"
  - "pypy3"
 install:
- - ./deps.sh --yes
  - pip install coverage
  - ./setup.py install
 script: ./setup.py test
 cache: pip
-sudo: required
 matrix:
   allow_failures:
    - python: nightly
