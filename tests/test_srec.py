@@ -14,7 +14,7 @@ def test_hello_world_simple_scan():
         dirname(__file__) + '/input-vectors/hello-world.srec',
         signature=True,
         quiet=True,
-        extract=True) # Throws a warning for missing external extractor
+        extract=True)  # Throws a warning for missing external extractor
     ok_(scan_result != [])
     eq_(len(scan_result), 1)
     eq_(scan_result[0].results[0].description,
