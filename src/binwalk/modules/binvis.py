@@ -1,6 +1,5 @@
 # Generates 3D visualizations of input files.
 
-import os
 from binwalk.core.compat import *
 from binwalk.core.common import BlockFile
 from binwalk.core.module import Module, Option, Kwarg

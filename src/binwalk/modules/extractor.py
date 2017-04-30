@@ -4,7 +4,6 @@
 
 import os
 import re
-import sys
 import stat
 import shlex
 import tempfile

@@ -1,7 +1,6 @@
 # Core code for supporting and managing plugins.
 
 import os
-import sys
 import imp
 import inspect
 import binwalk.core.common
@@ -39,31 +38,26 @@ class Plugin(object):
         Child class should override this if needed.
         Invoked during plugin initialization.
         '''
-        pass
 
     def pre_scan(self):
         '''
         Child class should override this if needed.
         '''
-        pass
 
     def new_file(self, fp):
         '''
         Child class should override this if needed.
         '''
-        pass
 
     def scan(self, module):
         '''
         Child class should override this if needed.
         '''
-        pass
 
     def post_scan(self):
         '''
         Child class should override this if needed.
         '''
-        pass
 
 
 class Plugins(object):

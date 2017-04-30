@@ -6,9 +6,7 @@
 # specified files.
 
 import os
-import re
 import ctypes
-import fnmatch
 import binwalk.core.C
 import binwalk.core.common
 from binwalk.core.compat import *

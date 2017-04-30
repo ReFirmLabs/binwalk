@@ -15,7 +15,6 @@ import binwalk.core.statuserver
 import binwalk.core.common
 import binwalk.core.settings
 import binwalk.core.plugin
-from threading import Thread
 from binwalk.core.compat import *
 
 
@@ -620,7 +619,6 @@ class ModuleException(Exception):
     Module exception class.
     Nothing special here except the name.
     '''
-    pass
 
 
 class Modules(object):

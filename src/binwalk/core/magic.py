@@ -15,7 +15,6 @@ class ParserException(Exception):
     '''
     Exception thrown specifically for signature file parsing errors.
     '''
-    pass
 
 
 class SignatureResult(binwalk.core.module.Result):

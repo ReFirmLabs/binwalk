@@ -3,7 +3,6 @@
 # Inspired by people who actually know what they're doing:
 # http://www.fourmilab.ch/random/
 
-import math
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Kwarg, Option, Dependency
 

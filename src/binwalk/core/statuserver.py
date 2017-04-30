@@ -1,7 +1,6 @@
 # Provides scan status information via a TCP socket service.
 # Currently only works for signature scans.
 
-import sys
 import time
 import errno
 import threading
