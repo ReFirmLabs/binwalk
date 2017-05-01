@@ -474,7 +474,7 @@
 >8      ubelong     !0          executable code,
 >>8     ubelong&3   !0          {invalid}
 >>8     ubelong     x           load address: 0x%X,
->32     byte        !0          {invalid}
+>32     byte        0           {invalid}
 >32     string      x           version: "%s"
 
 0       belong      0x5EA3A417      SEAMA firmware header, big endian,
