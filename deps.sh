@@ -187,10 +187,18 @@ then
         PKG_PYTHON3_CANDIDATES="$PYTHON3_APT_CANDIDATES"
     fi
 else
-    PKGCMD="$APTCMD"
-    PKGCMD_OPTS="install -y"
-    PKG_CANDIDATES="$APT_CANDIDATES"
-    PKG_PYTHON3_CANDIDATES="$PYTHON3_APT_CANDIDATES"
+    if "$APTCMD" install -s -y dpkg > /dev/null
+    then
+        PKGCMD="$APTCMD"
+        PKGCMD_OPTS="install -y"
+        PKG_CANDIDATES="$APT_CANDIDATES"
+        PKG_PYTHON3_CANDIDATES="$PYTHON3_APT_CANDIDATES"
+    else
+        PKGCMD="$APTGETCMD"
+        PKGCMD_OPTS="install -y"
+        PKG_CANDIDATES="$APT_CANDIDATES"
+        PKG_PYTHON3_CANDIDATES="$PYTHON3_APT_CANDIDATES"
+    fi
 fi
 
 if [ "$NEEDED_UTILS" != "" ]
