@@ -15,7 +15,10 @@ def test_hello_world_simple_scan():
         signature=True,
         quiet=True,
         extract=True)  # Throws a warning for missing external extractor
-    ok_(scan_result != [])
+    # Test number of modules used
     eq_(len(scan_result), 1)
+    # Test number of results for that module
+    eq_(len(scan_result[0].results), 1)
+    # Test result-description
     eq_(scan_result[0].results[0].description,
         'Motorola S-Record; binary data in text format, record type: data (32-bit)')
