@@ -4,6 +4,7 @@
 
 import os
 import re
+import sys
 import stat
 import shlex
 import tempfile
@@ -47,39 +48,6 @@ class Extractor(Module):
     PRIMARY = False
 
     CLI = [
-<< << << < HEAD
-        Option(
-            short='e', long='extract',
-            kwargs={'load_default_rules': True, 'enabled': True},
-            description='Automatically extract known file types'),
-        Option(
-            short='D', long='dd', type=list, dtype='type:ext:cmd',
-            kwargs={'manual_rules': [],
-                    'enabled': True},
-            description='Extract <type> signatures, give the files an extension of <ext>, and execute <cmd>'),
-        Option(
-            short='M', long='matryoshka', kwargs={'matryoshka': 8},
-            description='Recursively scan extracted files'),
-        Option(
-            short='d', long='depth', type=int, kwargs={'matryoshka': 0},
-            description='Limit matryoshka recursion depth (default: 8 levels deep)'),
-        Option(
-            short='C', long='directory', type=str,
-            kwargs={'base_directory': 0},
-            description='Extract files/folders to a custom directory (default: current working directory)'),
-        Option(
-            short='j', long='size', type=int, kwargs={'max_size': 0},
-            description='Limit the size of each extracted file'),
-        Option(
-            short='n', long='count', type=int, kwargs={'max_count': 0},
-            description='Limit the number of extracted files'),
-        Option(
-            short='r', long='rm', kwargs={'remove_after_execute': True},
-            description='Delete carved files after extraction'),
-        Option(
-            short='z', long='carve', kwargs={'run_extractors': False},
-            description="Carve data from files, but don't execute extraction utilities"), ]
-== == == =
         Option(short='e',
                long='extract',
                kwargs={'load_default_rules': True, 'enabled': True},
@@ -123,7 +91,6 @@ class Extractor(Module):
                kwargs={'run_extractors': False},
                description="Carve data from files, but don't execute extraction utilities"),
     ]
->>>>>>> 6b7260735c8905255a7359dd0ecb5f4e415db7bf
 
     KWARGS = [
         Kwarg(name='max_size', default=None),
@@ -224,25 +191,15 @@ class Extractor(Module):
         # Only extract valid results that have been marked for extraction and displayed to the user.
         # Note that r.display is still True even if --quiet has been specified; it is False if the result has been
         # explicitly excluded via the -y/-x options.
-<<<<<<< HEAD
-        if r.valid and r.extract and r.display and (
-                not self.max_count or self.extraction_count < self.max_count):
-=======
         if r.valid and r.extract and r.display and (not self.max_count or self.extraction_count < self.max_count):
->>>>>>> 6b7260735c8905255a7359dd0ecb5f4e415db7bf
             # Create some extract output for this file, it it doesn't already
             # exist
             if not binwalk.core.common.has_key(self.output, r.file.path):
                 self.output[r.file.path] = ExtractInfo()
 
             # Attempt extraction
-<<<<<<< HEAD
-            binwalk.core.common.debug("Extractor callback for %s @%d [%s]" % (
-                r.file.name, r.offset, r.description))
-=======
             binwalk.core.common.debug(
                 "Extractor callback for %s @%d [%s]" % (r.file.name, r.offset, r.description))
->>>>>>> 6b7260735c8905255a7359dd0ecb5f4e415db7bf
             (extraction_directory, dd_file, scan_extracted_files) = self.extract(
                 r.offset, r.description, r.file.path, size, r.name)
 
@@ -264,22 +221,12 @@ class Extractor(Module):
                 # If this is a newly created output directory, self.last_directory_listing won't have a record of it.
                 # If we've extracted other files to this directory before, it
                 # will.
-<<<<<<< HEAD
-                if not has_key(self.last_directory_listing,
-                               extraction_directory):
-=======
                 if not has_key(self.last_directory_listing, extraction_directory):
->>>>>>> 6b7260735c8905255a7359dd0ecb5f4e415db7bf
                     self.last_directory_listing[extraction_directory] = set()
 
                 # Loop through a list of newly created files (i.e., files that
                 # weren't listed in the last directory listing)
-<<<<<<< HEAD
-                for f in directory_listing.difference(
-                        self.last_directory_listing[extraction_directory]):
-=======
                 for f in directory_listing.difference(self.last_directory_listing[extraction_directory]):
->>>>>>> 6b7260735c8905255a7359dd0ecb5f4e415db7bf
                     # Build the full file path and add it to the extractor
                     # results
                     file_path = os.path.join(extraction_directory, f)
@@ -289,13 +236,8 @@ class Extractor(Module):
                     # Also keep a list of files created by the extraction
                     # utility
                     if real_file_path != dd_file_path:
-<<<<<<< HEAD
-                        self.output[r.file.path].extracted[r.offset].append(
-                            real_file_path)
-=======
                         self.output[r.file.path].extracted[
                             r.offset].append(real_file_path)
->>>>>>> 6b7260735c8905255a7359dd0ecb5f4e415db7bf
 
                     # If recursion was specified, and the file is not the same
                     # one we just dd'd
@@ -305,12 +247,7 @@ class Extractor(Module):
                             self.directory in real_file_path):
                         # If the recursion level of this file is less than or
                         # equal to our desired recursion level
-<<<<<<< HEAD
-                        if len(real_file_path.split(self.directory)[
-                               1].split(os.path.sep)) <= self.matryoshka:
-=======
                         if len(real_file_path.split(self.directory)[1].split(os.path.sep)) <= self.matryoshka:
->>>>>>> 6b7260735c8905255a7359dd0ecb5f4e415db7bf
                             # If this is a directory and we are supposed to process directories for this extractor,
                             # then add all files under that directory to the
                             # list of pending files.
@@ -332,8 +269,7 @@ class Extractor(Module):
     def append_rule(self, r):
         self.extract_rules.append(r.copy())
 
-    def add_rule(self, txtrule=None, regex=None, extension=None,
-                 cmd=None, codes=[0, None], recurse=True):
+    def add_rule(self, txtrule=None, regex=None, extension=None, cmd=None, codes=[0, None], recurse=True):
         '''
         Adds a set of rules to the extraction rule list.
 
@@ -502,13 +438,8 @@ class Extractor(Module):
                     raise e
                 except Exception as e:
                     if binwalk.core.common.DEBUG:
-<<<<<<< HEAD
-                        raise Exception("Extractor.load_defaults failed to load file '%s': %s" % (
-                            extract_file, str(e)))
-=======
                         raise Exception(
                             "Extractor.load_defaults failed to load file '%s': %s" % (extract_file, str(e)))
->>>>>>> 6b7260735c8905255a7359dd0ecb5f4e415db7bf
 
     def get_output_directory_override(self):
         '''
@@ -549,7 +480,7 @@ class Extractor(Module):
                 # However, the very *first* file being scanned is not necessarily in the
                 # CWD, so this will raise an IndexError. This is easy to handle though,
                 # since the very first file being scanned needs to have its contents
-                # extracted to ${CWD}/_basename.extracted, so we just set the subdir
+                # extracted to /_basename.extracted, so we just set the subdir
                 # variable to a blank string when an IndexError is encountered.
                 try:
                     subdir = basedir.split(self.directory)[1][1:]
@@ -642,13 +573,8 @@ class Extractor(Module):
                     recurse = True
 
                 # Copy out the data to disk, if we haven't already
-<<<<<<< HEAD
-                fname = self._dd(file_path, offset, size,
-                                 rule['extension'], output_file_name=name)
-=======
                 fname = self._dd(
                     file_path, offset, size, rule['extension'], output_file_name=name)
->>>>>>> 6b7260735c8905255a7359dd0ecb5f4e415db7bf
 
                 # If there was a command specified for this rule, try to execute it.
                 # If execution fails, the next rule will be attempted.
@@ -757,12 +683,7 @@ class Extractor(Module):
                     codes[i] = int(codes[i], 0)
                 except ValueError as e:
                     binwalk.core.common.warning(
-<<<<<<< HEAD
-                        "The specified return code '%s' for extractor '%s' is not a valid number!" %
-                        (codes[i], values[0]))
-=======
                         "The specified return code '%s' for extractor '%s' is not a valid number!" % (codes[i], values[0]))
->>>>>>> 6b7260735c8905255a7359dd0ecb5f4e415db7bf
             values[3] = codes
 
         if len(values) >= 5:

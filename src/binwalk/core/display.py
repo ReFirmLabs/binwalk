@@ -208,13 +208,8 @@ class Display(object):
             while len(line[offset:]) > max_line_wrap_length:
                 # Find the nearest space to wrap the line at (so we don't split
                 # a word across two lines)
-<< << << < HEAD
-                split_offset = line[offset:offset +
-                                    max_line_wrap_length].rfind(' ')
-== == == =
                 split_offset = line[
                     offset:offset + max_line_wrap_length].rfind(' ')
->>>>>> > 6b7260735c8905255a7359dd0ecb5f4e415db7bf
                 # If there were no good places to split the line, just truncate
                 # it at max_line_wrap_length
                 if split_offset < 1:

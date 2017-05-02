@@ -49,44 +49,6 @@ class Disasm(Module):
     ]
 
     ARCHITECTURES = [
-<< << << < HEAD
-        Architecture(
-            type=capstone.CS_ARCH_ARM, mode=capstone.CS_MODE_ARM,
-            endianess=capstone.CS_MODE_BIG_ENDIAN,
-            description="ARM executable code, 32-bit, big endian"),
-        Architecture(
-            type=capstone.CS_ARCH_ARM, mode=capstone.CS_MODE_ARM,
-            endianess=capstone.CS_MODE_LITTLE_ENDIAN,
-            description="ARM executable code, 32-bit, little endian"),
-        Architecture(
-            type=capstone.CS_ARCH_ARM64, mode=capstone.CS_MODE_ARM,
-            endianess=capstone.CS_MODE_BIG_ENDIAN,
-            description="ARM executable code, 64-bit, big endian"),
-        Architecture(
-            type=capstone.CS_ARCH_ARM64, mode=capstone.CS_MODE_ARM,
-            endianess=capstone.CS_MODE_LITTLE_ENDIAN,
-            description="ARM executable code, 64-bit, little endian"),
-        Architecture(
-            type=capstone.CS_ARCH_PPC, mode=capstone.CS_MODE_BIG_ENDIAN,
-            endianess=capstone.CS_MODE_BIG_ENDIAN,
-            description="PPC executable code, 32/64-bit, big endian"),
-        Architecture(
-            type=capstone.CS_ARCH_MIPS, mode=capstone.CS_MODE_64,
-            endianess=capstone.CS_MODE_BIG_ENDIAN,
-            description="MIPS executable code, 32/64-bit, big endian"),
-        Architecture(
-            type=capstone.CS_ARCH_MIPS, mode=capstone.CS_MODE_64,
-            endianess=capstone.CS_MODE_LITTLE_ENDIAN,
-            description="MIPS executable code, 32/64-bit, little endian"),
-        Architecture(
-            type=capstone.CS_ARCH_ARM, mode=capstone.CS_MODE_THUMB,
-            endianess=capstone.CS_MODE_LITTLE_ENDIAN,
-            description="ARM executable code, 16-bit (Thumb), little endian"),
-        Architecture(
-            type=capstone.CS_ARCH_ARM, mode=capstone.CS_MODE_THUMB,
-            endianess=capstone.CS_MODE_BIG_ENDIAN,
-            description="ARM executable code, 16-bit (Thumb), big endian"), ]
-== == == =
         Architecture(type=capstone.CS_ARCH_ARM,
                      mode=capstone.CS_MODE_ARM,
                      endianess=capstone.CS_MODE_BIG_ENDIAN,
@@ -127,7 +89,6 @@ class Disasm(Module):
                      endianess=capstone.CS_MODE_BIG_ENDIAN,
                      description="ARM executable code, 16-bit (Thumb), big endian"),
     ]
->>>>>>> 6b7260735c8905255a7359dd0ecb5f4e415db7bf
 
     def init(self):
         self.disassemblers = []

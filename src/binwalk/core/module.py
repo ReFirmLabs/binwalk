@@ -540,11 +540,7 @@ class Module(object):
         self.config.display.add_custom_header(
             self.VERBOSE_FORMAT, self.VERBOSE)
 
-<< << << < HEAD
-        if isinstance(self.HEADER, type([])):
-== == == =
         if type(self.HEADER) == type([]):
->>>>>> > 6b7260735c8905255a7359dd0ecb5f4e415db7bf
             self.config.display.header(
                 *self.HEADER, file_name=self.current_target_file_name)
         elif self.HEADER:
