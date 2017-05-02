@@ -229,8 +229,8 @@ class TestCommand(Command):
         pass
 
     def run(self):
-        subprocess.call(
-            'nosetests --exe --with-coverage --include=src/*', shell=True)
+        import nose
+        nose.main(argv=['--exe','--with-coverage'])
 
 
 # The data files to install along with the module
