@@ -15,6 +15,7 @@ from binwalk.core.common import file_size, file_md5, unique_file_name, BlockFile
 
 
 class ExtractInfo(object):
+
     def __init__(self):
         self.carved = {}
         self.extracted = {}
@@ -252,7 +253,8 @@ class Extractor(Module):
 
                 # Update the last directory listing for the next time we
                 # extract a file to this same output directory
-                self.last_directory_listing[extraction_directory] = directory_listing
+                self.last_directory_listing[
+                    extraction_directory] = directory_listing
 
     def append_rule(self, r):
         self.extract_rules.append(r.copy())
@@ -790,6 +792,16 @@ class Extractor(Module):
                 if not binwalk.core.common.DEBUG:
                     tmp = tempfile.TemporaryFile()
 
+                # Generate unique file paths for all paths in the current
+                # command that are surrounded by UNIQUE_PATH_DELIMITER
+                while self.UNIQUE_PATH_DELIMITER in cmd:
+                    need_unique_path = cmd.split(self.UNIQUE_PATH_DELIMITER)[
+                        1].split(self.UNIQUE_PATH_DELIMITER)[0]
+                    unique_path = binwalk.core.common.unique_file_name(
+                        need_unique_path)
+                    cmd = cmd.replace(
+                        self.UNIQUE_PATH_DELIMITER + need_unique_path + self.UNIQUE_PATH_DELIMITER, unique_path)
+
                 # Execute.
                 for command in cmd.split("&&"):
 
@@ -838,7 +850,8 @@ class Extractor(Module):
         except Exception as e:
             binwalk.core.common.warning(
                 "Extractor.execute failed to run external extractor '%s': %s, '%s' might not be installed correctly" % (str(cmd),
-                                                                                                                        str(e),
+                                                                                                                        str(
+                                                                                                                            e),
                                                                                                                         str(cmd)))
             retval = None
 

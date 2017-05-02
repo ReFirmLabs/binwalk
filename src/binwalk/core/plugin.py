@@ -6,6 +6,7 @@ import inspect
 import binwalk.core.common
 import binwalk.core.settings
 from binwalk.core.compat import *
+from binwalk.core.exceptions import IgnoreFileException
 
 
 class Plugin(object):
@@ -77,6 +78,7 @@ class Plugins(object):
 
     SCAN = 'scan'
     NEWFILE = 'new_file'
+    LOADFILE = 'load_file'
     PRESCAN = 'pre_scan'
     POSTSCAN = 'post_scan'
     MODULE_EXTENSION = '.py'
@@ -85,6 +87,7 @@ class Plugins(object):
         self.scan = []
         self.pre_scan = []
         self.new_file = []
+        self.load_file = []
         self.post_scan = []
         self.parent = parent
         self.settings = binwalk.core.settings.Settings()
@@ -104,6 +107,8 @@ class Plugins(object):
                     if obj is not None:
                         callback(obj)
             except KeyboardInterrupt as e:
+                raise e
+            except IgnoreFileException as e:
                 raise e
             except Exception as e:
                 binwalk.core.common.warning("%s.%s failed: %s" % (
@@ -217,6 +222,13 @@ class Plugins(object):
                     pass
 
                 try:
+                    self.load_file.append(getattr(class_instance, self.LOADFILE))
+                except KeyboardInterrupt as e:
+                    raise e
+                except Exception as e:
+                    pass
+
+                try:
                     self.pre_scan.append(getattr(class_instance, self.PRESCAN))
                 except KeyboardInterrupt as e:
                     raise e
@@ -246,6 +258,9 @@ class Plugins(object):
 
     def pre_scan_callbacks(self, obj):
         return self._call_plugins(self.pre_scan)
+
+    def load_file_callbacks(self, fp):
+        return self._call_plugins(self.load_file, fp)
 
     def new_file_callbacks(self, fp):
         return self._call_plugins(self.new_file, fp)

@@ -9,12 +9,7 @@ import struct
 import datetime
 import binwalk.core.common
 import binwalk.core.compat
-
-
-class ParserException(Exception):
-    '''
-    Exception thrown specifically for signature file parsing errors.
-    '''
+from binwalk.core.exceptions import ParserException
 
 
 class SignatureResult(binwalk.core.module.Result):
