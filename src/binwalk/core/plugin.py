@@ -10,6 +10,7 @@ from binwalk.core.exceptions import IgnoreFileException
 
 
 class Plugin(object):
+
     '''
     Class from which all plugin classes are based.
     '''
@@ -62,6 +63,7 @@ class Plugin(object):
 
 
 class Plugins(object):
+
     '''
     Class to load and call plugin callback functions, handled automatically by Binwalk.scan / Binwalk.single_scan.
     An instance of this class is available during a scan via the Binwalk.plugins object.
@@ -111,8 +113,8 @@ class Plugins(object):
             except IgnoreFileException as e:
                 raise e
             except Exception as e:
-                binwalk.core.common.warning("%s.%s failed: %s" % (
-                    callback.__module__, callback.__name__, e))
+                binwalk.core.common.warning(
+                    "%s.%s failed: %s" % (callback.__module__, callback.__name__, e))
 
     def _find_plugin_class(self, plugin):
         for (name, klass) in inspect.getmembers(plugin, inspect.isclass):
@@ -169,8 +171,8 @@ class Plugins(object):
                         module = file_name[:-len(self.MODULE_EXTENSION)]
 
                         try:
-                            plugin = imp.load_source(module, os.path.join(
-                                plugins[key]['path'], file_name))
+                            plugin = imp.load_source(
+                                module, os.path.join(plugins[key]['path'], file_name))
                             plugin_class = self._find_plugin_class(plugin)
 
                             plugins[key]['enabled'][module] = True
@@ -183,12 +185,13 @@ class Plugins(object):
                             plugins[key]['enabled'][module] = False
 
                         try:
-                            plugins[key]['descriptions'][module] = plugin_class.__doc__.strip().split('\n')[
-                                0]
+                            plugins[key]['descriptions'][
+                                module] = plugin_class.__doc__.strip().split('\n')[0]
                         except KeyboardInterrupt as e:
                             raise e
                         except Exception as e:
-                            plugins[key]['descriptions'][module] = 'No description'
+                            plugins[key]['descriptions'][
+                                module] = 'No description'
         return plugins
 
     def load_plugins(self):
@@ -222,7 +225,8 @@ class Plugins(object):
                     pass
 
                 try:
-                    self.load_file.append(getattr(class_instance, self.LOADFILE))
+                    self.load_file.append(
+                        getattr(class_instance, self.LOADFILE))
                 except KeyboardInterrupt as e:
                     raise e
                 except Exception as e:

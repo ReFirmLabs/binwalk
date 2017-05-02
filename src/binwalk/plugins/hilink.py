@@ -13,6 +13,7 @@ except ImportError as e:
 
 
 class HilinkDecryptor(binwalk.core.plugin.Plugin):
+
     '''
     Plugin to decrypt, validate, and extract Hilink encrypted firmware.
     '''
@@ -31,8 +32,7 @@ class HilinkDecryptor(binwalk.core.plugin.Plugin):
             # Add an extraction rule for encrypted Hilink firmware signature
             # results
             self.module.extractor.add_rule(
-                regex="^%s" %
-                self.SIGNATURE_DESCRIPTION,
+                regex="^%s" % self.SIGNATURE_DESCRIPTION,
                 extension="enc",
                 cmd=self._decrypt_and_extract)
 

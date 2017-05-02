@@ -6,6 +6,7 @@ import binwalk.core.plugin
 
 
 class ZLIBExtractPlugin(binwalk.core.plugin.Plugin):
+
     '''
     Zlib extractor plugin.
     '''

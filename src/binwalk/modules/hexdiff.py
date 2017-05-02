@@ -22,21 +22,27 @@ class HexDiff(Module):
     TITLE = "Binary Diffing"
 
     CLI = [
-        Option(
-            short='W', long='hexdump', kwargs={'enabled': True},
-            description='Perform a hexdump / diff of a file or files'),
-        Option(
-            short='G', long='green', kwargs={'show_green': True},
-            description='Only show lines containing bytes that are the same among all files'),
-        Option(
-            short='i', long='red', kwargs={'show_red': True},
-            description='Only show lines containing bytes that are different among all files'),
-        Option(
-            short='U', long='blue', kwargs={'show_blue': True},
-            description='Only show lines containing bytes that are different among some files'),
-        Option(
-            short='w', long='terse', kwargs={'terse': True},
-            description='Diff all files, but only display a hex dump of the first file'), ]
+        Option(short='W',
+               long='hexdump',
+               kwargs={'enabled': True},
+               description='Perform a hexdump / diff of a file or files'),
+        Option(short='G',
+               long='green',
+               kwargs={'show_green': True},
+               description='Only show lines containing bytes that are the same among all files'),
+        Option(short='i',
+               long='red',
+               kwargs={'show_red': True},
+               description='Only show lines containing bytes that are different among all files'),
+        Option(short='U',
+               long='blue',
+               kwargs={'show_blue': True},
+               description='Only show lines containing bytes that are different among some files'),
+        Option(short='w',
+               long='terse',
+               kwargs={'terse': True},
+               description='Diff all files, but only display a hex dump of the first file'),
+    ]
 
     KWARGS = [
         Kwarg(name='show_red', default=False),

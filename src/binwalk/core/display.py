@@ -9,6 +9,7 @@ from binwalk.core.compat import *
 
 
 class Display(object):
+
     '''
     Class to handle display of output and writing to log files.
     This class is instantiated for all modules implicitly and should not need to be invoked directly by most modules.
@@ -106,16 +107,16 @@ class Display(object):
                          timestamp], csv=False, filter=False)
             self._fprint("Target File:   %s\n", [
                          file_name], csv=False, filter=False)
-            self._fprint("MD5 Checksum:  %s\n", [
-                         md5sum], csv=False, filter=False)
+            self._fprint(
+                "MD5 Checksum:  %s\n", [md5sum], csv=False, filter=False)
             if self.custom_verbose_format and self.custom_verbose_args:
-                self._fprint(self.custom_verbose_format,
-                             self.custom_verbose_args, csv=False, filter=False)
+                self._fprint(
+                    self.custom_verbose_format, self.custom_verbose_args, csv=False, filter=False)
 
         self._fprint("%s", "\n", csv=False, filter=False)
         self._fprint(self.header_format, args, filter=False)
-        self._fprint("%s", ["-" * self.HEADER_WIDTH + "\n"],
-                     csv=False, filter=False)
+        self._fprint(
+            "%s", ["-" * self.HEADER_WIDTH + "\n"], csv=False, filter=False)
 
     def result(self, *args):
         # Convert to list for item assignment
@@ -207,8 +208,13 @@ class Display(object):
             while len(line[offset:]) > max_line_wrap_length:
                 # Find the nearest space to wrap the line at (so we don't split
                 # a word across two lines)
+<< << << < HEAD
                 split_offset = line[offset:offset +
                                     max_line_wrap_length].rfind(' ')
+== == == =
+                split_offset = line[
+                    offset:offset + max_line_wrap_length].rfind(' ')
+>>>>>> > 6b7260735c8905255a7359dd0ecb5f4e415db7bf
                 # If there were no good places to split the line, just truncate
                 # it at max_line_wrap_length
                 if split_offset < 1:
@@ -245,8 +251,8 @@ class Display(object):
                 import termios
 
                 # Get the terminal window width
-                hw = struct.unpack('hh', fcntl.ioctl(
-                    1, termios.TIOCGWINSZ, '1234'))
+                hw = struct.unpack(
+                    'hh', fcntl.ioctl(1, termios.TIOCGWINSZ, '1234'))
                 self.SCREEN_WIDTH = self.HEADER_WIDTH = hw[1]
             except KeyboardInterrupt as e:
                 raise e

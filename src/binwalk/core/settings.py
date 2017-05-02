@@ -7,6 +7,7 @@ from binwalk.core.compat import *
 
 
 class Settings:
+
     '''
     Binwalk settings class, used for accessing user and system file paths and general configuration settings.
 
@@ -45,19 +46,24 @@ class Settings:
         # Build the paths to all user-specific files
         self.user = common.GenericContainer(
             binarch=self._user_path(
-                self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE), magic=self._magic_signature_files(
-                user_only=True), extract=self._user_path(
-                self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE), modules=self._user_path(
-                    self.BINWALK_MODULES_DIR), plugins=self._user_path(
-                        self.BINWALK_PLUGINS_DIR))
+                self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE),
+            magic=self._magic_signature_files(
+                user_only=True),
+            extract=self._user_path(
+                self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE),
+            modules=self._user_path(
+                self.BINWALK_MODULES_DIR),
+            plugins=self._user_path(self.BINWALK_PLUGINS_DIR))
 
         # Build the paths to all system-wide files
         self.system = common.GenericContainer(
             binarch=self._system_path(
-                self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE), magic=self._magic_signature_files(
-                system_only=True), extract=self._system_path(
-                self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE), plugins=self._system_path(
-                    self.BINWALK_PLUGINS_DIR))
+                self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE),
+            magic=self._magic_signature_files(
+                system_only=True),
+            extract=self._system_path(
+                self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE),
+            plugins=self._system_path(self.BINWALK_PLUGINS_DIR))
 
     def _magic_signature_files(self, system_only=False, user_only=False):
         '''
@@ -183,8 +189,7 @@ class Settings:
         Returns the full path to the 'subdir/basename' file.
         '''
         try:
-            return self._file_path(os.path.join(
-                self.user_dir, self.BINWALK_USER_DIR, subdir), basename)
+            return self._file_path(os.path.join(self.user_dir, self.BINWALK_USER_DIR, subdir), basename)
         except KeyboardInterrupt as e:
             raise e
         except Exception:
@@ -200,8 +205,7 @@ class Settings:
         Returns the full path to the 'subdir/basename' file.
         '''
         try:
-            return self._file_path(os.path.join(
-                self.system_dir, subdir), basename)
+            return self._file_path(os.path.join(self.system_dir, subdir), basename)
         except KeyboardInterrupt as e:
             raise e
         except Exception:

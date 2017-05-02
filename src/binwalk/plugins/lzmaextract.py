@@ -3,6 +3,7 @@ import binwalk.core.plugin
 
 
 class LZMAExtractPlugin(binwalk.core.plugin.Plugin):
+
     '''
     LZMA extractor plugin.
     '''

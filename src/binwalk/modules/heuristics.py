@@ -8,6 +8,7 @@ from binwalk.core.module import Module, Kwarg, Option, Dependency
 
 
 class ChiSquare(object):
+
     '''
     Performs a Chi Squared test against the provided data.
     '''
@@ -77,6 +78,7 @@ class EntropyBlock(object):
 
 
 class HeuristicCompressionAnalyzer(Module):
+
     '''
     Performs analysis and attempts to interpret the results.
     '''
@@ -91,32 +93,23 @@ class HeuristicCompressionAnalyzer(Module):
     TITLE = "Heuristic Compression"
 
     DEPENDS = [
-        Dependency(
-            name='Entropy',
-            attribute='entropy',
-            kwargs={
-                'enabled': True,
-                'do_plot': False,
-                'display_results': False,
-                'block_size': ENTROPY_BLOCK_SIZE}),
-             ]
+        Dependency(name='Entropy',
+                   attribute='entropy',
+                   kwargs={
+                       'enabled': True, 'do_plot': False, 'display_results': False, 'block_size': ENTROPY_BLOCK_SIZE}),
+    ]
 
     CLI = [
-        Option(
-            short='H',
-            long='heuristic',
-            kwargs={
-                'enabled': True},
-            description='Heuristically classify high entropy data'),
-        Option(
-                short='a',
-                long='trigger',
-                kwargs={
-                    'trigger_level': 0},
-            type=float,
-            description='Set the entropy trigger level (0.0 - 1.0, default: %.2f)' %
-            ENTROPY_TRIGGER),
-                     ]
+        Option(short='H',
+               long='heuristic',
+               kwargs={'enabled': True},
+               description='Heuristically classify high entropy data'),
+        Option(short='a',
+               long='trigger',
+               kwargs={'trigger_level': 0},
+               type=float,
+               description='Set the entropy trigger level (0.0 - 1.0, default: %.2f)' % ENTROPY_TRIGGER),
+    ]
 
     KWARGS = [
         Kwarg(name='enabled', default=False),
@@ -143,14 +136,12 @@ class HeuristicCompressionAnalyzer(Module):
             if not has_key(self.blocks, result.file.name):
                 self.blocks[result.file.name] = []
 
-            if result.entropy >= self.trigger_level and(
-                    not self.blocks[result.file.name]
-                    or self.blocks[result.file.name][-1].end is not None):
+            if result.entropy >= self.trigger_level and (not self.blocks[result.file.name] or self.blocks[result.file.name][-1].end is not None):
                 self.blocks[result.file.name].append(
                     EntropyBlock(start=result.offset + self.BLOCK_OFFSET))
             elif result.entropy < self.trigger_level and self.blocks[result.file.name] and self.blocks[result.file.name][-1].end is None:
-                self.blocks[result.file.name][-1].end = result.offset - \
-                    self.BLOCK_OFFSET
+                self.blocks[result.file.name][
+                    -1].end = result.offset - self.BLOCK_OFFSET
 
     def run(self):
         for fp in iter(self.next_file, None):

@@ -6,6 +6,7 @@ import logging
 
 
 class ShutUpHashlib(logging.Filter):
+
     '''
     This is used to suppress hashlib exception messages
     if using the Python interpreter bundled with IDA.
@@ -41,6 +42,7 @@ def end_address():
 
 
 class IDBFileIO(io.FileIO):
+
     '''
     A custom class to override binwalk.core.common.Blockfile in order to
     read data directly out of the IDB, rather than reading from the original

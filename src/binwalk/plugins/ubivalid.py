@@ -5,6 +5,7 @@ import binwalk.core.compat
 
 
 class UBIValidPlugin(binwalk.core.plugin.Plugin):
+
     '''
     Helps validate UBI erase count signature results.
 

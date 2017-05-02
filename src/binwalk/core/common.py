@@ -198,6 +198,7 @@ class GenericContainer(object):
 
 
 class MathExpression(object):
+
     '''
     Class for safely evaluating mathematical expressions from a string.
     Stolen from: http://stackoverflow.com/questions/2371436/evaluating-a-mathematical-expression-in-a-string
@@ -237,13 +238,13 @@ class MathExpression(object):
         elif isinstance(node, ast.UnaryOp):
             return self.OPERATORS[type(node.op)](0, self._eval(node.operand))
         elif isinstance(node, ast.BinOp):  # <left> <operator> <right>
-            return self.OPERATORS[type(node.op)](
-                self._eval(node.left), self._eval(node.right))
+            return self.OPERATORS[type(node.op)](self._eval(node.left), self._eval(node.right))
         else:
             raise TypeError(node)
 
 
 class StringFile(object):
+
     '''
     A class to allow access to strings as if they were read from a file.
     Used internally as a conditional superclass to InternalBlockFile.
@@ -278,6 +279,7 @@ def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
 
     # Defining a class inside a function allows it to be dynamically subclassed
     class InternalBlockFile(subclass):
+
         '''
         Abstraction class for accessing binary files.
 
@@ -423,8 +425,13 @@ def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
             return data
 
         def reset(self):
+<< << << < HEAD
             self.set_block_size(block=self.base_block_size,
                                 peek=self.base_peek_size)
+== == == =
+            self.set_block_size(
+                block=self.base_block_size, peek=self.base_peek_size)
+>>>>>> > 6b7260735c8905255a7359dd0ecb5f4e415db7bf
             self.seek(self.offset)
 
         def set_block_size(self, block=None, peek=None):

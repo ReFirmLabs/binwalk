@@ -117,7 +117,7 @@ class Entropy(Module):
                 self.block_size = None
 
     def _entropy_sigterm_handler(self, *args):
-        print ("FUck it all.")
+        print("FUck it all.")
 
     def run(self):
         # If generating a graphical plot, this function will never return, as it invokes
@@ -167,10 +167,8 @@ class Entropy(Module):
         if self.block_size is None:
             block_size = fp.size / self.DEFAULT_DATA_POINTS
             # Round up to the nearest DEFAULT_BLOCK_SIZE (1024)
-            block_size = int(block_size +
-                             ((self.DEFAULT_BLOCK_SIZE -
-                               block_size) %
-                              self.DEFAULT_BLOCK_SIZE))
+            block_size = int(
+                block_size + ((self.DEFAULT_BLOCK_SIZE - block_size) % self.DEFAULT_BLOCK_SIZE))
         else:
             block_size = self.block_size
 
@@ -178,8 +176,8 @@ class Entropy(Module):
         if block_size <= 0:
             block_size = self.DEFAULT_BLOCK_SIZE
 
-        binwalk.core.common.debug("Entropy block size (%d data points): %d" % (
-            self.DEFAULT_DATA_POINTS, block_size))
+        binwalk.core.common.debug("Entropy block size (%d data points): %d" %
+                                  (self.DEFAULT_DATA_POINTS, block_size))
 
         while True:
             file_offset = fp.tell()
@@ -252,8 +250,8 @@ class Entropy(Module):
         '''
         # Entropy is a simple ratio of: <zlib compressed size> / <original
         # size>
-        e = float(float(len(zlib.compress(str2bytes(data), 9))) /
-                  float(len(data)))
+        e = float(
+            float(len(zlib.compress(str2bytes(data), 9))) / float(len(data)))
 
         if truncate and e > 1.0:
             e = 1.0
@@ -323,8 +321,8 @@ class Entropy(Module):
             except TypeError:
                 exporter = exporters.ImageExporter.ImageExporter(plt.plotItem)
             exporter.parameters()['width'] = self.FILE_WIDTH
-            exporter.export(binwalk.core.common.unique_file_name(
-                out_file, self.FILE_FORMAT))
+            exporter.export(
+                binwalk.core.common.unique_file_name(out_file, self.FILE_FORMAT))
         else:
             plt.setLabel('left', self.YLABEL, units=self.YUNITS)
             plt.setLabel('bottom', self.XLABEL, units=self.XUNITS)

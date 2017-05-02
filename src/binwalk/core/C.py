@@ -8,6 +8,7 @@ from binwalk.core.compat import *
 
 
 class Function(object):
+
     '''
     Container class for defining library functions.
     '''
@@ -21,6 +22,7 @@ class Function(object):
 
 
 class FunctionHandler(object):
+
     '''
     Class for abstracting function calls via ctypes and handling Python 2/3 compatibility issues.
     '''
@@ -61,7 +63,7 @@ class FunctionHandler(object):
         else:
             self.function.restype = self.retype
             self.retval_converter = None
-            #raise Exception("Unknown return type: '%s'" % self.retype)
+            # raise Exception("Unknown return type: '%s'" % self.retype)
 
     def run(self, *args):
         '''
@@ -87,6 +89,7 @@ class FunctionHandler(object):
 
 
 class Library(object):
+
     '''
     Class for loading the specified library via ctypes.
     '''
@@ -141,27 +144,27 @@ class Library(object):
                     '/usr/local/lib/lib%s.so' %
                     library],
                 'win32': [
-                        os.path.join(
-                            prefix,
-                            'lib%s.dll' %
-                            library),
+                    os.path.join(
+                        prefix,
+                        'lib%s.dll' %
+                        library),
                     '%s.dll' %
                     library],
                 'darwin': [
-                                os.path.join(
-                                    prefix,
-                                    'lib%s.dylib' %
-                                    library),
+                    os.path.join(
+                        prefix,
+                        'lib%s.dylib' %
+                        library),
                     '/opt/local/lib/lib%s.dylib' %
                     library,
                     '/usr/local/lib/lib%s.dylib' %
                     library,
-                                    ] +
+                ] +
                 glob.glob(
-                                        '/usr/local/Cellar/*%s*/*/lib/lib%s.dylib' %
-                                        (library,
-                                         library)),
-                                         }
+                    '/usr/local/Cellar/*%s*/*/lib/lib%s.dylib' %
+                    (library,
+                     library)),
+            }
 
             for i in range(2, 4):
                 system_paths['linux%d' % i] = system_paths['linux']

@@ -4,6 +4,7 @@ import binwalk.core.plugin
 
 
 class JFFS2ValidPlugin(binwalk.core.plugin.Plugin):
+
     '''
     Helps validate JFFS2 signature results.
 
@@ -24,8 +25,8 @@ class JFFS2ValidPlugin(binwalk.core.plugin.Plugin):
             header_crc = struct.unpack("<I", node_header[8:12])[0]
 
         # Calculate the actual CRC
-        calculated_header_crc = (binascii.crc32(
-            node_header[0:8], -1) ^ -1) & 0xffffffff
+        calculated_header_crc = (
+            binascii.crc32(node_header[0:8], -1) ^ -1) & 0xffffffff
 
         # Make sure they match
         return (header_crc == calculated_header_crc)

@@ -6,6 +6,7 @@ from binwalk.core.common import BlockFile
 
 
 class LZMAModPlugin(binwalk.core.plugin.Plugin):
+
     '''
     Finds and extracts modified LZMA files commonly found in cable modems.
     Based on Bernardo Rodrigues' work: http://w00tsec.blogspot.com/2013/11/unpacking-firmware-images-from-cable.html
@@ -31,8 +32,8 @@ class LZMAModPlugin(binwalk.core.plugin.Plugin):
         # If the external extractor was successul (True) or didn't exist
         # (None), don't do anything.
         if result not in [True, None]:
-            out_name = os.path.splitext(
-                fname)[0] + '-patched' + os.path.splitext(fname)[1]
+            out_name = os.path.splitext(fname)[
+                0] + '-patched' + os.path.splitext(fname)[1]
             fp_out = BlockFile(out_name, 'w')
             # Use self.module.config.open_file here to ensure that other config
             # settings (such as byte-swapping) are honored
@@ -65,9 +66,8 @@ class LZMAModPlugin(binwalk.core.plugin.Plugin):
     def scan(self, result):
         # The modified cable modem LZMA headers all have valid dictionary sizes
         # and a properties byte of 0x5D.
-        if result.description.lower().startswith(
-                self.SIGNATURE) and "invalid uncompressed size" in result.description:
+        if result.description.lower().startswith(self.SIGNATURE) and "invalid uncompressed size" in result.description:
             if "properties: 0x5D" in result.description and "invalid dictionary size" not in result.description:
                 result.valid = True
-                result.description = result.description.split("invalid uncompressed size")[
-                    0] + "missing uncompressed size"
+                result.description = result.description.split(
+                    "invalid uncompressed size")[0] + "missing uncompressed size"

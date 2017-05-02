@@ -11,8 +11,8 @@ except ImportError as e:
 class RomFSCommon(object):
 
     def _read_next_word(self):
-        value = struct.unpack("%sL" % self.endianess,
-                              self.data[self.index:self.index + 4])[0]
+        value = struct.unpack(
+            "%sL" % self.endianess, self.data[self.index:self.index + 4])[0]
         self.index += 4
         return value
 
@@ -107,6 +107,7 @@ class RomFSDirStruct(RomFSCommon):
 
 
 class FileContainer(object):
+
     def __init__(self):
         pass
 
@@ -152,32 +153,40 @@ class RomFS(object):
         while True:
             try:
                 entry = RomFSEntry(
+<< << << < HEAD
                     self.data[offset: offset + self.FILE_ENTRY_SIZE],
                     endianess=self.endianess)
+== == == =
+                    self.data[offset:offset + self.FILE_ENTRY_SIZE], endianess = self.endianess)
+>> >>>> > 6b7260735c8905255a7359dd0ecb5f4e415db7bf
             except ValueError as e:
                 break
 
             if not entry.uid in entries:
-                entries[entry.uid] = FileContainer()
+                entries[entry.uid]=FileContainer()
 
-            entries[entry.uid].offset = entry.offset
-            entries[entry.uid].size = entry.size
-            entries[entry.uid].type = entry.type
+            entries[entry.uid].offset=entry.offset
+            entries[entry.uid].size=entry.size
+            entries[entry.uid].type=entry.type
             if entry.uid == 0:
-                entries[entry.uid].name = os.path.sep
+                entries[entry.uid].name=os.path.sep
 
             if entry.type & entry.DIR_STRUCT_MASK:
-                entries[entry.uid].type = "directory"
-                ds = RomFSDirStruct(
+                entries[entry.uid].type="directory"
+                ds=RomFSDirStruct(
+<< << << < HEAD
                     self.data[entry.offset: entry.offset + entry.size],
-                    endianess=self.endianess)
+                    endianess = self.endianess)
+== == == =
+                    self.data[entry.offset:entry.offset + entry.size], endianess=self.endianess)
+>> >>>> > 6b7260735c8905255a7359dd0ecb5f4e415db7bf
                 for (uid, name) in ds.ls:
                     if not uid in entries:
-                        entries[uid] = FileContainer()
-                    entries[uid].parent = ds.uid
-                    entries[uid].name = name
+                        entries[uid]=FileContainer()
+                    entries[uid].parent=ds.uid
+                    entries[uid].name=name
             else:
-                entries[entry.uid].type = "data"
+                entries[entry.uid].type="data"
 
             offset += self.FILE_ENTRY_SIZE
 
@@ -188,19 +197,20 @@ if __name__ == '__main__':
     import sys
 
     try:
-        infile = sys.argv[1]
-        outdir = sys.argv[2]
+        infile=sys.argv[1]
+        outdir=sys.argv[2]
     except IndexError as e:
-        print ("Usage: %s <input file> <output directory>" % sys.argv[0])
+        print("Usage: %s <input file> <output directory>" % sys.argv[0])
         sys.exit(1)
 
 
 class DlinkROMFSExtractPlugin(binwalk.core.plugin.Plugin):
+
     '''
     Gzip extractor plugin.
     '''
-    MODULES = ['Signature']
-    BLOCK_SIZE = 10 * 1024
+    MODULES=['Signature']
+    BLOCK_SIZE=10 * 1024
 
     def init(self):
         # If the extractor is enabled for the module we're currently loaded
@@ -214,23 +224,23 @@ class DlinkROMFSExtractPlugin(binwalk.core.plugin.Plugin):
                                            cmd=self.extractor)
 
     def extractor(self, fname):
-        infile = os.path.abspath(fname)
-        outdir = os.path.join(os.path.dirname(infile), "romfs-root")
-        outdir = binwalk.core.common.unique_file_name(outdir)
+        infile=os.path.abspath(fname)
+        outdir=os.path.join(os.path.dirname(infile), "romfs-root")
+        outdir=binwalk.core.common.unique_file_name(outdir)
 
         # TODO: Support big endian targets.
-        fs = RomFS(infile)
+        fs=RomFS(infile)
         os.mkdir(outdir)
 
         for (uid, info) in fs.entries.items():
             if hasattr(info, 'name') and hasattr(info, 'parent'):
-                path = fs.build_path(uid).strip(os.path.sep)
-                fname = os.path.join(outdir, path)
+                path=fs.build_path(uid).strip(os.path.sep)
+                fname=os.path.join(outdir, path)
 
                 if info.type == "directory" and not os.path.exists(fname):
                     os.makedirs(fname)
                 else:
-                    fdata = fs.get_data(uid)
+                    fdata=fs.get_data(uid)
                     with open(fname, 'wb') as fp:
                         fp.write(fdata)
 

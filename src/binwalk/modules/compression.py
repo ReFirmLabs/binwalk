@@ -14,6 +14,7 @@ except ImportError:
 
 
 class LZMAHeader(object):
+
     def __init__(self, **kwargs):
         for (k, v) in binwalk.core.compat.iterator(kwargs):
             setattr(self, k, v)
@@ -37,10 +38,7 @@ class LZMA(object):
         # Add an extraction rule
         if self.module.extractor.enabled:
             self.module.extractor.add_rule(
-                regex='^%s' %
-                self.DESCRIPTION.lower(),
-                extension="7z",
-                cmd=self.extractor)
+                regex='^%s' % self.DESCRIPTION.lower(), extension="7z", cmd=self.extractor)
 
     def extractor(self, file_name):
         # Open and read the file containing the raw compressed data.
@@ -111,11 +109,11 @@ class LZMA(object):
         if self.module.partial_scan == True:
             # For partial scans, only use the largest dictionary value
             self.dictionaries.append(
-                binwalk.core.compat.bytes2str(struct.pack("<I", 2**25)))
+                binwalk.core.compat.bytes2str(struct.pack("<I", 2 ** 25)))
         else:
             for n in range(16, 26):
                 self.dictionaries.append(
-                    binwalk.core.compat.bytes2str(struct.pack("<I", 2**n)))
+                    binwalk.core.compat.bytes2str(struct.pack("<I", 2 ** n)))
 
     def build_headers(self):
         self.headers = set()
@@ -154,13 +152,18 @@ class LZMA(object):
         if result is not None:
             self.properties = self.build_property(
                 result.pb, result.lp, result.lc)
-            description = "%s, properties: 0x%.2X [pb: %d, lp: %d, lc: %d], dictionary size: %d" % (
-                self.DESCRIPTION, self.properties, result.pb, result.lp, result.lc, result.dictionary)
+            description = "%s, properties: 0x%.2X [pb: %d, lp: %d, lc: %d], dictionary size: %d" % (self.DESCRIPTION,
+                                                                                                    self.properties,
+                                                                                                    result.pb,
+                                                                                                    result.lp,
+                                                                                                    result.lc,
+                                                                                                    result.dictionary)
 
         return description
 
 
 class Deflate(object):
+
     '''
     Finds and extracts raw deflate compression streams.
     '''
@@ -175,10 +178,7 @@ class Deflate(object):
         # Add an extraction rule
         if self.module.extractor.enabled:
             self.module.extractor.add_rule(
-                regex='^%s' %
-                self.DESCRIPTION.lower(),
-                extension="deflate",
-                cmd=self.extractor)
+                regex='^%s' % self.DESCRIPTION.lower(), extension="deflate", cmd=self.extractor)
 
     def extractor(self, file_name):
         in_data = ""
@@ -280,8 +280,8 @@ class RawCompression(Module):
                         description = decompressor.decompress(
                             data[i:i + decompressor.BLOCK_SIZE])
                         if description:
-                            self.result(description=description,
-                                        file=fp, offset=fp.tell() - dlen + i)
+                            self.result(
+                                description=description, file=fp, offset=fp.tell() - dlen + i)
                             if self.stop_on_first_hit:
                                 file_done = True
                                 break

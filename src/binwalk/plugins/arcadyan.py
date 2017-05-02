@@ -4,6 +4,7 @@ import binwalk.core.plugin
 
 
 class ArcadyanDeobfuscator(binwalk.core.plugin.Plugin):
+
     '''
     Deobfuscator for known Arcadyan firmware obfuscation(s).
     '''
@@ -14,7 +15,8 @@ class ArcadyanDeobfuscator(binwalk.core.plugin.Plugin):
     BLOCK_SIZE = 32
     BLOCK1_OFFSET = 4
     BLOCK2_OFFSET = 0x68
-    MIN_FILE_SIZE = (OBFUSCATION_MAGIC_SIZE + BLOCK2_OFFSET + BLOCK_SIZE)
+    MIN_FILE_SIZE = (
+        OBFUSCATION_MAGIC_SIZE + BLOCK2_OFFSET + BLOCK_SIZE)
 
     BLOCK1_START = BLOCK1_OFFSET
     BLOCK1_END = BLOCK1_START + BLOCK_SIZE
@@ -57,10 +59,10 @@ class ArcadyanDeobfuscator(binwalk.core.plugin.Plugin):
             # Nibble-swap each byte in block 1
             nswap = ''
             for i in range(self.BLOCK1_START, self.BLOCK1_END):
-                nswap += chr(((ord(deobfuscated[i]) & 0x0F) <<
-                              4) + ((ord(deobfuscated[i]) & 0xF0) >> 4))
-            deobfuscated = deobfuscated[self.P1_START:self.P1_END] + \
-                nswap + deobfuscated[self.BLOCK1_END:]
+                nswap += chr(((ord(deobfuscated[i]) & 0x0F) << 4) + (
+                    (ord(deobfuscated[i]) & 0xF0) >> 4))
+            deobfuscated = deobfuscated[
+                self.P1_START:self.P1_END] + nswap + deobfuscated[self.BLOCK1_END:]
 
             # Byte-swap each byte pair in block 1
             bswap = ''
@@ -68,8 +70,8 @@ class ArcadyanDeobfuscator(binwalk.core.plugin.Plugin):
             while i < self.BLOCK1_END:
                 bswap += deobfuscated[i + 1] + deobfuscated[i]
                 i += 2
-            deobfuscated = deobfuscated[self.P1_START:self.P1_END] + \
-                bswap + deobfuscated[self.BLOCK1_END:]
+            deobfuscated = deobfuscated[
+                self.P1_START:self.P1_END] + bswap + deobfuscated[self.BLOCK1_END:]
 
         if deobfuscated:
             out = binwalk.core.common.BlockFile(

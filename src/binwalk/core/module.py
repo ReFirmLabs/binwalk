@@ -20,6 +20,7 @@ from binwalk.core.exceptions import *
 
 
 class Option(object):
+
     '''
     A container class that allows modules to declare command line options.
     '''
@@ -76,6 +77,7 @@ class Option(object):
 
 
 class Kwarg(object):
+
     '''
     A container class allowing modules to specify their expected __init__ kwarg(s).
     '''
@@ -96,6 +98,7 @@ class Kwarg(object):
 
 
 class Dependency(object):
+
     '''
     A container class for declaring module dependencies.
     '''
@@ -108,6 +111,7 @@ class Dependency(object):
 
 
 class Result(object):
+
     '''
     Generic class for storing and accessing scan results.
     '''
@@ -146,6 +150,7 @@ class Result(object):
 
 
 class Error(Result):
+
     '''
     A subclass of binwalk.core.module.Result.
     '''
@@ -163,6 +168,7 @@ class Error(Result):
 
 
 class Module(object):
+
     '''
     All module classes must be subclassed from this.
     '''
@@ -514,14 +520,14 @@ class Module(object):
         self.errors.append(e)
 
         if e.exception:
-            sys.stderr.write("\n" + e.module +
-                             " Exception: " + str(e.exception) + "\n")
+            sys.stderr.write(
+                "\n" + e.module + " Exception: " + str(e.exception) + "\n")
             sys.stderr.write("-" * exception_header_width + "\n")
             traceback.print_exc(file=sys.stderr)
             sys.stderr.write("-" * exception_header_width + "\n\n")
         elif e.description:
-            sys.stderr.write("\n" + e.module + " Error: " +
-                             e.description + "\n\n")
+            sys.stderr.write(
+                "\n" + e.module + " Error: " + e.description + "\n\n")
 
     def header(self):
         '''
@@ -534,7 +540,11 @@ class Module(object):
         self.config.display.add_custom_header(
             self.VERBOSE_FORMAT, self.VERBOSE)
 
+<< << << < HEAD
         if isinstance(self.HEADER, type([])):
+== == == =
+        if type(self.HEADER) == type([]):
+>>>>>> > 6b7260735c8905255a7359dd0ecb5f4e415db7bf
             self.config.display.header(
                 *self.HEADER, file_name=self.current_target_file_name)
         elif self.HEADER:
@@ -610,6 +620,7 @@ class Module(object):
 
 
 class Status(object):
+
     '''
     Class used for tracking module status (e.g., % complete).
     '''
@@ -624,6 +635,7 @@ class Status(object):
 
 
 class Modules(object):
+
     '''
     Main class used for running and managing modules.
     '''
@@ -640,8 +652,8 @@ class Modules(object):
         self.arguments = []
         self.executed_modules = {}
         self.default_dependency_modules = {}
-        self.status = Status(completed=0, total=0, fp=None,
-                             running=False, shutdown=False, finished=False)
+        self.status = Status(
+            completed=0, total=0, fp=None, running=False, shutdown=False, finished=False)
         self.status_server_started = False
         self.status_service = None
 
@@ -760,8 +772,8 @@ class Modules(object):
                         short_opt = "   "
 
                     fmt = "    %%s %%s%%-%ds%%s\n" % (25 - len(long_opt))
-                    help_string += fmt % (short_opt, long_opt,
-                                          optargs, module_option.description)
+                    help_string += fmt % (
+                        short_opt, long_opt, optargs, module_option.description)
 
         return help_string + "\n"
 
@@ -844,8 +856,7 @@ class Modules(object):
                 dependency.module = getattr(binwalk.modules, dependency.name)
             else:
                 raise ModuleException(
-                    "%s depends on %s which was not found in binwalk.modules.__init__.py\n" %
-                    (str(module), dependency.name))
+                    "%s depends on %s which was not found in binwalk.modules.__init__.py\n" % (str(module), dependency.name))
 
             # No recursive dependencies, thanks
             if dependency.module == module:
@@ -858,8 +869,8 @@ class Modules(object):
             # Modules that are not enabled (e.g., extraction module) can load any dependency as long as they don't
             # set any custom kwargs for those dependencies.
             if module_enabled or not dependency.kwargs:
-                depobj = self.run(dependency.module,
-                                  dependency=True, kwargs=dependency.kwargs)
+                depobj = self.run(
+                    dependency.module, dependency=True, kwargs=dependency.kwargs)
 
             # If a dependency failed, consider this a non-recoverable error and
             # raise an exception
@@ -940,8 +951,7 @@ class Modules(object):
                     # If this kwarg has not been previously processed, or if its priority is equal to or
                     # greater than the previously processed kwarg's priority,
                     # then let's process it.
-                    if not has_key(
-                            last_priority, name) or last_priority[name] <= module_option.priority:
+                    if not has_key(last_priority, name) or last_priority[name] <= module_option.priority:
 
                         # Track the priority for future iterations that may
                         # process the same kwarg name
@@ -982,8 +992,7 @@ class Modules(object):
                     setattr(obj, k, v)
         else:
             raise Exception(
-                "binwalk.core.module.Modules.process_kwargs: %s has no attribute 'KWARGS'" %
-                str(obj))
+                "binwalk.core.module.Modules.process_kwargs: %s has no attribute 'KWARGS'" % str(obj))
 
     def status_server(self, port):
         '''
@@ -1001,8 +1010,7 @@ class Modules(object):
                     port, self)
             except Exception as e:
                 binwalk.core.common.warning(
-                    "Failed to start status server on port %d: %s" %
-                    (port, str(e)))
+                    "Failed to start status server on port %d: %s" % (port, str(e)))
 
 
 def process_kwargs(obj, kwargs):

@@ -5,6 +5,7 @@ from binwalk.core.common import BlockFile
 
 
 class ZlibValidPlugin(binwalk.core.plugin.Plugin):
+
     '''
     Validates zlib compressed data.
     '''

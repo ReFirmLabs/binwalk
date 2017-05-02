@@ -4,6 +4,7 @@ from binwalk.core.common import BlockFile
 
 
 class LZMAPlugin(binwalk.core.plugin.Plugin):
+
     '''
     Validates lzma signature results.
     '''
@@ -54,8 +55,7 @@ class LZMAPlugin(binwalk.core.plugin.Plugin):
 
             # Seek to and read the suspected lzma data
             fd = self.module.config.open_file(
-                result.file.name, offset=result.offset,
-                length=self.MAX_DATA_SIZE)
+                result.file.name, offset=result.offset, length=self.MAX_DATA_SIZE)
             data = fd.read(self.MAX_DATA_SIZE)
             fd.close()
 

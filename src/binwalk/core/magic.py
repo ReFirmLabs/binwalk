@@ -13,6 +13,7 @@ from binwalk.core.exceptions import ParserException
 
 
 class SignatureResult(binwalk.core.module.Result):
+
     '''
     Container class for signature results.
     '''
@@ -40,6 +41,7 @@ class SignatureResult(binwalk.core.module.Result):
 
 
 class SignatureLine(object):
+
     '''
     Responsible for parsing signature lines from magic signature files.
     '''
@@ -163,14 +165,12 @@ class SignatureLine(object):
                     raise e
                 except Exception as e:
                     raise ParserException(
-                        "Failed to expand string '%s' with integer '%s' in line '%s'" %
-                        (self.value, n, line))
+                        "Failed to expand string '%s' with integer '%s' in line '%s'" % (self.value, n, line))
             try:
                 self.value = binwalk.core.compat.string_decode(self.value)
             except ValueError as e:
                 raise ParserException(
-                    "Failed to decode string value '%s' in line '%s'" %
-                    (self.value, line))
+                    "Failed to decode string value '%s' in line '%s'" % (self.value, line))
         # If a regex was specified, compile it
         elif self.type == 'regex':
             self.regex = True
@@ -188,15 +188,13 @@ class SignatureLine(object):
                 self.value = int(self.value, 0)
             except ValueError as e:
                 raise ParserException(
-                    "Failed to convert value '%s' to an integer on line '%s'" %
-                    (self.value, line))
+                    "Failed to convert value '%s' to an integer on line '%s'" % (self.value, line))
 
         # Sanity check to make sure the first line of a signature has an
         # explicit value
         if self.level == 0 and self.value is None:
             raise ParserException(
-                "First element of a signature must specify a non-wildcard value: '%s'" %
-                (line))
+                "First element of a signature must specify a non-wildcard value: '%s'" % (line))
 
         # Set the size and struct format value for the specified data type.
         # This must be done, obviously, after the value has been parsed out
@@ -281,6 +279,7 @@ class SignatureLine(object):
 
 
 class Signature(object):
+
     '''
     Class to hold signature data and generate signature regular expressions.
     '''
@@ -376,8 +375,7 @@ class Signature(object):
             for i in range(1, line.size):
                 if restr[i:] == restr[0:(line.size - i)]:
                     binwalk.core.common.warning(
-                        "Signature '%s' is a self-overlapping signature!" %
-                        line.text)
+                        "Signature '%s' is a self-overlapping signature!" % line.text)
                     break
 
         return re.compile(re.escape(restr))
@@ -396,6 +394,7 @@ class Signature(object):
 
 
 class Magic(object):
+
     '''
     Primary class for loading signature files and scanning
     blocks of arbitrary data for matching signatures.
@@ -487,8 +486,7 @@ class Magic(object):
         if '.' in expression and '(' in expression:
             replacements = {}
 
-            for period in [match.start()
-                           for match in self.period.finditer(expression)]:
+            for period in [match.start() for match in self.period.finditer(expression)]:
                 # Separate the offset field into the integer offset and type
                 # values (o and t respsectively)
                 s = expression[:period].rfind('(') + 1
@@ -515,28 +513,23 @@ class Magic(object):
                     # Big and little endian byte format
                     if t in ['b', 'B']:
                         v = struct.unpack(
-                            'b', binwalk.core.compat.str2bytes(
-                                self.data[o: o + 1]))[0]
+                            'b', binwalk.core.compat.str2bytes(self.data[o:o + 1]))[0]
                     # Little endian short format
                     elif t == 's':
                         v = struct.unpack(
-                            '<h', binwalk.core.compat.str2bytes(
-                                self.data[o: o + 2]))[0]
+                            '<h', binwalk.core.compat.str2bytes(self.data[o:o + 2]))[0]
                     # Little endian long format
                     elif t == 'l':
                         v = struct.unpack(
-                            '<i', binwalk.core.compat.str2bytes(
-                                self.data[o: o + 4]))[0]
+                            '<i', binwalk.core.compat.str2bytes(self.data[o:o + 4]))[0]
                     # Big endian short format
                     elif t == 'S':
                         v = struct.unpack(
-                            '>h', binwalk.core.compat.str2bytes(
-                                self.data[o: o + 2]))[0]
+                            '>h', binwalk.core.compat.str2bytes(self.data[o:o + 2]))[0]
                     # Bit endian long format
                     elif t == 'L':
                         v = struct.unpack(
-                            '>i', binwalk.core.compat.str2bytes(
-                                self.data[o: o + 4]))[0]
+                            '>i', binwalk.core.compat.str2bytes(self.data[o:o + 4]))[0]
                 # struct.error is thrown if there is not enough bytes in
                 # self.data for the specified format type
                 except struct.error as e:
@@ -574,8 +567,8 @@ class Magic(object):
         tag_strlen = None
         max_line_level = 0
         previous_line_end = 0
-        tags = {'id': signature.id, 'offset': offset,
-                'invalid': False, 'once': False}
+        tags = {'id': signature.id, 'offset':
+                offset, 'invalid': False, 'once': False}
 
         # Apply each line of the signature to self.data, starting at the
         # specified offset
@@ -604,8 +597,7 @@ class Magic(object):
                 # Sanity check
                 if not isinstance(line_offset, int):
                     raise ParserException(
-                        "Failed to convert offset '%s' to a number: '%s'" %
-                        (line.offset, line.text))
+                        "Failed to convert offset '%s' to a number: '%s'" % (line.offset, line.text))
 
                 # The start of the data needed by this line is at offset + line_offset.
                 # The end of the data will be line.size bytes later.
@@ -616,8 +608,7 @@ class Magic(object):
                 if line.pkfmt:
                     try:
                         dvalue = struct.unpack(
-                            line.pkfmt, binwalk.core.compat.str2bytes(
-                                self.data[start: end]))[0]
+                            line.pkfmt, binwalk.core.compat.str2bytes(self.data[start:end]))[0]
                     # Not enough bytes left in self.data for the specified
                     # format size
                     except struct.error as e:
@@ -628,15 +619,13 @@ class Magic(object):
                     if line.value is None:
                         # Check to see if this is a string whose size is known and has been specified on a previous
                         # signature line.
-                        if binwalk.core.compat.has_key(
-                                tags, 'strlen') and binwalk.core.compat.has_key(
-                                line.tags, 'string'):
+                        if binwalk.core.compat.has_key(tags, 'strlen') and binwalk.core.compat.has_key(line.tags, 'string'):
                             dvalue = self.data[start:(start + tags['strlen'])]
                         # Else, just terminate the string at the first newline,
                         # carriage return, or NULL byte
                         else:
-                            dvalue = self.data[start:end].split('\x00')[0].split('\r')[
-                                0].split('\n')[0]
+                            dvalue = self.data[start:end].split(
+                                '\x00')[0].split('\r')[0].split('\n')[0]
                     # Non-wildcard strings have a known length, specified in
                     # the signature line
                     else:
@@ -650,8 +639,7 @@ class Magic(object):
                     try:
                         # If the operator value of this signature line is just
                         # an integer value, use it
-                        if isinstance(line.opvalue, int) or isinstance(
-                                line.opvalue, long):
+                        if isinstance(line.opvalue, int) or isinstance(line.opvalue, long):
                             opval = line.opvalue
                         # Else, evaluate the complex expression
                         else:
@@ -677,10 +665,8 @@ class Magic(object):
                     except KeyboardInterrupt as e:
                         raise e
                     except Exception as e:
-                        raise ParserException(
-                            "Operation '" + str(dvalue) + " " +
-                            str(line.operator) + "= " + str(line.opvalue) +
-                            "' failed: " + str(e))
+                        raise ParserException("Operation '" + str(dvalue) + " " + str(
+                            line.operator) + "= " + str(line.opvalue) + "' failed: " + str(e))
 
                 # Does the data (dvalue) match the specified comparison?
                 if ((line.value is None) or
@@ -716,8 +702,7 @@ class Magic(object):
                     # Process tag keywords specified in the signature line. These have already been parsed out of the
                     # original format string so that they can be processed
                     # separately from the printed description string.
-                    for (tag_name, tag_value) in binwalk.core.compat.iterator(
-                            line.tags):
+                    for (tag_name, tag_value) in binwalk.core.compat.iterator(line.tags):
                         # If the tag value is a string, try to format it
                         if isinstance(tag_value, str):
                             # Generate the tuple for the format string
@@ -784,8 +769,7 @@ class Magic(object):
 
         # If the formatted string contains non-printable characters, consider
         # it invalid
-        if self.printable.match(
-                tags['description']).group() != tags['description']:
+        if self.printable.match(tags['description']).group() != tags['description']:
             tags['invalid'] = True
 
         return tags
