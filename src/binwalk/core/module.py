@@ -665,19 +665,23 @@ class Modules(object):
     def __exit__(self, t, v, b):
         self.cleanup()
 
-    def _set_arguments(self, argv=[], kargv={}):
-        for (k, v) in iterator(kargv):
-            k = self._parse_api_opt(k)
-            if v not in [True, False, None]:
-                if not isinstance(v, list):
-                    v = [v]
-                for value in v:
-                    if not isinstance(value, str):
-                        value = str(bytes2str(value))
-                    argv.append(k)
-                    argv.append(value)
-            else:
-                argv.append(k)
+    def _set_arguments(self, argv=None, kargv=None):
+        if kargv:
+            for (k, v) in iterator(kargv):
+                    k = self._parse_api_opt(k)
+                    if v not in [True, False, None]:
+                        if not isinstance(v, list):
+                            v = [v]
+                        for value in v:
+                            if not isinstance(value, str):
+                                value = str(bytes2str(value))
+                            argv.append(k)
+                            argv.append(value)
+                    else:
+                        # Only append if the value is True; this allows for toggling values
+                        # by the function call.
+                        if v:
+                            argv.append(k)
 
         if not argv and not self.arguments:
             self.arguments = sys.argv[1:]
