@@ -190,7 +190,7 @@ if __name__ == '__main__':
         infile = sys.argv[1]
         outdir = sys.argv[2]
     except IndexError as e:
-        print ("Usage: %s <input file> <output directory>" % sys.argv[0])
+        print("Usage: %s <input file> <output directory>" % sys.argv[0])
         sys.exit(1)
 
 

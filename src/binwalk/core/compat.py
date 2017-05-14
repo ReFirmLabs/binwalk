@@ -27,7 +27,8 @@ def has_key(dictionary, key):
     if PY_MAJOR_VERSION > 2:
         return key in dictionary
     else:
-        return dictionary.has_key(key)
+        return key in dictionary
+
 
 
 def get_keys(dictionary):

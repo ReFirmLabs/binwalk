@@ -25,6 +25,7 @@ for _module_path in [
 import binwalk
 import binwalk.modules
 
+
 def main():
     with binwalk.Modules() as modules:
         try:
@@ -34,17 +35,19 @@ def main():
             # If no explicit module was enabled in the command line arguments,
             # run again with the default signature scan explicitly enabled.
             elif not modules.execute():
-                # Make sure the Signature module is loaded before attempting 
+                # Make sure the Signature module is loaded before attempting
                 # an implicit signature scan; else, the error message received
                 # by the end user is not very helpful.
                 if hasattr(binwalk.modules, "Signature"):
                     modules.execute(*sys.argv[1:], signature=True)
                 else:
                     sys.stderr.write("Error: Signature scans not supported; ")
-                    sys.stderr.write("make sure you have python-lzma installed and try again.\n")
+                    sys.stderr.write(
+                        "make sure you have python-lzma installed and try again.\n")
                     sys.exit(2)
         except binwalk.ModuleException as e:
             sys.exit(3)
+
 
 if __name__ == '__main__':
     try:
@@ -59,4 +62,3 @@ if __name__ == '__main__':
         pass
     except KeyboardInterrupt:
         sys.stdout.write("\n")
-

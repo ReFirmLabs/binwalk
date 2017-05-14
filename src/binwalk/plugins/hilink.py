@@ -96,5 +96,6 @@ class HilinkDecryptor(binwalk.core.plugin.Plugin):
                     # name fields
                     if result.size > (result.file.size - result.offset):
                         result.valid = False
-                    if not all(c in string.printable for c in result.description):
+                    if not all(
+                            c in string.printable for c in result.description):
                         result.valid = False

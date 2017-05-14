@@ -15,7 +15,6 @@ import binwalk.core.statuserver
 import binwalk.core.common
 import binwalk.core.settings
 import binwalk.core.plugin
-from threading import Thread
 from binwalk.core.compat import *
 from binwalk.core.exceptions import *
 
@@ -26,7 +25,8 @@ class Option(object):
     A container class that allows modules to declare command line options.
     '''
 
-    def __init__(self, kwargs={}, priority=0, description="", short="", long="", type=None, dtype=None, hidden=False):
+    def __init__(self, kwargs={}, priority=0, description="",
+                 short="", long="", type=None, dtype=None, hidden=False):
         '''
         Class constructor.
 
@@ -51,7 +51,8 @@ class Option(object):
         self.hidden = hidden
 
         if not self.dtype and self.type:
-            if self.type in [io.FileIO, argparse.FileType, binwalk.core.common.BlockFile]:
+            if self.type in [io.FileIO, argparse.FileType,
+                             binwalk.core.common.BlockFile]:
                 self.dtype = 'file'
             elif self.type in [int, float, str]:
                 self.dtype = self.type.__name__
@@ -355,7 +356,7 @@ class Module(object):
         args = []
 
         if self.RESULT:
-            if type(self.RESULT) != type([]):
+            if not isinstance(self.RESULT, type([])):
                 result = [self.RESULT]
             else:
                 result = self.RESULT

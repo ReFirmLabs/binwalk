@@ -6,9 +6,7 @@
 # specified files.
 
 import os
-import re
 import ctypes
-import fnmatch
 import binwalk.core.C
 import binwalk.core.common
 from binwalk.core.compat import *
@@ -138,7 +136,8 @@ class HashMatch(Module):
         file1_dup = False
         file2_dup = False
 
-        if not self.filter_by_name or os.path.basename(file1) == os.path.basename(file2):
+        if not self.filter_by_name or os.path.basename(
+                file1) == os.path.basename(file2):
             if os.path.exists(file1) and os.path.exists(file2):
 
                 hash1 = ctypes.create_string_buffer(self.FUZZY_MAX_RESULT)
@@ -219,7 +218,8 @@ class HashMatch(Module):
         Returns True if this is a good match.
         Returns False if his is not a good match.
         '''
-        return (match is not None and ((match >= self.cutoff and self.same) or (match < self.cutoff and not self.same)))
+        return (match is not None and ((match >= self.cutoff and self.same) or (
+            match < self.cutoff and not self.same)))
 
     def _get_file_list(self, directory):
         '''

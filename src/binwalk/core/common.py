@@ -205,13 +205,13 @@ class MathExpression(object):
     '''
 
     OPERATORS = {
-        ast.Add:    op.add,
-        ast.UAdd:   op.add,
-        ast.USub:   op.sub,
-        ast.Sub:    op.sub,
-        ast.Mult:   op.mul,
-        ast.Div:    op.truediv,
-        ast.Pow:    op.pow,
+        ast.Add: op.add,
+        ast.UAdd: op.add,
+        ast.USub: op.sub,
+        ast.Sub: op.sub,
+        ast.Mult: op.mul,
+        ast.Div: op.truediv,
+        ast.Pow: op.pow,
         ast.BitXor: op.xor
     }
 
@@ -316,7 +316,9 @@ def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
         # blocks.
         DEFAULT_BLOCK_READ_SIZE = 1 * 1024 * 1024
 
-        def __init__(self, fname, mode='r', length=0, offset=0, block=DEFAULT_BLOCK_READ_SIZE, peek=DEFAULT_BLOCK_PEEK_SIZE, swap=0):
+        def __init__(self, fname, mode='r', length=0, offset=0,
+                     block=DEFAULT_BLOCK_READ_SIZE,
+                     peek=DEFAULT_BLOCK_PEEK_SIZE, swap=0):
             '''
             Class constructor.
 

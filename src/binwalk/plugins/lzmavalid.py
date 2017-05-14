@@ -42,14 +42,16 @@ class LZMAPlugin(binwalk.core.plugin.Plugin):
             except Exception as e:
                 # The Python3 module gives this error on truncated input data.
                 # The inconsistency between modules is a bit worrisome.
-                if str(e) != "Compressed data ended before the end-of-stream marker was reached":
+                if str(
+                        e) != "Compressed data ended before the end-of-stream marker was reached":
                     valid = False
 
         return valid
 
     def scan(self, result):
         # If this result is an lzma signature match, try to decompress the data
-        if result.valid and result.file and result.description.lower().startswith('lzma compressed data'):
+        if result.valid and result.file and result.description.lower(
+        ).startswith('lzma compressed data'):
 
             # Seek to and read the suspected lzma data
             fd = self.module.config.open_file(

@@ -117,7 +117,7 @@ class Entropy(Module):
                 self.block_size = None
 
     def _entropy_sigterm_handler(self, *args):
-        print ("FUck it all.")
+        print("FUck it all.")
 
     def run(self):
         # If generating a graphical plot, this function will never return, as it invokes

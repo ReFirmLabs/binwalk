@@ -16,7 +16,8 @@ class GzipExtractPlugin(binwalk.core.plugin.Plugin):
         # into, and if a rule that matches gzip signature results already exists
         # (e.g., the default rules were loaded or a gzip rule was specified manually),
         # then register self.extractor as a gzip extraction rule.
-        if self.module.extractor.enabled and self.module.extractor.match("gzip compressed data"):
+        if self.module.extractor.enabled and self.module.extractor.match(
+                "gzip compressed data"):
             self.module.extractor.add_rule(txtrule=None,
                                            regex="^gzip compressed data",
                                            extension="gz",

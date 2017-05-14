@@ -458,7 +458,7 @@ class Magic(object):
 
         # If exclusive include filters have been specified and did
         # not match the text, then the text should be filtered out.
-        if self.includes and filtered == None:
+        if self.includes and filtered is None:
             return True
 
         for exclude in self.excludes:
@@ -468,7 +468,7 @@ class Magic(object):
 
         # If no explicit exclude filters were matched, then the
         # text should *not* be filtered.
-        if filtered == None:
+        if filtered is None:
             filtered = False
 
         return filtered
@@ -818,14 +818,15 @@ class Magic(object):
                 # as well as those outside the specified self.data range
                 # (dlen).
                 if (offset not in matched_offsets or self.show_invalid) and offset >= 0 and offset < dlen:
-                # if offset >= 0 and offset < dlen:
+                    # if offset >= 0 and offset < dlen:
                     # Analyze the data at this offset using the current
                     # signature rule
                     tags = self._analyze(signature, offset)
 
                     # Generate a SignatureResult object and append it to the results list if the
                     # signature is valid, or if invalid results were requested.
-                    if (not tags['invalid'] or self.show_invalid) and not self._filtered(tags['description']):
+                    if (not tags['invalid'] or self.show_invalid) and not self._filtered(
+                            tags['description']):
                         # Only display results with the 'once' tag once.
                         if tags['once']:
                             if signature.title in self.display_once:

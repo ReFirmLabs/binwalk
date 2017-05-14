@@ -4,9 +4,9 @@ import binwalk.core.plugin
 
 
 class CompressdPlugin(binwalk.core.plugin.Plugin):
-#    '''
-#    Searches for and validates compress'd data.
-#    '''
+    #    '''
+    #    Searches for and validates compress'd data.
+    #    '''
 
     MODULES = ['Signature']
 
@@ -20,13 +20,13 @@ class CompressdPlugin(binwalk.core.plugin.Plugin):
     # comp = None
 
     # def init(self):
-        # self.comp = binwalk.core.C.Library(self.COMPRESS42, self.COMPRESS42_FUNCTIONS)
-        # This plugin is currently disabled due to the need to move away from supporting C
-        # libraries and into a pure Python project, for cross-platform support and ease of
-        # installation / package maintenance. A Python implementation will likely need to
-        # be custom developed in the future, but for now, since this compression format is
-        # not very common, especially in firmware, simply disable it.
-        # self.comp = None
+    # self.comp = binwalk.core.C.Library(self.COMPRESS42, self.COMPRESS42_FUNCTIONS)
+    # This plugin is currently disabled due to the need to move away from supporting C
+    # libraries and into a pure Python project, for cross-platform support and ease of
+    # installation / package maintenance. A Python implementation will likely need to
+    # be custom developed in the future, but for now, since this compression format is
+    # not very common, especially in firmware, simply disable it.
+    # self.comp = None
 
     # def scan(self, result):
     #    if self.comp and result.file and result.description.lower().startswith("compress'd data"):

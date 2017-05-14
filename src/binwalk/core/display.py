@@ -18,7 +18,8 @@ class Display(object):
     HEADER_WIDTH = 80
     DEFAULT_FORMAT = "%s\n"
 
-    def __init__(self, quiet=False, verbose=False, log=None, csv=False, fit_to_screen=False):
+    def __init__(self, quiet=False, verbose=False,
+                 log=None, csv=False, fit_to_screen=False):
         self.quiet = quiet
         self.verbose = verbose
         self.fit_to_screen = fit_to_screen
@@ -196,7 +197,8 @@ class Display(object):
             # the line wrap to the alignment offset.
             delim += ' ' * offset
 
-        if line_columns and self.fit_to_screen and len(line) > self.SCREEN_WIDTH:
+        if line_columns and self.fit_to_screen and len(
+                line) > self.SCREEN_WIDTH:
             # Calculate the maximum length that each wrapped line can be
             max_line_wrap_length = self.SCREEN_WIDTH - offset
             # Append all but the last column to formatted_line

@@ -141,11 +141,9 @@ class General(Module):
                 self.file_name_exclude_regex)
 
         self.settings = binwalk.core.settings.Settings()
-        self.display = binwalk.core.display.Display(log=self.log_file,
-                                                    csv=self.csv,
-                                                    quiet=self.quiet,
-                                                    verbose=self.verbose,
-                                                    fit_to_screen=self.format_to_terminal)
+        self.display = binwalk.core.display.Display(
+            log=self.log_file, csv=self.csv, quiet=self.quiet,
+            verbose=self.verbose, fit_to_screen=self.format_to_terminal)
 
         if self.show_help:
             show_help()
@@ -178,14 +176,17 @@ class General(Module):
 
         Returns True if the file should be scanned, False if not.
         '''
-        if self.file_name_include_regex and not self.file_name_include_regex.search(fp.name):
+        if self.file_name_include_regex and not self.file_name_include_regex.search(
+                fp.name):
             return False
-        if self.file_name_exclude_regex and self.file_name_exclude_regex.search(fp.name):
+        if self.file_name_exclude_regex and self.file_name_exclude_regex.search(
+                fp.name):
             return False
 
         return True
 
-    def open_file(self, fname, length=None, offset=None, swap=None, block=None, peek=None):
+    def open_file(self, fname, length=None, offset=None,
+                  swap=None, block=None, peek=None):
         '''
         Opens the specified file with all pertinent configuration settings.
         '''

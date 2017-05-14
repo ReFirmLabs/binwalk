@@ -15,6 +15,7 @@ class ShutUpHashlib(logging.Filter):
     def filter(self, record):
         return not record.getMessage().startswith("code for hash")
 
+
 try:
     import idc
     import idaapi
@@ -72,7 +73,8 @@ class IDBFileIO(io.FileIO):
                 self.args.length = self.args.offset * -1
                 self.args.offset = end_address() + self.args.offset
 
-            if self.args.length == 0 or self.args.length > (end_address() - start_address()):
+            if self.args.length == 0 or self.args.length > (
+                    end_address() - start_address()):
                 self.args.length = end_address() - start_address()
 
     def read(self, n=-1):

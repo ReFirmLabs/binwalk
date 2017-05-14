@@ -59,7 +59,8 @@ class LZMA(object):
             # Try to extract it with all the normal lzma extractors until one
             # works
             for exrule in self.module.extractor.match("lzma compressed data"):
-                if self.module.extractor.execute(exrule['cmd'], file_name) == True:
+                if self.module.extractor.execute(
+                        exrule['cmd'], file_name) == True:
                     break
 
     def build_property(self, pb, lp, lc):
@@ -143,7 +144,8 @@ class LZMA(object):
             except Exception as e:
                 # The Python3 module gives this error on truncated input data.
                 # The inconsistency between modules is a bit worrisome.
-                if str(e) == "Compressed data ended before the end-of-stream marker was reached":
+                if str(
+                        e) == "Compressed data ended before the end-of-stream marker was reached":
                     result = self.parse_header(header)
                     break
 

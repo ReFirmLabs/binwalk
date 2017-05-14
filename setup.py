@@ -232,6 +232,7 @@ class TestCommand(Command):
         import nose
         nose.main(argv=['--exe','--with-coverage'])
 
+
 # The data files to install along with the module
 install_data_files = []
 for data_dir in ["magic", "config", "plugins", "modules", "core"]:

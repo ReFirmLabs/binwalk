@@ -82,7 +82,8 @@ class Settings:
 
         def list_files(dir_path):
             # Ignore hidden dotfiles.
-            return [os.path.join(dir_path, x) for x in os.listdir(dir_path) if not x.startswith('.')]
+            return [os.path.join(dir_path, x) for x in os.listdir(
+                dir_path) if not x.startswith('.')]
 
         if not system_only:
             user_dir = os.path.join(

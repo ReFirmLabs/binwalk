@@ -3,7 +3,6 @@
 # Inspired by people who actually know what they're doing:
 # http://www.fourmilab.ch/random/
 
-import math
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Kwarg, Option, Dependency
 
@@ -97,7 +96,7 @@ class HeuristicCompressionAnalyzer(Module):
         Dependency(name='Entropy',
                    attribute='entropy',
                    kwargs={
-                   'enabled': True, 'do_plot': False, 'display_results': False, 'block_size': ENTROPY_BLOCK_SIZE}),
+                       'enabled': True, 'do_plot': False, 'display_results': False, 'block_size': ENTROPY_BLOCK_SIZE}),
     ]
 
     CLI = [

@@ -161,9 +161,11 @@ class Disasm(Module):
                     self.status.completed += 1
 
                 if result is not None:
-                    r = self.result(offset=result.offset,
-                                    file=fp,
-                                    description=(result.description + ", at least %d valid instructions" % len(result.insns)))
+                    r = self.result(
+                        offset=result.offset, file=fp,
+                        description=(result.description +
+                                     ", at least %d valid instructions" %
+                                     len(result.insns)))
 
                     if r.valid and r.display:
                         if self.config.verbose:
