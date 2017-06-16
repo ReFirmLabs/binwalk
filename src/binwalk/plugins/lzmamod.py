@@ -16,14 +16,15 @@ class LZMAModPlugin(binwalk.core.plugin.Plugin):
     SIGNATURE = "lzma compressed data"
 
     def init(self):
-        self.original_cmd = ''
-
-        self.module.extractor.add_rule(txtrule=None,
-                                       regex="^%s" % self.SIGNATURE,
-                                       extension="7z",
-                                       cmd=self.lzma_cable_extractor, prepend=True)
+        if self.module.extractor.enabled:
+            self.module.extractor.add_rule(txtrule=None,
+                                           regex="^%s" % self.SIGNATURE,
+                                           extension="7z",
+                                           cmd=self.lzma_cable_extractor, prepend=True)
 
     def lzma_cable_extractor(self, fname):
+        result = False
+
         out_name = os.path.splitext(fname)[0] + '-patched' + os.path.splitext(fname)[1]
         fp_out = BlockFile(out_name, 'w')
         # Use self.module.config.open_file here to ensure that other config

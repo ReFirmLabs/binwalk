@@ -15,8 +15,12 @@ from binwalk.core.module import Module, Option, Kwarg
 from binwalk.core.common import file_size, file_md5, unique_file_name, BlockFile
 
 
-class ExtractInfo(object):
+class ExtractDetails(object):
+    def __init__(self, **kwargs):
+        for (k, v) in kwargs.iteritems():
+            setattr(self, k, v)
 
+class ExtractInfo(object):
     def __init__(self):
         self.carved = {}
         self.extracted = {}
@@ -204,10 +208,14 @@ class Extractor(Module):
                 self.output[r.file.path] = ExtractInfo()
 
             # Attempt extraction
-            binwalk.core.common.debug(
-                "Extractor callback for %s @%d [%s]" % (r.file.name, r.offset, r.description))
-            (extraction_directory, dd_file, scan_extracted_files) = self.extract(
-                r.offset, r.description, r.file.path, size, r.name)
+            binwalk.core.common.debug("Extractor callback for %s @%d [%s]" % (r.file.name,
+                                                                              r.offset,
+                                                                              r.description))
+            (extraction_directory, dd_file, scan_extracted_files, extraction_utility) = self.extract(r.offset,
+                                                                                                     r.description,
+                                                                                                     r.file.path,
+                                                                                                     size,
+                                                                                                     r.name)
 
             # If the extraction was successful, self.extract will have returned
             # the output directory and name of the dd'd file
@@ -219,7 +227,7 @@ class Extractor(Module):
                 # info for this file
                 dd_file_path = os.path.join(extraction_directory, dd_file)
                 self.output[r.file.path].carved[r.offset] = dd_file_path
-                self.output[r.file.path].extracted[r.offset] = []
+                self.output[r.file.path].extracted[r.offset] = ExtractDetails(files=[], command=extraction_utility)
 
                 # Do a directory listing of the output directory
                 directory_listing = set(os.listdir(extraction_directory))
@@ -242,8 +250,7 @@ class Extractor(Module):
                     # Also keep a list of files created by the extraction
                     # utility
                     if real_file_path != dd_file_path:
-                        self.output[r.file.path].extracted[
-                            r.offset].append(real_file_path)
+                        self.output[r.file.path].extracted[r.offset].files.append(real_file_path)
 
                     # If recursion was specified, and the file is not the same
                     # one we just dd'd
@@ -564,7 +571,7 @@ class Extractor(Module):
 
         # No extraction rules for this file
         if not rules:
-            return (None, None, False)
+            return (None, None, False, str(None))
         else:
             binwalk.core.common.debug("Found %d matching extraction rules" % len(rules))
 
@@ -643,7 +650,7 @@ class Extractor(Module):
 
             os.chdir(original_dir)
 
-        return (output_directory, fname, recurse)
+        return (output_directory, fname, recurse, str(rule['cmd']))
 
     def _entry_offset(self, index, entries, description):
         '''
