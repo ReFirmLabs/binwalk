@@ -318,3 +318,13 @@
 >8      byte            !0x24                   {invalid}
 >8      byte            0x24                    folder records offset: %d
 
+# Benny Baumann <BenBE@geshi.org>
+# XAR archiver, http://code.google.com/p/xar/
+0       string          xar!                    XAR archive
+>6      beshort         x                       \b, version: %d
+>4      ubeshort        x                       \b, header size: %d
+>8      ubequad         x                       \b, TOC compressed: %d
+>16     ubequad         x                       \b, TOC uncompressed: %d
+>24     belong          0                       \b, checksum: none
+>24     belong          1                       \b, checksum: SHA1
+>24     belong          2                       \b, checksum: MD5
