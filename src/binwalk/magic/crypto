@@ -110,3 +110,20 @@
 >8      belong        x             salt: 0x%X
 >12     belong        x             \b%X
 
+#------------------------------------------------------------------------------
+# LUKS http://tomb.dyne.org/Luks_on_disk_format.pdf
+# sessyargc
+0       string          LUKS\xBA\xBE            LUKS_MAGIC
+>6      short           0x0001                  version 0x%X
+>8      string          aes                     %s
+>8      string          twofish                 %s
+>8      string          serpent                 %s
+>8      string          cast5                   %s
+>8      string          cast6                   %s
+>40     string          ecb                     %s
+>40     string          cbc-plain               %s
+>40     string          cbc-essiv               %s:
+>72     string          sha1                    %s
+>72     string          sha256                  %s
+>72     string          sha512                  %s
+>72     string          ripemd160               %s
