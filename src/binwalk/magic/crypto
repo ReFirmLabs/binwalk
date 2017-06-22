@@ -28,11 +28,13 @@
 >4      string          !\x02\x01\x00   {invalid}
 >2      beshort         <0              {invalid}
 >2      beshort         x               header length: 4, sequence length: %d
+>2      beshort+4       x               {size:%d}
 
 0       string          \x30\x82        Certificate in DER format (x509 v3),
 >4      string          !\x30\x82       {invalid}
 >2      beshort         <0              {invalid}
 >2      beshort         x               header length: 4, sequence length: %d
+>2      beshort+4       x               {size:%d}
 
 # GnuPG
 # The format is very similar to pgp
