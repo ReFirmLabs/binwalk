@@ -88,9 +88,10 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
 
                 # Validate the reported name length
                 file_name = self._get_file_name(result.description)
-                file_name_length = self._get_file_name_length(
-                    result.description)
-                if len(file_name) != file_name_length:
+                file_name_length = self._get_file_name_length(result.description)
+
+                # The +1 is to account for string lengths that include the terminating NULL byte
+                if file_name_length not in [len(file_name), len(file_name)+1]:
                     result.valid = False
                     return
 
