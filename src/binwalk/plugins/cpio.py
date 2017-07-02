@@ -73,10 +73,16 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
     def _get_file_name_length(self, description):
         length = 0
         if 'file name length: "' in description:
-            length_string = description.split(
-                'file name length: "')[1].split('"')[0]
+            length_string = description.split('file name length: "')[1].split('"')[0]
             length = int(length_string, 0)
         return length
+
+    def _get_file_size(self, description):
+        size = 0
+        if 'file size: "' in description:
+            size_string = description.split('file size: "')[1].split('"')[0]
+            size = int(size_string, 0)
+        return size
 
     def scan(self, result):
         if result.valid:
@@ -87,6 +93,7 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
             if result.description.startswith('ASCII cpio archive'):
 
                 # Validate the reported name length
+                file_size = self._get_file_size(result.description)
                 file_name = self._get_file_name(result.description)
                 file_name_length = self._get_file_name_length(result.description)
 
@@ -94,6 +101,8 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
                 if file_name_length not in [len(file_name), len(file_name)+1]:
                     result.valid = False
                     return
+                else:
+                    result.jump = file_size + file_name_length
 
                 self.consecutive_hits += 1
 
