@@ -72,7 +72,7 @@ function install_sasquatch
 
 function install_jefferson
 {
-    install_pip_package cstruct
+    install_pip_package "cstruct==1.0"
     git clone https://github.com/sviehb/jefferson
     (cd jefferson && $SUDO python2 setup.py install)
     $SUDO rm -rf jefferson
