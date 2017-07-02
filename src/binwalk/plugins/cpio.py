@@ -11,6 +11,7 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
     cpio utility since no output directory can be provided to it directly.
     '''
     CPIO_OUT_DIR = "cpio-root"
+    CPIO_HEADER_SIZE = 76
 
     MODULES = ['Signature']
 
@@ -97,13 +98,12 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
                 file_name = self._get_file_name(result.description)
                 file_name_length = self._get_file_name_length(result.description)
 
-                # The +1 is to account for string lengths that include the terminating NULL byte
-                if file_name_length not in [len(file_name), len(file_name)+1]:
+                # The +1 is to include the terminating NULL byte
+                if file_name_length != len(file_name)+1:
                     result.valid = False
                     return
-                else:
-                    result.jump = file_size + file_name_length
 
+                result.jump = self.CPIO_HEADER_SIZE + file_size + file_name_length
                 self.consecutive_hits += 1
 
                 if not self.found_archive or self.found_archive_in_file != result.file.name:
