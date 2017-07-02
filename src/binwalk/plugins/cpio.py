@@ -1,7 +1,7 @@
 import os
 import subprocess
+import binwalk.core.common
 import binwalk.core.plugin
-
 
 class CPIOPlugin(binwalk.core.plugin.Plugin):
 
@@ -27,20 +27,21 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
     def extractor(self, fname):
         result = None
         fname = os.path.abspath(fname)
-        out_dir = os.path.join(os.path.dirname(fname), self.CPIO_OUT_DIR)
+        out_dir_base_name = os.path.join(os.path.dirname(fname), self.CPIO_OUT_DIR)
+        out_dir = binwalk.core.common.unique_file_name(out_dir_base_name)
 
         try:
             fpin = open(fname, "rb")
             fperr = open(os.devnull, "rb")
             os.mkdir(out_dir)
         except OSError:
-            return
+            return False
 
         try:
             curdir = os.getcwd()
             os.chdir(out_dir)
         except OSError:
-            return
+            return False
 
         try:
             result = subprocess.call(
@@ -93,16 +94,20 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
             # found.
             if result.description.startswith('ASCII cpio archive'):
 
-                # Validate the reported name length
+                # Parse the reported name length and file size
                 file_size = self._get_file_size(result.description)
                 file_name = self._get_file_name(result.description)
                 file_name_length = self._get_file_name_length(result.description)
 
                 # The +1 is to include the terminating NULL byte
                 if file_name_length != len(file_name)+1:
+                    # If the reported length of the file name doesn't match the actual
+                    # file name length, treat this as a false positive result.
                     result.valid = False
                     return
 
+                # Instruct binwalk to skip the rest of this CPIO entry.
+                # We don't want/need to scan what's inside it.
                 result.jump = self.CPIO_HEADER_SIZE + file_size + file_name_length
                 self.consecutive_hits += 1
 
@@ -133,3 +138,4 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
                 # TODO: It would be better to jump to the end of this CPIO
                 # entry rather than make this assumption...
                 result.valid = False
+
