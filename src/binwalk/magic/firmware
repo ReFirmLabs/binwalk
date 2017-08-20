@@ -786,3 +786,6 @@
 >7  string      05                          start linear address
 >7  ubeshort    >0x3035                     unknown {invalid}
 
+# MCastFS2 (.mcfs)
+# http://support.aminocom.com/link/portal/1108/1281/Article/1204/Software-for-Aminet-set-top-boxes
+0       string      \x0E\x00\x4D\x43\x61\x73\x74\x46\x53\x32\x00\x00    Amino MCastFS2 (.mcfs)
