@@ -533,6 +533,45 @@
 >19     string  none\n                  \b, unencrypted
 >19     string  AES-256\n               \b, encrypted AES-256
 
+# https://github.com/omnirom/android_bootable_recovery/blob/android-7.1/adbbu/twadbstream.h
+0        string       TWRP\x00\x00\x00\x00                                TWRP Backup,
+>0x8     string       twstreamheader\x00\x00                              AdbBackupStreamHeader,
+>>0x2C   string       \x00*468                                            
+>>0x18   ulequad      x                                                   TWRP Parititon Count: %d,
+>>0x20   ulequad      x                                                   ADB Backup Version: %d,
+>>0x28   ubelong      x                                                   CRC32 data checksum: 0x%X
+>0x8     string       twfilename\x00\x00\x00\x00\x00\x00                  twfilehdr (twfilename),
+>>0x18   ulequad      x                                                   Size: %d,
+>>0x20   ulequad      x                                                   Compressed: %d,
+>>0x28   ubelong      x                                                   CRC32 data checksum: 0x%X,
+>>0x2C   string       x                                                   Filename: %s{jump:468}
+>0x8     string       twimage\x00\x00\x00\x00\x00\x00\x00\x00\x00         twfilehdr (twimage),
+>>0x18   ulequad      x                                                   Size: %d,
+>>0x20   ulequad      x                                                   Compressed: %d,
+>>0x28   ubelong      x                                                   CRC32 data checksum: 0x%X,
+>>0x2C   string       x                                                   Filename: %s{jump:468}
+>0x8     string       md5trailer\x00\x00\x00\x00\x00\x00                  AdbBackupFileTrailer,
+>>0x48   string       \x00*440                                            
+>>0x18   ubelong      x                                                   zlib CRC32 data checksum: 0x%X,
+>>0x1C   ubelong      x                                                   CRC32 data checksum: 0x%X,
+>>0x20   string       x                                                   MD5: %s,
+>0x8     string       twendadb\x00\x00\x00\x00\x00\x00\x00\x00            AdbBackupControlType (twendadb),
+>>0x18   ubelong      x                                                   CRC32 data checksum: 0x%X
+>>0x1C   string       \x00*484                                            
+>0x8     string       tweof\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00   AdbBackupControlType (tweof),
+>>0x18   ubelong      x                                                   CRC32 data checksum: 0x%X
+>>0x1C   string       \x00*484                                            
+>0x8     string       twverifymd5\x00\x00\x00\x00\x00                     AdbBackupControlType (twverifymd5),
+>>0x18   ubelong      x                                                   CRC32 data checksum: 0x%X
+>>0x1C   string       \x00*484                                            
+>0x8     string       twdatablock\x00\x00\x00\x00\x00                     AdbBackupControlType (twdatablock),
+>>0x18   ubelong      x                                                   CRC32 data checksum: 0x%X
+>>0x1C   string       \x00*484                                            
+>0x8     string       twerror\x00\x00\x00\x00\x00\x00\x00\x00\x00         AdbBackupControlType (twerror),
+>>0x18   ubelong      x                                                   CRC32 data checksum: 0x%X
+>>0x1C   string       \x00*484                                            
+
+
 # http://forum.xda-developers.com/showthread.php?p=47818657
 8    string    imgARMcC         Roku aimage SB
 
