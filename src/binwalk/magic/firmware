@@ -825,6 +825,13 @@
 >7  string      05                          start linear address
 >7  ubeshort    >0x3035                     unknown {invalid}
 
+# ATAGs msm nand partition table
+# https://github.com/roman-yepishev/acer-tools/tree/master/msmptbl
+0    ubequad  0x9a1b7daabc487d1f   ATAGs msm parition table (msmptbl),
+>8   lelong   >0                   version: %X,
+>>12 lelong   >0                   number of paritions: %d
+>8   lelong   <0                   {invalid}
+
 # MCastFS2 (.mcfs)
 # http://support.aminocom.com/link/portal/1108/1281/Article/1204/Software-for-Aminet-set-top-boxes
 0       string      \x0E\x00\x4D\x43\x61\x73\x74\x46\x53\x32\x00\x00    Amino MCastFS2 (.mcfs)
