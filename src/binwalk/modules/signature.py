@@ -123,6 +123,9 @@ class Signature(Module):
             if r.jump and (r.jump + r.offset) > r.file.size:
                 r.valid = False
 
+            if hasattr(r, "location") and (r.location != r.offset):
+                r.valid = False
+
         if r.valid:
             # Don't keep displaying signatures that repeat a bunch of times
             # (e.g., JFFS2 nodes)
