@@ -91,7 +91,10 @@ function install_unstuff
 function install_ubireader
 {
     git clone https://github.com/jrspruitt/ubi_reader
-    (cd ubi_reader && $SUDO python setup.py install)
+    # Some UBIFS extraction breaks after this commit, due to "Added fatal error check if UBI block extends beyond file size"
+    # (see this commit: https://github.com/jrspruitt/ubi_reader/commit/af678a5234dc891e8721ec985b1a6e74c77620b6)
+    # Reset to a known working commit.
+    (cd ubi_reader && git reset --hard 0955e6b95f07d849a182125919a1f2b6790d5b51 && $SUDO python setup.py install)
     $SUDO rm -rf ubi_reader
 }
 

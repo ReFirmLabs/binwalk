@@ -564,6 +564,7 @@ class Extractor(Module):
         Returns the name of the extracted file (blank string if nothing was extracted).
         '''
         fname = ''
+        rule = None
         recurse = False
         original_dir = os.getcwd()
         rules = self.match(description)
@@ -650,7 +651,10 @@ class Extractor(Module):
 
             os.chdir(original_dir)
 
-        return (output_directory, fname, recurse, str(rule['cmd']))
+        if rule is not None:
+            return (output_directory, fname, recurse, str(rule['cmd']))
+        else:
+            return (output_directory, fname, recurse, '')
 
     def _entry_offset(self, index, entries, description):
         '''
