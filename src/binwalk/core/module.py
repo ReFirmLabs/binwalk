@@ -11,6 +11,7 @@ import inspect
 import argparse
 import traceback
 from copy import copy
+import binwalk
 import binwalk.core.statuserver
 import binwalk.core.common
 import binwalk.core.settings
@@ -743,7 +744,7 @@ class Modules(object):
         Returns the help string.
         '''
         modules = {}
-        help_string = "\nBinwalk v%s\nCraig Heffner, http://www.binwalk.org\n" % binwalk.core.settings.Settings.VERSION
+        help_string = "\nBinwalk v%s\nCraig Heffner, https://github.com/devttys0/binwalk\n" % binwalk.__version__
         help_string += "\nUsage: binwalk [OPTIONS] [FILE1] [FILE2] [FILE3] ...\n"
 
         # Build a dictionary of modules and their ORDER attributes.

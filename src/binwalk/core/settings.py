@@ -19,9 +19,6 @@ class Settings:
         o BINWALK_MAGIC_FILE  - Path to the default binwalk magic file.
         o PLUGINS             - Path to the plugins directory.
     '''
-    # Release version
-    VERSION = "2.1.2b"
-
     # Sub directories
     BINWALK_USER_DIR = "binwalk"
     BINWALK_MAGIC_DIR = "magic"
