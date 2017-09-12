@@ -300,10 +300,3 @@ class Entropy(Module):
         else:
             plt.show()
 
-        #if self.show_legend and has_key(self.file_markers, fname):
-        #    plt.addLegend(size=(self.max_description_length * 10, 0))
-
-        #                i = 0
-
-        #        plt.plot(x=[offset, offset], y=[0, 1.1],
-        #                 name=description, pen=pg.mkPen(color, width=2.5))
