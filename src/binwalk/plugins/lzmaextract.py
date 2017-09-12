@@ -36,7 +36,9 @@ class LZMAExtractPlugin(binwalk.core.plugin.Plugin):
                                                cmd=self.extractor,
                                                prepend=True)
         except ImportError as e:
-            pass
+            if self.module.extractor.enabled:
+                binwalk.core.common.warning("The Python LZMA module could not be found. It is *strongly* recommended that you install this module for binwalk to provide proper LZMA identification and extraction results.")
+
 
     def extractor(self, fname):
         fname = os.path.abspath(fname)
