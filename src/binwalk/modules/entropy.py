@@ -120,19 +120,15 @@ class Entropy(Module):
         print ("FUck it all.")
 
     def run(self):
-        # If generating a graphical plot, this function will never return, as it invokes
-        # pg.exit. Calling pg.exit is pretty much required, but pg.exit calls os._exit in
-        # order to work around QT cleanup issues.
         self._run()
 
     def _run(self):
-        # Sanity check and warning if pyqtgraph isn't found
+        # Sanity check and warning if matplotlib isn't found
         if self.do_plot:
             try:
-                import pyqtgraph as pg
+                import matplotlib.pyplot as plt
             except ImportError as e:
-                binwalk.core.common.warning(
-                    "Failed to import pyqtgraph module, visual entropy graphing will be disabled")
+                binwalk.core.common.warning("Failed to import matplotlib module, visual entropy graphing will be disabled")
                 self.do_plot = False
 
         for fp in iter(self.next_file, None):
@@ -144,12 +140,6 @@ class Entropy(Module):
 
             if self.display_results:
                 self.footer()
-
-        if self.do_plot:
-            if not self.save_plot:
-                from pyqtgraph.Qt import QtGui
-                QtGui.QApplication.instance().exec_()
-            pg.exit()
 
     def calculate_file_entropy(self, fp):
         # Tracks the last displayed rising/falling edge (0 for falling, 1 for
@@ -260,9 +250,7 @@ class Entropy(Module):
 
     def plot_entropy(self, fname):
         try:
-            import numpy as np
-            import pyqtgraph as pg
-            import pyqtgraph.exporters as exporters
+            import matplotlib.pyplot as plt
         except ImportError as e:
             return
 
@@ -275,54 +263,60 @@ class Entropy(Module):
             x.append(r.offset)
             y.append(r.entropy)
 
-        plt = pg.plot(title=fname, clear=True)
+        fig = plt.figure()
+        ax = fig.add_subplot(1, 1, 1, autoscale_on=True)
+        ax.set_title(fname)
+        ax.set_xlabel(self.XLABEL)
+        ax.set_ylabel(self.YLABEL)
+        ax.plot(x, y)
 
-        # Disable auto-ranging of the Y (entropy) axis, as it
-        # can cause some very un-intuitive graphs, particularly
-        # for files with only high-entropy data.
-        plt.setYRange(0, 1)
+        if self.save_plot:
+            out_file = os.path.join(os.getcwd(), os.path.basename(fname)) + '.png'
+            fig.savefig(out_file)
+        else:
+            plt.show()
 
-        if self.show_legend and has_key(self.file_markers, fname):
-            plt.addLegend(size=(self.max_description_length * 10, 0))
+        #if self.show_legend and has_key(self.file_markers, fname):
+        #    plt.addLegend(size=(self.max_description_length * 10, 0))
 
-            for (offset, description) in self.file_markers[fname]:
+        #    for (offset, description) in self.file_markers[fname]:
                 # If this description has already been plotted at a different offset, we need to
                 # use the same color for the marker, but set the description to None to prevent
                 # duplicate entries in the graph legend.
                 #
                 # Else, get the next color and use it to mark descriptions of
                 # this type.
-                if has_key(plotted_colors, description):
-                    color = plotted_colors[description]
-                    description = None
-                else:
-                    color = self.COLORS[i]
-                    plotted_colors[description] = color
+        #        if has_key(plotted_colors, description):
+        #            color = plotted_colors[description]
+        #            description = None
+        #        else:
+        #            color = self.COLORS[i]
+        #            plotted_colors[description] = color
 
-                    i += 1
-                    if i >= len(self.COLORS):
-                        i = 0
+        #            i += 1
+        #            if i >= len(self.COLORS):
+        #                i = 0
 
-                plt.plot(x=[offset, offset], y=[0, 1.1],
-                         name=description, pen=pg.mkPen(color, width=2.5))
+        #        plt.plot(x=[offset, offset], y=[0, 1.1],
+        #                 name=description, pen=pg.mkPen(color, width=2.5))
 
         # Plot data points
-        plt.plot(x, y, pen='y')
+        #plt.plot(x, y, pen='y')
 
         # TODO: legend is not displayed properly when saving plots to disk
-        if self.save_plot:
+        #if self.save_plot:
             # Save graph to CWD
-            out_file = os.path.join(os.getcwd(), os.path.basename(fname))
+        #    out_file = os.path.join(os.getcwd(), os.path.basename(fname))
 
             # exporters.ImageExporter is different in different versions of
             # pyqtgraph
-            try:
-                exporter = exporters.ImageExporter(plt.plotItem)
-            except TypeError:
-                exporter = exporters.ImageExporter.ImageExporter(plt.plotItem)
-            exporter.parameters()['width'] = self.FILE_WIDTH
-            exporter.export(
-                binwalk.core.common.unique_file_name(out_file, self.FILE_FORMAT))
-        else:
-            plt.setLabel('left', self.YLABEL, units=self.YUNITS)
-            plt.setLabel('bottom', self.XLABEL, units=self.XUNITS)
+        #    try:
+        #        exporter = exporters.ImageExporter(plt.plotItem)
+        #    except TypeError:
+        #        exporter = exporters.ImageExporter.ImageExporter(plt.plotItem)
+        #    exporter.parameters()['width'] = self.FILE_WIDTH
+        #    exporter.export(
+        #        binwalk.core.common.unique_file_name(out_file, self.FILE_FORMAT))
+        #else:
+        #    plt.setLabel('left', self.YLABEL, units=self.YUNITS)
+        #    plt.setLabel('bottom', self.XLABEL, units=self.XUNITS)
