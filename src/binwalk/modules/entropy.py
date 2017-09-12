@@ -19,7 +19,7 @@ class Entropy(Module):
     FILE_WIDTH = 1024
     FILE_FORMAT = 'png'
 
-    COLORS = ['r', 'g', 'c', 'b', 'm']
+    COLORS = ['g', 'r', 'c', 'm', 'y']
 
     DEFAULT_BLOCK_SIZE = 1024
     DEFAULT_DATA_POINTS = 2048
@@ -268,7 +268,31 @@ class Entropy(Module):
         ax.set_title(fname)
         ax.set_xlabel(self.XLABEL)
         ax.set_ylabel(self.YLABEL)
-        ax.plot(x, y)
+        ax.plot(x, y, lw=2)
+
+
+        if self.show_legend and has_key(self.file_markers, fname):
+            for (offset, description) in self.file_markers[fname]:
+                # If this description has already been plotted at a different offset, we need to
+                # use the same color for the marker, but set the description to None to prevent
+                # duplicate entries in the graph legend.
+                #
+                # Else, get the next color and use it to mark descriptions of
+                # this type.
+                if has_key(plotted_colors, description):
+                    color = plotted_colors[description]
+                    description = None
+                else:
+                    color = self.COLORS[i]
+                    plotted_colors[description] = color
+
+                    i += 1
+                    if i >= len(self.COLORS):
+                        i = 0
+
+                ax.plot([offset, offset], [0, 1.1], '%s-' % color, lw=2, label=description)
+
+            ax.legend(loc='upper right', shadow=True)
 
         if self.save_plot:
             out_file = os.path.join(os.getcwd(), os.path.basename(fname)) + '.png'
@@ -279,44 +303,7 @@ class Entropy(Module):
         #if self.show_legend and has_key(self.file_markers, fname):
         #    plt.addLegend(size=(self.max_description_length * 10, 0))
 
-        #    for (offset, description) in self.file_markers[fname]:
-                # If this description has already been plotted at a different offset, we need to
-                # use the same color for the marker, but set the description to None to prevent
-                # duplicate entries in the graph legend.
-                #
-                # Else, get the next color and use it to mark descriptions of
-                # this type.
-        #        if has_key(plotted_colors, description):
-        #            color = plotted_colors[description]
-        #            description = None
-        #        else:
-        #            color = self.COLORS[i]
-        #            plotted_colors[description] = color
-
-        #            i += 1
-        #            if i >= len(self.COLORS):
         #                i = 0
 
         #        plt.plot(x=[offset, offset], y=[0, 1.1],
         #                 name=description, pen=pg.mkPen(color, width=2.5))
-
-        # Plot data points
-        #plt.plot(x, y, pen='y')
-
-        # TODO: legend is not displayed properly when saving plots to disk
-        #if self.save_plot:
-            # Save graph to CWD
-        #    out_file = os.path.join(os.getcwd(), os.path.basename(fname))
-
-            # exporters.ImageExporter is different in different versions of
-            # pyqtgraph
-        #    try:
-        #        exporter = exporters.ImageExporter(plt.plotItem)
-        #    except TypeError:
-        #        exporter = exporters.ImageExporter.ImageExporter(plt.plotItem)
-        #    exporter.parameters()['width'] = self.FILE_WIDTH
-        #    exporter.export(
-        #        binwalk.core.common.unique_file_name(out_file, self.FILE_FORMAT))
-        #else:
-        #    plt.setLabel('left', self.YLABEL, units=self.YUNITS)
-        #    plt.setLabel('bottom', self.XLABEL, units=self.XUNITS)
