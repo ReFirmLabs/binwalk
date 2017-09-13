@@ -7,7 +7,7 @@ from distutils.core import setup, Command
 from distutils.dir_util import remove_tree
 
 MODULE_NAME = "binwalk"
-MODULE_VERSION = "2.1.2b"
+MODULE_VERSION = "2.1.2"
 SCRIPT_NAME = MODULE_NAME
 MODULE_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 VERSION_FILE = os.path.join(MODULE_DIRECTORY, "src", "binwalk", "core", "version.py")
