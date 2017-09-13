@@ -1,4 +1,6 @@
-build/
+build
+dist
+version.py
 .coverage
-*.extracted/
+*.extracted
 *.pyc
