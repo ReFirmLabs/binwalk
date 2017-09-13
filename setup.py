@@ -303,6 +303,8 @@ class TestCommand(Command):
         # Run the tests
         nose.core.run(argv=['--exe','--with-coverage'])
 
+        sys.stdout.write("\n")
+
         # Clean up the resulting pyc files in the testing directory
         for pyc in glob.glob("%s/*.pyc" % testing_directory):
             sys.stdout.write("removing '%s'\n" % pyc)
