@@ -7,9 +7,10 @@ from distutils.core import setup, Command
 from distutils.dir_util import remove_tree
 
 MODULE_NAME = "binwalk"
-SCRIPT_NAME = MODULE_NAME
 MODULE_VERSION = "2.1.2b"
-VERSION_FILE = os.path.join(os.path.dirname(os.path.realpath(__file__)), "src", "binwalk", "core", "version.py")
+SCRIPT_NAME = MODULE_NAME
+MODULE_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
+VERSION_FILE = os.path.join(MODULE_DIRECTORY, "src", "binwalk", "core", "version.py")
 
 # Python3 has a built-in DEVNULL; for Python2, we have to open
 # os.devnull to redirect subprocess stderr output to the ether.
@@ -36,8 +37,7 @@ except NameError:
 
 def which(command):
     # /usr/local/bin is usually the default install path, though it may not be in $PATH
-    usr_local_bin = os.path.sep.join(
-        [os.path.sep, 'usr', 'local', 'bin', command])
+    usr_local_bin = os.path.sep.join([os.path.sep, 'usr', 'local', 'bin', command])
 
     try:
         location = subprocess.Popen(
@@ -226,14 +226,14 @@ class CleanCommand(Command):
             sys.stderr.write("failed to remove file %s: %s\n" % (VERSION_FILE, str(e)))
 
         try:
-            remove_tree("build")
+            remove_tree(os.path.join(MODULE_DIRECTORY, "build"))
         except KeyboardInterrupt as e:
             raise e
         except Exception:
             pass
 
         try:
-            remove_tree("dist")
+            remove_tree(os.path.join(MODULE_DIRECTORY, "dist"))
         except KeyboardInterrupt as e:
             raise e
         except Exception:
