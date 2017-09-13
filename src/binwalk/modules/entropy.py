@@ -270,6 +270,9 @@ class Entropy(Module):
         ax.set_ylabel(self.YLABEL)
         ax.plot(x, y, lw=2)
 
+        # Add a fake, invisible plot entry so that offsets at/near the
+        # minimum x value (0) are actually visible on the plot.
+        ax.plot(-(max(x)*.001), 0, lw=0)
 
         if self.show_legend and has_key(self.file_markers, fname):
             for (offset, description) in self.file_markers[fname]:
@@ -292,7 +295,7 @@ class Entropy(Module):
 
                 ax.plot([offset, offset], [0, 1.1], '%s-' % color, lw=2, label=description)
 
-            ax.legend(loc='upper right', shadow=True)
+            ax.legend(loc='lower right', shadow=True)
 
         if self.save_plot:
             out_file = os.path.join(os.getcwd(), os.path.basename(fname)) + '.png'
