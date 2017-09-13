@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
+import glob
 import shutil
 import subprocess
 from distutils.core import setup, Command
@@ -288,8 +289,28 @@ class TestCommand(Command):
         pass
 
     def run(self):
+        # Need the nose module for testing
         import nose
-        nose.main(argv=['--exe','--with-coverage'])
+
+        # cd into the testing directory. Otherwise, the src/binwalk
+        # directory gets imported by nose which a) clutters the src
+        # directory with a bunch of .pyc files and b) will fail anyway
+        # unless a build/install has already been run which creates
+        # the version.py file.
+        testing_directory = os.path.join(MODULE_DIRECTORY, "tests")
+        os.chdir(testing_directory)
+
+        # Run the tests
+        nose.core.run(argv=['--exe','--with-coverage'])
+
+        # Clean up the resulting pyc files in the testing directory
+        for pyc in glob.glob("%s/*.pyc" % testing_directory):
+            sys.stdout.write("removing '%s'\n" % pyc)
+            os.remove(pyc)
+
+        input_vectors_directory = os.path.join(testing_directory, "input-vectors")
+        for extracted_directory in glob.glob("%s/*.extracted" % input_vectors_directory):
+            remove_tree(extracted_directory)
 
 # The data files to install along with the module
 install_data_files = []
