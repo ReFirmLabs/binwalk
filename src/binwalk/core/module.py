@@ -670,7 +670,7 @@ class Modules(object):
         if kargv:
             for (k, v) in iterator(kargv):
                     k = self._parse_api_opt(k)
-                    if v not in [True, False, None]:
+                    if v is not True and v is not False and v is not None:
                         if not isinstance(v, list):
                             v = [v]
                         for value in v:
@@ -904,8 +904,8 @@ class Modules(object):
         # Must build arguments from all modules so that:
         #
         #    1) Any conflicting arguments will raise an exception
-        # 2) The only unknown arguments will be the target files, making them
-        # easy to identify
+        #    2) The only unknown arguments will be the target files, making them
+        #       easy to identify
         for m in self.list(attribute="CLI"):
 
             for module_option in m.CLI:
@@ -965,8 +965,7 @@ class Modules(object):
                         except Exception as e:
                             raise ModuleException("Invalid usage: %s" % str(e))
 
-        binwalk.core.common.debug("%s :: %s => %s" %
-                                  (module.TITLE, str(argv), str(kwargs)))
+        binwalk.core.common.debug("%s :: %s => %s" % (module.TITLE, str(argv), str(kwargs)))
         return kwargs
 
     def kwargs(self, obj, kwargs):
