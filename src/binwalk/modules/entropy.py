@@ -173,7 +173,7 @@ class Entropy(Module):
             file_offset = fp.tell()
 
             (data, dlen) = fp.read_block()
-            if not data:
+            if dlen < 1:
                 break
 
             i = 0

@@ -270,7 +270,7 @@ class RawCompression(Module):
 
             while not file_done:
                 (data, dlen) = fp.read_block()
-                if not data:
+                if dlen < 1:
                     break
 
                 for i in range(0, dlen):

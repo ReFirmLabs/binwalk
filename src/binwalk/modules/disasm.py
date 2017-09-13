@@ -109,7 +109,7 @@ class Disasm(Module):
             result = None
 
             (data, dlen) = fp.read_block()
-            if not data:
+            if dlen < 1:
                 break
 
             # If this data block doesn't contain at least two different bytes, skip it

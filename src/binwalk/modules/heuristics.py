@@ -177,7 +177,7 @@ class HeuristicCompressionAnalyzer(Module):
         while i < block.length:
             j = 0
             (d, dlen) = fp.read_block()
-            if not d:
+            if dlen < 1:
                 break
 
             while j < dlen:

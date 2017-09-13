@@ -782,7 +782,7 @@ class Extractor(Module):
 
             while total_size < size:
                 (data, dlen) = fdin.read_block()
-                if not data:
+                if dlen < 1:
                     break
                 else:
                     total_size += (dlen - adjust)

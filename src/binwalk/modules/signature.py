@@ -138,7 +138,7 @@ class Signature(Module):
 
         while True:
             (data, dlen) = fp.read_block()
-            if not data:
+            if dlen < 1:
                 break
 
             current_block_offset = 0

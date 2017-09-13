@@ -50,6 +50,13 @@ def error(msg):
     sys.stderr.write("\nERROR: " + msg + "\n")
 
 
+def critical(msg):
+    '''
+    Prints critical messages to stderr
+    '''
+    sys.stderr.write("\nCRITICAL: " + msg + "\n")
+
+
 def get_module_path():
     root = __file__
     if os.path.islink(root):
@@ -176,7 +183,7 @@ def strings(filename, minimum=4):
     with BlockFile(filename) as f:
         while True:
             (data, dlen) = f.read_block()
-            if not data:
+            if dlen < 1:
                 break
 
             for c in data:
@@ -451,10 +458,10 @@ def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
 
             return n
 
-        def read(self, n=-1):
+        def read(self, n=-1, override=False):
             ''''
             Reads up to n bytes of data (or to EOF if n is not specified).
-            Will not read more than self.length bytes.
+            Will not read more than self.length bytes unless override == True.
 
             io.FileIO.read does not guaruntee that all requested data will be read;
             this method overrides io.FileIO.read and does guaruntee that all data will be read.
@@ -464,9 +471,10 @@ def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
             l = 0
             data = b''
 
-            if self.total_read < self.length:
+            if override == True or (self.total_read < self.length):
                 # Don't read more than self.length bytes from the file
-                if (self.total_read + n) > self.length:
+                # unless an override has been requested.
+                if override == False and (self.total_read + n) > self.length:
                     n = self.length - self.total_read
 
                 while n < 0 or l < n:
@@ -486,7 +494,7 @@ def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
             Peeks at data in file.
             '''
             pos = self.tell()
-            data = self.read(n)
+            data = self.read(n, override=True)
             self.seek(pos)
             return data
 
