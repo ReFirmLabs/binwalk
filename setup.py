@@ -297,7 +297,7 @@ class TestCommand(Command):
         # directory with a bunch of .pyc files and b) will fail anyway
         # unless a build/install has already been run which creates
         # the version.py file.
-        testing_directory = os.path.join(MODULE_DIRECTORY, "tests")
+        testing_directory = os.path.join(MODULE_DIRECTORY, "testing", "tests")
         os.chdir(testing_directory)
 
         # Run the tests
