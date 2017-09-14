@@ -11,7 +11,7 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
     cpio utility since no output directory can be provided to it directly.
     '''
     CPIO_OUT_DIR = "cpio-root"
-    CPIO_HEADER_SIZE = 76
+    CPIO_HEADER_SIZE = 110
 
     MODULES = ['Signature']
 

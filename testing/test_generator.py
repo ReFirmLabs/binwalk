@@ -8,8 +8,8 @@ import sys
 import binwalk
 
 test_script_template = """
+import os
 import binwalk
-from os.path import dirname
 from nose.tools import eq_, ok_
 
 def test_%s():
@@ -21,7 +21,11 @@ def test_%s():
 %s
     ]
 
-    scan_result = binwalk.scan(dirname(__file__) + '/input-vectors/%s',
+    input_vector_file = os.path.join(os.path.dirname(__file__),
+                                     "input-vectors",
+                                     "%s")
+
+    scan_result = binwalk.scan(input_vector_file,
                                signature=True,
                                quiet=True)
 
@@ -44,10 +48,10 @@ except IndexError:
     sys.exit(1)
 
 target_file_basename = os.path.basename(target_file)
-scan_function_name = target_file_basename.replace('.', '_')
+scan_function_name = target_file_basename.replace('.', '_').replace('-', '_')
 expected_results = ""
 
-signature = binwalk.scan(target_file, signature=True)[0]
+signature = binwalk.scan(target_file, signature=True, term=True)[0]
 for result in signature.results:
     expected_results += "\t[%d, '%s'],\n" % (result.offset, result.description)
 
