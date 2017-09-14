@@ -42,8 +42,7 @@ class TarPlugin(binwalk.core.plugin.Plugin):
         if result.description.lower().startswith('posix tar archive'):
             is_tar = True
             file_offset = result.offset
-            fd = self.module.config.open_file(
-                result.file.name, offset=result.offset)
+            fd = self.module.config.open_file(result.file.name, offset=result.offset)
 
             while is_tar:
                 # read in the tar header struct
@@ -55,8 +54,7 @@ class TarPlugin(binwalk.core.plugin.Plugin):
                     # include header)
                     try:
                         size = self.nti(buf[124:136])
-                        blocks = math.ceil(
-                            size / float(self.TAR_BLOCKSIZE)) + 1
+                        blocks = math.ceil(size / float(self.TAR_BLOCKSIZE)) + 1
                     except ValueError as e:
                         is_tar = False
                         break

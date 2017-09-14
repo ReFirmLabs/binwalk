@@ -134,11 +134,9 @@ class General(Module):
 
         # Build file name filter regex rules
         if self.file_name_include_regex:
-            self.file_name_include_regex = re.compile(
-                self.file_name_include_regex)
+            self.file_name_include_regex = re.compile(self.file_name_include_regex)
         if self.file_name_exclude_regex:
-            self.file_name_exclude_regex = re.compile(
-                self.file_name_exclude_regex)
+            self.file_name_exclude_regex = re.compile(self.file_name_exclude_regex)
 
         self.settings = binwalk.core.settings.Settings()
         self.display = binwalk.core.display.Display(log=self.log_file,

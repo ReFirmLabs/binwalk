@@ -11,8 +11,7 @@ except ImportError as e:
 class RomFSCommon(object):
 
     def _read_next_word(self):
-        value = struct.unpack(
-            "%sL" % self.endianess, self.data[self.index:self.index + 4])[0]
+        value = struct.unpack("%sL" % self.endianess, self.data[self.index:self.index + 4])[0]
         self.index += 4
         return value
 
@@ -152,8 +151,7 @@ class RomFS(object):
 
         while True:
             try:
-                entry = RomFSEntry(
-                    self.data[offset:offset + self.FILE_ENTRY_SIZE], endianess=self.endianess)
+                entry = RomFSEntry(self.data[offset:offset + self.FILE_ENTRY_SIZE], endianess=self.endianess)
             except ValueError as e:
                 break
 
@@ -168,8 +166,7 @@ class RomFS(object):
 
             if entry.type & entry.DIR_STRUCT_MASK:
                 entries[entry.uid].type = "directory"
-                ds = RomFSDirStruct(
-                    self.data[entry.offset:entry.offset + entry.size], endianess=self.endianess)
+                ds = RomFSDirStruct(self.data[entry.offset:entry.offset + entry.size], endianess=self.endianess)
                 for (uid, name) in ds.ls:
                     if not uid in entries:
                         entries[uid] = FileContainer()

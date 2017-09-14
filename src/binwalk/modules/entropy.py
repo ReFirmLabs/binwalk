@@ -102,8 +102,7 @@ class Entropy(Module):
                     if len(description) > self.max_description_length:
                         self.max_description_length = len(description)
 
-                    self.file_markers[result.file.name].append(
-                        (result.offset, description))
+                    self.file_markers[result.file.name].append((result.offset, description))
 
         # If other modules have been run and they produced results, don't spam
         # the terminal with entropy results
@@ -157,8 +156,7 @@ class Entropy(Module):
         if self.block_size is None:
             block_size = fp.size / self.DEFAULT_DATA_POINTS
             # Round up to the nearest DEFAULT_BLOCK_SIZE (1024)
-            block_size = int(
-                block_size + ((self.DEFAULT_BLOCK_SIZE - block_size) % self.DEFAULT_BLOCK_SIZE))
+            block_size = int(block_size + ((self.DEFAULT_BLOCK_SIZE - block_size) % self.DEFAULT_BLOCK_SIZE))
         else:
             block_size = self.block_size
 
@@ -240,8 +238,7 @@ class Entropy(Module):
         '''
         # Entropy is a simple ratio of: <zlib compressed size> / <original
         # size>
-        e = float(
-            float(len(zlib.compress(str2bytes(data), 9))) / float(len(data)))
+        e = float(float(len(zlib.compress(str2bytes(data), 9))) / float(len(data)))
 
         if truncate and e > 1.0:
             e = 1.0

@@ -109,13 +109,14 @@ class Display(object):
             self._fprint(
                 "MD5 Checksum:  %s\n", [md5sum], csv=False, filter=False)
             if self.custom_verbose_format and self.custom_verbose_args:
-                self._fprint(
-                    self.custom_verbose_format, self.custom_verbose_args, csv=False, filter=False)
+                self._fprint(self.custom_verbose_format,
+                             self.custom_verbose_args,
+                             csv=False,
+                             filter=False)
 
         self._fprint("%s", "\n", csv=False, filter=False)
         self._fprint(self.header_format, args, filter=False)
-        self._fprint(
-            "%s", ["-" * self.HEADER_WIDTH + "\n"], csv=False, filter=False)
+        self._fprint("%s", ["-" * self.HEADER_WIDTH + "\n"], csv=False, filter=False)
 
     def result(self, *args):
         # Convert to list for item assignment
@@ -218,8 +219,7 @@ class Display(object):
 
             # Add any remaining data (guarunteed to be max_line_wrap_length
             # long or shorter) to self.string_parts
-            self._append_to_data_parts(
-                line, offset, offset + len(line[offset:]))
+            self._append_to_data_parts(line, offset, offset + len(line[offset:]))
 
             # Append self.string_parts to formatted_line; each part seperated
             # by delim
@@ -244,8 +244,7 @@ class Display(object):
                 import termios
 
                 # Get the terminal window width
-                hw = struct.unpack(
-                    'hh', fcntl.ioctl(1, termios.TIOCGWINSZ, '1234'))
+                hw = struct.unpack('hh', fcntl.ioctl(1, termios.TIOCGWINSZ, '1234'))
                 self.SCREEN_WIDTH = self.HEADER_WIDTH = hw[1]
             except KeyboardInterrupt as e:
                 raise e

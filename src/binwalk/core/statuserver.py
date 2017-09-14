@@ -28,22 +28,17 @@ class StatusRequestHandler(SocketServer.BaseRequestHandler):
             time.sleep(0.1)
 
             try:
-                self.request.send(
-                    binwalk.core.compat.str2bytes('\b' * last_status_message_len))
-                self.request.send(
-                    binwalk.core.compat.str2bytes(' ' * last_status_message_len))
-                self.request.send(
-                    binwalk.core.compat.str2bytes('\b' * last_status_message_len))
+                self.request.send(binwalk.core.compat.str2bytes('\b' * last_status_message_len))
+                self.request.send(binwalk.core.compat.str2bytes(' ' * last_status_message_len))
+                self.request.send(binwalk.core.compat.str2bytes('\b' * last_status_message_len))
 
                 if self.server.binwalk.status.shutdown:
                     self.server.binwalk.status.finished = True
                     break
 
                 if self.server.binwalk.status.total != 0:
-                    percentage = (
-                        (float(self.server.binwalk.status.completed) / float(self.server.binwalk.status.total)) * 100)
-                    status_message = message_format % (
-                        self.server.binwalk.status.fp.path,
+                    percentage = ((float(self.server.binwalk.status.completed) / float(self.server.binwalk.status.total)) * 100)
+                    status_message = message_format % (self.server.binwalk.status.fp.path,
                         percentage,
                         self.server.binwalk.status.completed,
                         self.server.binwalk.status.total)
@@ -53,15 +48,13 @@ class StatusRequestHandler(SocketServer.BaseRequestHandler):
                     continue
 
                 last_status_message_len = len(status_message)
-                self.request.send(
-                    binwalk.core.compat.str2bytes(status_message))
+                self.request.send(binwalk.core.compat.str2bytes(status_message))
                 message_sent = True
             except IOError as e:
                 if e.errno == errno.EPIPE:
                     break
             except Exception as e:
-                binwalk.core.common.debug(
-                    'StatusRequestHandler exception: ' + str(e) + '\n')
+                binwalk.core.common.debug('StatusRequestHandler exception: ' + str(e) + '\n')
             except KeyboardInterrupt as e:
                 raise e
 
@@ -77,8 +70,7 @@ class ThreadedStatusServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
 class StatusServer(object):
 
     def __init__(self, port, binwalk):
-        self.server = ThreadedStatusServer(
-            ('127.0.0.1', port), StatusRequestHandler)
+        self.server = ThreadedStatusServer(('127.0.0.1', port), StatusRequestHandler)
         self.server.binwalk = binwalk
 
         t = threading.Thread(target=self.server.serve_forever)

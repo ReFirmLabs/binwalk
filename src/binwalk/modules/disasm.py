@@ -99,8 +99,7 @@ class Disasm(Module):
         self.disasm_data_size = self.min_insn_count * 10
 
         for arch in self.ARCHITECTURES:
-            self.disassemblers.append(
-                (capstone.Cs(arch.type, (arch.mode + arch.endianess)), arch.description))
+            self.disassemblers.append((capstone.Cs(arch.type, (arch.mode + arch.endianess)), arch.description))
 
     def scan_file(self, fp):
         total_read = 0
@@ -124,18 +123,15 @@ class Disasm(Module):
                     # Don't pass the entire data block into disasm_lite, it's horribly inefficient
                     # to pass large strings around in Python. Break it up into
                     # smaller code blocks instead.
-                    code_block = binwalk.core.compat.str2bytes(
-                        data[block_offset:block_offset + self.disasm_data_size])
+                    code_block = binwalk.core.compat.str2bytes(data[block_offset:block_offset + self.disasm_data_size])
 
                     # If this code block doesn't contain at least two different bytes, skip it
                     # to prevent false positives (e.g., "\x00\x00\x00\x00" is a
                     # nop in MIPS).
                     if len(set(code_block)) >= 2:
                         for (md, description) in self.disassemblers:
-                            insns = [insn for insn in md.disasm_lite(
-                                code_block, (total_read + block_offset))]
-                            binwalk.core.common.debug(
-                                "0x%.8X   %s, at least %d valid instructions" % ((total_read + block_offset),
+                            insns = [insn for insn in md.disasm_lite(code_block, (total_read + block_offset))]
+                            binwalk.core.common.debug("0x%.8X   %s, at least %d valid instructions" % ((total_read + block_offset),
                                                                                  description,
                                                                                  len(insns)))
 
@@ -150,8 +146,7 @@ class Disasm(Module):
                                     if result.count >= self.THRESHOLD:
                                         break
                                 else:
-                                    result = ArchResult(
-                                        offset=total_read +
+                                    result = ArchResult(offset=total_read +
                                         block_offset + fp.offset,
                                         description=description,
                                         insns=insns,
@@ -168,8 +163,7 @@ class Disasm(Module):
                     if r.valid and r.display:
                         if self.config.verbose:
                             for (position, size, mnem, opnds) in result.insns:
-                                self.result(
-                                    offset=position, file=fp, description="%s %s" % (mnem, opnds))
+                                self.result(offset=position, file=fp, description="%s %s" % (mnem, opnds))
                         if not self.keep_going:
                             return
 

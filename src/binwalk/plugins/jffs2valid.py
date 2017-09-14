@@ -25,8 +25,7 @@ class JFFS2ValidPlugin(binwalk.core.plugin.Plugin):
             header_crc = struct.unpack("<I", node_header[8:12])[0]
 
         # Calculate the actual CRC
-        calculated_header_crc = (
-            binascii.crc32(node_header[0:8], -1) ^ -1) & 0xffffffff
+        calculated_header_crc = (binascii.crc32(node_header[0:8], -1) ^ -1) & 0xffffffff
 
         # Make sure they match
         return (header_crc == calculated_header_crc)
@@ -35,8 +34,7 @@ class JFFS2ValidPlugin(binwalk.core.plugin.Plugin):
         if result.file and result.description.lower().startswith('jffs2 filesystem'):
 
             # Seek to and read the suspected JFFS2 node header
-            fd = self.module.config.open_file(
-                result.file.name, offset=result.offset)
+            fd = self.module.config.open_file(result.file.name, offset=result.offset)
             # JFFS2 headers are only 12 bytes in size, but reading larger amounts of
             # data from disk speeds up repeated disk access and decreases performance
             # hits (disk caching?).

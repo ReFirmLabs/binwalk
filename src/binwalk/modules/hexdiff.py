@@ -149,8 +149,7 @@ class HexDiff(Module):
                         hexbyte = "XX"
                         asciibyte = "."
                     else:
-                        (hexbyte, asciibyte) = self.hexascii(
-                            block_data, block_data[fp][i], i)
+                        (hexbyte, asciibyte) = self.hexascii(block_data, block_data[fp][i], i)
 
                     hexline += "%s " % hexbyte
                     asciiline += "%s" % asciibyte

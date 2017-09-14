@@ -56,8 +56,7 @@ class UBIValidPlugin(binwalk.core.plugin.Plugin):
     def scan(self, result):
         if result.file and result.description.lower().startswith('ubi erase count header'):
             # Seek to and read the suspected UBI erase count header
-            fd = self.module.config.open_file(
-                result.file.name, offset=result.offset)
+            fd = self.module.config.open_file(result.file.name, offset=result.offset)
 
             ec_header = binwalk.core.compat.str2bytes(fd.read(1024))
             fd.close()

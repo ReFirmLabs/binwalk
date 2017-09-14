@@ -28,8 +28,7 @@ class ZLIBExtractPlugin(binwalk.core.plugin.Plugin):
             fpin = binwalk.core.common.BlockFile(fname)
             fpout = binwalk.core.common.BlockFile(outfile, 'w')
 
-            plaintext = zlib.decompress(
-                binwalk.core.compat.str2bytes(fpin.read()))
+            plaintext = zlib.decompress(binwalk.core.compat.str2bytes(fpin.read()))
             fpout.write(plaintext)
 
             fpin.close()

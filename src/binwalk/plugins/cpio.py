@@ -44,11 +44,10 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
             return False
 
         try:
-            result = subprocess.call(
-                ['cpio', '-d', '-i', '--no-absolute-filenames'],
-                stdin=fpin,
-                stderr=fperr,
-                stdout=fperr)
+            result = subprocess.call(['cpio', '-d', '-i', '--no-absolute-filenames'],
+                                     stdin=fpin,
+                                     stderr=fperr,
+                                     stdout=fperr)
         except OSError:
             result = -1
 

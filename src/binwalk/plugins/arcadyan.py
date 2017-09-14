@@ -15,8 +15,7 @@ class ArcadyanDeobfuscator(binwalk.core.plugin.Plugin):
     BLOCK_SIZE = 32
     BLOCK1_OFFSET = 4
     BLOCK2_OFFSET = 0x68
-    MIN_FILE_SIZE = (
-        OBFUSCATION_MAGIC_SIZE + BLOCK2_OFFSET + BLOCK_SIZE)
+    MIN_FILE_SIZE = (OBFUSCATION_MAGIC_SIZE + BLOCK2_OFFSET + BLOCK_SIZE)
 
     BLOCK1_START = BLOCK1_OFFSET
     BLOCK1_END = BLOCK1_START + BLOCK_SIZE
@@ -34,8 +33,7 @@ class ArcadyanDeobfuscator(binwalk.core.plugin.Plugin):
 
     def init(self):
         if self.module.extractor.enabled:
-            self.module.extractor.add_rule(
-                regex="^obfuscated arcadyan firmware",
+            self.module.extractor.add_rule(regex="^obfuscated arcadyan firmware",
                 extension="obfuscated",
                 cmd=self.extractor)
 
@@ -59,8 +57,7 @@ class ArcadyanDeobfuscator(binwalk.core.plugin.Plugin):
             # Nibble-swap each byte in block 1
             nswap = ''
             for i in range(self.BLOCK1_START, self.BLOCK1_END):
-                nswap += chr(((ord(deobfuscated[i]) & 0x0F) << 4) + (
-                    (ord(deobfuscated[i]) & 0xF0) >> 4))
+                nswap += chr(((ord(deobfuscated[i]) & 0x0F) << 4) + ((ord(deobfuscated[i]) & 0xF0) >> 4))
             deobfuscated = deobfuscated[
                 self.P1_START:self.P1_END] + nswap + deobfuscated[self.BLOCK1_END:]
 
@@ -74,8 +71,7 @@ class ArcadyanDeobfuscator(binwalk.core.plugin.Plugin):
                 self.P1_START:self.P1_END] + bswap + deobfuscated[self.BLOCK1_END:]
 
         if deobfuscated:
-            out = binwalk.core.common.BlockFile(
-                (os.path.splitext(fname)[0] + '.deobfuscated'), "wb")
+            out = binwalk.core.common.BlockFile((os.path.splitext(fname)[0] + '.deobfuscated'), "wb")
             out.write(deobfuscated)
             out.close()
             return True

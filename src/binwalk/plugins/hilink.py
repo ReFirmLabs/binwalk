@@ -31,8 +31,7 @@ class HilinkDecryptor(binwalk.core.plugin.Plugin):
         if self.enabled is True and self.module.extractor.enabled is True:
             # Add an extraction rule for encrypted Hilink firmware signature
             # results
-            self.module.extractor.add_rule(
-                regex="^%s" % self.SIGNATURE_DESCRIPTION,
+            self.module.extractor.add_rule(regex="^%s" % self.SIGNATURE_DESCRIPTION,
                 extension="enc",
                 cmd=self._decrypt_and_extract)
 
@@ -72,25 +71,20 @@ class HilinkDecryptor(binwalk.core.plugin.Plugin):
                 if result.description.lower().startswith(self.SIGNATURE_DESCRIPTION) is True:
                     # Read in the first 64 bytes of the suspected encrypted
                     # uImage header
-                    fd = self.module.config.open_file(
-                        result.file.name, offset=result.offset)
-                    encrypted_header_data = binwalk.core.compat.str2bytes(
-                        fd.read(64))
+                    fd = self.module.config.open_file(result.file.name, offset=result.offset)
+                    encrypted_header_data = binwalk.core.compat.str2bytes(fd.read(64))
                     fd.close()
 
                     # Decrypt the header
-                    decrypted_header_data = self._hilink_decrypt(
-                        encrypted_header_data)
+                    decrypted_header_data = self._hilink_decrypt(encrypted_header_data)
 
                     # Pull out the image size and image name fields from the decrypted uImage header
                     # and add them to the printed description.
-                    result.size = struct.unpack(
-                        b">L", decrypted_header_data[12:16])[0]
+                    result.size = struct.unpack(b">L", decrypted_header_data[12:16])[0]
                     result.description += ", size: %d" % (result.size)
                     # NOTE: The description field should be 32 bytes? Hilink seems to use only 24 bytes for this field,
                     #       even though the header size is still 64 bytes?
-                    result.description += ', image name: "%s"' % binwalk.core.compat.bytes2str(
-                        decrypted_header_data[32:56]).strip("\x00")
+                    result.description += ', image name: "%s"' % binwalk.core.compat.bytes2str(decrypted_header_data[32:56]).strip("\x00")
 
                     # Do some basic validation on the decrypted size and image
                     # name fields

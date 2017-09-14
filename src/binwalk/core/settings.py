@@ -41,25 +41,16 @@ class Settings:
         self.system_dir = common.get_module_path()
 
         # Build the paths to all user-specific files
-        self.user = common.GenericContainer(
-            binarch=self._user_path(
-                self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE),
-            magic=self._magic_signature_files(
-                user_only=True),
-            extract=self._user_path(
-                self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE),
-            modules=self._user_path(
-                self.BINWALK_MODULES_DIR),
+        self.user = common.GenericContainer(binarch=self._user_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE),
+            magic=self._magic_signature_files(user_only=True),
+            extract=self._user_path(self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE),
+            modules=self._user_path(self.BINWALK_MODULES_DIR),
             plugins=self._user_path(self.BINWALK_PLUGINS_DIR))
 
         # Build the paths to all system-wide files
-        self.system = common.GenericContainer(
-            binarch=self._system_path(
-                self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE),
-            magic=self._magic_signature_files(
-                system_only=True),
-            extract=self._system_path(
-                self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE),
+        self.system = common.GenericContainer(binarch=self._system_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE),
+            magic=self._magic_signature_files(system_only=True),
+            extract=self._system_path(self.BINWALK_CONFIG_DIR, self.EXTRACT_FILE),
             plugins=self._system_path(self.BINWALK_PLUGINS_DIR))
 
     def _magic_signature_files(self, system_only=False, user_only=False):
@@ -72,18 +63,15 @@ class Settings:
         Returns a list of user/system magic signature files.
         '''
         files = []
-        user_binarch = self._user_path(
-            self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
-        system_binarch = self._system_path(
-            self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
+        user_binarch = self._user_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
+        system_binarch = self._system_path(self.BINWALK_MAGIC_DIR, self.BINARCH_MAGIC_FILE)
 
         def list_files(dir_path):
             # Ignore hidden dotfiles.
             return [os.path.join(dir_path, x) for x in os.listdir(dir_path) if not x.startswith('.')]
 
         if not system_only:
-            user_dir = os.path.join(
-                self.user_dir, self.BINWALK_USER_DIR, self.BINWALK_MAGIC_DIR)
+            user_dir = os.path.join(self.user_dir, self.BINWALK_USER_DIR, self.BINWALK_MAGIC_DIR)
             files += list_files(user_dir)
         if not user_only:
             system_dir = os.path.join(self.system_dir, self.BINWALK_MAGIC_DIR)

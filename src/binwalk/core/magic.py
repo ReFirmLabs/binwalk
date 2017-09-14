@@ -164,13 +164,11 @@ class SignatureLine(object):
                 except KeyboardInterrupt as e:
                     raise e
                 except Exception as e:
-                    raise ParserException(
-                        "Failed to expand string '%s' with integer '%s' in line '%s'" % (self.value, n, line))
+                    raise ParserException("Failed to expand string '%s' with integer '%s' in line '%s'" % (self.value, n, line))
             try:
                 self.value = binwalk.core.compat.string_decode(self.value)
             except ValueError as e:
-                raise ParserException(
-                    "Failed to decode string value '%s' in line '%s'" % (self.value, line))
+                raise ParserException("Failed to decode string value '%s' in line '%s'" % (self.value, line))
         # If a regex was specified, compile it
         elif self.type == 'regex':
             self.regex = True
@@ -180,21 +178,18 @@ class SignatureLine(object):
             except KeyboardInterrupt as e:
                 raise e
             except Exception as e:
-                raise ParserException(
-                    "Invalid regular expression '%s': %s" % (self.value, str(e)))
+                raise ParserException("Invalid regular expression '%s': %s" % (self.value, str(e)))
         # Non-string types are integer values
         else:
             try:
                 self.value = int(self.value, 0)
             except ValueError as e:
-                raise ParserException(
-                    "Failed to convert value '%s' to an integer on line '%s'" % (self.value, line))
+                raise ParserException("Failed to convert value '%s' to an integer on line '%s'" % (self.value, line))
 
         # Sanity check to make sure the first line of a signature has an
         # explicit value
         if self.level == 0 and self.value is None:
-            raise ParserException(
-                "First element of a signature must specify a non-wildcard value: '%s'" % (line))
+            raise ParserException("First element of a signature must specify a non-wildcard value: '%s'" % (line))
 
         # Set the size and struct format value for the specified data type.
         # This must be done, obviously, after the value has been parsed out
@@ -232,8 +227,7 @@ class SignatureLine(object):
             self.fmt = 'i'
             self.size = 4
         else:
-            raise ParserException(
-                "Unknown data type '%s' in line '%s'" % (self.type, line))
+            raise ParserException("Unknown data type '%s' in line '%s'" % (self.type, line))
 
         # The struct module uses the same characters for specifying signed and unsigned data types,
         # except that signed data types are upper case. The above if-else code sets self.fmt to the
@@ -374,8 +368,7 @@ class Signature(object):
         if not binwalk.core.compat.has_key(line.tags, 'overlap'):
             for i in range(1, line.size):
                 if restr[i:] == restr[0:(line.size - i)]:
-                    binwalk.core.common.warning(
-                        "Signature '%s' is a self-overlapping signature!" % line.text)
+                    binwalk.core.common.warning("Signature '%s' is a self-overlapping signature!" % line.text)
                     break
 
         return re.compile(re.escape(restr))
@@ -492,8 +485,7 @@ class Magic(object):
                 s = expression[:period].rfind('(') + 1
                 # The offset address may be an evaluatable expression, such as '(4+0.L)', typically the result
                 # of the original offset being something like '(&0.L)'.
-                o = binwalk.core.common.MathExpression(
-                    expression[s:period]).value
+                o = binwalk.core.common.MathExpression(expression[s:period]).value
                 t = expression[period + 1]
 
                 # Re-build just the parsed offset portion of the expression
@@ -512,24 +504,19 @@ class Magic(object):
                 try:
                     # Big and little endian byte format
                     if t in ['b', 'B']:
-                        v = struct.unpack(
-                            'b', binwalk.core.compat.str2bytes(self.data[o:o + 1]))[0]
+                        v = struct.unpack('b', binwalk.core.compat.str2bytes(self.data[o:o + 1]))[0]
                     # Little endian short format
                     elif t == 's':
-                        v = struct.unpack(
-                            '<h', binwalk.core.compat.str2bytes(self.data[o:o + 2]))[0]
+                        v = struct.unpack('<h', binwalk.core.compat.str2bytes(self.data[o:o + 2]))[0]
                     # Little endian long format
                     elif t == 'l':
-                        v = struct.unpack(
-                            '<i', binwalk.core.compat.str2bytes(self.data[o:o + 4]))[0]
+                        v = struct.unpack('<i', binwalk.core.compat.str2bytes(self.data[o:o + 4]))[0]
                     # Big endian short format
                     elif t == 'S':
-                        v = struct.unpack(
-                            '>h', binwalk.core.compat.str2bytes(self.data[o:o + 2]))[0]
+                        v = struct.unpack('>h', binwalk.core.compat.str2bytes(self.data[o:o + 2]))[0]
                     # Bit endian long format
                     elif t == 'L':
-                        v = struct.unpack(
-                            '>i', binwalk.core.compat.str2bytes(self.data[o:o + 4]))[0]
+                        v = struct.unpack('>i', binwalk.core.compat.str2bytes(self.data[o:o + 4]))[0]
                 # struct.error is thrown if there is not enough bytes in
                 # self.data for the specified format type
                 except struct.error as e:
@@ -589,15 +576,13 @@ class Magic(object):
                     ple = '%d+' % previous_line_end
                     # Allow users to use either the '&0' (libmagic) or '&+0' (explcit addition) sytaxes;
                     # replace both with the ple text.
-                    line_offset_text = line.offset.replace(
-                        '&+', ple).replace('&', ple)
+                    line_offset_text = line.offset.replace('&+', ple).replace('&', ple)
                     # Evaluate the expression
                     line_offset = self._do_math(offset, line_offset_text)
 
                 # Sanity check
                 if not isinstance(line_offset, int):
-                    raise ParserException(
-                        "Failed to convert offset '%s' to a number: '%s'" % (line.offset, line.text))
+                    raise ParserException("Failed to convert offset '%s' to a number: '%s'" % (line.offset, line.text))
 
                 # The start of the data needed by this line is at offset + line_offset.
                 # The end of the data will be line.size bytes later.
@@ -607,8 +592,7 @@ class Magic(object):
                 # If the line has a packed format string, unpack it
                 if line.pkfmt:
                     try:
-                        dvalue = struct.unpack(
-                            line.pkfmt, binwalk.core.compat.str2bytes(self.data[start:end]))[0]
+                        dvalue = struct.unpack(line.pkfmt, binwalk.core.compat.str2bytes(self.data[start:end]))[0]
                     # Not enough bytes left in self.data for the specified
                     # format size
                     except struct.error as e:
@@ -624,8 +608,7 @@ class Magic(object):
                         # Else, just terminate the string at the first newline,
                         # carriage return, or NULL byte
                         else:
-                            dvalue = self.data[start:end].split(
-                                '\x00')[0].split('\r')[0].split('\n')[0]
+                            dvalue = self.data[start:end].split('\x00')[0].split('\r')[0].split('\n')[0]
                     # Non-wildcard strings have a known length, specified in
                     # the signature line
                     else:
@@ -665,8 +648,13 @@ class Magic(object):
                     except KeyboardInterrupt as e:
                         raise e
                     except Exception as e:
-                        raise ParserException("Operation '" + str(dvalue) + " " + str(
-                            line.operator) + "= " + str(line.opvalue) + "' failed: " + str(e))
+                        raise ParserException("Operation '" +
+                                              str(dvalue) +
+                                              " " +
+                                              str(line.operator) +
+                                              "= " +
+                                              str(line.opvalue) +
+                                              "' failed: " + str(e))
 
                 # Does the data (dvalue) match the specified comparison?
                 if ((line.value is None) or
@@ -896,8 +884,7 @@ class Magic(object):
                 # existing signature entry, something is very wrong with the
                 # signature file.
                 else:
-                    raise ParserException(
-                        "Invalid signature line: '%s'" % line)
+                    raise ParserException("Invalid signature line: '%s'" % line)
 
         # Add the final signature to the signature list
         if signature:

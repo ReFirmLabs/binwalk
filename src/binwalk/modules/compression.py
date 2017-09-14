@@ -37,8 +37,7 @@ class LZMA(object):
 
         # Add an extraction rule
         if self.module.extractor.enabled:
-            self.module.extractor.add_rule(
-                regex='^%s' % self.DESCRIPTION.lower(), extension="7z", cmd=self.extractor)
+            self.module.extractor.add_rule(regex='^%s' % self.DESCRIPTION.lower(), extension="7z", cmd=self.extractor)
 
     def extractor(self, file_name):
         # Open and read the file containing the raw compressed data.
@@ -53,8 +52,7 @@ class LZMA(object):
             # and a fake output file size field.
             header = chr(self.properties) + \
                 self.dictionaries[-1] + ("\xFF" * 8)
-            binwalk.core.common.BlockFile(
-                file_name, "wb").write(header + compressed_data)
+            binwalk.core.common.BlockFile(file_name, "wb").write(header + compressed_data)
 
             # Try to extract it with all the normal lzma extractors until one
             # works
@@ -83,8 +81,7 @@ class LZMA(object):
 
     def parse_header(self, header):
         (pb, lp, lc) = self.parse_property(header[0])
-        dictionary = struct.unpack(
-            "<I", binwalk.core.compat.str2bytes(header[1:5]))[0]
+        dictionary = struct.unpack("<I", binwalk.core.compat.str2bytes(header[1:5]))[0]
         return LZMAHeader(pb=pb, lp=lp, lc=lc, dictionary=dictionary)
 
     def build_properties(self):
@@ -107,12 +104,10 @@ class LZMA(object):
 
         if self.module.partial_scan == True:
             # For partial scans, only use the largest dictionary value
-            self.dictionaries.append(
-                binwalk.core.compat.bytes2str(struct.pack("<I", 2 ** 25)))
+            self.dictionaries.append(binwalk.core.compat.bytes2str(struct.pack("<I", 2 ** 25)))
         else:
             for n in range(16, 26):
-                self.dictionaries.append(
-                    binwalk.core.compat.bytes2str(struct.pack("<I", 2 ** n)))
+                self.dictionaries.append(binwalk.core.compat.bytes2str(struct.pack("<I", 2 ** n)))
 
     def build_headers(self):
         self.headers = set()
@@ -148,8 +143,7 @@ class LZMA(object):
                     break
 
         if result is not None:
-            self.properties = self.build_property(
-                result.pb, result.lp, result.lc)
+            self.properties = self.build_property(result.pb, result.lp, result.lc)
             description = "%s, properties: 0x%.2X [pb: %d, lp: %d, lc: %d], dictionary size: %d" % (self.DESCRIPTION,
                                                                                                     self.properties,
                                                                                                     result.pb,
@@ -175,8 +169,7 @@ class Deflate(object):
 
         # Add an extraction rule
         if self.module.extractor.enabled:
-            self.module.extractor.add_rule(
-                regex='^%s' % self.DESCRIPTION.lower(), extension="deflate", cmd=self.extractor)
+            self.module.extractor.add_rule(regex='^%s' % self.DESCRIPTION.lower(), extension="deflate", cmd=self.extractor)
 
     def extractor(self, file_name):
         in_data = ""
@@ -193,8 +186,7 @@ class Deflate(object):
                     in_data += data[:dlen]
 
                 try:
-                    out_data = zlib.decompress(
-                        binwalk.core.compat.str2bytes(in_data), -15)
+                    out_data = zlib.decompress(binwalk.core.compat.str2bytes(in_data), -15)
                     with binwalk.core.common.BlockFile(out_file, 'w') as fp_out:
                         fp_out.write(out_data)
                     retval = True
@@ -275,11 +267,9 @@ class RawCompression(Module):
 
                 for i in range(0, dlen):
                     for decompressor in self.decompressors:
-                        description = decompressor.decompress(
-                            data[i:i + decompressor.BLOCK_SIZE])
+                        description = decompressor.decompress(data[i:i + decompressor.BLOCK_SIZE])
                         if description:
-                            self.result(
-                                description=description, file=fp, offset=fp.tell() - dlen + i)
+                            self.result(description=description, file=fp, offset=fp.tell() - dlen + i)
                             if self.stop_on_first_hit:
                                 file_done = True
                                 break

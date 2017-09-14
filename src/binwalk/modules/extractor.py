@@ -165,11 +165,9 @@ class Extractor(Module):
                 fp.close()
                 self.pending.append(f)
             except IOError as e:
-                binwalk.core.common.warning(
-                    "Ignoring file '%s': %s" % (f, str(e)))
+                binwalk.core.common.warning("Ignoring file '%s': %s" % (f, str(e)))
         else:
-            binwalk.core.common.warning(
-                "Ignoring file '%s': Not a regular file" % f)
+            binwalk.core.common.warning("Ignoring file '%s': Not a regular file" % f)
 
     def reset(self):
         # Holds a list of pending files that should be scanned; only populated
@@ -441,8 +439,7 @@ class Extractor(Module):
         except KeyboardInterrupt as e:
             raise e
         except Exception as e:
-            raise Exception(
-                "Extractor.load_from_file failed to load file '%s': %s" % (fname, str(e)))
+            raise Exception("Extractor.load_from_file failed to load file '%s': %s" % (fname, str(e)))
 
     def load_defaults(self):
         '''
@@ -464,8 +461,7 @@ class Extractor(Module):
                     raise e
                 except Exception as e:
                     if binwalk.core.common.DEBUG:
-                        raise Exception(
-                            "Extractor.load_defaults failed to load file '%s': %s" % (extract_file, str(e)))
+                        raise Exception("Extractor.load_defaults failed to load file '%s': %s" % (extract_file, str(e)))
 
     def get_output_directory_override(self):
         '''
@@ -516,19 +512,16 @@ class Extractor(Module):
                 subdir = ""
 
             if self.output_directory_override:
-                output_directory = os.path.join(
-                    self.directory, subdir, self.output_directory_override)
+                output_directory = os.path.join(self.directory, subdir, self.output_directory_override)
             else:
                 outdir = os.path.join(self.directory, subdir, '_' + basename)
-                output_directory = unique_file_name(
-                    outdir, extension='extracted')
+                output_directory = unique_file_name(outdir, extension='extracted')
 
             if not os.path.exists(output_directory):
                 os.mkdir(output_directory)
 
             self.extraction_directories[path] = output_directory
-            self.output[path].directory = os.path.realpath(
-                output_directory) + os.path.sep
+            self.output[path].directory = os.path.realpath(output_directory) + os.path.sep
         # Else, just use the already created directory
         else:
             output_directory = self.extraction_directories[path]
@@ -719,8 +712,7 @@ class Extractor(Module):
                 try:
                     codes[i] = int(codes[i], 0)
                 except ValueError as e:
-                    binwalk.core.common.warning(
-                        "The specified return code '%s' for extractor '%s' is not a valid number!" % (codes[i], values[0]))
+                    binwalk.core.common.warning("The specified return code '%s' for extractor '%s' is not a valid number!" % (codes[i], values[0]))
             values[3] = codes
 
         if len(values) >= 5:
@@ -827,8 +819,7 @@ class Extractor(Module):
                 except KeyboardInterrupt as e:
                     raise e
                 except Exception as e:
-                    binwalk.core.common.warning(
-                        "Internal extractor '%s' failed with exception: '%s'" % (str(cmd), str(e)))
+                    binwalk.core.common.warning("Internal extractor '%s' failed with exception: '%s'" % (str(cmd), str(e)))
             elif cmd:
                 # If not in debug mode, create a temporary file to redirect
                 # stdout and stderr to
@@ -840,31 +831,25 @@ class Extractor(Module):
                 while self.UNIQUE_PATH_DELIMITER in cmd:
                     need_unique_path = cmd.split(self.UNIQUE_PATH_DELIMITER)[
                         1].split(self.UNIQUE_PATH_DELIMITER)[0]
-                    unique_path = binwalk.core.common.unique_file_name(
-                        need_unique_path)
-                    cmd = cmd.replace(
-                        self.UNIQUE_PATH_DELIMITER + need_unique_path + self.UNIQUE_PATH_DELIMITER, unique_path)
+                    unique_path = binwalk.core.common.unique_file_name(need_unique_path)
+                    cmd = cmd.replace(self.UNIQUE_PATH_DELIMITER + need_unique_path + self.UNIQUE_PATH_DELIMITER, unique_path)
 
                 # Execute.
                 for command in cmd.split("&&"):
 
                     # Replace all instances of FILE_NAME_PLACEHOLDER in the
                     # command with fname
-                    command = command.strip().replace(
-                        self.FILE_NAME_PLACEHOLDER, fname)
+                    command = command.strip().replace(self.FILE_NAME_PLACEHOLDER, fname)
 
-                    binwalk.core.common.debug(
-                        "subprocess.call(%s, stdout=%s, stderr=%s)" % (command, str(tmp), str(tmp)))
-                    rval = subprocess.call(
-                        shlex.split(command), stdout=tmp, stderr=tmp)
+                    binwalk.core.common.debug("subprocess.call(%s, stdout=%s, stderr=%s)" % (command, str(tmp), str(tmp)))
+                    rval = subprocess.call(shlex.split(command), stdout=tmp, stderr=tmp)
 
                     if rval in codes:
                         retval = True
                     else:
                         retval = False
 
-                    binwalk.core.common.debug(
-                        'External extractor command "%s" completed with return code %d (success: %s)' % (cmd, rval, str(retval)))
+                    binwalk.core.common.debug('External extractor command "%s" completed with return code %d (success: %s)' % (cmd, rval, str(retval)))
 
                     # TODO: Should errors from all commands in a command string be checked? Currently we only support
                     #       specifying one set of error codes, so at the moment, this is not done; it is up to the
@@ -876,8 +861,7 @@ class Extractor(Module):
         except KeyboardInterrupt as e:
             raise e
         except Exception as e:
-            binwalk.core.common.warning(
-                "Extractor.execute failed to run external extractor '%s': %s, '%s' might not be installed correctly" % (str(cmd), str(e), str(cmd)))
+            binwalk.core.common.warning("Extractor.execute failed to run external extractor '%s': %s, '%s' might not be installed correctly" % (str(cmd), str(e), str(cmd)))
             retval = None
 
         if tmp is not None:
