@@ -5,8 +5,8 @@ from nose.tools import eq_, ok_
 
 def test_firmware_gzip():
     '''
-    Test: Open firmware.gzip, scan for signatures
-    verify that all (and only) expected signatures are detected
+    Test: Open firmware.gzip, scan for signatures.
+    Verify that only one gzip signature was detected.
     '''
     input_vector_file = os.path.join(os.path.dirname(__file__),
                                      "input-vectors",

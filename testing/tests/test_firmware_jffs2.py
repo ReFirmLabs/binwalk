@@ -5,8 +5,9 @@ from nose.tools import eq_, ok_
 
 def test_firmware_jffs2():
     '''
-    Test: Open firmware.jffs2, scan for signatures
-    verify that all (and only) expected signatures are detected
+    Test: Open firmware.jffs2, scan for signatures.
+    Verify that only JFFS2 signatures are detected.
+    Verify that only the first one was displayed.
     '''
     input_vector_file = os.path.join(os.path.dirname(__file__),
                                      "input-vectors",
@@ -19,8 +20,8 @@ def test_firmware_jffs2():
     # Test number of modules used
     eq_(len(scan_result), 1)
 
-    # Test number of results for that module
-    ok_(len(scan_result[0].results) > 0)
+    # Test number of results for that module, should be more than one
+    ok_(len(scan_result[0].results) > 1)
 
     first_result = scan_result[0].results[0]
 

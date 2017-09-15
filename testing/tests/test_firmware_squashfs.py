@@ -5,8 +5,9 @@ from nose.tools import eq_, ok_
 
 def test_firmware_squashfs():
     '''
-    Test: Open firmware.squashfs, scan for signatures
-    verify that all (and only) expected signatures are detected
+    Test: Open firmware.squashfs, scan for signatures.
+    Verify that one, and only one signature was detected.
+    Verityf that it was a SquashFS file system.
     '''
     input_vector_file = os.path.join(os.path.dirname(__file__),
                                      "input-vectors",

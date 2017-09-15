@@ -5,8 +5,9 @@ from nose.tools import eq_, ok_
 
 def test_firmware_cpio():
     '''
-    Test: Open firmware.cpio, scan for signatures
-    verify that all (and only) expected signatures are detected
+    Test: Open firmware.cpio, scan for signatures.
+    Verify that at least one CPIO signature is detected.
+    Verify that only CPIO signatures are detected.
     '''
     input_vector_file = os.path.join(os.path.dirname(__file__),
                                      "input-vectors",
