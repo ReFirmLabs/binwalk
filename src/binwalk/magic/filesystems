@@ -372,6 +372,7 @@
 >28     beshort >10     {invalid}
 >28     beshort <1      {invalid}
 >30     beshort >10     {invalid}
+>30     beshort <1      {invalid}
 >28     beshort x       version %d.
 >30     beshort x       \b%d,
 >28     beshort >3      compression:
@@ -383,12 +384,15 @@
 >>20    beshort >4      \b{invalid},
 >28     beshort <3
 >>8     belong  x       size: %d bytes,
+>>8     belong  <1      {invalid}
 >>8     belong  x       {size:%d}
 >28     beshort 3
 >>63    bequad  x       size: %ld bytes,
+>>63    bequad  <1      {invalid}
 >>63    bequad  x       {size:%ld}
 >28     beshort >3
 >>40    bequad  x       size: %ld bytes,
+>>40    bequad  <1      {invalid}
 >>40    bequad  x       {size:%ld}
 >4      belong  x       %d inodes,
 >28     beshort >3
