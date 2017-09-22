@@ -1,9 +1,9 @@
 import os
 import errno
 import struct
-import binwalk.core.plugin
+import binwalk.core.common
 import binwalk.core.compat
-from binwalk.core.common import BlockFile as open
+import binwalk.core.plugin
 
 class PFSCommon(object):
 
@@ -23,13 +23,13 @@ class PFS(PFSCommon):
 
     def __init__(self, fname, endianess='<'):
         self.endianess = endianess
-        self.meta = open(fname, 'rb')
+        self.meta = binwalk.core.common.BlockFile(fname, 'rb')
         header = self.meta.read(self.HEADER_SIZE)
         self.file_list_start = self.meta.tell()
-        
+
         self.num_files = self._make_short(header[-2:], endianess)
         self.node_size = self._get_fname_len() + 12
-    
+
     def _get_fname_len(self, bufflen=128):
         """Returns the number of bytes designated for the filename."""
         buff = self.meta.peek(bufflen)
@@ -38,7 +38,7 @@ class PFS(PFSCommon):
             if b != '\0':
                 return strlen+i
         return bufflen
-    
+
     def _get_node(self):
         """Reads a chunk of meta data from file and returns a PFSNode."""
         data = self.meta.read(self.node_size)
@@ -80,7 +80,7 @@ class PFSExtractor(binwalk.core.plugin.Plugin):
     Extractor for known PFS/0.9 File System Formats.
     """
     MODULES = ['Signature']
-    
+
     def init(self):
         if self.module.extractor.enabled:
             self.module.extractor.add_rule(regex='^pfs filesystem',
@@ -96,16 +96,22 @@ class PFSExtractor(binwalk.core.plugin.Plugin):
 
     def extractor(self, fname):
         fname = os.path.abspath(fname)
+        out_dir = binwalk.core.common.unique_file_name(os.path.join(os.path.dirname(fname), "pfs-root"))
+
         try:
             with PFS(fname) as fs:
                 # The end of PFS meta data is the start of the actual data
-                data = open(fname, 'rb')
+                data = binwalk.core.common.BlockFile(fname, 'rb')
                 data.seek(fs.get_end_of_meta_data())
                 for entry in fs.entries():
-                    self._create_dir_from_fname(entry.fname)
-                    outfile = open(entry.fname, 'wb')
-                    outfile.write(data.read(entry.fsize))
-                    outfile.close()
+                    outfile_path = os.path.join(out_dir, entry.fname)
+                    if not outfile_path.startswith(out_dir):
+                        binwalk.core.common.warning("Unpfs extractor detected directory traversal attempt for file: '%s'. Refusing to extract." % outfile_path)
+                    else:
+                        self._create_dir_from_fname(outfile_path)
+                        outfile = binwalk.core.common.BlockFile(outfile_path, 'wb')
+                        outfile.write(data.read(entry.fsize))
+                        outfile.close()
                 data.close()
         except KeyboardInterrupt as e:
             raise e
