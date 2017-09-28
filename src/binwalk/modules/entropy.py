@@ -261,7 +261,15 @@ class Entropy(Module):
             y.append(r.entropy)
 
         fig = plt.figure()
-        ax = fig.add_subplot(1, 1, 1, autoscale_on=True, axisbg='black')
+
+        # axisbg is depreciated, but older versions of matplotlib don't support facecolor.
+        # This tries facecolor first, thus preventing the annoying depreciation warnings,
+        # and falls back to axisbg if that fails.
+        try:
+            ax = fig.add_subplot(1, 1, 1, autoscale_on=True, facecolor='black')
+        except AttributeError:
+            ax = fig.add_subplot(1, 1, 1, autoscale_on=True, axisbg='black')
+
         ax.set_title(fname)
         ax.set_xlabel(self.XLABEL)
         ax.set_ylabel(self.YLABEL)
