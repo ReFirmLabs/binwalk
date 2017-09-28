@@ -38,8 +38,8 @@ then
 else
     APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord"
 fi
-PYTHON2_APT_CANDIDATES="python-crypto python-lzo python-lzma python-pip"
-PYTHON3_APT_CANDIDATES="python3-crypto python3-pip"
+PYTHON2_APT_CANDIDATES="python-crypto python-lzo python-lzma python-pip python-tk"
+PYTHON3_APT_CANDIDATES="python3-crypto python3-pip python3-tk"
 PYTHON3_YUM_CANDIDATES=""
 YUM_CANDIDATES="git gcc gcc-c++ make openssl-devel qtwebkit-devel qt-devel gzip bzip2 tar arj p7zip p7zip-plugins cabextract squashfs-tools zlib zlib-devel lzo lzo-devel xz xz-compat-libs xz-libs xz-devel xz-lzma-compat python-backports-lzma lzip pyliblzma perl-Compress-Raw-Lzma lzop srecord"
 PYTHON2_YUM_CANDIDATES="python-pip python-Bottleneck"
