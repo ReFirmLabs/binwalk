@@ -278,6 +278,7 @@ class Entropy(Module):
         # Add a fake, invisible plot entry so that offsets at/near the
         # minimum x value (0) are actually visible on the plot.
         ax.plot(-(max(x)*.001), 1.1, lw=0)
+        ax.plot(-(max(x)*.001), 0, lw=0)
 
         if self.show_legend and has_key(self.file_markers, fname):
             for (offset, description) in self.file_markers[fname]:
