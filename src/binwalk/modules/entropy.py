@@ -27,7 +27,7 @@ class Entropy(Module):
     DEFAULT_TRIGGER_HIGH = .95
     DEFAULT_TRIGGER_LOW = .85
 
-    TITLE = "Entropy Analysis"
+    TITLE = ""
     ORDER = 8
 
     # TODO: Add --dpoints option to set the number of data points?
@@ -270,7 +270,7 @@ class Entropy(Module):
         except AttributeError:
             ax = fig.add_subplot(1, 1, 1, autoscale_on=True, axisbg='black')
 
-        ax.set_title(fname)
+        ax.set_title(self.TITLE)
         ax.set_xlabel(self.XLABEL)
         ax.set_ylabel(self.YLABEL)
         ax.plot(x, y, 'y', lw=2)
@@ -278,6 +278,7 @@ class Entropy(Module):
         # Add a fake, invisible plot entry so that offsets at/near the
         # minimum x value (0) are actually visible on the plot.
         ax.plot(-(max(x)*.001), 1.1, lw=0)
+        ax.plot(-(max(x)*.001), 0, lw=0)
 
         if self.show_legend and has_key(self.file_markers, fname):
             for (offset, description) in self.file_markers[fname]:

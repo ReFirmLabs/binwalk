@@ -24,8 +24,8 @@ except ImportError:
 # include the git commit hash as part of the version number reported
 # by binwalk.
 try:
-    label = subprocess.check_output(["git", "describe"], stderr=DEVNULL).decode('utf-8')
-    MODULE_VERSION = "%s-%s" % (MODULE_VERSION, label.split('-')[-1].strip())
+    label = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=DEVNULL).decode('utf-8')
+    MODULE_VERSION = "%s-%s" % (MODULE_VERSION, label.strip())
 except KeyboardInterrupt as e:
     raise e
 except Exception:
