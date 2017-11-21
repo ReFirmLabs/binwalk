@@ -303,7 +303,7 @@ class TestCommand(Command):
         os.chdir(testing_directory)
 
         # Run the tests
-        nose.core.run(argv=['--exe','--with-coverage'])
+        retval = nose.core.run(argv=['--exe','--with-coverage'])
 
         sys.stdout.write("\n")
 
@@ -315,6 +315,11 @@ class TestCommand(Command):
         input_vectors_directory = os.path.join(testing_directory, "input-vectors")
         for extracted_directory in glob.glob("%s/*.extracted" % input_vectors_directory):
             remove_tree(extracted_directory)
+
+        if retval == True:
+           sys.exit(0)
+        else:
+           sys.exit(1)
 
 # The data files to install along with the module
 install_data_files = []
