@@ -10,6 +10,7 @@ python:
  - "pypy3"
 install:
  - pip install coverage
+ - pip install backports.lzma
  - ./setup.py install
 script: ./setup.py test
 cache: pip
