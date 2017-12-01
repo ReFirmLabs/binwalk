@@ -184,7 +184,7 @@ class Plugins(object):
                         except KeyboardInterrupt as e:
                             raise e
                         except Exception as e:
-                            binwalk.core.common.warning("Error loading plugin '%s': %s" % (file_name, str(e)))
+                            binwalk.core.common.debug("Error loading plugin '%s': %s" % (file_name, str(e)))
                             plugins[key]['enabled'][module] = False
 
                         try:
