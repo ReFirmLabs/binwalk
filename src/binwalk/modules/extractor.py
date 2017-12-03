@@ -17,7 +17,7 @@ from binwalk.core.common import file_size, file_md5, unique_file_name, BlockFile
 
 class ExtractDetails(object):
     def __init__(self, **kwargs):
-        for (k, v) in kwargs.iteritems():
+        for (k, v) in iterator(kwargs):
             setattr(self, k, v)
 
 class ExtractInfo(object):
