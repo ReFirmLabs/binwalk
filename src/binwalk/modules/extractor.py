@@ -209,8 +209,6 @@ class Extractor(Module):
 
                     if (index + 1) < len(self.header_r.offsets):
                         size = self.header_r.offsets[index + 1] - self.header_r.offsets[index]
-                    else:
-                        size = r.file.size - r.offset
         else:
             size = r.size
 
