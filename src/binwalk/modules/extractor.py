@@ -203,12 +203,16 @@ class Extractor(Module):
                 header_r = self.header_r
                 if r != header_r and hasattr(header_r, "offsets"):
                     # calculate the size by the offset which is defined in header
-                    for index, offset in enumerate(self.header_r.offsets):
-                        if r.offset == offset + self.header_r.offset:
-                            break;
+                    for index, offset in enumerate(header_r.offsets):
+                        # offset in header is invalid or it already in the last offset
+                        if offset == 0 or (index + 1) == len(header_r.offsets):
+                            break
 
-                    if (index + 1) < len(self.header_r.offsets):
-                        size = self.header_r.offsets[index + 1] - self.header_r.offsets[index]
+                        # find the correct offset in header offsets and caculate the size
+                        if r.offset == offset + header_r.offset and self.header_r.offsets[index + 1] != 0:
+                            size = self.header_r.offsets[index + 1] - offset
+                            break
+
         else:
             size = r.size
 
