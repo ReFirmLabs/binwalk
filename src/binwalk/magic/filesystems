@@ -3,24 +3,28 @@
 # Minix filesystems
 0x410   string      \x7f\x13\x00\x00\x00\x00    Minix filesystem, V1, little endian,
 >0x402  beshort     x                           %d zones
+>0x402  beshort     <1                          \b, invalid zone count {invalid}
 >0x1e   string      minix                       \b, bootable
 >0x1e   string      !minix
 >>0x1e  string      !\x00\x00\x00\x00\x00       {invalid}
 
 0x410   string      \x13\x7f\x00\x00\x00\x00    Minix filesystem, V1, big endian,
 >0x402  beshort     x                           %d zones
+>0x402  beshort     <1                          \b, invalid zone count {invalid}
 >0x1e   string      minix                       \b, bootable
 >0x1e   string      !minix
 >>0x1e  string      !\x00\x00\x00\x00\x00       {invalid}
 
 0x410   string      \x8f\x13\x00\x00\x00\x00    Minix filesystem, V1, little endian, 30 char names,
 >0x402  beshort     x                           %d zones
+>0x402  beshort     <1                          \b, invalid zone count {invalid}
 >0x1e   string      minix                       \b, bootable
 >0x1e   string      !minix
 >>0x1e  string      !\x00\x00\x00\x00\x00       {invalid}
 
 0x410   string      \x13\x8f\x00\x00\x00\x00    Minix filesystem, V1, big endian, 30 char names,
 >0x402  beshort     x                           %d zones
+>0x402  beshort     <1                          \b, invalid zone count {invalid}
 >0x1e   string      minix                       \b, bootable
 >0x1e   string      !minix
 >>0x1e  string      !\x00\x00\x00\x00\x00       {invalid}
