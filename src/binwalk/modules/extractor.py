@@ -611,8 +611,10 @@ class Extractor(Module):
                     else:
                         extract_ok = True
 
-                    # Only clean up files if remove_after_execute was specified
-                    if extract_ok == True and self.remove_after_execute:
+                    # Only clean up files if remove_after_execute was specified.
+                    # Only clean up files if the file was extracted sucessfully, or if we've run
+                    # out of extractors.
+                    if self.remove_after_execute and (extract_ok == True or i == (len(rules) - 1)):
 
                         # Remove the original file that we extracted,
                         # if it has not been modified by the extractor.
