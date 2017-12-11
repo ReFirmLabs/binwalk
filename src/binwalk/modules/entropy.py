@@ -27,7 +27,7 @@ class Entropy(Module):
     DEFAULT_TRIGGER_HIGH = .95
     DEFAULT_TRIGGER_LOW = .85
 
-    TITLE = ""
+    TITLE = "Entropy"
     ORDER = 8
 
     # TODO: Add --dpoints option to set the number of data points?
