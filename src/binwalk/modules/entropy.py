@@ -116,7 +116,7 @@ class Entropy(Module):
                 self.block_size = None
 
     def _entropy_sigterm_handler(self, *args):
-        print ("FUck it all.")
+        print ("Fuck it all.")
 
     def run(self):
         self._run()
@@ -125,6 +125,12 @@ class Entropy(Module):
         # Sanity check and warning if matplotlib isn't found
         if self.do_plot:
             try:
+                # If we're saving the plot to a file, configure matplotlib
+                # to use the Agg back-end. This does not require a X server,
+                # allowing users to generate plot files on headless systems.
+                if self.save_plot:
+                    import matplotlib as mpl
+                    mpl.use('Agg')
                 import matplotlib.pyplot as plt
             except ImportError as e:
                 binwalk.core.common.warning("Failed to import matplotlib module, visual entropy graphing will be disabled")
