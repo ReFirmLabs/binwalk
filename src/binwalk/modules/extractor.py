@@ -191,8 +191,28 @@ class Extractor(Module):
         except Exception as e:
             return
 
+        # Keep the header result to calculate result size when it doesn't have size
+        if hasattr(r, 'header') and r.valid:
+            self.header_r = r
+
         if not r.size:
             size = r.file.size - r.offset
+
+            # has header result, calculate its size by header
+            if hasattr(self, 'header_r'):
+                header_r = self.header_r
+                if r != header_r and hasattr(header_r, "offsets"):
+                    # calculate the size by the offset which is defined in header
+                    for index, offset in enumerate(header_r.offsets):
+                        # offset in header is invalid or it already in the last offset
+                        if offset == 0 or (index + 1) == len(header_r.offsets):
+                            break
+
+                        # find the correct offset in header offsets and caculate the size
+                        if r.offset == offset + header_r.offset and self.header_r.offsets[index + 1] != 0:
+                            size = self.header_r.offsets[index + 1] - offset
+                            break
+
         else:
             size = r.size
 

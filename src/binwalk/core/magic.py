@@ -699,19 +699,25 @@ class Magic(object):
                                 dvalue_tuple += (dvalue,)
 
                             # Format the tag string
-                            tags[tag_name] = tag_value % dvalue_tuple
-                        # Else, just use the raw tag value
-                        else:
-                            tags[tag_name] = tag_value
+                            tag_value = tag_value % dvalue_tuple
 
                         # Some tag values are intended to be integer values, so
                         # try to convert them as such
                         try:
-                            tags[tag_name] = int(tags[tag_name], 0)
+                            tag_value = int(tag_value, 0)
                         except KeyboardInterrupt as e:
                             raise e
                         except Exception as e:
                             pass
+
+                        if tag_name in tags:
+                            if isinstance(tags[tag_name], list):
+                                tags[tag_name].append(tag_value)
+                            else:
+                                tags[tag_name] = [tags[tag_name], tag_value]
+
+                        else:
+                            tags[tag_name] = tag_value
 
                     # Abort processing soon as this signature is marked invalid, unless invalid results
                     # were explicitly requested. This means that the sooner invalid checks are made in a
@@ -821,7 +827,12 @@ class Magic(object):
                                 self.display_once.add(signature.title)
 
                         # Append the result to the results list
-                        results.append(SignatureResult(**tags))
+                        r = SignatureResult(**tags)
+                        for x in tags.keys():
+                            binwalk.core.common.debug("tags key:%s, value:%s" % (str(x), str(tags[x])))
+                        results.append(r)
+                        binwalk.core.common.debug(
+                            "scan for %s @%d r.size:%d [%s]" % (r.name, r.offset, r.size, r.description))
 
                         # Add this offset to the matched_offsets set, so that it can be ignored by
                         # subsequent loops.
