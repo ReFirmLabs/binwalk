@@ -20,7 +20,7 @@ If you're running Python 2.x, installing the optional Python lzma module is stro
 $ sudo apt-get install python-lzma
 ```
 
-For instructions on installing other optional dependencies, see [INSTALL.md](https://github.com/devttys0/binwalk/blob/master/INSTALL.md).
+For instructions on installing other optional dependencies, see [INSTALL.md](https://github.com/ReFirmLabs/binwalk/blob/master/INSTALL.md).
 
 
 Usage
@@ -38,4 +38,4 @@ DECIMAL       HEXADECIMAL     DESCRIPTION
 2319004       0x23629C        Squashfs filesystem, little endian, version 4.0, compression: xz, size: 12442471 bytes, 3158 inodes, blocksize: 131072 bytes, blocksize: 131072 bytes, created: 2014-05-21 22:38:47
 ```
 
-For additional examples and descriptions of advanced options, see the [wiki](https://github.com/devttys0/binwalk/wiki).
+For additional examples and descriptions of advanced options, see the [wiki](https://github.com/ReFirmLabs/binwalk/wiki).

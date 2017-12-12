@@ -346,7 +346,7 @@ setup(
     version=MODULE_VERSION,
     description="Firmware analysis tool",
     author="Craig Heffner",
-    url="https://github.com/devttys0/%s" % MODULE_NAME,
+    url="https://github.com/ReFirmLabs/%s" % MODULE_NAME,
     requires=[],
     package_dir={"": "src"},
     packages=[MODULE_NAME],

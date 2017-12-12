@@ -732,8 +732,12 @@ class Modules(object):
         Returns the help string.
         '''
         modules = {}
-        help_string = "\nBinwalk v%s\nCraig Heffner, https://github.com/devttys0/binwalk\n" % binwalk.__version__
-        help_string += "\nUsage: binwalk [OPTIONS] [FILE1] [FILE2] [FILE3] ...\n"
+        help_string = "\n"
+        help_string += "Binwalk v%s\n" % binwalk.__version__
+        help_string += "Craig Heffner, ReFirmLabs\n"
+        help_string += "https://github.com/ReFirmLabs/binwalk\n"
+        help_string += "\n"
+        help_string += "Usage: binwalk [OPTIONS] [FILE1] [FILE2] [FILE3] ...\n"
 
         # Build a dictionary of modules and their ORDER attributes.
         # This makes it easy to sort modules by their ORDER attribute for
