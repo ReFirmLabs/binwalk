@@ -184,7 +184,12 @@ class Plugins(object):
                         except KeyboardInterrupt as e:
                             raise e
                         except Exception as e:
-                            binwalk.core.common.debug("Error loading plugin '%s': %s" % (file_name, str(e)))
+                            # Python files in the plugins directory that are not
+                            # actually binwalk plugins will generate a TypeError
+                            # about converting an object to a string implicitly.
+                            # Don't need to warn about these.
+                            if not str(e).endswith('object to str implicitly'):
+                                binwalk.core.common.warning("Error loading plugin '%s': %s" % (file_name, str(e)))
                             plugins[key]['enabled'][module] = False
 
                         try:
