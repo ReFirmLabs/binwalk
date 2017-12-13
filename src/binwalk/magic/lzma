@@ -9,6 +9,7 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x5A
@@ -21,6 +22,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x5B
@@ -33,6 +36,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x5C
@@ -45,6 +50,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x5D
@@ -57,6 +64,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x5E
@@ -69,6 +78,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x63
@@ -81,6 +92,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x64
@@ -93,6 +106,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x65
@@ -105,6 +120,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x66
@@ -117,6 +134,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x6C
@@ -129,6 +148,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x6D
@@ -141,6 +162,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x6E
@@ -153,6 +176,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x75
@@ -165,6 +190,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x76
@@ -177,6 +204,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x7E
@@ -189,6 +218,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x87
@@ -201,6 +232,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x88
@@ -213,6 +246,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x89
@@ -225,6 +260,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x8A
@@ -237,6 +274,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x8B
@@ -249,6 +288,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x90
@@ -261,6 +302,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x91
@@ -273,6 +316,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x92
@@ -285,6 +330,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x93
@@ -297,6 +344,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x99
@@ -309,6 +358,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x9A
@@ -321,6 +372,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0x9B
@@ -333,6 +386,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0xA2
@@ -345,6 +400,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0xA3
@@ -357,6 +414,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0xAB
@@ -369,6 +428,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0xB4
@@ -381,6 +442,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0xB5
@@ -393,6 +456,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0xB6
@@ -405,6 +470,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0xB7
@@ -417,6 +484,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0xB8
@@ -429,6 +498,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0xBD
@@ -441,6 +512,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0xBE
@@ -453,6 +526,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0xBF
@@ -465,6 +540,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0xC0
@@ -477,6 +554,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0xC6
@@ -489,6 +568,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0xC7
@@ -501,6 +582,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0xC8
@@ -513,6 +596,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0xCF
@@ -525,6 +610,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0xD0
@@ -537,6 +624,8 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
 # ------------------------------------------------------------------
 # Signature for LZMA compressed data with valid properties byte 0xD8
@@ -549,4 +638,6 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
 
