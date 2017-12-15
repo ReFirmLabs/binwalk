@@ -84,6 +84,7 @@ class Entropy(Module):
         self.HEADER[-1] = "ENTROPY"
         self.max_description_length = 0
         self.file_markers = {}
+        self.output_file = None
 
         if self.use_zlib:
             self.algorithm = self.gzip
@@ -310,8 +311,8 @@ class Entropy(Module):
             ax.legend(loc='lower right', shadow=True)
 
         if self.save_plot:
-            out_file = os.path.join(os.getcwd(), os.path.basename(fname)) + '.png'
-            fig.savefig(out_file)
+            self.output_file = os.path.join(os.getcwd(), os.path.basename(fname)) + '.png'
+            fig.savefig(self.output_file)
         else:
             plt.show()
 
