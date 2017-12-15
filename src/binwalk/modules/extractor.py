@@ -20,6 +20,7 @@ class ExtractDetails(object):
         for (k, v) in iterator(kwargs):
             setattr(self, k, v)
 
+
 class ExtractInfo(object):
     def __init__(self):
         self.carved = {}
