@@ -25,6 +25,7 @@ fi
 if [ $YES -eq 0 ]
 then
     distro="${1:-$(lsb_release -i|cut -f 2)}"
+    distro_version="${1:-$(lsb_release -r|cut -f 2|cut -c1-2)}"
 else
     distro="${2:-$(lsb_release -i|cut -f 2)}"
 fi
@@ -35,6 +36,9 @@ YUMCMD="yum"
 if [ $distro = "Kali" ]
 then
     APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract util-linux firmware-mod-kit cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop cpio"
+elif [ $distro_version = "17"]
+then 
+    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
 else
     APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
 fi
@@ -136,7 +140,7 @@ then
     echo ""
     if [ $distro != Unknown ]
     then
-        echo "         $distro detected"
+        echo "         $distro $distro_version detected"
     else
         echo "WARNING: Distro not detected, using package-manager defaults"
     fi
