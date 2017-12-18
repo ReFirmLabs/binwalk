@@ -28,6 +28,7 @@ then
     distro_version="${1:-$(lsb_release -r|cut -f 2|cut -c1-2)}"
 else
     distro="${2:-$(lsb_release -i|cut -f 2)}"
+    distro_version="${2:-$(lsb_release -r|cut -f 2|cut -c1-2)}"
 fi
 REQUIRED_UTILS="wget tar python"
 APTCMD="apt"
@@ -154,7 +155,7 @@ then
     fi
 elif [ $distro != Unknown ]
 then
-     echo "$distro detected"
+     echo "$distro $distro_version detected"
 else
     echo "WARNING: Distro not detected, using package-manager defaults"
 fi
