@@ -588,7 +588,7 @@ class Extractor(Module):
             # Extract into subdirectories named by the offset
             if self.extract_into_subdirs:
                 # Remove trailing L that is added by hex()
-                offset_dir = hex(offset).rstrip("L")
+                offset_dir = "0x%X" % offset
                 os.mkdir(offset_dir)
                 os.chdir(offset_dir)
 
