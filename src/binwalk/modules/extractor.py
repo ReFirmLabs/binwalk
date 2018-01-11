@@ -100,7 +100,7 @@ class Extractor(Module):
                long='carve',
                kwargs={'run_extractors': False},
                description="Carve data from files, but don't execute extraction utilities"),
-        Option(short='S',
+        Option(short='T',
                long='subdirs',
                kwargs={'extract_into_subdirs': True},
                description="Extract into sub-directories named by the offset"),
