@@ -100,6 +100,10 @@ class Extractor(Module):
                long='carve',
                kwargs={'run_extractors': False},
                description="Carve data from files, but don't execute extraction utilities"),
+        Option(short='T',
+               long='subdirs',
+               kwargs={'extract_into_subdirs': True},
+               description="Extract into sub-directories named by the offset"),
     ]
 
     KWARGS = [
@@ -110,6 +114,7 @@ class Extractor(Module):
         Kwarg(name='remove_after_execute', default=False),
         Kwarg(name='load_default_rules', default=False),
         Kwarg(name='run_extractors', default=True),
+        Kwarg(name='extract_into_subdirs', default=False),
         Kwarg(name='manual_rules', default=[]),
         Kwarg(name='matryoshka', default=0),
         Kwarg(name='enabled', default=False),
@@ -580,6 +585,12 @@ class Extractor(Module):
 
         if os.path.isfile(file_path):
             os.chdir(output_directory)
+            # Extract into subdirectories named by the offset
+            if self.extract_into_subdirs:
+                # Remove trailing L that is added by hex()
+                offset_dir = "0x%X" % offset
+                os.mkdir(offset_dir)
+                os.chdir(offset_dir)
 
             # Loop through each extraction rule until one succeeds
             for i in range(0, len(rules)):
