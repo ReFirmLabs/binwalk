@@ -464,6 +464,8 @@
 >12 belong      !0                      {invalid},
 >8  ubelong     x                       cumulative ~CRC32: 0x%.8X
 
+-4   string      \x00\x00\x00\x00ENDS   Signed Ubiquiti end header, RSA 2048 bit, header size: 264 bytes
+>260 ubelong     !0                     {invalid}
 
 # Found in DIR-100 firmware
 0       string      AIH0        AIH0 firmware header, header size: 48,
