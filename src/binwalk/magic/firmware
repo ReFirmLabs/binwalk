@@ -573,7 +573,144 @@
 
 
 # http://forum.xda-developers.com/showthread.php?p=47818657
-8    string    imgARMcC         Roku aimage SB
+0       string imgARMcC           Roku aimage v1 header           {adjust:-8}
+# Image type
+>16     ulelong 0x0               \b, Type: invalid
+>16     ulelong 0x1               \b, Type: debug message
+>16     ulelong 0x2               \b, Type: bloader
+>16     ulelong 0x3               \b, Type: slaveloader
+>16     ulelong 0x4               \b, Type: env
+>16     ulelong 0x5               \b, Type: rbf
+>16     ulelong 0x6               \b, Type: jbc (or bootdata)
+>16     ulelong 0x7               \b, Type: cexapp
+>16     ulelong 0x8               \b, Type: slaveapp
+>16     ulelong 0x9               \b, Type: zimage
+>16     ulelong 0xa               \b, Type: initfs_cramfs
+>16     ulelong 0xb               \b, Type: initfs_zext2
+>16     ulelong 0xc               \b, Type: appfs_ext2
+>16     ulelong 0xd               \b, Type: appfs_cramfs
+>16     ulelong 0xe               \b, Type: firmware_blob
+>16     ulelong 0xf               \b, Type: boot count
+>16     ulelong 0x10              \b, Type: boot selection
+>16     ulelong 0x11              \b, Type: gracenotefs (ext2 or ext3)
+>16     ulelong 0x12              \b, Type: eth0 mac address
+>16     ulelong 0x13              \b, Type: bootloader test mode UART download
+>16     ulelong 0x14              \b, Type: bootloader DFU mode USB download
+>16     ulelong 0x15              \b, Type: splashscreen
+>16     ulelong 0x16              \b, Type: read-only per instance config (or custom pkg token)
+>16     ulelong 0x17              \b, Type: initrd
+>16     ulelong 0x18              \b, Type: uimage
+>16     ulelong 0x19              \b, Type: uboot (mipsel)
+>16     ulelong 0x1a              \b, Type: uboot (mipseb)
+>16     ulelong 0x1b              \b, Type: initfs_squashfs
+>16     ulelong 0x101             \b, Type: cramfs_auth
+>16     ulelong >0x1b
+>>16    ulelong !0x101            \b, Type: unknown (0x%02x) {invalid}
+# Ignore images <256 (minimum header size)
+>20     ulelong <256              {invalid}
+>20     ulelong x                 \b, image length: %u
+>20     ulelong x                 {size:%u}
+>20     ulelong x                 {jump:%u}
+>32     ulelong !0                \b, link address: 0x%x
+>36     ulelong !0                \b, entry point offset: 0x%x
+# Branch instruction used when data start offset and entry point offset are both 0
+>28     ulelong 0
+>>36    ulelong 0
+>>>-8   ulelong !0                \b, Branch instruction 0x%08x
+>>>-4   ulelong !0                \b, Branch delay slot 0x%08x
+# Flags (first 5 bits - mask 0x1F)
+>40     ulelong x                 \b, Flags:
+>40     ulelong&0x1F 0            \b none
+#>40    ulelong&0x1 0             Overwrite (header is part of image)
+>40     ulelong &0x01             Prepended header
+>>24    ulelong x                 \b (data length: %u
+>>28    ulelong x                 \b, offset: %u)
+>40     ulelong &0x02             \b, DFU VID present
+>40     ulelong &0x08             \b, DFU PID present
+>40     ulelong &0x10             \b, DFU string present
+>40     ulelong &0x20             \b, extended header
+# Encryption mode flags (mask 0x1C0)
+>40     ubyte&0x1C0 0x0           \b, Encryption: None
+>40     ubyte&0x1C0 0x40          \b, Encryption: cbc_onepass
+>40     ubyte&0x1C0 0x80          \b, Encryption: cbc_4kblocks
+>40     ubyte&0x1C0 0xC0          \b, Encryption: ctr
+>40     ubyte&0x1C0 !0
+>>232   ubelong x                 \b, IV: %08x
+>>236   ubelong x                 \b%08x
+>>240   ubelong x                 \b%08x
+>>244   ubelong x                 \b%08x
+# Build info
+# Date must be after 1/1/1990
+>44     ledate >631173600
+>>44    ledate x                  \b, Build Date: "%s"
+>48     lelong !0
+>>(48.l)   lelong !0
+>>>(48.l)  lelong !0xffffffff
+>>>>(48.l) string x               \b, Build Host: "%s"
+# Release and Platform IDs
+>8      lelong 0                  \b, Release ID: Dev
+>8      lelong !0
+>>8     lelong 0x585822b8         \b, Release ID: Default
+>>8     lelong !0x585822b8
+>>>11   byte x                    \b, Release ID: %d.
+>>>10   ubyte x                   \b%d-
+>>>8    leshort x                 \b%d
+>>>8    lelong x                  (0x%x)
+>12     lelong 0x53B22500         \b, Platform ID: Default
+>12     lelong !0x53B22500
+>>12    lelong x                  \b, Platform ID: 0x%x
+# 1024 bit RSA signature
+>52     ubelong 0                 \b, RSA Signature: none
+>52     ubelong !0
+>>52    ubelong x                 \b, RSA Signature: 0x%08x
+>>56    ubelong x                 \b%08x
+>>60    ubelong x                 \b%08x
+>>64    ubelong x                 \b%08x
+>>68    ubelong x                 \b%08x
+>>72    ubelong x                 \b%08x
+>>76    ubelong x                 \b%08x
+>>80    ubelong x                 \b%08x
+>>84    ubelong x                 \b%08x
+>>88    ubelong x                 \b%08x
+>>92    ubelong x                 \b%08x
+>>96    ubelong x                 \b%08x
+>>100   ubelong x                 \b%08x
+>>104   ubelong x                 \b%08x
+>>108   ubelong x                 \b%08x
+>>112   ubelong x                 \b%08x
+>>116   ubelong x                 \b%08x
+>>120   ubelong x                 \b%08x
+>>124   ubelong x                 \b%08x
+>>128   ubelong x                 \b%08x
+>>132   ubelong x                 \b%08x
+>>136   ubelong x                 \b%08x
+>>140   ubelong x                 \b%08x
+>>144   ubelong x                 \b%08x
+>>148   ubelong x                 \b%08x
+>>152   ubelong x                 \b%08x
+>>156   ubelong x                 \b%08x
+>>160   ubelong x                 \b%08x
+>>164   ubelong x                 \b%08x
+>>168   ubelong x                 \b%08x
+>>172   ubelong x                 \b%08x
+>>176   ubelong x                 \b%08x
+# SHA1 hash (if not checking signature)
+>180    ubelong 0                 \b, SHA1: none
+>180    ubelong !0
+>>180   ubelong x                 \b, SHA1: %08x
+>>184   ubelong x                 \b%08x
+>>188   ubelong x                 \b%08x
+>>192   ubelong x                 \b%08x
+>>196   ubelong x                 \b%08x
+>200    ulelong !0                \b, Unsigned data: 0x%08x
+# Type-specific parameters
+>204    ulelong !0                \b, Param #1: 0x%08x
+>208    ulelong !0                \b, Param #2: 0x%08x
+>212    ulelong !0                \b, Param #3: 0x%08x
+>216    ulelong !0                \b, Param #4: 0x%08x
+>220    ulelong !0                \b, Param #5: 0x%08x
+>224    ulelong !0                \b, Param #6: 0x%08x
+>228    ulelong !0                \b, Param #7: 0x%08x
 
 # Boot ROM images for Sun/Cobalt Linux server appliances
 0       string    Cobalt\ Networks\ Inc.\nFirmware\ v    Paged Sun/COBALT boot rom,
