@@ -16,11 +16,12 @@ class LZMAModPlugin(binwalk.core.plugin.Plugin):
     SIGNATURE = "lzma compressed data"
 
     def init(self):
-        if self.module.extractor.enabled:
-            self.module.extractor.add_rule(txtrule=None,
-                                           regex="^%s" % self.SIGNATURE,
-                                           extension="7z",
-                                           cmd=self.lzma_cable_extractor, prepend=True)
+        pass
+        #if self.module.extractor.enabled:
+        #    self.module.extractor.add_rule(txtrule=None,
+        #                                   regex="^%s" % self.SIGNATURE,
+        #                                   extension="7z",
+        #                                   cmd=self.lzma_cable_extractor, prepend=True)
 
     def lzma_cable_extractor(self, fname):
         result = False
