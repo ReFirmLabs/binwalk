@@ -35,12 +35,14 @@
 >0x161  string      WINZIP          WinZIP self-extracting,
 >4      byte        0x14
 >>30    ubelong     !0x6d696d65     at least v2.0 to extract,
+>4      byte        0x2d
+>>30    ubelong     !0x6d696d65     at least v3.0 to extract,
 >18     lelong      !0
->>18    lelong      <0              {invalid}
+>>18    lelong      <-1             {invalid}
 >>18    lelong      x               compressed size: %d,
 >>18    lelong      x               {jump:%d}
 >22     lelong      !0
->>22    lelong      <0              {invalid}
+>>22    lelong      <-1             {invalid}
 >>22    lelong      x               uncompressed size: %d,
 >30     byte        <0x2D           {invalid}
 >30     byte        >0x7A           {invalid}
