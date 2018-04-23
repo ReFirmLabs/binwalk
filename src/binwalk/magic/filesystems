@@ -75,7 +75,7 @@
 >14     leshort   x         %d files
 
 # MPFS file system
-0       string      MPFS     MPFS filesystem, Microchop,
+0       string      MPFS     MPFS filesystem, Microchip,
 >4      byte        <0       {invalid}
 >4      byte        >10      {invalid}
 >5      byte        <0       {invalid}
