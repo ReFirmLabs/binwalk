@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ReFirmLabs/binwalk.png)](https://travis-ci.org/ReFirmLabs/binwalk)
+[![Build Status](https://travis-ci.org/ReFirmLabs/binwalk.svg)](https://travis-ci.org/ReFirmLabs/binwalk)
 
 Description
 ===========
