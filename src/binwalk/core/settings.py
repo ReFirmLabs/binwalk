@@ -128,11 +128,16 @@ class Settings:
         '''
         try:
             # This should work in both Windows and Unix environments
-            return os.getenv('USERPROFILE') or os.getenv('HOME')
+            for envname in ['USERPROFILE', 'HOME']:
+                user_dir = os.getenv(envname)
+                if user_dir is not None:
+                    return user_dir
         except KeyboardInterrupt as e:
             raise e
         except Exception:
-            return ''
+            pass
+
+        return ''
 
     def _file_path(self, dirname, filename):
         '''
