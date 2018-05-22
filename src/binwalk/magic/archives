@@ -107,20 +107,21 @@
 
 # RAR archiver (http://kthoom.googlecode.com/hg/docs/unrar.html, https://www.rarlab.com/technote.htm#rarsign)
 0   string      \x52\x61\x72\x21\x1A\x07            RAR archive data,
+>6  ubyte       >1                                  unknown version{invalid}
+>6  ubyte       1                                   version 5.x
 >6  ubyte       0                                   version 4.x, first volume type:
->6  ubyte       1                                   version 5.x, first volume type:
->9  ubyte       <0x72                               {invalid}
->9  ubyte       >0x7B                               {invalid}
->9  ubyte       0x72                                MARK_HEAD
->9  ubyte       0x73                                MAIN_HEAD
->9  ubyte       0x74                                FILE_HEAD
->9  ubyte       0x75                                COMM_HEAD
->9  ubyte       0x76                                AV_HEAD
->9  ubyte       0x77                                SUB_HEAD
->9  ubyte       0x78                                PROTECT_HEAD
->9  ubyte       0x79                                SIGN_HEAD
->9  ubyte       0x7A                                NEWSUB_HEAD
->9  ubyte       0x7B                                ENDARC_HEAD
+>>9  ubyte       <0x72                               {invalid}
+>>9  ubyte       >0x7B                               {invalid}
+>>9  ubyte       0x72                                MARK_HEAD
+>>9  ubyte       0x73                                MAIN_HEAD
+>>9  ubyte       0x74                                FILE_HEAD
+>>9  ubyte       0x75                                COMM_HEAD
+>>9  ubyte       0x76                                AV_HEAD
+>>9  ubyte       0x77                                SUB_HEAD
+>>9  ubyte       0x78                                PROTECT_HEAD
+>>9  ubyte       0x79                                SIGN_HEAD
+>>9  ubyte       0x7A                                NEWSUB_HEAD
+>>9  ubyte       0x7B                                ENDARC_HEAD
 
 # HPACK archiver (Peter Gutmann, pgut1@cs.aukuni.ac.nz)
 0    string        HPAK        HPACK archive data
