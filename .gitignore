@@ -1,6 +1,7 @@
+src/binwalk/core/version.py
 build
 dist
 .coverage
 *.extracted
-*.pyc
+*.py[co]
 **/*.egg-info

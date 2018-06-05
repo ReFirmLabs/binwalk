@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 import io
 import os
+from setuptools import setup
+from setuptools.config import read_configuration
+
+import os
 import sys
 import glob
 import shutil
@@ -11,10 +15,18 @@ except ImportError:
     from distutils.core import setup, Command
 from distutils.dir_util import remove_tree
 
-MODULE_NAME = "binwalk"
+MODULE_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
+cfg = read_configuration(os.path.join(MODULE_DIRECTORY, 'setup.cfg'))
+cfg["options"].update(cfg["metadata"])
+cfg = cfg["options"]
+
+MODULE_NAME = cfg["name"]
 MODULE_VERSION = "2.3.3"
 SCRIPT_NAME = MODULE_NAME
-MODULE_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
+
+PACKAGE_DIR = "src"
+BINWALK_ROOT_DIR = os.path.join(PACKAGE_DIR, MODULE_NAME)
+VERSION_FILE = os.path.join(MODULE_DIRECTORY, BINWALK_ROOT_DIR, "core", "version.py")
 
 # Python3 has a built-in DEVNULL; for Python2, we have to open
 # os.devnull to redirect subprocess stderr output to the ether.
@@ -100,7 +112,7 @@ def remove_binwalk_module(pydir=None, pybin=None):
 
 
 class IDAUnInstallCommand(Command):
-    description = "Uninstalls the binwalk IDA plugin module"
+    description = "Uninstalls the "+MODULE_NAME+" IDA plugin module"
     user_options = [
         ('idadir=', None, 'Specify the path to your IDA install directory.'),
     ]
@@ -120,7 +132,7 @@ class IDAUnInstallCommand(Command):
             return
 
         binida_dst_path = os.path.join(self.idadir, 'plugins', 'binida.py')
-        binwalk_dst_path = os.path.join(self.idadir, 'python', 'binwalk')
+        binwalk_dst_path = os.path.join(self.idadir, 'python', MODULE_NAME)
 
         if os.path.exists(binida_dst_path):
             sys.stdout.write("removing '%s'\n" % binida_dst_path)
@@ -131,7 +143,7 @@ class IDAUnInstallCommand(Command):
 
 
 class IDAInstallCommand(Command):
-    description = "Installs the binwalk IDA plugin module"
+    description = "Installs the "+MODULE_NAME+" IDA plugin module"
     user_options = [
         ('idadir=', None, 'Specify the path to your IDA install directory.'),
     ]
@@ -164,12 +176,12 @@ class IDAInstallCommand(Command):
                 binida_dst_path)
             return
 
-        binwalk_src_path = os.path.join(self.mydir, 'binwalk')
+        binwalk_src_path = os.path.join(self.mydir, MODULE_NAME)
         binwalk_dst_path = os.path.join(self.idadir, 'python')
 
         if not os.path.exists(binwalk_src_path):
             sys.stderr.write(
-                "ERROR: could not locate binwalk source directory '%s'!\n" %
+                "ERROR: could not locate "+MODULE_NAME+" source directory '%s'!\n" %
                 binwalk_src_path)
             return
         if not os.path.exists(binwalk_dst_path):
@@ -179,7 +191,7 @@ class IDAInstallCommand(Command):
             return
 
         binida_dst_path = os.path.join(binida_dst_path, 'binida.py')
-        binwalk_dst_path = os.path.join(binwalk_dst_path, 'binwalk')
+        binwalk_dst_path = os.path.join(binwalk_dst_path, MODULE_NAME)
 
         if os.path.exists(binida_dst_path):
             os.remove(binida_dst_path)
@@ -198,8 +210,8 @@ class IDAInstallCommand(Command):
 class UninstallCommand(Command):
     description = "Uninstalls the Python module"
     user_options = [
-        ('pydir=', None, 'Specify the path to the binwalk python module to be removed.'),
-        ('pybin=', None, 'Specify the path to the binwalk executable to be removed.'),
+        ('pydir=', None, 'Specify the path to the '+MODULE_NAME+' python module to be removed.'),
+        ('pybin=', None, 'Specify the path to the '+MODULE_NAME+' executable to be removed.'),
     ]
 
     def initialize_options(self):
@@ -252,7 +264,7 @@ class AutoCompleteCommand(Command):
     def run(self):
         options = []
         autocomplete_file_path = "/etc/bash_completion.d/%s" % MODULE_NAME
-        auto_complete = '''_binwalk()
+        auto_complete = "_"+MODULE_NAME+'''()
 {
     local cur prev opts
     COMPREPLY=()
@@ -265,9 +277,9 @@ class AutoCompleteCommand(Command):
         return 0
     fi
 }
-complete -F _binwalk binwalk'''
+complete -F _'''+MODULE_NAME+" "+MODULE_NAME
 
-        (out, err) = subprocess.Popen(["binwalk", "--help"], stdout=subprocess.PIPE).communicate()
+        (out, err) = subprocess.Popen([MODULE_NAME, "--help"], stdout=subprocess.PIPE).communicate()
         for line in out.splitlines():
             if b'--' in line:
                 long_opt = line.split(b'--')[1].split(b'=')[0].split()[0].strip()
@@ -330,21 +342,12 @@ with io.open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 setup(
     name=MODULE_NAME,
     version=MODULE_VERSION,
-    description="Firmware analysis tool",
-    long_description=long_description,
-    long_description_content_type='text/markdown',
-    author="Craig Heffner",
     url="https://github.com/ReFirmLabs/%s" % MODULE_NAME,
     requires=[],
     python_requires=">=3",
     package_dir={"": "src"},
     packages=[MODULE_NAME],
     package_data={MODULE_NAME: install_data_files},
-    scripts=[
-        os.path.join(
-            "src",
-            "scripts",
-            SCRIPT_NAME)],
     cmdclass={
         'clean': CleanCommand,
         'uninstall': UninstallCommand,
