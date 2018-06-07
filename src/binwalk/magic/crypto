@@ -109,8 +109,8 @@
 >15     string          PGP\040SIGNATURE-       signature
 
 0       string        Salted__      OpenSSL encryption, salted,
->8      belong        x             salt: 0x%X
->12     belong        x             \b%X
+>8      ubelong       x             salt: 0x%X
+>12     ubelong       x             \b%X
 
 #------------------------------------------------------------------------------
 # LUKS http://tomb.dyne.org/Luks_on_disk_format.pdf
