@@ -83,72 +83,73 @@
 >20     belong          <0                          {invalid}(invalid link layer
 >16     belong          x                           \b, snaplen: %d)
 
-0       lelong          0xa1b2c3d4      Libpcap capture file, little-endian,
+0       ulelong         0xa1b2c3d4      Libpcap capture file, little-endian,
 >4      leshort         >2              {invalid}
 >4      leshort         <0              {invalid}
 >4      leshort         x               version %d
 >6      leshort         x               \b.%d,
->20     lelong          0               (No link-layer encapsulation
->20     lelong          1               (Ethernet
->20     lelong          2               (3Mb Ethernet
->20     lelong          3               (AX.25
->20     lelong          4               (ProNET
->20     lelong          5               (CHAOS
->20     lelong          6               (Token Ring
->20     lelong          7               (ARCNET
->20     lelong          8               (SLIP
->20     lelong          9               (PPP
->20     lelong          10              (FDDI
->20     lelong          11              (RFC 1483 ATM
->20     lelong          12              (raw IP
->20     lelong          13              (BSD/OS SLIP
->20     lelong          14              (BSD/OS PPP
->20     lelong          19              (Linux ATM Classical IP
->20     lelong          50              (PPP or Cisco HDLC
->20     lelong          51              (PPP-over-Ethernet
->20     lelong          99              (Symantec Enterprise Firewall
->20     lelong          100             (RFC 1483 ATM
->20     lelong          101             (raw IP
->20     lelong          102             (BSD/OS SLIP
->20     lelong          103             (BSD/OS PPP
->20     lelong          104             (BSD/OS Cisco HDLC
->20     lelong          105             (802.11
->20     lelong          106             (Linux Classical IP over ATM
->20     lelong          107             (Frame Relay
->20     lelong          108             (OpenBSD loopback
->20     lelong          109             (OpenBSD IPsec encrypted
->20     lelong          112             (Cisco HDLC
->20     lelong          113             (Linux "cooked"
->20     lelong          114             (LocalTalk
->20     lelong          117             (OpenBSD PFLOG
->20     lelong          119             (802.11 with Prism header
->20     lelong          122             (RFC 2625 IP over Fibre Channel
->20     lelong          123             (SunATM
->20     lelong          127             (802.11 with radiotap header
->20     lelong          129             (Linux ARCNET
->20     lelong          138             (Apple IP over IEEE 1394
->20     lelong          140             (MTP2
->20     lelong          141             (MTP3
->20     lelong          143             (DOCSIS
->20     lelong          144             (IrDA
->20     lelong          147             (Private use 0
->20     lelong          148             (Private use 1
->20     lelong          149             (Private use 2
->20     lelong          150             (Private use 3
->20     lelong          151             (Private use 4
->20     lelong          152             (Private use 5
->20     lelong          153             (Private use 6
->20     lelong          154             (Private use 7
->20     lelong          155             (Private use 8
->20     lelong          156             (Private use 9
->20     lelong          157             (Private use 10
->20     lelong          158             (Private use 11
->20     lelong          159             (Private use 12
->20     lelong          160             (Private use 13
->20     lelong          161             (Private use 14
->20     lelong          162             (Private use 15
->20     lelong          163             (802.11 with AVS header
->20     lelong          >163            {invalid}(invalid link layer
->20     lelong          <0              {invalid}(invalid link layer
->16     lelong          x               \b, snaplen: %d)
+>20     lelong          0               No link-layer encapsulation
+>20     lelong          1               Ethernet
+>20     lelong          2               3Mb Ethernet
+>20     lelong          3               AX.25
+>20     lelong          4               ProNET
+>20     lelong          5               CHAOS
+>20     lelong          6               Token Ring
+>20     lelong          7               ARCNET
+>20     lelong          8               SLIP
+>20     lelong          9               PPP
+>20     lelong          10              FDDI
+>20     lelong          11              RFC 1483 ATM
+>20     lelong          12              raw IP
+>20     lelong          13              BSD/OS SLIP
+>20     lelong          14              BSD/OS PPP
+>20     lelong          19              Linux ATM Classical IP
+>20     lelong          50              PPP or Cisco HDLC
+>20     lelong          51              PPP-over-Ethernet
+>20     lelong          99              Symantec Enterprise Firewall
+>20     lelong          100             RFC 1483 ATM
+>20     lelong          101             raw IP
+>20     lelong          102             BSD/OS SLIP
+>20     lelong          103             BSD/OS PPP
+>20     lelong          104             BSD/OS Cisco HDLC
+>20     lelong          105             802.11
+>20     lelong          106             Linux Classical IP over ATM
+>20     lelong          107             Frame Relay
+>20     lelong          108             OpenBSD loopback
+>20     lelong          109             OpenBSD IPsec encrypted
+>20     lelong          112             Cisco HDLC
+>20     lelong          113             Linux "cooked"
+>20     lelong          114             LocalTalk
+>20     lelong          117             OpenBSD PFLOG
+>20     lelong          119             802.11 with Prism header
+>20     lelong          122             RFC 2625 IP over Fibre Channel
+>20     lelong          123             SunATM
+>20     lelong          127             802.11 with radiotap header
+>20     lelong          129             Linux ARCNET
+>20     lelong          138             Apple IP over IEEE 1394
+>20     lelong          140             MTP2
+>20     lelong          141             MTP3
+>20     lelong          143             DOCSIS
+>20     lelong          144             IrDA
+>20     lelong          147             Private use 0
+>20     lelong          148             Private use 1
+>20     lelong          149             Private use 2
+>20     lelong          150             Private use 3
+>20     lelong          151             Private use 4
+>20     lelong          152             Private use 5
+>20     lelong          153             Private use 6
+>20     lelong          154             Private use 7
+>20     lelong          155             Private use 8
+>20     lelong          156             Private use 9
+>20     lelong          157             Private use 10
+>20     lelong          158             Private use 11
+>20     lelong          159             Private use 12
+>20     lelong          160             Private use 13
+>20     lelong          161             Private use 14
+>20     lelong          162             Private use 15
+>20     lelong          163             802.11 with AVS header
+>20     lelong          >163            Unknown link layer
+>20     lelong          >276            {invalid},invalid link layer
+>20     lelong          <0              {invalid},invalid link layer
+>16     lelong          x               \b, snaplen: %d
 
