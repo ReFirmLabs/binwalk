@@ -105,7 +105,7 @@
 >7      byte        >9          {invalid}
 >7      byte        <0          {invalid}
 
-# RAR archiver (http://kthoom.googlecode.com/hg/docs/unrar.html, https://www.rarlab.com/technote.htm#rarsign)
+# RAR archiver (http://archive.today/2014.05.14-050637/http://kthoom.googlecode.com/hg/docs/unrar.html, https://www.rarlab.com/technote.htm#rarsign)
 0   string      \x52\x61\x72\x21\x1A\x07            RAR archive data,
 >6  ubyte       >1                                  unknown version{invalid}
 >6  ubyte       1                                   version 5.x
