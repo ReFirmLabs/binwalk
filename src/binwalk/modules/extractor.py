@@ -659,7 +659,11 @@ class Extractor(Module):
             os.chdir(original_dir)
 
         if rule is not None:
-            return (output_directory, fname, recurse, str(rule['cmd']))
+            if callable(rule['cmd']):
+                command_name = get_class_name_from_method(rule['cmd'])
+            else:
+                command_name = rule['cmd']
+            return (output_directory, fname, recurse, command_name)
         else:
             return (output_directory, fname, recurse, '')
 

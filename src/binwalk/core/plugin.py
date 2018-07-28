@@ -36,6 +36,9 @@ class Plugin(object):
         else:
             self._enabled = False
 
+    def __str__(self):
+        return self.__class__.__name__
+
     def init(self):
         '''
         Child class should override this if needed.

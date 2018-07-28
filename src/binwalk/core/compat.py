@@ -10,6 +10,13 @@ if PY_MAJOR_VERSION > 2:
     string.letters = string.ascii_letters
 
 
+def get_class_name_from_method(method):
+    if PY_MAJOR_VERSION > 2:
+        return method.__self__.__class__.__name__
+    else:
+        return method.im_class.__name__
+
+
 def iterator(dictionary):
     '''
     For cross compatibility between Python 2 and Python 3 dictionaries.
