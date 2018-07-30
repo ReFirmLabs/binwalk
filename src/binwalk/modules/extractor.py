@@ -565,6 +565,7 @@ class Extractor(Module):
         fname = ''
         rule = None
         recurse = False
+        command_line = ''
         original_dir = os.getcwd()
         rules = self.match(description)
         file_path = os.path.realpath(file_name)
@@ -619,9 +620,10 @@ class Extractor(Module):
 
                     # Execute the specified command against the extracted file
                     if self.run_extractors:
-                        extract_ok = self.execute(rule['cmd'], fname, rule['codes'])
+                        (extract_ok, command_line) = self.execute(rule['cmd'], fname, rule['codes'])
                     else:
                         extract_ok = True
+                        command_line = ''
 
                     # Only clean up files if remove_after_execute was specified.
                     # Only clean up files if the file was extracted sucessfully, or if we've run
@@ -658,14 +660,16 @@ class Extractor(Module):
 
             os.chdir(original_dir)
 
-        if rule is not None:
-            if callable(rule['cmd']):
-                command_name = get_class_name_from_method(rule['cmd'])
-            else:
-                command_name = rule['cmd']
-            return (output_directory, fname, recurse, command_name)
-        else:
-            return (output_directory, fname, recurse, '')
+        return (output_directory, fname, recurse, command_line)
+
+        #if rule is not None:
+        #    if callable(rule['cmd']):
+        #        command_name = get_class_name_from_method(rule['cmd'])
+        #    else:
+        #        command_name = rule['cmd']
+        #    return (output_directory, fname, recurse, command_name)
+        #else:
+        #    return (output_directory, fname, recurse, '')
 
     def _entry_offset(self, index, entries, description):
         '''
@@ -827,11 +831,14 @@ class Extractor(Module):
         tmp = None
         rval = 0
         retval = True
+        command_list = []
 
         binwalk.core.common.debug("Running extractor '%s'" % str(cmd))
 
         try:
             if callable(cmd):
+                command_list.append(get_class_name_from_method(cmd))
+
                 try:
                     retval = cmd(fname)
                 except KeyboardInterrupt as e:
@@ -868,6 +875,7 @@ class Extractor(Module):
                         retval = False
 
                     binwalk.core.common.debug('External extractor command "%s" completed with return code %d (success: %s)' % (cmd, rval, str(retval)))
+                    command_list.append(command)
 
                     # TODO: Should errors from all commands in a command string be checked? Currently we only support
                     #       specifying one set of error codes, so at the moment, this is not done; it is up to the
@@ -885,4 +893,4 @@ class Extractor(Module):
         if tmp is not None:
             tmp.close()
 
-        return retval
+        return (retval, '&&'.join(command_list))
