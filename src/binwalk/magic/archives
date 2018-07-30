@@ -87,7 +87,7 @@
 >34     byte        !0
 >>34    string      x           {name:%s}
 >>34    string      x           original name: "%s",
->0xC    ledate      x           original file date: %s,
+>0xC    uledate      x           original file date: %s,
 >0x10   lelong      <0          {invalid}
 >0x10   lelong      x           compressed file size: %d,
 >0x14   lelong      <0          {invalid}
@@ -218,8 +218,8 @@
 >6    leshort    <0           {invalid}
 >6    leshort    0            {invalid}
 >6    leshort    x            volume number: %d,
->8    ledate     x            current date: %s,
->12   ledate     x            starting date: %s,
+>8    uledate     x            current date: %s,
+>12   uledate     x            starting date: %s,
 >20   string     x            disk name: "%s",
 >36   string     x            file system name: "%s",
 >52   string     x            user name: "%s"

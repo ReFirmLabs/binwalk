@@ -138,7 +138,7 @@
 >3      byte            &0x20           \b, encrypted{invalid}
 # Dates before 1992 are {invalid}, unless of course you're DD-WRT in which
 # case you don't know how to set a date in your gzip files. Brilliant.
->4      ledate          x               \b, last modified: %s
+>4      uledate         x               \b, last modified: %s
 >4      lelong          =0              (null date)
 >4      lelong          !0
 >>4     lelong          <694224000      (bogus date)

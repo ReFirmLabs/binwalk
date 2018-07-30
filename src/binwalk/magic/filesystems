@@ -240,9 +240,9 @@
 >28     beshort 3
 >>51    belong  x       blocksize: %d bytes,
 >28     beshort <4
->>39    bedate  x       created: %s
+>>39    ubedate  x       created: %s
 >28     beshort >3
->>8     bedate  x       created: %s
+>>8     ubedate  x       created: %s
 
 # Squashfs, little endian
 0       string  hsqs    Squashfs filesystem, little endian,
@@ -277,9 +277,9 @@
 >28     leshort 3
 >>51    lelong  x       blocksize: %d bytes,
 >28     leshort <4
->>39    ledate  x       created: %s
+>>39    uledate  x       created: %s
 >28     leshort >3
->>8     ledate  x       created: %s
+>>8     uledate  x       created: %s
 >28     leshort <3
 >>8     lelong  x       {jump:%d}
 >28     leshort 3
@@ -320,9 +320,9 @@
 >28     beshort 3
 >>51    belong  x       blocksize: %d bytes,
 >28     beshort <4
->>39    bedate  x       created: %s
+>>39    ubedate  x       created: %s
 >28     beshort >3
->>8     bedate  x       created: %s
+>>8     ubedate  x       created: %s
 >28     beshort <3
 >>8     belong  x       {jump:%d}
 >28     beshort 3
@@ -363,9 +363,9 @@
 >28     beshort 3
 >>51    belong  x       blocksize: %d bytes,
 >28     beshort <4
->>39    bedate  x       created: %s
+>>39    ubedate  x       created: %s
 >28     beshort >3
->>8     bedate  x       created: %s
+>>8     ubedate  x       created: %s
 >28     beshort <3
 >>8     belong  x       {jump:%d}
 >28     beshort 3
@@ -410,9 +410,9 @@
 >28     beshort 3
 >>51    belong  x       blocksize: %d bytes,
 >28     beshort <4
->>39    bedate  x       created: %s
+>>39    ubedate  x       created: %s
 >28     beshort >3
->>8     bedate  x       created: %s
+>>8     ubedate  x       created: %s
 >28     beshort <3
 >>8     belong  x       {jump:%d}
 >28     beshort 3
@@ -453,9 +453,9 @@
 >28     leshort 3
 >>51    lelong  x       blocksize: %d bytes,
 >28     leshort <4
->>39    ledate  x       created: %s
+>>39    uledate  x       created: %s
 >28     leshort >3
->>8     ledate  x       created: %s
+>>8     uledate  x       created: %s
 >28     leshort <3
 >>8     lelong  x       {jump:%d}
 >28     leshort 3
@@ -496,9 +496,9 @@
 >28     leshort 3
 >>51    lelong  x       blocksize: %d bytes,
 >28     leshort <4
->>39    ledate  x       created: %s
+>>39    uledate  x       created: %s
 >28     leshort >3
->>8     ledate  x       created: %s
+>>8     uledate  x       created: %s
 >28     leshort <3
 >>8     lelong  x       {jump:%d}
 >28     leshort 3
@@ -607,7 +607,7 @@
 
 18      string            WDK\x202.0\x00    WDK file system, version 2.0,
 >11     byte              !0                %d files,
->4      bedate            !0                Last modified %s GMT
+>4      ubedate            !0                Last modified %s GMT
 
 32769   string        CD001                                         ISO
 >6144   string        !NSR0                                         9660 CD-ROM filesystem data,
@@ -664,7 +664,7 @@
 >8       lelong*1024   x                {jump:%d}
 >8       lelong        x                total blocks: %d,
 >972     lelong        x                free blocks: %d,
->968     ledate        x                last modified: %s
+>968     uledate        x                last modified: %s
 >980     byte          !0
 >>980    string        x                \b, last mounted on: "%s"
 

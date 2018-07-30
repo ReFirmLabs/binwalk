@@ -671,8 +671,11 @@ class Magic(object):
                     # Up until this point, date fields are treated as integer values,
                     # but we want to display them as nicely formatted strings.
                     if line.type == 'date':
-                        ts = datetime.datetime.utcfromtimestamp(dvalue)
-                        dvalue = ts.strftime("%Y-%m-%d %H:%M:%S")
+                        try:
+                            ts = datetime.datetime.utcfromtimestamp(dvalue)
+                            dvalue = ts.strftime("%Y-%m-%d %H:%M:%S")
+                        except OSError:
+                            dvalue = "invalid timestamp"
 
                     # Generate the tuple for the format string
                     dvalue_tuple = ()
