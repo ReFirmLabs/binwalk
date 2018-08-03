@@ -674,7 +674,9 @@ class Magic(object):
                         try:
                             ts = datetime.datetime.utcfromtimestamp(dvalue)
                             dvalue = ts.strftime("%Y-%m-%d %H:%M:%S")
-                        except OSError:
+                        except KeyboardInterrupt as e:
+                            raise e
+                        except Exception:
                             dvalue = "invalid timestamp"
 
                     # Generate the tuple for the format string
