@@ -1,13 +1,10 @@
-[![Build Status](https://travis-ci.org/ReFirmLabs/binwalk.png)](https://travis-ci.org/ReFirmLabs/binwalk)
+# Binwalk
 
-Description
-===========
+[![Build Status](https://travis-ci.org/ReFirmLabs/binwalk.svg?branch=master)](https://travis-ci.org/ReFirmLabs/binwalk)
 
 Binwalk is a fast, easy to use tool for analyzing, reverse engineering, and extracting firmware images.
 
-Installation
-============
-
+## Installation
 Binwalk follows the standard Python installation procedure:
 
 ```bash
@@ -23,8 +20,7 @@ $ sudo apt-get install python-lzma
 For instructions on installing other optional dependencies, see [INSTALL.md](https://github.com/ReFirmLabs/binwalk/blob/master/INSTALL.md).
 
 
-Usage
-=====
+## Usage
 
 Basic usage is simple:
 
