@@ -16,7 +16,8 @@ Binwalk is a fast, easy to use tool for analyzing, reverse engineering, and extr
 * [Getting Started](https://github.com/ReFirmLabs/binwalk/wiki/Quick-Start-Guide)
 * [Binwalk Command Line Usage](https://github.com/ReFirmLabs/binwalk/wiki/Usage)
 * [Binwalk IDA Plugin Usage](https://github.com/ReFirmLabs/binwalk/wiki/Creating-Custom-Plugins)
-* [Wiki](https://github.com/ReFirmLabs/binwalk/wiki)
+
+More information on [Wiki](https://github.com/ReFirmLabs/binwalk/wiki)
 
 ## Quick start
 
