@@ -1,7 +1,6 @@
 # Core code for supporting and managing plugins.
 
 import os
-import sys
 import imp
 import inspect
 import binwalk.core.common

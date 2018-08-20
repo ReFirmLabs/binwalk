@@ -278,17 +278,17 @@ class Signature(object):
     Class to hold signature data and generate signature regular expressions.
     '''
 
-    def __init__(self, id, first_line):
+    def __init__(self, sid, first_line):
         '''
         Class constructor.
 
-        @id         - A ID value to uniquely identify this signature.
+        @sid        - A ID value to uniquely identify this signature.
         @first_line - The first SignatureLine of the signature (subsequent
                       SignatureLines should be added via self.append).
 
         Returns None.
         '''
-        self.id = id
+        self.id = sid
         self.lines = [first_line]
         self.title = first_line.format
         self.offset = first_line.offset
@@ -551,7 +551,6 @@ class Magic(object):
         Returns a dictionary of tags parsed from the data.
         '''
         description = []
-        tag_strlen = None
         max_line_level = 0
         previous_line_end = 0
         tags = {'id': signature.id, 'offset':

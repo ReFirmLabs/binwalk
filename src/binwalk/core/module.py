@@ -16,7 +16,6 @@ import binwalk.core.statuserver
 import binwalk.core.common
 import binwalk.core.settings
 import binwalk.core.plugin
-from threading import Thread
 from binwalk.core.compat import *
 from binwalk.core.exceptions import *
 
@@ -881,8 +880,6 @@ class Modules(object):
         '''
         kwargs = {'enabled': False}
         last_priority = {}
-        longs = []
-        shorts = ""
         parser = argparse.ArgumentParser(add_help=False)
         # Hack: This allows the ListActionParser class to correllate short options to long options.
         # There is probably a built-in way to do this in the

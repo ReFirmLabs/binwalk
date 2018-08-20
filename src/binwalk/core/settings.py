@@ -6,7 +6,7 @@ import binwalk.core.common as common
 from binwalk.core.compat import *
 
 
-class Settings:
+class Settings(object):
 
     '''
     Binwalk settings class, used for accessing user and system file paths and general configuration settings.

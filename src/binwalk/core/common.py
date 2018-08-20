@@ -106,11 +106,11 @@ def file_size(filename):
         os.close(fd)
 
 
-def strip_quoted_strings(string):
+def strip_quoted_strings(quoted_string):
     '''
     Strips out data in between double quotes.
 
-    @string - String to strip.
+    @quoted_string - String to strip.
 
     Returns a sanitized string.
     '''
@@ -120,14 +120,14 @@ def strip_quoted_strings(string):
     # double quotes, and this function should ignore those. However, it also means that any
     # data between two quoted strings (ex: '"quote 1" you won't see me "quote
     # 2"') will also be stripped.
-    return re.sub(r'\"(.*)\"', "", string)
+    return re.sub(r'\"(.*)\"', "", quoted_string)
 
 
-def get_quoted_strings(string):
+def get_quoted_strings(quoted_string):
     '''
     Returns a string comprised of all data in between double quotes.
 
-    @string - String to get quoted data from.
+    @quoted_string - String to get quoted data from.
 
     Returns a string of quoted data on success.
     Returns a blank string if no quoted data is present.
@@ -139,7 +139,7 @@ def get_quoted_strings(string):
         # double quotes, and this function should ignore those. However, it also means that any
         # data between two quoted strings (ex: '"quote 1" non-quoted data
         # "quote 2"') will also be included.
-        return re.findall(r'\"(.*)\"', string)[0]
+        return re.findall(r'\"(.*)\"', quoted_string)[0]
     except KeyboardInterrupt as e:
         raise e
     except Exception:

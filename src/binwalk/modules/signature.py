@@ -134,8 +134,6 @@ class Signature(Module):
                 self.one_of_many = None
 
     def scan_file(self, fp):
-        current_file_offset = 0
-
         while True:
             (data, dlen) = fp.read_block()
             if dlen < 1:

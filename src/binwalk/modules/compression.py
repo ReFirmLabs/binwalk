@@ -119,7 +119,6 @@ class LZMA(object):
     def decompress(self, data):
         result = None
         description = None
-        i = 0
 
         for header in self.headers:
             i += 1
@@ -197,9 +196,6 @@ class Deflate(object):
         return retval
 
     def decompress(self, data):
-        valid = True
-        description = None
-
         # Looking for either a valid decompression, or an error indicating
         # truncated input data
         try:
