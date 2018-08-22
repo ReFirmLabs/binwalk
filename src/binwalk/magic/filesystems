@@ -686,3 +686,49 @@
 
 # QNX IFS
 0       string   \xEB\x7E\xFF\x00    QNX IFS
+
+# QNX Condensed Filesystem
+0       lequad    0x5346444e43584e51 QNX Condensed Filesystem,
+>8      uleshort  x                  Version: %hu,
+>10     uleshort  x                  Filesystem: %hu,
+>12     byte      x
+>>12    byte&0x1  x                  Compressed,
+>>12    byte&0x2  x                  Encrypted,
+>16     ulequad   x                  Decondensed File Size: %llu bytes,
+>24     ulequad   x                  Condensed File Size: %llu bytes,
+>32     ulequad   x                  Decompressed & Decrypted Cluster(s) File Size: %llu bytes,
+>40     ulequad   x                  Extents Offset: 0x%llx,
+>48     ulequad   x                  Clusters Offset: 0x%llx,
+>64     ulequad   x                  Number of Extents: %llu,
+>72     ulequad   x                  Number of Clusters: %llu,
+>80     ulelong   x                  Cluster Size: %lu bytes,
+>88     ulelong   x                  Header Hash Type:
+>>88    ulelong   0                  \b None,
+>>88    ulelong   1                  \b CRC32,
+>>88    ulelong   2                  \b MD5,
+>>88    ulelong   3                  \b SHA224,
+>>88    ulelong   4                  \b SHA256,
+>>88    ulelong   5                  \b SHA384,
+>>88    ulelong   6                  \b SHA512,
+>>88    ulelong   7                  \b AES256-GCM,
+>>88    ulelong   >7                 \b Unknown,
+>92     ulelong   x                  Extents/Clusters Hash Type:
+>>92    ulelong   0                  \b None,
+>>92    ulelong   1                  \b CRC32,
+>>92    ulelong   2                  \b MD5,
+>>92    ulelong   3                  \b SHA224,
+>>92    ulelong   4                  \b SHA256,
+>>92    ulelong   5                  \b SHA384,
+>>92    ulelong   6                  \b SHA512,
+>>92    ulelong   7                  \b AES256-GCM,
+>>92    ulelong   >7                 \b Unknown,
+>96     ulelong   x                  Data Hash Type:
+>>96    ulelong   0                  \b None
+>>96    ulelong   1                  \b CRC32
+>>96    ulelong   2                  \b MD5
+>>96    ulelong   3                  \b SHA224
+>>96    ulelong   4                  \b SHA256
+>>96    ulelong   5                  \b SHA384
+>>96    ulelong   6                  \b SHA512
+>>96    ulelong   7                  \b AES256-GCM
+>>96    ulelong   >7                 \b Unknown
