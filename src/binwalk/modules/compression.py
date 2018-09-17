@@ -121,7 +121,6 @@ class LZMA(object):
         description = None
 
         for header in self.headers:
-            i += 1
             # The only acceptable exceptions are those indicating that the
             # input data was truncated.
             try:
