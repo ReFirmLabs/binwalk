@@ -40,6 +40,9 @@ then
 elif [ $distro_version = "17" ]
 then
     APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
+elif [ $distro_version = "18" ]
+then
+    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
 else
     APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
 fi
@@ -92,6 +95,26 @@ function install_unstuff
     cd -
     rm -rf /tmp/unstuff
 }
+
+function install_cramfstools
+{
+  # Downloads cramfs tools from sourceforge and installs them to $INSTALL_LOCATION
+  TIME=`date +%s`
+  INSTALL_LOCATION=/usr/local/bin
+
+  # https://github.com/torvalds/linux/blob/master/fs/cramfs/README#L106
+  wget  https://downloads.sourceforge.net/project/cramfs/cramfs/1.1/cramfs-1.1.tar.gz?ts=$TIME -O cramfs-1.1.tar.gz
+  tar xf cramfs-1.1.tar.gz
+  # There is no "make install"
+  (cd cramfs-1.1 \
+  && make \
+  && $SUDO install mkcramfs $INSTALL_LOCATION \
+  && $SUDO install cramfsck $INSTALL_LOCATION)
+
+  rm cramfs-1.1.tar.gz
+  rm -rf cramfs-1.1
+}
+
 
 function install_ubireader
 {
@@ -239,3 +262,7 @@ install_jefferson
 install_unstuff
 install_ubireader
 
+if [ $distro_version = "18" ]
+then
+install_cramfstools
+fi
