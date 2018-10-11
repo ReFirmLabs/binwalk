@@ -333,3 +333,6 @@
 >24     belong          0                       \b, checksum: none
 >24     belong          1                       \b, checksum: SHA1
 >24     belong          2                       \b, checksum: MD5
+
+# Borg backup-archive (https://github.com/borgbackup/borg)
+0    string    BORG_SEG     BORG Backup Archive
