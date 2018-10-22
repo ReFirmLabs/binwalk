@@ -30,6 +30,7 @@ class SignatureResult(binwalk.core.module.Result):
         self.invalid = False
         self.once = False
         self.overlap = False
+        self.end = False
 
         # These are set by code internally
         self.id = 0

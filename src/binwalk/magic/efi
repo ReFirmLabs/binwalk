@@ -1,5 +1,4 @@
-# http://blogs.phoenix.com/phoenix_technologies_bios/\
-# 2007/02/uefi_pi_10_firm.html
+# http://blogs.phoenix.com/phoenix_technologies_bios/2007/02/uefi_pi_10_firm.html
 
 40      string     _FVH              UEFI PI Firmware Volume
 >32     ulequad    >0xFFFFFFFF       {invalid} unrealistic size
