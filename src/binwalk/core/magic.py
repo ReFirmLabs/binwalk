@@ -430,6 +430,9 @@ class Magic(object):
         # Regex rule to find periods (see self._do_math)
         self.period = re.compile("\.")
 
+    def reset(self):
+        self.display_once = set()
+
     def _filtered(self, text):
         '''
         Tests if a string should be filtered out or not.
