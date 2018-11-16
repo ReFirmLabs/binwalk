@@ -685,4 +685,20 @@
 0       string   \xEB\x10\x90\x00    QNX6 filesystem
 
 # QNX IFS
-0       string   \xEB\x7E\xFF\x00    QNX IFS
+0       string    \xEB\x7E\xFF\x00                                  QNX IFS,
+>7      byte      !0                                                {invalid}
+>50     leshort   !0                                                {invalid}
+>52     string    !\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00 {invalid}
+>36     lelong    x                                                 size: %d bytes,
+>36     lelong    x                                                 {size:%d}
+>10     leshort   x                                                 machine-type: 0x%x,
+>6      byte&0x02 0                                                 little endian,
+>6      byte&0x02 !0                                                big endian,
+>6      byte&0x1c 0                                                 plain text,
+>6      byte&0x1c !0
+>>36    lelong    x                                                 {jump:%d}
+>6      byte&0x1c 0x02                                              SHIFT-compressed,
+>6      byte&0x1c 0x04                                              ZLIB-compressed,
+>6      byte&0x1c 0x08                                              LZO-compressed,
+>6      byte&0x1c 0x0c                                              UCL-compressed,
+>4      uleshort   x                                                version: %d
