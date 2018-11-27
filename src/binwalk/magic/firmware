@@ -453,16 +453,16 @@
 >4      byte        0           {invalid},
 >4      string      x           version: "%s"
 
-4   string      \x00\x00\x00\x00PART    Ubiquiti partition header,
+-4  string      \x00\x00\x00\x00PART    Ubiquiti partition header,
 >0  byte        x                       header size: 56 bytes,
->8  byte        0                       {invalid}
->8  string      x                       name: "%s",
->44 ubelong     x                       base address: 0x%.8X,
->52 belong      x                       data size: %d bytes{size:%d}
+>0  byte        0                       {invalid}
+>0  string      x                       name: "%s",
+>40 ubelong     x                       base address: 0x%.8X,
+>48 belong      x                       data size: %d bytes{size:%d}
 
-4   string      \x00\x00\x00\x00END\x2e Ubiquiti end header, header size: 12 bytes,
->12 belong      !0                      {invalid},
->8  ubelong     x                       cumulative ~CRC32: 0x%.8X
+-4  string      \x00\x00\x00\x00END\x2e Ubiquiti end header, header size: 12 bytes,
+>8  belong      !0                      {invalid},
+>4  ubelong     x                       cumulative ~CRC32: 0x%.8X
 
 -4   string      \x00\x00\x00\x00ENDS   Signed Ubiquiti end header, RSA 2048 bit, header size: 264 bytes
 >260 ubelong     !0                     {invalid}
