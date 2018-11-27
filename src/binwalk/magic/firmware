@@ -837,3 +837,36 @@
 # MCastFS2 (.mcfs)
 # http://support.aminocom.com/link/portal/1108/1281/Article/1204/Software-for-Aminet-set-top-boxes
 0       string      \x0E\x00\x4D\x43\x61\x73\x74\x46\x53\x32\x00\x00    Amino MCastFS2 (.mcfs)
+
+
+# Intel microcode package. Might contain more than one, but using only magic
+# files, it's not fun to detect them. Also, it uses BCD dates, that's why the date format looks weird.
+# Header version is always 1
+0x0        ulelong     1        Intel x86 or x64 microcode,
+# Signature of the applicable model, cannot be 0. It might be possible to narrow this down a bit.
+>0x0c      ulelong     !0       sig 0x%08x,
+# 
+>0x18      ulelong     x        pf_mask 0x%02x,
+# Year
+>0x09      ubyte       >0x20    {invalid}
+>0x09      ubyte       <0x19    {invalid}
+>0x08      uleshort    x        %04X-
+# Month, BCD, test if 0x01 <= month <= 19
+>0x0b      ubyte       0        {invalid}
+>0x0b      ubyte&0xf0  >0x10    {invalid}
+>0x0b      ubyte&0x0f  >0x09    {invalid}
+>0x0b      ubyte       x        \b%02X-
+# Day, BCD, test if 0x01 <= day <= 39
+>0x0a      ubyte&0xf0  >0x30    {invalid}
+>0x0a      ubyte&0x0f  >0x09    {invalid}
+>0x0a      ubyte       0        {invalid}
+>0x0a      ubyte       x        \b%02X,
+# The revision of the microcode update
+>0x04      lelong      !0       rev 0x%04x,
+# Total size, useful for extraction?
+>0x20      ulelong     0        size 2048 {size:2048}
+>0x20      ulelong     !0       size %d {size:%d}
+# Reserved, always zero as of 2018-09-23
+>0x24      ulelong     0
+>0x28      ulelong     0
+>0x2c      ulelong     0
