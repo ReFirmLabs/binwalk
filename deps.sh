@@ -39,12 +39,12 @@ then
     APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract util-linux firmware-mod-kit cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop cpio"
 elif [ $distro_version = "17" ]
 then
-    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
+    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop cpio libtool libtool-bin"
 elif [ $distro_version = "18" ]
 then
-    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
+    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop cpio libtool libtool-bin"
 else
-    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
+    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop cpio libtool libtool-bin"
 fi
 PYTHON2_APT_CANDIDATES="python-crypto python-lzo python-lzma python-pip python-tk"
 PYTHON3_APT_CANDIDATES="python3-crypto python3-pip python3-tk"
@@ -124,6 +124,19 @@ function install_ubireader
     # Reset to a known working commit.
     (cd ubi_reader && git reset --hard 0955e6b95f07d849a182125919a1f2b6790d5b51 && $SUDO python setup.py install)
     $SUDO rm -rf ubi_reader
+}
+
+function install_srecord()
+{
+    wget https://sourceforge.net/projects/srecord/files/srecord/1.64/srecord-1.64.tar.gz
+    tar xf srecord-1.64.tar.gz
+    (cd srecord-1.64 \
+    && ./configure --without-gcrypt \
+    && make \
+    && $SUDO make install \
+    && ldconfig \
+    && rm -rf $PWD \
+    && cd -)
 }
 
 function install_pip_package
@@ -261,6 +274,7 @@ install_yaffshiv
 install_jefferson
 install_unstuff
 install_ubireader
+install_srecord
 
 if [ $distro_version = "18" ]
 then
