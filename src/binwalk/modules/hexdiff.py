@@ -39,6 +39,10 @@ class HexDiff(Module):
                long='blue',
                kwargs={'show_blue': True},
                description='Only show lines containing bytes that are different among some files'),
+        Option(short='u',
+               long='similar',
+               kwargs={'show_same': True},
+               description='Only display lines that are the same between all files'),
         Option(short='w',
                long='terse',
                kwargs={'terse': True},
@@ -50,6 +54,7 @@ class HexDiff(Module):
         Kwarg(name='show_blue', default=False),
         Kwarg(name='show_green', default=False),
         Kwarg(name='terse', default=False),
+        Kwarg(name='show_same', default=False),
         Kwarg(name='enabled', default=False),
     ]
 
@@ -170,7 +175,7 @@ class HexDiff(Module):
 
             offset = fp.offset + (self.block * loop_count)
 
-            if current_raw_line == last_raw_line:
+            if current_raw_line == last_raw_line and self.show_same == True:
                 display = line = self.SAME_DIFFERENCE
             elif not self._color_filter(line):
                 display = line = self.SKIPPED_LINE
