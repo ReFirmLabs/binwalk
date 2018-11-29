@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-import os
+import os, sys, subprocess
 from setuptools import setup
 from setuptools.config import read_configuration
 
-import os, sys, subprocess
 import glob
 import shutil
 from distutils.core import Command
@@ -31,15 +30,23 @@ except ImportError:
 
 # If this version of binwalk was checked out from the git repository,
 # include the git commit hash as part of the version number reported
-# by binwalk. However, this version do not confirm to PEM-0440, and
+# by binwalk. However, this version do not confirm to PEP-0440, and
 # will cause warnings and be marked as outdated by pip.
-try:
-    label = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=DEVNULL).decode('utf-8')
-    MODULE_VERSION = "%s-%s" % (MODULE_VERSION, label.strip())
-except KeyboardInterrupt as e:
-    raise e
-except Exception:
-    pass
+
+# we want:  Developmental release of a post-release :  X.Y.postN.devM
+n = MODULE_VERSION.split('.')
+if len(n) > 2:
+    n[2] = 'post' + n[2] + '.dev1'
+    MODULE_VERSION = '.'.join(n)
+else:
+
+    try:
+        label = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=DEVNULL).decode('utf-8')
+        MODULE_VERSION = "%s-%s" % (MODULE_VERSION, label.strip())
+    except KeyboardInterrupt as e:
+        raise e
+    except Exception:
+        pass
 
 # Python2/3 compliance
 try:
