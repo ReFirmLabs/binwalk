@@ -3,12 +3,10 @@ import os
 from setuptools import setup
 from setuptools.config import read_configuration
 
-import os
-import sys
+import os, sys, subprocess
 import glob
 import shutil
-import subprocess
-from distutils.core import setup, Command
+from distutils.core import Command
 from distutils.dir_util import remove_tree
 
 MODULE_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
