@@ -6,7 +6,19 @@ Binwalk supports Python 2.7 - 3.x. Although most systems have Python2.7 set as t
 Installation
 ============
 
-Installation follows the typical Python installation procedure:
+Installation follows the typical Python installation procedure. However, for source installations 
+when cloning from github, you should alway try to use `pip` to make the install, because pip keeps 
+track of all files installed, unlike using *setup.py install*, alone. (`pip` is also using your *setup.py*.)
+
+So the right way for source installation is:
+
+```bash
+# git clone ...
+# cd binwalk
+sudo pip install .
+```
+
+The older direct distutils way is:
 
 ```bash
 # Python2.7
@@ -18,7 +30,8 @@ $ sudo python setup.py install
 $ sudo python3 setup.py install
 ```
 
-**NOTE**: Older versions of binwalk (e.g., v1.0) are not compatible with the latest version of binwalk. It is strongly recommended that you uninstall any existing binwalk installations before installing the latest version in order to avoid API conflicts.
+
+**NOTE**: Older versions of binwalk (e.g., `v1.0`) are not compatible with the latest version of binwalk. It is strongly recommended that you uninstall any existing binwalk installations before installing the latest version in order to avoid API conflicts.
 
 Dependencies
 ============
@@ -144,15 +157,21 @@ Uninstalling Binwalk
 
 If binwalk has been installed to a standard system location (e.g., via `setup.py install`), it can be removed by running:
 
-```bash
-# Python2.7
-$ sudo python setup.py uninstall
-```
+The OLD distutils way:
 
 ```bash
-# Python3
+# For Python2.7
+$ sudo python setup.py uninstall
+
+# For Python3
 $ sudo python3 setup.py uninstall
 ```
 
-Note that this does _not_ remove any of the manually installed dependencies.
+The right way:
 
+```bash
+pip uninstall binwalk
+```
+<sub>**NOTE**: If you have both Python2 and 3 installed, usually `pip` is symlinked to `pip2` or `pip3`.</sub>
+
+Note that this does _not_ remove any of the manually installed dependencies.
