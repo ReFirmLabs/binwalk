@@ -7,27 +7,27 @@ import binwalk.core.plugin
 
 class PFSCommon(object):
 
-    def _make_short(self, data, endianess):
+    def _make_short(self, data, endianness):
         """Returns a 2 byte integer."""
         data = binwalk.core.compat.str2bytes(data)
-        return struct.unpack('%sH' % endianess, data)[0]
+        return struct.unpack('%sH' % endianness, data)[0]
 
-    def _make_int(self, data, endianess):
+    def _make_int(self, data, endianness):
         """Returns a 4 byte integer."""
         data = binwalk.core.compat.str2bytes(data)
-        return struct.unpack('%sI' % endianess, data)[0]
+        return struct.unpack('%sI' % endianness, data)[0]
 
 class PFS(PFSCommon):
     """Class for accessing PFS meta-data."""
     HEADER_SIZE = 16
 
-    def __init__(self, fname, endianess='<'):
-        self.endianess = endianess
+    def __init__(self, fname, endianness='<'):
+        self.endianness = endianness
         self.meta = binwalk.core.common.BlockFile(fname, 'rb')
         header = self.meta.read(self.HEADER_SIZE)
         self.file_list_start = self.meta.tell()
 
-        self.num_files = self._make_short(header[-2:], endianess)
+        self.num_files = self._make_short(header[-2:], endianness)
         self.node_size = self._get_fname_len() + 12
 
     def _get_fname_len(self, bufflen=128):
@@ -42,7 +42,7 @@ class PFS(PFSCommon):
     def _get_node(self):
         """Reads a chunk of meta data from file and returns a PFSNode."""
         data = self.meta.read(self.node_size)
-        return PFSNode(data, self.endianess)
+        return PFSNode(data, self.endianness)
 
     def get_end_of_meta_data(self):
         """Returns integer indicating the end of the file system meta data."""
@@ -63,12 +63,12 @@ class PFS(PFSCommon):
 class PFSNode(PFSCommon):
     """A node in the PFS Filesystem containing meta-data about a single file."""
 
-    def __init__(self, data, endianess):
+    def __init__(self, data, endianness):
         self.fname, data = data[:-12], data[-12:]
         self._decode_fname()
-        self.inode_no = self._make_int(data[:4], endianess)
-        self.foffset = self._make_int(data[4:8], endianess)
-        self.fsize = self._make_int(data[8:], endianess)
+        self.inode_no = self._make_int(data[:4], endianness)
+        self.foffset = self._make_int(data[4:8], endianness)
+        self.fsize = self._make_int(data[8:], endianness)
 
     def _decode_fname(self):
         """Extracts the actual string from the available bytes."""
