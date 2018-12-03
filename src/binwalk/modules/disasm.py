@@ -51,42 +51,42 @@ class Disasm(Module):
     ARCHITECTURES = [
         Architecture(type=capstone.CS_ARCH_ARM,
                      mode=capstone.CS_MODE_ARM,
-                     endianess=capstone.CS_MODE_BIG_ENDIAN,
+                     endianness=capstone.CS_MODE_BIG_ENDIAN,
                      description="ARM executable code, 32-bit, big endian"),
         Architecture(type=capstone.CS_ARCH_ARM,
                      mode=capstone.CS_MODE_ARM,
-                     endianess=capstone.CS_MODE_LITTLE_ENDIAN,
+                     endianness=capstone.CS_MODE_LITTLE_ENDIAN,
                      description="ARM executable code, 32-bit, little endian"),
         Architecture(type=capstone.CS_ARCH_ARM64,
                      mode=capstone.CS_MODE_ARM,
-                     endianess=capstone.CS_MODE_BIG_ENDIAN,
+                     endianness=capstone.CS_MODE_BIG_ENDIAN,
                      description="ARM executable code, 64-bit, big endian"),
         Architecture(type=capstone.CS_ARCH_ARM64,
                      mode=capstone.CS_MODE_ARM,
-                     endianess=capstone.CS_MODE_LITTLE_ENDIAN,
+                     endianness=capstone.CS_MODE_LITTLE_ENDIAN,
                      description="ARM executable code, 64-bit, little endian"),
 
         Architecture(type=capstone.CS_ARCH_PPC,
                      mode=capstone.CS_MODE_BIG_ENDIAN,
-                     endianess=capstone.CS_MODE_BIG_ENDIAN,
+                     endianness=capstone.CS_MODE_BIG_ENDIAN,
                      description="PPC executable code, 32/64-bit, big endian"),
 
         Architecture(type=capstone.CS_ARCH_MIPS,
                      mode=capstone.CS_MODE_64,
-                     endianess=capstone.CS_MODE_BIG_ENDIAN,
+                     endianness=capstone.CS_MODE_BIG_ENDIAN,
                      description="MIPS executable code, 32/64-bit, big endian"),
         Architecture(type=capstone.CS_ARCH_MIPS,
                      mode=capstone.CS_MODE_64,
-                     endianess=capstone.CS_MODE_LITTLE_ENDIAN,
+                     endianness=capstone.CS_MODE_LITTLE_ENDIAN,
                      description="MIPS executable code, 32/64-bit, little endian"),
 
         Architecture(type=capstone.CS_ARCH_ARM,
                      mode=capstone.CS_MODE_THUMB,
-                     endianess=capstone.CS_MODE_LITTLE_ENDIAN,
+                     endianness=capstone.CS_MODE_LITTLE_ENDIAN,
                      description="ARM executable code, 16-bit (Thumb), little endian"),
         Architecture(type=capstone.CS_ARCH_ARM,
                      mode=capstone.CS_MODE_THUMB,
-                     endianess=capstone.CS_MODE_BIG_ENDIAN,
+                     endianness=capstone.CS_MODE_BIG_ENDIAN,
                      description="ARM executable code, 16-bit (Thumb), big endian"),
     ]
 
@@ -99,7 +99,7 @@ class Disasm(Module):
         self.disasm_data_size = self.min_insn_count * 10
 
         for arch in self.ARCHITECTURES:
-            self.disassemblers.append((capstone.Cs(arch.type, (arch.mode + arch.endianess)), arch.description))
+            self.disassemblers.append((capstone.Cs(arch.type, (arch.mode + arch.endianness)), arch.description))
 
     def scan_file(self, fp):
         total_read = 0

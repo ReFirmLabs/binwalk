@@ -131,13 +131,13 @@ class SignatureLine(object):
         # little endian.
         if self.type.startswith('be'):
             self.type = self.type[2:]
-            self.endianess = '>'
+            self.endianness = '>'
         elif self.type.startswith('le'):
-            self.endianess = '<'
+            self.endianness = '<'
             self.type = self.type[2:]
-        # Assume big endian if no endianess was explicitly specified
+        # Assume big endian if no endianness was explicitly specified
         else:
-            self.endianess = '>'
+            self.endianness = '>'
 
         # Check the comparison value for the type of comparison to be performed (e.g.,
         # '=0x1234', '>0x1234', etc). If no operator is specified, '=' is implied.
@@ -237,9 +237,9 @@ class SignatureLine(object):
             self.fmt = self.fmt.upper()
 
         # If a struct format was identified, create a format string to be passed to struct.unpack
-        # which specifies the endianess and data type format.
+        # which specifies the endianness and data type format.
         if self.fmt:
-            self.pkfmt = '%c%c' % (self.endianess, self.fmt)
+            self.pkfmt = '%c%c' % (self.endianness, self.fmt)
         else:
             self.pkfmt = None
 
@@ -312,7 +312,7 @@ class Signature(object):
 
         # Strings and single byte signatures are taken at face value;
         # multi-byte integer values are turned into regex strings based
-        # on their data type size and endianess.
+        # on their data type size and endianness.
         if line.type == 'regex':
             # Regex types are already compiled expressions.
             # Note that since re.finditer is used, unless the specified
@@ -323,23 +323,23 @@ class Signature(object):
         elif line.size == 1:
             restr = chr(line.value)
         elif line.size == 2:
-            if line.endianess == '<':
+            if line.endianness == '<':
                 restr = chr(line.value & 0xFF) + chr(line.value >> 8)
-            elif line.endianess == '>':
+            elif line.endianness == '>':
                 restr = chr(line.value >> 8) + chr(line.value & 0xFF)
         elif line.size == 4:
-            if line.endianess == '<':
+            if line.endianness == '<':
                 restr = (chr(line.value & 0xFF) +
                          chr((line.value >> 8) & 0xFF) +
                          chr((line.value >> 16) & 0xFF) +
                          chr(line.value >> 24))
-            elif line.endianess == '>':
+            elif line.endianness == '>':
                 restr = (chr(line.value >> 24) +
                          chr((line.value >> 16) & 0xFF) +
                          chr((line.value >> 8) & 0xFF) +
                          chr(line.value & 0xFF))
         elif line.size == 8:
-            if line.endianess == '<':
+            if line.endianness == '<':
                 restr = (chr(line.value & 0xFF) +
                          chr((line.value >> 8) & 0xFF) +
                          chr((line.value >> 16) & 0xFF) +
@@ -348,7 +348,7 @@ class Signature(object):
                          chr((line.value >> 40) & 0xFF) +
                          chr((line.value >> 48) & 0xFF) +
                          chr(line.value >> 56))
-            elif line.endianess == '>':
+            elif line.endianness == '>':
                 restr = (chr(line.value >> 56) +
                          chr((line.value >> 48) & 0xFF) +
                          chr((line.value >> 40) & 0xFF) +

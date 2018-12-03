@@ -558,7 +558,7 @@
 0x10    string          ROMFS\x20v      D-Link ROMFS filesystem,
 >0x17   string          x               version %s,
 >0      string          !\x2EmoR
->>0     string          !Rom\x2E        {invalid} unknown endianess
+>>0     string          !Rom\x2E        {invalid} unknown endianness
 >0      string          \x2EmoR         little endian,
 >>8     lelong          x               size: <= %d
 >>8     lelong-0x20     x               {jump:%d}
