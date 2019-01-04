@@ -585,14 +585,14 @@
 >36     lelong    x                                 %d files
 
 # ISO 9660 Boot Record - http://wiki.osdev.org/ISO_9660
-32768    string      \x00CD001\x01                   ISO 9660 Boot Record,
+32768    string      \x00CD001\x01                   ISO 9660 Boot Record,{end}
 >7       byte        !0
 >>7      string      x                               Boot System Identifier: "%.32s",
 >39      byte        !0
 >>39     string      x                               Boot Identifier: "%.32s"
 
 # ISO 9660 Primary Volume - http://wiki.osdev.org/ISO_9660
-32768    string      \x01CD001\x01\x00               ISO 9660 Primary Volume,
+32768    string      \x01CD001\x01\x00               ISO 9660 Primary Volume,{end}
 >8       byte        !0
 >>8      string      x                               System Identifier: "%.32s",
 >40      byte        !0
@@ -609,7 +609,7 @@
 >11     byte              !0                %d files,
 >4      ubedate            !0                Last modified %s GMT
 
-32769   string        CD001                                         ISO
+32769   string        CD001                                         ISO{end}
 >6144   string        !NSR0                                         9660 CD-ROM filesystem data,
 >6144   string        NSR0                                          UDF filesystem data,
 >32770  byte          !1                                            {invalid}
