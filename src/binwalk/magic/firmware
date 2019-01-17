@@ -870,3 +870,29 @@
 >0x24      ulelong     0
 >0x28      ulelong     0
 >0x2c      ulelong     0
+
+# Flattened device tree
+# Device Tree specification v0.2
+# https://github.com/devicetree-org/devicetree-specification/releases/download/v0.2/devicetree-specification-v0.2.pdf
+# Device tree magic
+0           ubelong   0xd00dfeed  Flattened device tree,
+# Device tree size, may not be less than header size (40)
+>4          ubelong   <40         {invalid}
+>4          ubelong   x               size: %d bytes,
+# Offset of structure block, may not be less than header size (40), must be aligned to 4 byte boundary
+>8          ubelong   <40         {invalid}
+>8          ubelong&3 !0          {invalid}
+>8          ubelong   !0
+# First node of structure block, must be either FDT_BEGIN_NODE (1), FDT_NOP (4) or FDT_END (9)
+>>(8.L)     ubelong   !1
+>>>(8.L)    ubelong   !4
+>>>>(8.L)   ubelong   !9          {invalid}
+>>>>(8.L)   ubelong   9               empty device tree,
+# Offset of strings block, may not be less than header size (40)
+>12         ubelong   <40         {invalid}
+# Version
+>20         ubelong   x               version: %d
+# Size of strings block, must be greater than 0
+>32         ubelong   0           {invalid}
+# Size of structure block, must be greater than 0
+>36         ubelong   0           {invalid}
