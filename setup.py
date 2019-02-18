@@ -329,7 +329,7 @@ for data_dir in ["magic", "config", "plugins", "modules", "core"]:
 # If doing a build or installation, then create a version.py file
 # which defines the current binwalk version. This file is excluded
 # from git in the .gitignore file.
-if 'install' in ' '.join(sys.argv) or 'build' in ' '.join(sys.argv):
+if 'install' in ' '.join(sys.argv) or 'build' in ' '.join(sys.argv) or 'sdist' in ' '.join(sys.argv):
     sys.stdout.write("creating %s\n" % (VERSION_FILE))
 
     try:
