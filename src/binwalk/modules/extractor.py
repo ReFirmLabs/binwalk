@@ -573,12 +573,12 @@ class Extractor(Module):
 
         # No extraction rules for this file
         if not rules:
+            binwalk.core.common.debug("No extraction rules found for '%s'" % description)
             return (None, None, False, str(None))
         else:
             binwalk.core.common.debug("Found %d matching extraction rules" % len(rules))
 
-        # Generate the output directory name where extracted files will be
-        # stored
+        # Generate the output directory name where extracted files will be stored
         output_directory = self.build_output_directory(file_name)
 
         # Extract to end of file if no size was specified
@@ -586,7 +586,9 @@ class Extractor(Module):
             size = file_size(file_path) - offset
 
         if os.path.isfile(file_path):
+            binwalk.core.common.debug("Changing directory to: %s" % output_directory)
             os.chdir(output_directory)
+
             # Extract into subdirectories named by the offset
             if self.extract_into_subdirs:
                 # Remove trailing L that is added by hex()
@@ -598,12 +600,16 @@ class Extractor(Module):
             for i in range(0, len(rules)):
                 rule = rules[i]
 
+                binwalk.core.common.debug("Processing extraction rule #%d (%s)" % (i, str(rule['cmd'])))
+
                 # Make sure we don't recurse into any extracted directories if
                 # instructed not to
                 if rule['recurse'] in [True, False]:
                     recurse = rule['recurse']
                 else:
                     recurse = True
+
+                binwalk.core.common.debug("Extracting %s[%d:] to %s" % (file_path, offset, name))
 
                 # Copy out the data to disk, if we haven't already
                 fname = self._dd(file_path, offset, size, rule['extension'], output_file_name=name)
@@ -619,12 +625,17 @@ class Extractor(Module):
                     if self.remove_after_execute:
                         fname_md5 = file_md5(fname)
 
+                    binwalk.core.common.debug("Executing extraction command %s" % (str(rule['cmd'])))
+
                     # Execute the specified command against the extracted file
                     if self.run_extractors:
                         (extract_ok, command_line) = self.execute(rule['cmd'], fname, rule['codes'])
                     else:
                         extract_ok = True
                         command_line = ''
+
+                    binwalk.core.common.debug("Ran extraction command: %s" % command_line)
+                    binwalk.core.common.debug("Extraction successful: %s" % extract_ok)
 
                     # Only clean up files if remove_after_execute was specified.
                     # Only clean up files if the file was extracted sucessfully, or if we've run
@@ -659,6 +670,7 @@ class Extractor(Module):
                 else:
                     break
 
+            binwalk.core.common.debug("Changing directory back to: %s" % original_dir)
             os.chdir(original_dir)
 
         return (output_directory, fname, recurse, command_line)
@@ -759,14 +771,17 @@ class Extractor(Module):
         # Default extracted file name is <displayed hex offset>.<extension>
         default_bname = "%X" % (offset + self.config.base)
 
+        # Make sure the output file name is a string
+        if output_file_name is not None:
+            output_file_name = str(output_file_name)
+
         if self.max_size and size > self.max_size:
             size = self.max_size
 
         if not output_file_name or output_file_name is None:
             bname = default_bname
         else:
-            # Strip the output file name of invalid/dangerous characters (like
-            # file paths)
+            # Strip the output file name of invalid/dangerous characters (like file paths)
             bname = os.path.basename(output_file_name)
 
         fname = unique_file_name(bname, extension)
