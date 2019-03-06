@@ -71,7 +71,7 @@ class HilinkDecryptor(binwalk.core.plugin.Plugin):
                 if result.description.lower().startswith(self.SIGNATURE_DESCRIPTION) is True:
                     # Read in the first 64 bytes of the suspected encrypted
                     # uImage header
-                    fd = self.module.config.open_file(result.file.name, offset=result.offset)
+                    fd = self.module.config.open_file(result.file.path, offset=result.offset)
                     encrypted_header_data = binwalk.core.compat.str2bytes(fd.read(64))
                     fd.close()
 

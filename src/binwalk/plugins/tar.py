@@ -42,7 +42,7 @@ class TarPlugin(binwalk.core.plugin.Plugin):
         if result.description.lower().startswith('posix tar archive'):
             is_tar = True
             file_offset = result.offset
-            fd = self.module.config.open_file(result.file.name, offset=result.offset)
+            fd = self.module.config.open_file(result.file.path, offset=result.offset)
 
             while is_tar:
                 # read in the tar header struct

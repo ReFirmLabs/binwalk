@@ -116,10 +116,10 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
                 result.jump = self.CPIO_HEADER_SIZE + file_size + file_name_length
                 self.consecutive_hits += 1
 
-                if not self.found_archive or self.found_archive_in_file != result.file.name:
+                if not self.found_archive or self.found_archive_in_file != result.file.path:
                     # This is the first entry. Set found_archive and allow the
                     # scan to continue normally.
-                    self.found_archive_in_file = result.file.name
+                    self.found_archive_in_file = result.file.path
                     self.found_archive = True
                     result.extract = True
                 elif 'TRAILER!!!' in result.description:

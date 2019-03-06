@@ -17,7 +17,7 @@ class GzipValidPlugin(binwalk.core.plugin.Plugin):
         # If this result is a gzip signature match, try to decompress the data
         if result.file and result.description.lower().startswith('gzip'):
             # Seek to and read the suspected gzip data
-            fd = self.module.config.open_file(result.file.name, offset=result.offset, length=self.MAX_DATA_SIZE)
+            fd = self.module.config.open_file(result.file.path, offset=result.offset, length=self.MAX_DATA_SIZE)
             data = fd.read(self.MAX_DATA_SIZE)
             fd.close()
 

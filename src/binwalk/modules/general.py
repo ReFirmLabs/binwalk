@@ -219,4 +219,4 @@ class General(Module):
                 except KeyboardInterrupt as e:
                     raise e
                 except Exception as e:
-                    self.error(description="Cannot open file : %s" % str(e))
+                    self.error(description="Cannot open file %s (CWD: %s) : %s" % (tfile, os.getcwd(), str(e)))

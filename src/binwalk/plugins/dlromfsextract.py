@@ -1,4 +1,5 @@
 import os
+import zlib
 import struct
 import binwalk.core.plugin
 import binwalk.core.common
@@ -132,7 +133,12 @@ class RomFS(object):
         except KeyboardInterrupt as e:
             raise e
         except Exception as e:
-            pass
+            try:
+                data = zlib.decompress(data)
+            except KeyboardInterrupt as e:
+                raise e
+            except Exception as e:
+                pass
 
         return data
 

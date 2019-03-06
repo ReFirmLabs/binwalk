@@ -258,7 +258,7 @@ class StringFile(object):
     '''
 
     def __init__(self, fname, mode='r'):
-        self.string = fname
+        self.string = fname #bytes2str(fname)
         self.name = "String"
         self.args.size = len(self.string)
 

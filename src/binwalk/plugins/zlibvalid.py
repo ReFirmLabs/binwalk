@@ -27,7 +27,7 @@ class ZlibValidPlugin(binwalk.core.plugin.Plugin):
             offset = result.offset - adjust
 
             # Seek to and read the suspected zlib data
-            fd = self.module.config.open_file(result.file.name)
+            fd = self.module.config.open_file(result.file.path)
             fd.seek(offset)
             data = fd.read(self.MAX_DATA_SIZE)[adjust:]
             fd.close()

@@ -561,10 +561,10 @@
 >>0     string          !Rom\x2E        {invalid} unknown endianness
 >0      string          \x2EmoR         little endian,
 >>8     lelong          x               size: <= %d
->>8     lelong-0x20     x               {jump:%d}
+#>>8     lelong-0x20     x               {jump:%d}
 >0      string          Rom\x2E         big endian,
 >>8     belong          x               size: <= %d
->>8     belong-0x20     x               {jump:%d}
+#>>8     belong-0x20     x               {jump:%d}
 
 # Wind River MemFS file system, found in some VxWorks devices
 0       string    owowowowowowowowowowowowowowow    Wind River management filesystem,{overlap}

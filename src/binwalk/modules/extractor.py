@@ -254,6 +254,7 @@ class Extractor(Module):
                     # Report the file_path, not the real_file_path, otherwise symlinks will be resolved and
                     # the same file can end up being listed multiple times if there are symlinks to it.
                     if real_file_path != dd_file_path:
+                        binwalk.core.common.debug("Adding %s (%s) (%s) to file list" % (file_path, f, real_file_path))
                         self.output[r.file.path].extracted[r.offset].files.append(file_path)
 
                     # If recursion was specified, and the file is not the same

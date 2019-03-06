@@ -27,7 +27,7 @@ class UBIValidPlugin(binwalk.core.plugin.Plugin):
         return header_crc == calculated_header_crc
 
     def _process_result(self, result):
-        if self.current_file == result.file.name:
+        if self.current_file == result.file.path:
             result.display = False
         else:
             # Reset everything in case new file is encountered
@@ -38,7 +38,7 @@ class UBIValidPlugin(binwalk.core.plugin.Plugin):
             # Display result and trigger extraction
             result.display = True
 
-        self.current_file = result.file.name
+        self.current_file = result.file.path
 
         if not self.peb_size and self.last_ec_hdr_offset:
             # Calculate PEB size by subtracting last EC block offset
@@ -56,7 +56,7 @@ class UBIValidPlugin(binwalk.core.plugin.Plugin):
     def scan(self, result):
         if result.file and result.description.lower().startswith('ubi erase count header'):
             # Seek to and read the suspected UBI erase count header
-            fd = self.module.config.open_file(result.file.name, offset=result.offset)
+            fd = self.module.config.open_file(result.file.path, offset=result.offset)
 
             ec_header = binwalk.core.compat.str2bytes(fd.read(1024))
             fd.close()
