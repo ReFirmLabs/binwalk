@@ -758,10 +758,6 @@
 >20   ulelong    x             \b, ramdisk addr: 0x%X
 >48   string     x             \b, product name: "%s"
 
-# DTB
-# http://elinux.org/images/c/cf/Power_ePAPR_APPROVED_v1.1.pdf
-0     string     \xd0\x0d\xfe\xed    device tree image (dtb)
-
 # QCDT
 # https://source.codeaurora.org/quic/la/device/qcom/common/tree/dtbtool?h=LA.BF64.1.2.2_rb4.42
 0     string     QCDT          Qualcomm device tree container
