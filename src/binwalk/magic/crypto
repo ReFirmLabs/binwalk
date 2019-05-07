@@ -36,6 +36,14 @@
 >2      beshort         x               header length: 4, sequence length: %d
 >2      beshort+4       x               {size:%d}
 
+# Type: PKCS#7 signature DER format
+0       string          \x30\x82        Object signature in DER format (PKCS#7),
+# OBJECT IDENTIFIER 1.2.840.113549.1.7.2 signedData (PKCS #7)
+>4      string          !\x06\x09\x2a\x86\x48\x86\xF7\x0D\x01\x07\x02  {invalid}
+>2      beshort         <0              {invalid}
+>2      beshort         x               header length: 4, sequence length: %d
+>2      beshort+4       x               {size:%d}
+
 # GnuPG
 # The format is very similar to pgp
 0       string          \001gpg                 GPG key trust database
