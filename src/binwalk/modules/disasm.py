@@ -49,6 +49,14 @@ class Disasm(Module):
     ]
 
     ARCHITECTURES = [
+        Architecture(type=capstone.CS_ARCH_X86,
+                     mode=capstone.CS_MODE_32,
+                     endianness=capstone.CS_MODE_LITTLE_ENDIAN,
+                     description="x86 executable code, 32-bit, little endian"),
+        Architecture(type=capstone.CS_ARCH_X86,
+                     mode=capstone.CS_MODE_64,
+                     endianness=capstone.CS_MODE_LITTLE_ENDIAN,
+                     description="x86 executable code, 64-bit, little endian"),
         Architecture(type=capstone.CS_ARCH_ARM,
                      mode=capstone.CS_MODE_ARM,
                      endianness=capstone.CS_MODE_BIG_ENDIAN,
