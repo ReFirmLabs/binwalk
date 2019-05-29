@@ -467,6 +467,20 @@
 -4   string      \x00\x00\x00\x00ENDS   Signed Ubiquiti end header, RSA 2048 bit, header size: 264 bytes
 >260 ubelong     !0                     {invalid}
 
+# Ubiquiti additional data
+-4           string   \x00\x00\x00\x00EXEC  Ubiquiti firmware additional data,
+# Non-empty string (16 bytes max)
+>4           byte     0                     {invalid}
+>4           string   x                         name: %s,
+# Size of attached data
+>48          ubelong  x                         size: %d bytes,
+# Size, again
+>52          ubelong  x                         size2: %d bytes,
+# CRC32 of header + data
+>>(48.L+56)  ubelong  x                         CRC32: %x
+# Padding
+>>(48.L+60)  ubelong  !0                    {invalid}
+
 # Found in DIR-100 firmware
 0       string      AIH0        AIH0 firmware header, header size: 48,
 >12     ubelong     0           {invalid}
