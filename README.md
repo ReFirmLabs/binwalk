@@ -7,10 +7,6 @@
 
 Binwalk is a fast, easy to use tool for analyzing, reverse engineering, and extracting firmware images.
 
-# Binwalk Professional Edition
-
-After years of developing and supporting binwalk as an open source project we have finally sold out to the man and released a cloud-based firmware extraction engine called *Binwalk Pro*. After all someone needs to pay devttys0 so he can buy more milling equipment and feed his children (in that order). Please consider subscribing and reap the benefits of getting actual customer support for all your firmware extraction needs. Please visit https://www.refirmlabs.com/binwalk-pro/ for more information. 
-
 ### Installation and Usage
 
 * [Installation](./INSTALL.md)
@@ -22,36 +18,6 @@ After years of developing and supporting binwalk as an open source project we ha
 
 More information on [Wiki](https://github.com/ReFirmLabs/binwalk/wiki)
 
-## Quick start
+# Binwalk Professional Edition
 
-### Installation
-Binwalk follows the standard Python installation procedure:
-
-```bash
-$ sudo python setup.py install
-```
-
-If you're running Python 2.x, installing the optional Python lzma module is strongly recommended (but not required):
-
-```bash
-$ sudo apt-get install python-lzma
-```
-
-For instructions on installing other optional dependencies, see [installation guide](https://github.com/ReFirmLabs/binwalk/blob/master/INSTALL.md).
-
-
-### Usage
-
-Basic usage is simple:
-
-```bash
-$ binwalk firmware.bin
-
-DECIMAL       HEXADECIMAL     DESCRIPTION
---------------------------------------------------------------------------------
-0             0x0             TRX firmware header, little endian, header size: 28 bytes, image size: 14766080 bytes, CRC32: 0x6980E553 flags: 0x0, version: 1
-28            0x1C            LZMA compressed data, properties: 0x5D, dictionary size: 65536 bytes, uncompressed size: 5494368 bytes
-2319004       0x23629C        Squashfs filesystem, little endian, version 4.0, compression: xz, size: 12442471 bytes, 3158 inodes, blocksize: 131072 bytes, blocksize: 131072 bytes, created: 2014-05-21 22:38:47
-```
-
-For additional examples and descriptions of advanced options, see the [wiki](https://github.com/ReFirmLabs/binwalk/wiki).
+After years of developing and supporting binwalk as an open source project we have finally sold out to the man and released a cloud-based firmware extraction engine called *Binwalk Pro*. After all someone needs to pay devttys0 so he can buy more milling equipment and feed his children (in that order). Please consider subscribing and reap the benefits of getting actual customer support for all your firmware extraction needs. Please visit https://www.refirmlabs.com/binwalk-pro/ for more information. 
