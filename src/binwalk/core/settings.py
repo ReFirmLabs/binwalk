@@ -132,6 +132,8 @@ class Settings(object):
                 user_dir = os.getenv(envname)
                 if user_dir is not None:
                     return user_dir
+            if os.path.expanduser("~") is Not None:
+                return os.path.expanduser("~")
         except KeyboardInterrupt as e:
             raise e
         except Exception:
