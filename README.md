@@ -7,6 +7,9 @@
 
 Binwalk is a fast, easy to use tool for analyzing, reverse engineering, and extracting firmware images.
 
+# Binwalk Professional Edition
+
+After years of developing and supporting binwalk as an open source project we have finally sold out to the man and released a cloud-based firmware extraction engine called *Binwalk Pro*. After all someone needs to pay devttys0 so he can buy more milling equipment and feed his children (in that order). Please consider subscribing and reap the benefits of getting actual customer support for all your firmware extraction needs. Please visit https://www.refirmlabs.com/binwalk-pro/ for more information. 
 
 ### Installation and Usage
 
