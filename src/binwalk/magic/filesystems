@@ -511,6 +511,8 @@
 # volume label and UUID Russell Coker
 # http://etbe.coker.com.au/2008/07/08/label-vs-uuid-vs-device/
 0x438       uleshort        0xEF53          Linux EXT filesystem,
+>0x404      ulelong         x               blocks count: %d,
+>0x404      lelong*1024     x               image size: %d,{jump:%d}
 >0x43A      leshort         >4              {invalid}invalid state
 >0x43A      leshort         3               {invalid}invalid state
 >0x43A      leshort         <0              {invalid}invalid state
