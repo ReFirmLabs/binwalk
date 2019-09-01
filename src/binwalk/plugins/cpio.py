@@ -64,6 +64,11 @@ class CPIOPlugin(binwalk.core.plugin.Plugin):
         # Be sure to re-set this at the beginning of every scan
         self.found_archive = False
         self.found_archive_in_file = None
+        self.consecutive_hits = 0
+
+    def new_file(self, f):
+        # Make sure internal settings don't persist across different files
+        self.pre_scan()
 
     def _get_file_name(self, description):
         name = ''
