@@ -137,3 +137,103 @@
 >72     string          sha256                  %s
 >72     string          sha512                  %s
 >72     string          ripemd160               %s
+
+# magic signatures to detect PGP crypto material (from stef)
+# detects and extracts metadata from:
+#  - symmetric encrypted packet header
+#  - RSA (e=65537) secret (sub-)keys
+
+# 1024b RSA encrypted data
+
+0       string  \x84\x8c\x03        PGP RSA encrypted session key -
+>3      ubelong x                   keyid: %X
+>7      ubelong x                   %X
+>11     byte    <0x01               {invalid}
+>11     byte    >0x02               {invalid}
+>11     byte    0x01                RSA (Encrypt or Sign) 1024b
+>11     byte    0x02                RSA Encrypt-Only 1024b
+>12     string  \x04\x00
+>12     string  \x03\xff
+>12     string  \x03\xfe
+>12     string  \x03\xfd
+>12     string  \x03\xfc
+>12     string  \x03\xfb
+>12     string  \x03\xfa
+>12     string  \x03\xf9
+>142    byte    0xd2
+
+# 2048b RSA encrypted data
+
+0       string  \x85\x01\x0c\x03    PGP RSA encrypted session key -
+>4      ubelong x                   keyid: %X
+>8      ubelong x                   %X
+>12     byte    <0x01               {invalid}
+>12     byte    >0x02               {invalid}
+>12     byte    0x01                RSA (Encrypt or Sign) 2048b
+>12     byte    0x02                RSA Encrypt-Only 2048b
+>13     string  \x08\x00
+>13     string  \x07\xff
+>13     string  \x07\xfe
+>13     string  \x07\xfd
+>13     string  \x07\xfc
+>13     string  \x07\xfb
+>13     string  \x07\xfa
+>13     string  \x07\xf9
+>271    byte    0xd2
+
+# 3072b RSA encrypted data
+
+0       string  \x85\x01\x8c\x03    PGP RSA encrypted session key -
+>4      ubelong x                   keyid: %X
+>8      ubelong x                   %X
+>12     byte    <0x01               {invalid}
+>12     byte    >0x02               {invalid}
+>12     byte    0x01                RSA (Encrypt or Sign) 3072b
+>12     byte    0x02                RSA Encrypt-Only 3072b
+>13     string  \x0c\x00
+>13     string  \x0b\xff
+>13     string  \x0b\xfe
+>13     string  \x0b\xfd
+>13     string  \x0b\xfc
+>13     string  \x0b\xfb
+>13     string  \x0b\xfa
+>13     string  \x0b\xf9
+>399    byte    0xd2
+
+# 3072b RSA encrypted data
+
+0       string  \x85\x02\x0c\x03    PGP RSA encrypted session key -
+>4      ubelong x                   keyid: %X
+>8      ubelong x                   %X
+>12     byte    <0x01               {invalid}
+>12     byte    >0x02               {invalid}
+>12     byte    0x01                RSA (Encrypt or Sign) 4096b
+>12     byte    0x02                RSA Encrypt-Only 4096b
+>13     string  \x10\x00
+>13     string  \x0f\xff
+>13     string  \x0f\xfe
+>13     string  \x0f\xfd
+>13     string  \x0f\xfc
+>13     string  \x0f\xfb
+>13     string  \x0f\xfa
+>13     string  \x0f\xf9
+>527    byte    0xd2
+
+# 4096b RSA encrypted data
+
+0       string  \x85\x04\x0c\x03    PGP RSA encrypted session key -
+>4      ubelong x                   keyid: %X
+>8      ubelong x                   %X
+>12     byte    <0x01               {invalid}
+>12     byte    >0x02               {invalid}
+>12     byte    0x01                RSA (Encrypt or Sign) 8129b
+>12     byte    0x02                RSA Encrypt-Only 8129b
+>13     string  \x20\x00
+>13     string  \x1f\xff
+>13     string  \x1f\xfe
+>13     string  \x1f\xfd
+>13     string  \x1f\xfc
+>13     string  \x1f\xfb
+>13     string  \x1f\xfa
+>13     string  \x1f\xf9
+>1039   byte    0xd2
