@@ -133,3 +133,9 @@
 0   string  \xF6\x69\x0B\x00\xF6\x68            SuperH instructions, little endian, function epilogue (gcc)
 0   string  \x69\xF6\x00\x0B\x68\xF6            SuperH instructions, big endian, function epilogue (gcc)
 
+# AArch64
+# ret
+0 ulelong 0xd65f03c0 AArch64 instructions, function epilogue
+
+# nop
+0 ulelong 0xd503201f AArch64 instructions, nop
