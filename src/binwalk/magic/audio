@@ -1,0 +1,4 @@
+# WAV files
+# by Folkert van Heusden <mail@vanheusden.com>
+0       string  RIFF        WAV file
+>4      lelong  x           size - 8 bytes: %d
