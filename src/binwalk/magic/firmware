@@ -892,3 +892,7 @@
 >32         ubelong   0           {invalid}
 # Size of structure block, must be greater than 0
 >36         ubelong   0           {invalid}
+
+# Toshiba SSD Firmware Update
+# The version string seems to be at 0xe2f4, but I'm unsure if that offset is fixed
+0           string    ID\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00 Toshiba SSD Firmware Update
