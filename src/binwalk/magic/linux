@@ -11,9 +11,21 @@
 # Finds and prints Linux kernel strings in raw Linux kernels (output like uname -a).
 # Commonly found in decompressed embedded kernel binaries.
 0       string      Linux\x20version\x20    Linux kernel version
->14     byte        >0x33                   {invalid}
+>14     byte        >0x36                   {invalid}
 >14     byte        <0x32                   {invalid}
 >14     string      x                       %.6s
+
+# Find and print the Linux kernel symbol table compression
+# dictionary ("kallsyms_token_table").
+# This table contains 256 characters or string fragments:
+# for positions that correspond to an ASCII code points
+# contained in any symbol name, it is the character itself,
+# while other positions correspond to string fragments.
+# As such, ASCII characters [0-9] (that we are looking for)
+# are always present, but never followed by a ":" (the next
+# ASCII codepoint) because it is contained in no symbol name.
+0       string      \x000\x001\x002\x003\x004\x005\x006\x007\x008\x009      Linux kernel embedded symbol table compression dictionary (kallsyms_token_table)
+>21     byte        0x3a        {invalid}
 
 # Linux ARM compressed kernel image
 # Starts with 8 NOPs, with 0x016F2818 at offset 0x24

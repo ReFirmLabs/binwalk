@@ -258,9 +258,12 @@ class Extractor(Module):
                         self.output[r.file.path].extracted[r.offset].files.append(file_path)
 
                     # If recursion was specified, and the file is not the same
-                    # one we just dd'd
+                    # one we just dd'd.
+                    # Also avoid excessive recursion through the fils created by
+                    # the "vmlinuxtoelf.py" plugin
                     if (self.matryoshka and
                         file_path != dd_file_path and
+                        '_reconstructed' not in file_path and
                         scan_extracted_files and
                             self.directory in real_file_path):
                         # If the recursion level of this file is less than or

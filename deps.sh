@@ -71,6 +71,14 @@ function install_yaffshiv
     $SUDO rm -rf yaffshiv
 }
 
+function install_vmlinux_to_elf {
+    find_path python3 # This is Python 3-only, and will install a binary in /usr/local/bin
+    if [ $? -eq 0 ]
+    then
+        $SUDO pip3 install --upgrade git+https://github.com/marin-m/vmlinux-to-elf
+    fi
+}
+
 function install_sasquatch
 {
     git clone https://github.com/devttys0/sasquatch
@@ -254,6 +262,7 @@ if [ $? -ne 0 ]
 fi
 install_pip_package matplotlib
 install_pip_package capstone
+install_vmlinux_to_elf
 install_sasquatch
 install_yaffshiv
 install_jefferson
