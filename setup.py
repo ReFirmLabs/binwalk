@@ -2,7 +2,6 @@
 import io
 import os
 import sys
-import glob
 import shutil
 import subprocess
 try:
@@ -281,35 +280,8 @@ class TestCommand(Command):
         pass
 
     def run(self):
-        # Need the nose module for testing
-        import nose
+        os.system("py.test --cov=binwalk testing")
 
-        # cd into the testing directory. Otherwise, the src/binwalk
-        # directory gets imported by nose which a) clutters the src
-        # directory with a bunch of .pyc files and b) will fail anyway
-        # unless a build/install has already been run which creates
-        # the version.py file.
-        testing_directory = os.path.join(MODULE_DIRECTORY, "testing", "tests")
-        os.chdir(testing_directory)
-
-        # Run the tests
-        retval = nose.core.run(argv=['--exe','--with-coverage'])
-
-        sys.stdout.write("\n")
-
-        # Clean up the resulting pyc files in the testing directory
-        for pyc in glob.glob("%s/*.pyc" % testing_directory):
-            sys.stdout.write("removing '%s'\n" % pyc)
-            os.remove(pyc)
-
-        input_vectors_directory = os.path.join(testing_directory, "input-vectors")
-        for extracted_directory in glob.glob("%s/*.extracted" % input_vectors_directory):
-            remove_tree(extracted_directory)
-
-        if retval == True:
-           sys.exit(0)
-        else:
-           sys.exit(1)
 
 # The data files to install along with the module
 install_data_files = []
