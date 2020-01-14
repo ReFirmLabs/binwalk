@@ -34,12 +34,6 @@ except KeyboardInterrupt:
 except Exception:
     pass
 
-# Python2/3 compliance
-try:
-    raw_input
-except NameError:
-    raw_input = input
-
 
 def which(command):
     # /usr/local/bin is usually the default install path, though it may not be in $PATH
