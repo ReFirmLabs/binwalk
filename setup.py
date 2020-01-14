@@ -29,8 +29,8 @@ except ImportError:
 try:
     label = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=DEVNULL).decode('utf-8')
     MODULE_VERSION = "%s+%s" % (MODULE_VERSION, label.strip())
-except KeyboardInterrupt as e:
-    raise e
+except KeyboardInterrupt:
+    raise
 except Exception:
     pass
 
