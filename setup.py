@@ -338,17 +338,17 @@ setup(
     requires=[],
     python_requires=">=3",
     package_dir={"": "src"},
-    packages=[MODULE_NAME],
+    packages=setuptools.find_packages("src"),
     package_data={MODULE_NAME: install_data_files},
-    scripts=[
-        os.path.join(
-            "src",
-            "scripts",
-            SCRIPT_NAME)],
+    entry_points={
+        'console_scripts': ['binwalk=binwalk.__main__:main'],
+    },
     cmdclass={
         'clean': CleanCommand,
         'uninstall': UninstallCommand,
         'idainstall': IDAInstallCommand,
         'idauninstall': IDAUnInstallCommand,
         'autocomplete' : AutoCompleteCommand,
-        'test': TestCommand})
+        'test': TestCommand,
+    },
+)
