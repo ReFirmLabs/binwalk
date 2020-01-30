@@ -64,7 +64,11 @@
 # A value of -1 IS valid!
 >5        lequad    !-1
 >>5        lequad    <32        {invalid}
->>5        lequad   >1000000000000 {invalid}
+# Some oddball LZMA implementations use the 0x5D properties byte,
+# but don't include the ucompressed size. For this specific LZMA
+# property, don't check the uncompressed size here (it is validated
+# in a plugin).
+#>>5        lequad   >1000000000000 {invalid}
 
 
 # ------------------------------------------------------------------
