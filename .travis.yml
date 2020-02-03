@@ -1,3 +1,7 @@
+dist: xenial
+addons:
+  apt:
+    update: true
 language: python
 arch: 
  - ppc64le
@@ -9,13 +13,21 @@ python:
  - "3.6"
  - "3.7"
  - "3.8"
+ - "3.9"
  - "nightly"
 install:
+ - ./deps.sh --yes
  - pip install coverage
- - pip install backports.lzma
  - ./setup.py install
 script: ./setup.py test
 cache: pip
-matrix:
+jobs:
+  include:
+   - python: "3.6"
+     dist: bionic
+   - python: "3.8"
+     dist: focal
+   - python: "3.9"
+     dist: focal
   allow_failures:
    - python: nightly
