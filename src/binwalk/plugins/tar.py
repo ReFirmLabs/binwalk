@@ -33,7 +33,7 @@ class TarPlugin(binwalk.core.plugin.Plugin):
                 raise ValueError("invalid tar header")
         else:
             n = 0
-            for i in xrange(len(s) - 1):
+            for i in range(len(s) - 1):
                 n <<= 8
                 n += ord(s[i + 1])
         return n
