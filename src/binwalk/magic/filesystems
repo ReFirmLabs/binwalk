@@ -216,8 +216,10 @@
 >>20    beshort 2       \blzma,
 >>20    beshort 3       \bgzip (non-standard type definition),
 >>20    beshort 4       \bxz,
+>>20    beshort 5       \blz4,
+>>20    beshort 6       \bzstd,
 >>20    beshort 0       \b{invalid},
->>20    beshort >4      \b{invalid},
+>>20    beshort >6      \b{invalid},
 >28     beshort <3
 >>8     belong  x       size: %d bytes,
 >>8     belong  x       \b{jump:%d}
@@ -256,8 +258,10 @@
 >>20    leshort 2       \blzma,
 >>20    leshort 3       \bgzip (non-standard type definition),
 >>20    leshort 4       \bxz,
+>>20    leshort 5       \blz4,
+>>20    leshort 6       \bzstd,
 >>20    leshort 0       \b{invalid},
->>20    leshort >4      \b{invalid},
+>>20    leshort >6      \b{invalid},
 >28     leshort <3
 >>8     lelong  x       size: %d bytes,
 >>8     lelong  x       {size:%d}
@@ -299,8 +303,10 @@
 >>20    beshort 2       \blzma,
 >>20    beshort 3       \bgzip (non-standard type definition),
 >>20    beshort 4       \blzma (non-standard type definition),
+>>20    beshort 5       \blz4,
+>>20    beshort 6       \bzstd,
 >>20    beshort 0       \b{invalid},
->>20    beshort >4      \b{invalid},
+>>20    beshort >6      \b{invalid},
 >28     beshort <3
 >>8     belong  x       size: %d bytes,
 >>8     belong  x       {size:%d}
@@ -342,8 +348,10 @@
 >>20    beshort 2       \blzma,
 >>20    beshort 3       \bgzip (non-standard type definition),
 >>20    beshort 4       \bxz,
+>>20    beshort 5       \blz4,
+>>20    beshort 6       \bzstd,
 >>20    beshort 0       \b{invalid},
->>20    beshort >4      \b{invalid},
+>>20    beshort >6      \b{invalid},
 >28     beshort <3
 >>8     belong  x       size: %d bytes,
 >>8     belong  x       {size:%d}
@@ -386,8 +394,10 @@
 >>20    beshort 2       \blzma,
 >>20    beshort 3       \bgzip (non-standard type definition),
 >>20    beshort 4       \bxz,
+>>20    beshort 5       \blz4,
+>>20    beshort 6       \bzstd,
 >>20    beshort 0       \b{invalid},
->>20    beshort >4      \b{invalid},
+>>20    beshort >6      \b{invalid},
 >28     beshort <3
 >>8     belong  x       size: %d bytes,
 >>8     belong  <1      {invalid}
@@ -432,8 +442,10 @@
 >>20    leshort 2       \blzma,
 >>20    leshort 3       \bgzip (non-standard type definition),
 >>20    leshort 4       \bxz,
+>>20    leshort 5       \blz4,
+>>20    leshort 6       \bzstd,
 >>20    leshort 0       \b{invalid},
->>20    leshort >4      \b{invalid},
+>>20    leshort >6      \b{invalid},
 >28     leshort <3
 >>8     lelong  x       size: %d bytes,
 >>8     lelong  x       {size:%d}
@@ -475,8 +487,10 @@
 >>20    leshort 2       \blzma,
 >>20    leshort 3       \bgzip (non-standard type definition),
 >>20    leshort 4       \bxz,
+>>20    leshort 5       \blz4,
+>>20    leshort 6       \bzstd,
 >>20    leshort 0       \b{invalid},
->>20    leshort >4      \b{invalid},
+>>20    leshort >6      \b{invalid},
 >28     leshort <3
 >>8     lelong  x       size: %d bytes,
 >>8     lelong  x       {size:%d}
