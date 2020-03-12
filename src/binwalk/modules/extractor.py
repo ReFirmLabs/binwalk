@@ -59,9 +59,10 @@ class Extractor(Module):
         Option(short='D',
                long='dd',
                type=list,
-               dtype='type:ext:cmd',
+               dtype='type[:ext[:cmd]]',
                kwargs={'manual_rules': [], 'enabled': True},
-               description='Extract <type> signatures, give the files an extension of <ext>, and execute <cmd>'),
+               description='Extract <type> signatures (regular expression), give the files an extension of <ext>, '
+                           'and execute <cmd>'),
         Option(short='M',
                long='matryoshka',
                kwargs={'matryoshka': 8},
