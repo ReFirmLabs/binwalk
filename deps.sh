@@ -13,9 +13,14 @@ set -o nounset
 if ! which lsb_release > /dev/null
 then
     function lsb_release {
-        if [ -f /etc/lsb-release ]
+        if [ -f /etc/os-release ]
         then
-            cat /etc/lsb-release | grep DISTRIB_ID | cut -d= -f 2
+            [[ "$1" = "-i" ]] && cat /etc/os-release | grep ^"ID" | cut -d= -f 2
+            [[ "$1" = "-r" ]] && cat /etc/os-release | grep "VERSION_ID" | cut -d= -d'"' -f 2
+        elif [ -f /etc/lsb-release ]
+        then
+            [[ "$1" = "-i" ]] && cat /etc/lsb-release | grep "DISTRIB_ID" | cut -d= -f 2
+            [[ "$1" = "-r" ]] && cat /etc/lsb-release | grep "DISTRIB_RELEASE" | cut -d= -f 2
         else
             echo Unknown
         fi
