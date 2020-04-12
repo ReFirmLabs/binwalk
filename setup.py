@@ -283,11 +283,6 @@ class TestCommand(Command):
         os.system("py.test --cov=binwalk testing")
 
 
-# The data files to install along with the module
-install_data_files = []
-for data_dir in ["magic", "config", "plugins", "modules", "core"]:
-    install_data_files.append("%s%s*" % (data_dir, os.path.sep))
-
 this_directory = os.path.abspath(os.path.dirname(__file__))
 with io.open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
@@ -305,7 +300,7 @@ setup(
     python_requires=">=3",
     package_dir={"": "src"},
     packages=setuptools.find_packages("src"),
-    package_data={MODULE_NAME: install_data_files},
+    include_package_data=True,
     entry_points={
         'console_scripts': ['binwalk=binwalk.__main__:main'],
     },
