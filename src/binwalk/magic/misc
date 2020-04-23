@@ -83,3 +83,10 @@
 # Xilinx FPGA Bitstream
 # Ref: http://www.xilinx.com/support/answers/7891.html
 0       ubequad        0xffffffffaa995566  Xilinx Virtex/Spartan FPGA bitstream dummy + sync word
+
+# D-Link MD5 hash based langpack (sealpac.slp used in embedded PHP i18n function)
+0       belong          0x05ea19ac      D-Link MD5 based langpack (sealpac),
+>4      belong          x               %d translations,
+>8      bequad          !0              {invalid} non-zero header padding
+>0x1f   byte            0
+>>0x10  string          x               langcode: %s
