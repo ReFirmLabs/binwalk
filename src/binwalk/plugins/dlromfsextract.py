@@ -11,6 +11,11 @@ except ImportError as e:
 
 class RomFSCommon(object):
 
+    def _read_next_halfword(self):
+        value = struct.unpack("%sH" % self.endianness, self.data[self.index:self.index + 2])[0]
+        self.index += 2
+        return value
+
     def _read_next_word(self):
         value = struct.unpack("%sL" % self.endianness, self.data[self.index:self.index + 4])[0]
         self.index += 4
@@ -48,7 +53,7 @@ class RomFSEntry(RomFSCommon):
 
     DIR_STRUCT_MASK = 0x00000001
     DATA_MASK = 0x00000008
-    COMPRESSED_MASK = 0x005B0000
+    COMPRESSED_MASK = 0x005B0000 # wrong - probably some permissions
 
     def __init__(self, data, endianness="<"):
         self.data = data
@@ -56,12 +61,13 @@ class RomFSEntry(RomFSCommon):
         self.index = 0
 
         self.type = self._read_next_word()
-        self.unknown2 = self._read_next_word()
-        self.unknown3 = self._read_next_word()
+        self.nlink = self._read_next_word()
+        self.user_id = self._read_next_halfword()
+        self.group_id = self._read_next_halfword()
         self.size = self._read_next_word()
-        self.unknown4 = self._read_next_word()
+        self.ctime = self._read_next_word()
         self.offset = self._read_next_word()
-        self.unknown5 = self._read_next_word()
+        self.size_decompressed = self._read_next_word() # 0 means no compression
         self.uid = self._read_next_uid()
 
 
@@ -167,6 +173,9 @@ class RomFS(object):
             entries[entry.uid].offset = entry.offset
             entries[entry.uid].size = entry.size
             entries[entry.uid].type = entry.type
+            entries[entry.uid].size_decompressed = entry.size_decompressed
+            entries[entry.uid].ctime = entry.ctime
+            entries[entry.uid].nlink = entry.nlink
             if entry.uid == 0:
                 entries[entry.uid].name = os.path.sep
 
@@ -200,7 +209,7 @@ if __name__ == '__main__':
 class DlinkROMFSExtractPlugin(binwalk.core.plugin.Plugin):
 
     '''
-    Gzip extractor plugin.
+    D-link ROMFS extractor plugin.
     '''
     MODULES = ['Signature']
     BLOCK_SIZE = 10 * 1024
