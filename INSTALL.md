@@ -117,6 +117,11 @@ $ wget -O - http://my.smithmicro.com/downloads/files/stuffit520.611linux-i386.ta
 $ sudo cp bin/unstuff /usr/local/bin/
 ```
 
+```powershell
+# Download CECompress.dll (closed source) to extract from Windows CE ROM files
+> (new-object System.Net.WebClient).DownloadFile('"https://github.com/KodaSec/wince-extractor/blob/master/DLLs/CECompress.dll?raw=true','C:\CECompress.dll')
+```
+
 Note that for Debian/Ubuntu users, all of the above dependencies can be installed automatically using the included `deps.sh` script:
 
 ```bash
