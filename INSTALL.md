@@ -119,6 +119,7 @@ $ sudo cp bin/unstuff /usr/local/bin/
 
 ```powershell
 # Download CECompress.dll (closed source) to extract from Windows CE ROM files
+# The DLL requires 32bit Python
 > (new-object System.Net.WebClient).DownloadFile('"https://github.com/KodaSec/wince-extractor/blob/master/DLLs/CECompress.dll?raw=true','C:\CECompress.dll')
 ```
 
