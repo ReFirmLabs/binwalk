@@ -119,7 +119,7 @@ $ sudo cp bin/unstuff /usr/local/bin/
 
 ```powershell
 # Download CECompress.dll (closed source) to extract from Windows CE ROM files
-> (new-object System.Net.WebClient).DownloadFile('"https://github.com/KodaSec/wince-extractor/blob/master/DLLs/CECompress.dll?raw=true','C:\CECompress.dll')
+> (new-object System.Net.WebClient).DownloadFile('"http://nah6.com/~itsme/cvs-xdadevtools/dumprom/CECompress.dll','C:\CECompress.dll')
 ```
 
 Note that for Debian/Ubuntu users, all of the above dependencies can be installed automatically using the included `deps.sh` script:
