@@ -131,7 +131,7 @@
 >72     string          ripemd160               %s
 #-------------------------------------------------------------------------------
 # Nagra Stuff
-0      string          \x0\x0\x01\6c           Nagra PK
+0      string          \x00\x00\x01\6c           Nagra PK
 >4     ubelong         x                       Ird: %X
 >9     byte            <0x03                   {invalid}        
 >9     byte            >0x03                   {invalid}       
