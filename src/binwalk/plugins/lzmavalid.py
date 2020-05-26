@@ -62,3 +62,5 @@ class LZMAPlugin(binwalk.core.plugin.Plugin):
                 data = data[:5] + self.FAKE_LZMA_SIZE + data[5:]
                 if not self.is_valid_lzma(data):
                     result.valid = False
+                else:
+                    result.description = ",".join(result.description.split(',')[:-1] + [" missing uncompressed size"])

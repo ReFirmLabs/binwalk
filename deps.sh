@@ -13,9 +13,14 @@ set -o nounset
 if ! which lsb_release > /dev/null
 then
     function lsb_release {
-        if [ -f /etc/lsb-release ]
+        if [ -f /etc/os-release ]
         then
-            cat /etc/lsb-release | grep DISTRIB_ID | cut -d= -f 2
+            [[ "$1" = "-i" ]] && cat /etc/os-release | grep ^"ID" | cut -d= -f 2
+            [[ "$1" = "-r" ]] && cat /etc/os-release | grep "VERSION_ID" | cut -d= -d'"' -f 2
+        elif [ -f /etc/lsb-release ]
+        then
+            [[ "$1" = "-i" ]] && cat /etc/lsb-release | grep "DISTRIB_ID" | cut -d= -f 2
+            [[ "$1" = "-r" ]] && cat /etc/lsb-release | grep "DISTRIB_RELEASE" | cut -d= -f 2
         else
             echo Unknown
         fi
@@ -103,16 +108,14 @@ function install_cramfstools
   INSTALL_LOCATION=/usr/local/bin
 
   # https://github.com/torvalds/linux/blob/master/fs/cramfs/README#L106
-  wget  https://downloads.sourceforge.net/project/cramfs/cramfs/1.1/cramfs-1.1.tar.gz?ts=$TIME -O cramfs-1.1.tar.gz
-  tar xf cramfs-1.1.tar.gz
+  git clone https://github.com/npitre/cramfs-tools
   # There is no "make install"
-  (cd cramfs-1.1 \
+  (cd cramfs-tools \
   && make \
   && $SUDO install mkcramfs $INSTALL_LOCATION \
   && $SUDO install cramfsck $INSTALL_LOCATION)
 
-  rm cramfs-1.1.tar.gz
-  rm -rf cramfs-1.1
+  rm -rf cramfs-tools
 }
 
 

@@ -86,12 +86,12 @@ Each module object will also have an additional `extractor` attribute, which is 
 ```python
 for module in binwalk.scan(sys.argv[1], signature=True, quiet=True, extract=True):
     for result in module.results:
-        if module.extractor.output.has_key(result.file.path):
+        if result.file.path in module.extractor.output:
             # These are files that binwalk carved out of the original firmware image, a la dd
-            if module.extractor.output[result.file.path].carved.has_key(result.offset):
+            if result.offset in module.extractor.output[result.file.path].carved:
                 print "Carved data from offset 0x%X to %s" % (result.offset, module.extractor.output[result.file.path].carved[result.offset])
             # These are files/directories created by extraction utilities (gunzip, tar, unsquashfs, etc)
-            if module.extractor.output[result.file.path].extracted.has_key(result.offset):
+            if result.offset in module.extractor.output[result.file.path].extracted:
                 print "Extracted %d files from offset 0x%X to '%s' using '%s'" % (len(module.extractor.output[result.file.path].extracted[result.offset].files),
                                                                                   result.offset,
                                                                                   module.extractor.output[result.file.path].extracted[result.offset].files[0],

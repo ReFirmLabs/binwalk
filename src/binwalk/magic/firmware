@@ -467,6 +467,20 @@
 -4   string      \x00\x00\x00\x00ENDS   Signed Ubiquiti end header, RSA 2048 bit, header size: 264 bytes
 >260 ubelong     !0                     {invalid}
 
+# Ubiquiti additional data
+-4           string   \x00\x00\x00\x00EXEC  Ubiquiti firmware additional data,
+# Non-empty string (16 bytes max)
+>4           byte     0                     {invalid}
+>4           string   x                         name: %s,
+# Size of attached data
+>48          ubelong  x                         size: %d bytes,
+# Size, again
+>52          ubelong  x                         size2: %d bytes,
+# CRC32 of header + data
+>>(48.L+56)  ubelong  x                         CRC32: %x
+# Padding
+>>(48.L+60)  ubelong  !0                    {invalid}
+
 # Found in DIR-100 firmware
 0       string      AIH0        AIH0 firmware header, header size: 48,
 >12     ubelong     0           {invalid}
@@ -758,10 +772,6 @@
 >20   ulelong    x             \b, ramdisk addr: 0x%X
 >48   string     x             \b, product name: "%s"
 
-# DTB
-# http://elinux.org/images/c/cf/Power_ePAPR_APPROVED_v1.1.pdf
-0     string     \xd0\x0d\xfe\xed    device tree image (dtb)
-
 # QCDT
 # https://source.codeaurora.org/quic/la/device/qcom/common/tree/dtbtool?h=LA.BF64.1.2.2_rb4.42
 0     string     QCDT          Qualcomm device tree container
@@ -896,3 +906,7 @@
 >32         ubelong   0           {invalid}
 # Size of structure block, must be greater than 0
 >36         ubelong   0           {invalid}
+
+# Toshiba SSD Firmware Update
+# The version string seems to be at 0xe2f4, but I'm unsure if that offset is fixed
+0           string    ID\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00 Toshiba SSD Firmware Update

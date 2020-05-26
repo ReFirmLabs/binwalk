@@ -415,7 +415,7 @@ class Module(object):
 
             # Values in self.target_file_list are either already open files (BlockFile instances), or paths
             # to files that need to be opened for scanning.
-            if isinstance(next_target_file, str):
+            if isinstance(next_target_file, str) or isinstance(next_target_file, unicode):
                 fp = self.config.open_file(next_target_file)
             else:
                 fp = next_target_file
