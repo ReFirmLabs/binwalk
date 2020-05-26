@@ -141,3 +141,10 @@
 0>     ubelong         x                       IDEA_Key: %X 
 4>     ubelong         x                       %X  
 8>     ubelong         x                       %X
+
+# The Rijndael S-Box
+0   string    \x63\x7C\x77\x7B   AES S-Box
+>4  string   !\xF2\x6B\x6F\xC5   {invalid} 
+        
+0   string    \x52\x09\x6a\xd5   AES Inverse S-Box 
+>4  string   !\x30\x36\xA5\x38   {invalid}
