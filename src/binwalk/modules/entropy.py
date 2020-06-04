@@ -1,12 +1,22 @@
 # Calculates and optionally plots the entropy of input files.
 
 import os
+import sys
 import math
 import zlib
 import binwalk.core.common
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg
 
+try:
+    import numpy as np
+except ImportError:
+    pass
+try:
+    from numba import njit
+except ImportError:
+    def njit(func):
+        return func
 
 class Entropy(Module):
 
@@ -89,7 +99,10 @@ class Entropy(Module):
         if self.use_zlib:
             self.algorithm = self.gzip
         else:
-            self.algorithm = self.shannon
+            if 'numpy' in sys.modules:
+                self.algorithm = self.shannon_numpy
+            else:
+                self.algorithm = self.shannon
 
         # Get a list of all other module's results to mark on the entropy graph
         for (module, obj) in iterator(self.modules):
@@ -225,18 +238,33 @@ class Entropy(Module):
         entropy = 0
 
         if data:
+            data = data.encode('latin-1')
             length = len(data)
-
-            seen = dict(((chr(x), 0) for x in range(0, 256)))
+            # seen = dict(((chr(x), 0) for x in range(0, 256)))
+            seen = [0] * 256
             for byte in data:
                 seen[byte] += 1
 
-            for x in range(0, 256):
-                p_x = float(seen[chr(x)]) / length
+            for x in seen:
+                p_x = float(x) / length
                 if p_x > 0:
                     entropy -= p_x * math.log(p_x, 2)
 
         return (entropy / 8)
+
+    def shannon_numpy(self, data):
+        if data:
+            return self._shannon_numpy(data.encode('latin-1'))
+        else:
+            return 0
+    
+    @staticmethod
+    @njit
+    def _shannon_numpy(data):
+            A = np.frombuffer(data, dtype=np.uint8)
+            pA = np.bincount(A) / len(A)
+            entropy = -np.nansum(pA*np.log2(pA))
+            return (entropy / 8)
 
     def gzip(self, data, truncate=True):
         '''
