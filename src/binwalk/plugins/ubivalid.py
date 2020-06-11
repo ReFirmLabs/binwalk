@@ -11,9 +11,6 @@ class UBIValidPlugin(binwalk.core.plugin.Plugin):
     Checks header CRC and calculates jump value
     '''
     MODULES = ['Signature']
-    current_file = None
-    last_ec_hdr_offset = None
-    peb_size = None
 
     def _check_crc(self, header):
         # Get the header's reported CRC value
@@ -74,7 +71,8 @@ class UBIValidPlugin(binwalk.core.plugin.Plugin):
             vid_header = self._read_vid_header(result, ec_header, count * (1<<blocksize))
 
             if not vid_header:
-                break
+                count += 1
+                continue
 
             magic, version, vol_type, copy_flag, compat, vol_id, lnum, data_size, used_ebs, data_pad, data_crc, sqnum, crc = struct.unpack(">4s4BLL4x4L4xQ12xL",vid_header)
 
