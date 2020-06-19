@@ -121,7 +121,7 @@ class Plugins(object):
             except IgnoreFileException as e:
                 raise e
             except Exception as e:
-                binwalk.core.common.warning("%s.%s failed: %s" % (callback.__module__, callback.__name__, e))
+                binwalk.core.common.warning("%s.%s failed [%s]: '%s'" % (callback.__module__, callback.__name__, type(e), e))
 
     def _find_plugin_class(self, plugin):
         for (name, klass) in inspect.getmembers(plugin, inspect.isclass):
