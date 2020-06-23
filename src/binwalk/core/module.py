@@ -474,7 +474,6 @@ class Module(object):
         # as enabled
         if not self.enabled:
             self.enabled = True
-
         self.validate(r)
         self._plugins_result(r)
 

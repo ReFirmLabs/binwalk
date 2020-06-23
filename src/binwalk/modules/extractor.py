@@ -861,6 +861,7 @@ class Extractor(Module):
                 except KeyboardInterrupt as e:
                     raise e
                 except Exception as e:
+                    retval = False
                     binwalk.core.common.warning("Internal extractor '%s' failed with exception: '%s'" % (str(cmd), str(e)))
             elif cmd:
                 # If not in debug mode, create a temporary file to redirect

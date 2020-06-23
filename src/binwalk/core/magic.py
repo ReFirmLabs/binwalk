@@ -801,9 +801,11 @@ class Magic(object):
         if dlen is None:
             dlen = len(data)
 
+        sc = 0
         for signature in self.signatures:
             # Use regex to search the data block for potential signature
             # matches (fast)
+            sc += 1
             for match in signature.regex.finditer(data):
                 # Take the offset of the start of the signature into account
                 offset = match.start() - signature.offset
@@ -827,7 +829,7 @@ class Magic(object):
                                 continue
                             else:
                                 self.display_once.add(signature.title)
-
+                        
                         # Append the result to the results list
                         results.append(SignatureResult(**tags))
 
