@@ -42,8 +42,11 @@ class ArcadyanDeobfuscator(binwalk.core.plugin.Plugin):
         fname = os.path.abspath(fname)
 
         infile = binwalk.core.common.BlockFile(fname, "rb")
-        obfuscated = infile.read()
+        obfuscated = infile.read(self.MIN_FILE_SIZE)
         infile.close()
+
+        if os.path.getsize(fname) > self.MAX_IMAGE_SIZE:
+            raise Exception("Input file too large for Arcadyan obfuscated firmware")
 
         if len(obfuscated) >= self.MIN_FILE_SIZE:
             # Swap blocks 1 and 2
