@@ -170,7 +170,6 @@
 >>84     uleshort    1              lzo
 >>84     uleshort    2              zlib
 >>86     leshort     !0             invalid padding,{invalid}
->>128    string      !\x00*3968     invalid padding{invalid}
 
 # JFFS2 file system
 # If used with binwalk's smart signature feature (on by default, -S to disable)
