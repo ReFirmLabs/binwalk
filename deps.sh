@@ -85,7 +85,6 @@ function install_sasquatch
 
 function install_jefferson
 {
-    install_pip_package "-r requirements.txt"
     git clone https://github.com/sviehb/jefferson
     (cd jefferson && $SUDO pip3 install -r requirements.txt && $SUDO python3 setup.py install)
     $SUDO rm -rf jefferson
