@@ -113,7 +113,7 @@ $ (cd yaffshiv && sudo python setup.py install)
 
 ```bash
 # Install unstuff (closed source) to extract StuffIt archive files
-$ wget -O - http://my.smithmicro.com/downloads/files/stuffit520.611linux-i386.tar.gz | tar -zxv
+$ wget -O - http://downloads.tuxfamily.org/sdtraces/stuffit520.611linux-i386.tar.gz | tar -zxv
 $ sudo cp bin/unstuff /usr/local/bin/
 ```
 
