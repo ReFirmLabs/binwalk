@@ -1,5 +1,7 @@
 language: python
-arch: ppc64le
+arch: 
+ - ppc64le
+ - amd64
 python:
  - "2.7"
  - "3.4"
