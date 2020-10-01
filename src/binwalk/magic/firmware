@@ -65,7 +65,7 @@
 >31    byte      1              compression type: gzip,
 >31    byte      2              compression type: bzip2,
 >31    byte      3              compression type: lzma,
->32    string    x              image name: "%s"
+>32    string    x              image name: "%.32s"
 
 # Hilink encrypted uImage firmware.
 # Additional validation/processing is done by the hilink.py plugin.
