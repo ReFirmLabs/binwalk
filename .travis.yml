@@ -1,4 +1,7 @@
 language: python
+arch: 
+ - ppc64le
+ - amd64
 python:
  - "2.7"
  - "3.4"
@@ -7,8 +10,6 @@ python:
  - "3.7"
  - "3.8"
  - "nightly"
- - "pypy"
- - "pypy3"
 install:
  - pip install coverage
  - pip install backports.lzma
