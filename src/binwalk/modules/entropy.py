@@ -308,11 +308,11 @@ class Entropy(Module):
 
                 ax.plot([offset, offset], [0, 1.1], '%s-' % color, lw=2, label=description)
 
-            ax.legend(loc='lower right', shadow=True)
+            ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
         if self.save_plot:
             self.output_file = os.path.join(os.getcwd(), os.path.basename(fname)) + '.png'
-            fig.savefig(self.output_file)
+            fig.savefig(self.output_file, bbox_inches='tight')
         else:
             plt.show()
 
