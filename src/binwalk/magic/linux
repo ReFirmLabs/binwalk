@@ -36,3 +36,21 @@
 >20 ubelong !0xE1A00000                     {invalid}(invalid)
 >24 ubelong !0xE1A00000                     {invalid}(invalid)
 >28 ubelong !0xE1A00000                     {invalid}(invalid)
+
+# Linux ARM64 kernel image
+# Header defined through https://www.kernel.org/doc/Documentation/arm64/booting.txt
+56  string    ARMd                          Linux kernel ARM64 image,
+# Reserved fields
+>32 ulequad   !0                            {invalid}
+>40 ulequad   !0                            {invalid}
+>48 ulequad   !0                            {invalid}
+# Information
+>8  ulelong   x                             load offset: 0x%x,
+>16 ulelong   x                             image size: %d bytes,
+# Flags
+>24 ulequad&1 0                             little endian,
+>24 ulequad&1 1                             big endian,
+>24 ulequad&6 2                             4k page size,
+>24 ulequad&6 4                             16k page size,
+>24 ulequad&6 6                             64k page size,
+>24 ulequad&8 0                             place kernel close to DRAM base
