@@ -11,6 +11,11 @@ import binwalk.core.common
 import binwalk.core.compat
 from binwalk.core.exceptions import ParserException
 
+try:
+    long
+except NameError:
+    long = int
+
 
 class SignatureResult(binwalk.core.module.Result):
 
