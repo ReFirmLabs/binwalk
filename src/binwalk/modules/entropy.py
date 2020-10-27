@@ -8,10 +8,10 @@ import binwalk.core.common
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg
 
-try:
-    import numpy as np
-except ImportError:
-    pass
+#try:
+#    import numpy as np
+#except ImportError:
+#    pass
 try:
     from numba import njit
 except ImportError:
@@ -238,14 +238,14 @@ class Entropy(Module):
         entropy = 0
 
         if data:
-            data = data.encode('latin-1')
             length = len(data)
-            seen = [0] * 256
+
+            seen = dict(((chr(x), 0) for x in range(0, 256)))
             for byte in data:
                 seen[byte] += 1
 
-            for x in seen:
-                p_x = float(x) / length
+            for x in range(0, 256):
+                p_x = float(seen[chr(x)]) / length
                 if p_x > 0:
                     entropy -= p_x * math.log(p_x, 2)
 
@@ -253,7 +253,7 @@ class Entropy(Module):
 
     def shannon_numpy(self, data):
         if data:
-            return self._shannon_numpy(data.encode('latin-1'))
+            return self._shannon_numpy(bytes2str(data))
         else:
             return 0
     
