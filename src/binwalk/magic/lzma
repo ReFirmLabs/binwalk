@@ -1,0 +1,647 @@
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x51
+# ------------------------------------------------------------------
+0        string    \x51\x00\x00    LZMA compressed data, properties: 0x51,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x5A
+# ------------------------------------------------------------------
+0        string    \x5A\x00\x00    LZMA compressed data, properties: 0x5A,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x5B
+# ------------------------------------------------------------------
+0        string    \x5B\x00\x00    LZMA compressed data, properties: 0x5B,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x5C
+# ------------------------------------------------------------------
+0        string    \x5C\x00\x00    LZMA compressed data, properties: 0x5C,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x5D
+# ------------------------------------------------------------------
+0        string    \x5D\x00\x00    LZMA compressed data, properties: 0x5D,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+# Some oddball LZMA implementations use the 0x5D properties byte,
+# but don't include the ucompressed size. For this specific LZMA
+# property, don't check the uncompressed size here (it is validated
+# in a plugin).
+#>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x5E
+# ------------------------------------------------------------------
+0        string    \x5E\x00\x00    LZMA compressed data, properties: 0x5E,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x63
+# ------------------------------------------------------------------
+0        string    \x63\x00\x00    LZMA compressed data, properties: 0x63,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x64
+# ------------------------------------------------------------------
+0        string    \x64\x00\x00    LZMA compressed data, properties: 0x64,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x65
+# ------------------------------------------------------------------
+0        string    \x65\x00\x00    LZMA compressed data, properties: 0x65,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x66
+# ------------------------------------------------------------------
+0        string    \x66\x00\x00    LZMA compressed data, properties: 0x66,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x6C
+# ------------------------------------------------------------------
+0        string    \x6C\x00\x00    LZMA compressed data, properties: 0x6C,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x6D
+# ------------------------------------------------------------------
+0        string    \x6D\x00\x00    LZMA compressed data, properties: 0x6D,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x6E
+# ------------------------------------------------------------------
+0        string    \x6E\x00\x00    LZMA compressed data, properties: 0x6E,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x75
+# ------------------------------------------------------------------
+0        string    \x75\x00\x00    LZMA compressed data, properties: 0x75,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x76
+# ------------------------------------------------------------------
+0        string    \x76\x00\x00    LZMA compressed data, properties: 0x76,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x7E
+# ------------------------------------------------------------------
+0        string    \x7E\x00\x00    LZMA compressed data, properties: 0x7E,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x87
+# ------------------------------------------------------------------
+0        string    \x87\x00\x00    LZMA compressed data, properties: 0x87,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x88
+# ------------------------------------------------------------------
+0        string    \x88\x00\x00    LZMA compressed data, properties: 0x88,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x89
+# ------------------------------------------------------------------
+0        string    \x89\x00\x00    LZMA compressed data, properties: 0x89,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x8A
+# ------------------------------------------------------------------
+0        string    \x8A\x00\x00    LZMA compressed data, properties: 0x8A,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x8B
+# ------------------------------------------------------------------
+0        string    \x8B\x00\x00    LZMA compressed data, properties: 0x8B,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x90
+# ------------------------------------------------------------------
+0        string    \x90\x00\x00    LZMA compressed data, properties: 0x90,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x91
+# ------------------------------------------------------------------
+0        string    \x91\x00\x00    LZMA compressed data, properties: 0x91,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x92
+# ------------------------------------------------------------------
+0        string    \x92\x00\x00    LZMA compressed data, properties: 0x92,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x93
+# ------------------------------------------------------------------
+0        string    \x93\x00\x00    LZMA compressed data, properties: 0x93,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x99
+# ------------------------------------------------------------------
+0        string    \x99\x00\x00    LZMA compressed data, properties: 0x99,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x9A
+# ------------------------------------------------------------------
+0        string    \x9A\x00\x00    LZMA compressed data, properties: 0x9A,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0x9B
+# ------------------------------------------------------------------
+0        string    \x9B\x00\x00    LZMA compressed data, properties: 0x9B,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xA2
+# ------------------------------------------------------------------
+0        string    \xA2\x00\x00    LZMA compressed data, properties: 0xA2,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xA3
+# ------------------------------------------------------------------
+0        string    \xA3\x00\x00    LZMA compressed data, properties: 0xA3,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xAB
+# ------------------------------------------------------------------
+0        string    \xAB\x00\x00    LZMA compressed data, properties: 0xAB,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xB4
+# ------------------------------------------------------------------
+0        string    \xB4\x00\x00    LZMA compressed data, properties: 0xB4,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xB5
+# ------------------------------------------------------------------
+0        string    \xB5\x00\x00    LZMA compressed data, properties: 0xB5,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xB6
+# ------------------------------------------------------------------
+0        string    \xB6\x00\x00    LZMA compressed data, properties: 0xB6,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xB7
+# ------------------------------------------------------------------
+0        string    \xB7\x00\x00    LZMA compressed data, properties: 0xB7,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xB8
+# ------------------------------------------------------------------
+0        string    \xB8\x00\x00    LZMA compressed data, properties: 0xB8,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xBD
+# ------------------------------------------------------------------
+0        string    \xBD\x00\x00    LZMA compressed data, properties: 0xBD,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xBE
+# ------------------------------------------------------------------
+0        string    \xBE\x00\x00    LZMA compressed data, properties: 0xBE,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xBF
+# ------------------------------------------------------------------
+0        string    \xBF\x00\x00    LZMA compressed data, properties: 0xBF,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xC0
+# ------------------------------------------------------------------
+0        string    \xC0\x00\x00    LZMA compressed data, properties: 0xC0,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xC6
+# ------------------------------------------------------------------
+0        string    \xC6\x00\x00    LZMA compressed data, properties: 0xC6,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xC7
+# ------------------------------------------------------------------
+0        string    \xC7\x00\x00    LZMA compressed data, properties: 0xC7,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xC8
+# ------------------------------------------------------------------
+0        string    \xC8\x00\x00    LZMA compressed data, properties: 0xC8,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xCF
+# ------------------------------------------------------------------
+0        string    \xCF\x00\x00    LZMA compressed data, properties: 0xCF,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xD0
+# ------------------------------------------------------------------
+0        string    \xD0\x00\x00    LZMA compressed data, properties: 0xD0,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+
+# ------------------------------------------------------------------
+# Signature for LZMA compressed data with valid properties byte 0xD8
+# ------------------------------------------------------------------
+0        string    \xD8\x00\x00    LZMA compressed data, properties: 0xD8,
+>1        lelong    x        dictionary size: %d bytes,
+>5        lequad    x        uncompressed size: %lld bytes
+# Assume that a valid size will be greater than 32 bytes.
+# This could technically be valid, but is unlikely.
+# A value of -1 IS valid!
+>5        lequad    !-1
+>>5        lequad    <32        {invalid}
+>>5        lequad   >1000000000000 {invalid}
+
+

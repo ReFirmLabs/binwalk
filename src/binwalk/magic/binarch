@@ -1,0 +1,141 @@
+# MIPS prologue
+# addiu $sp, -XX
+# sw XX, XX($sp)
+# 27 BD FF XX
+# AF BX XX XX
+1	string		\xFF\xBD\x27	MIPSEL instructions, function prologue
+>6	byte		!0xAF			{invalid}
+>5	byte&0xE0	!0xA0			{invalid}
+
+0	string		\x27\xBD\xFF	MIPS instructions, function prologue
+>4	byte		!0xAF			{invalid}
+>5	byte&0xE0	!0xA0			{invalid}
+
+# MIPS epilogue
+# jr $ra
+# addiu $sp, XX
+#
+# addiu $sp, XX
+# jr $ra
+0	ubelong	0x03e00008	MIPS instructions, function epilogue
+>4	ubeshort	!0x27BD		{invalid}
+0	ubeshort	0x27BD		MIPS instructions, function epilogue
+>2	ubelong	!0x03e00008	{invalid}
+
+0	ulelong	0x03e00008	MIPSEL instructions, function epilogue
+>6	uleshort	!0x27BD		{invalid}
+0	uleshort	0x27BD		MIPS instructions, function epilogue
+>2	ulelong	!0x03e00008	{invalid}
+
+# MIPS16e
+# nop (x4)
+# TODO: Produces false positives when scanning ARM Thumb code
+#0	string	\x65\x00\x65\x00\x65\x00\x65\x00	MIPS16e instructions, nops{jump-to-offset:8}
+#0	string	\x00\x65\x00\x65\x00\x65\x00\x65	MIPSEL16e instructions, nops{jump-to-offset:8}
+
+# save a0-a1, XX
+# addiu XX, XX
+0	string	\xf0\x08\x64	MIPS16e instructions, function prologue
+>4	byte	!0x01			{invalid}
+
+# move $sp, $s1
+# restore XX, XX, XX
+# jrc $ra
+0	ubeshort	0x65B9			MIPS16e instructions, function epilogue
+>3	byte	    !0x64			{invalid}
+>4	ubeshort	!0xE8A0			{invalid}
+0	uleshort	0x65B9			MIPSEL16e instructions, function epilogue
+>3	byte	    !0x64			{invalid}
+>4	uleshort	!0xE8A0			{invalid}
+
+# jrc $ra
+# nop
+0	ubelong	0xe8a06500		MIPS16e instructions, function epilogue
+0	ulelong	0xe8a06500		MIPSEL16e instructions, function epilogue
+
+# PowerPC prologue
+# mflr r0
+0	ubelong 0x7C0802A6	PowerPC big endian instructions, function prologue
+0	ulelong 0x7C0802A6	PowerPC little endian instructions, function prologue
+
+# PowerPC epilogue
+# blr
+0	ubelong 0x4E800020	PowerPC big endian instructions, function epilogue
+0	ulelong 0x4E800020	PowerPC little endian instructions, function epilogue
+
+# TODO: Add ARM Thumb dectection
+# ARM prologue
+# STMFD SP!, {XX}
+# <any instruction whose opcode begins with 0xE>
+0	ubeshort	0xE92D	ARMEB instructions, function prologue
+>4	byte&0xF0	!0xE0	{invalid}
+>8	byte&0xF0	!0xE0	{invalid}
+0	uleshort	0xE92D	ARM instructions, function prologue{adjust:-2}
+>5	byte&0xF0	!0xE0	{invalid}
+>9	byte&0xF0	!0xE0	{invalid}
+
+# ARM epilogue
+# MOV R0, XX
+# LDMFD SP!, {XX}
+0	ubeshort	0xE1A0	ARMEB instructions, function epilogue
+>4	beshort		!0xE8BD	{invalid}
+0	uleshort	0xE1A0	ARM instructions, function epilogue{adjust:-2}
+>4	leshort		!0xE8BD	{invalid}
+
+
+# Ubicom32 prologue
+# move.4 -4($sp)++, $ra
+0	ubelong	    0x02FF6125	Ubicom32 instructions, function prologue
+
+# Ubicom32 epilogues
+# calli $ra, 0($ra)
+# ret ($sp)4++
+0	ubelong	    0xF0A000A0	Ubicom32 instructions, function epilogue
+0	ubelong	    0x000022E1	Ubicom32 instructions, function epilogue
+
+# AVR8 prologue
+# push r28
+# push r29
+0	ubelong	    0x93CF93DF	AVR8 instructions, function prologue
+0	ubelong	    0x93DF93CF	AVR8 instructions, function prologue
+
+# AVR32 prologue
+# pushm   r7,lr
+# mov r7,sp
+0	string	\xEB\xCD\x40\x80\x1A\x97	AVR32 instructions, function prologue
+
+# SPARC epilogue
+# ret
+# restore XX
+0	string	\x81\xC7\xE0\x08\x81\xE8	SPARC instructions, function epilogue
+
+# x86 epilogue
+# push ebp
+# move ebp, esp
+# sub esp, XX
+#
+# push ebp
+# move ebp, esp
+# push edi
+# push esi
+0	string	\x55\x89\xE5\x83\xEC				Intel x86 instructions, function prologue
+0	string	\x55\x89\xE5\x57\x56				Intel x86 instructions, function prologue
+0	string	\x90\x90\x90\x90\x90\x90\x90\x90	Intel x86 instructions, nops{jump:8}{overlap}
+
+# unlk a6
+# rts
+# link a6, XX
+0   string  N^NuNV      Motorola Coldfire instructions, function prologue/epilogue
+
+# mov.l   @r15+, r9
+# rts
+# mov.l   @r15
+0   string  \xF6\x69\x0B\x00\xF6\x68            SuperH instructions, little endian, function epilogue (gcc)
+0   string  \x69\xF6\x00\x0B\x68\xF6            SuperH instructions, big endian, function epilogue (gcc)
+
+# AArch64
+# ret
+0 ulelong 0xd65f03c0 AArch64 instructions, function epilogue
+
+# nop
+0 ulelong 0xd503201f AArch64 instructions, nop

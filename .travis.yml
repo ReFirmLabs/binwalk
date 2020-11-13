@@ -1,0 +1,20 @@
+language: python
+python:
+ - "2.7"
+ - "3.4"
+ - "3.5"
+ - "3.6"
+ - "3.7"
+ - "3.8"
+ - "nightly"
+ - "pypy"
+ - "pypy3"
+install:
+ - pip install coverage
+ - pip install backports.lzma
+ - ./setup.py install
+script: ./setup.py test
+cache: pip
+matrix:
+  allow_failures:
+   - python: nightly

@@ -1,0 +1,109 @@
+# From Gurkan Sengun <gurkan@linuks.mine.nu>, www.linuks.mine.nu
+12  string      GameBoy\x20Music\x20Module  Nintendo Gameboy Music Module
+
+#------------------------------------------------------------------------------
+# gameboy:  file(1) magic for the Nintendo (Color) Gameboy raw ROM format
+#
+0x104   ubelong     0xCEED6666      Gameboy ROM,
+>0x134  byte        !0
+>>0x134 string      x               name: "%.16s"
+>0x146  byte        0x03            \b,[SGB]
+>0x147  byte        0x00            \b, [ROM ONLY]
+>0x147  byte        0x01            \b, [ROM+MBC1]
+>0x147  byte        0x02            \b, [ROM+MBC1+RAM]
+>0x147  byte        0x03            \b, [ROM+MBC1+RAM+BATT]
+>0x147  byte        0x05            \b, [ROM+MBC2]
+>0x147  byte        0x06            \b, [ROM+MBC2+BATTERY]
+>0x147  byte        0x08            \b, [ROM+RAM]
+>0x147  byte        0x09            \b, [ROM+RAM+BATTERY]
+>0x147  byte        0x0B            \b, [ROM+MMM01]
+>0x147  byte        0x0C            \b, [ROM+MMM01+SRAM]
+>0x147  byte        0x0D            \b, [ROM+MMM01+SRAM+BATT]
+>0x147  byte        0x0F            \b, [ROM+MBC3+TIMER+BATT]
+>0x147  byte        0x10            \b, [ROM+MBC3+TIMER+RAM+BATT]
+>0x147  byte        0x11            \b, [ROM+MBC3]
+>0x147  byte        0x12            \b, [ROM+MBC3+RAM]
+>0x147  byte        0x13            \b, [ROM+MBC3+RAM+BATT]
+>0x147  byte        0x19            \b, [ROM+MBC5]
+>0x147  byte        0x1A            \b, [ROM+MBC5+RAM]
+>0x147  byte        0x1B            \b, [ROM+MBC5+RAM+BATT]
+>0x147  byte        0x1C            \b, [ROM+MBC5+RUMBLE]
+>0x147  byte        0x1D            \b, [ROM+MBC5+RUMBLE+SRAM]
+>0x147  byte        0x1E            \b, [ROM+MBC5+RUMBLE+SRAM+BATT]
+>0x147  byte        0x1F            \b, [Pocket Camera]
+>0x147  byte        0xFD            \b, [Bandai TAMA5]
+>0x147  byte        0xFE            \b, [Hudson HuC-3]
+>0x147  byte        0xFF            \b, [Hudson HuC-1]
+
+>0x148  byte        0               \b, ROM: 256Kbit
+>0x148  byte        1               \b, ROM: 512Kbit
+>0x148  byte        2               \b, ROM: 1Mbit
+>0x148  byte        3               \b, ROM: 2Mbit
+>0x148  byte        4               \b, ROM: 4Mbit
+>0x148  byte        5               \b, ROM: 8Mbit
+>0x148  byte        6               \b, ROM: 16Mbit
+>0x148  byte        0x52            \b, ROM: 9Mbit
+>0x148  byte        0x53            \b, ROM: 10Mbit
+>0x148  byte        0x54            \b, ROM: 12Mbit
+
+>0x149  byte        1               \b, RAM: 16Kbit
+>0x149  byte        2               \b, RAM: 64Kbit
+>0x149  byte        3               \b, RAM: 128Kbit
+>0x149  byte        4               \b, RAM: 1Mbit
+
+#>0x14e  long        x               \b, CRC: %x
+
+#------------------------------------------------------------------------------
+# genesis:  file(1) magic for the Sega MegaDrive/Genesis raw ROM format
+#
+0x100   string  SEGA    Sega MegaDrive/Genesis raw ROM dump,
+>0x120  string  x       Name: "%.16s",
+>0x110  byte    !0
+>>0x110 string  x       "%.16s",
+>0x1B0  string  RA      with SRAM
+
+# From: "Nelson A. de Oliveira" <naoliv@gmail.com>
+# Nintendo .nds
+192 string  \044\377\256Qi\232          Nintendo DS Game ROM Image
+# Nintendo .gba
+0   string  \056\000\000\352$\377\256Qi Nintendo Game Boy Advance ROM Image
+
+#------------------------------------------------------------------------------
+# Sony Playstation executables (Adam Sjoegren <asjo@diku.dk>) :
+0       string  PS-X\x20EXE     Sony Playstation executable
+#  Area:
+>113    string  x               (%s)
+
+#------------------------------------------------------------------------------
+## Microsoft Xbox executables .xbe (Esa Hyyti <ehyytia@cc.hut.fi>)
+0                       string              XBEH            Microsoft Xbox executable (XBE),
+## probabilistic checks whether signed or not
+>0x0004                 ulelong             =0
+>>10                    ulelong             =0
+>>>16                   ulelong             =0              \b, not signed
+>0x0004                 ulelong             >0
+>>10                    ulelong             >0              \b, signed
+>>>16                   ulelong             >0              \b, signed
+## expect base address of 0x10000
+>0x0104                 ulelong             !0x10000        {invalid}
+>0x0104                 ulelong             =0x10000
+>>(0x0118-0x0FF60)      ulelong&0x80000007  0x80000007      \b, all regions
+>>(0x0118-0x0FF60)      ulelong&0x80000007  !0x80000007
+>>>(0x0118-0x0FF60)     ulelong             >0              (regions:
+>>>>(0x0118-0x0FF60)    ulelong             &0x00000001     NA
+>>>>(0x0118-0x0FF60)    ulelong             &0x00000002     Japan
+>>>>(0x0118-0x0FF60)    ulelong             &0x00000004     Rest_of_World
+>>>>(0x0118-0x0FF60)    ulelong             &0x80000000     Manufacturer
+>>>(0x0118-0x0FF60)     ulelong             >0              \b)
+
+# --------------------------------
+# # Microsoft Xbox data file formats
+# # http://home.comcast.net/~admiral_powerslave/filestructure.html
+0       string          XIP0                        XIP, Microsoft Xbox data,
+>12     lelong          x                           total size: %d
+>16     lelong          !0                          {invalid}
+>24     lelong          !0                          {invalid}
+
+0       string          XTF0\x00\x00\x00            XTF, Microsoft Xbox data
+
+
