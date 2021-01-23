@@ -976,3 +976,16 @@
 >31    byte      2              compression type: bzip2,
 >31    byte      3              compression type: lzma,
 >32    string    x              image name: "%s"
+
+# AUTEL EVO I/II
+# https://github.com/anthok/autel
+0 string "<filetransfer>" Autel EVO Upgrade Transfer{overlap},
+>16 string "<fileinfo>"
+>28 belong x filename_size: {strlen:%d}%d,
+>32 belong x 
+>36 string x filename: {string}%s,
+>(28.L+36) string "<filecontent>"
+>(28.L+36+15) belong x file_size: %d,
+>(28.L+36+15+4) belong x 
+
+
