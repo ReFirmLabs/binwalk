@@ -79,7 +79,13 @@ function install_yaffshiv
 function install_sasquatch
 {
     git clone https://github.com/devttys0/sasquatch
-    (cd sasquatch && $SUDO ./build.sh)
+    cd sasquatch
+    GCCVERSION=$(gcc --version | grep ^gcc | sed -e 's/^.* //g; s/\..//g')
+    if [ $GCCVERSION -ge 10 ]; then
+	 $SUDO CFLAGS=-fcommon ./build.sh
+    else
+   	 $SUDO ./build.sh
+    fi
     $SUDO rm -rf sasquatch
 }
 
