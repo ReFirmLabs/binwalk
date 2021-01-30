@@ -35,30 +35,32 @@ else
     distro="${2:-$(lsb_release -i|cut -f 2)}"
     distro_version="${2:-$(lsb_release -r|cut -f 2|cut -c1-2)}"
 fi
-REQUIRED_UTILS="wget tar python"
+REQUIRED_UTILS="wget tar"
 APTCMD="apt"
 APTGETCMD="apt-get"
 YUMCMD="yum"
 if [ $distro = "Kali" ]
 then
-    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract util-linux firmware-mod-kit cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop cpio"
+    APT_CANDIDATES="git build-essential mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract util-linux firmware-mod-kit cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop cpio"
 elif [ $distro_version = "17" ]
 then
-    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
+    APT_CANDIDATES="git build-essential mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
 elif [ $distro_version = "18" ]
 then
-    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
+    APT_CANDIDATES="git build-essential mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
 else
-    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
+    APT_CANDIDATES="git build-essential mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
 fi
-PYTHON2_APT_CANDIDATES="python-crypto python-lzo python-lzma python-pip python-tk"
+wget http://launchpadlibrarian.net/251826685/cramfsprogs_1.1-6ubuntu1_amd64.deb
+sudo dpkg -i cramfsprogs_1.1-6ubuntu1_amd64.deb
+#PYTHON2_APT_CANDIDATES="python-crypto python-lzo python-lzma python-pip python-tk"
 PYTHON3_APT_CANDIDATES="python3-crypto python3-pip python3-tk"
 PYTHON3_YUM_CANDIDATES=""
 YUM_CANDIDATES="git gcc gcc-c++ make openssl-devel qtwebkit-devel qt-devel gzip bzip2 tar arj p7zip p7zip-plugins cabextract squashfs-tools zlib zlib-devel lzo lzo-devel xz xz-compat-libs xz-libs xz-devel xz-lzma-compat python-backports-lzma lzip pyliblzma perl-Compress-Raw-Lzma lzop srecord"
-PYTHON2_YUM_CANDIDATES="python-pip python-Bottleneck cpio"
-APT_CANDIDATES="$APT_CANDIDATES $PYTHON2_APT_CANDIDATES"
-YUM_CANDIDATES="$YUM_CANDIDATES $PYTHON2_YUM_CANDIDATES"
-PIP_COMMANDS="pip"
+#PYTHON2_YUM_CANDIDATES="python-pip python-Bottleneck cpio"
+#APT_CANDIDATES="$APT_CANDIDATES $PYTHON2_APT_CANDIDATES"
+#YUM_CANDIDATES="$YUM_CANDIDATES $PYTHON2_YUM_CANDIDATES"
+PIP_COMMANDS="pip3"
 
 # Check for root privileges
 if [ $UID -eq 0 ]
@@ -72,7 +74,7 @@ fi
 function install_yaffshiv
 {
     git clone https://github.com/devttys0/yaffshiv
-    (cd yaffshiv && $SUDO python2 setup.py install)
+    (cd yaffshiv && $SUDO python3 setup.py install)
     $SUDO rm -rf yaffshiv
 }
 
@@ -131,7 +133,7 @@ function install_ubireader
     # Some UBIFS extraction breaks after this commit, due to "Added fatal error check if UBI block extends beyond file size"
     # (see this commit: https://github.com/jrspruitt/ubi_reader/commit/af678a5234dc891e8721ec985b1a6e74c77620b6)
     # Reset to a known working commit.
-    (cd ubi_reader && git reset --hard 0955e6b95f07d849a182125919a1f2b6790d5b51 && $SUDO python setup.py install)
+    (cd ubi_reader && git reset --hard 0955e6b95f07d849a182125919a1f2b6790d5b51 && $SUDO python3 setup.py install)
     $SUDO rm -rf ubi_reader
 }
 
@@ -141,7 +143,7 @@ function install_pip_package
 
     for PIP_COMMAND in $PIP_COMMANDS
     do
-        $SUDO $PIP_COMMAND install $PACKAGE
+        $SUDO $PIP_COMMAND install $PACKAGE -i https://mirrors.aliyun.com/pypi/simple/
     done
 }
 
