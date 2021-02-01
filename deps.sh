@@ -51,8 +51,12 @@ then
 else
     APT_CANDIDATES="git build-essential mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
 fi
-wget http://launchpadlibrarian.net/251826685/cramfsprogs_1.1-6ubuntu1_amd64.deb
+
+if [ ! -f "cramfsprogs_1.1-6ubuntu1_amd64.deb" ]; then
+    wget http://launchpadlibrarian.net/251826685/cramfsprogs_1.1-6ubuntu1_amd64.deb
+fi
 sudo dpkg -i cramfsprogs_1.1-6ubuntu1_amd64.deb
+
 #PYTHON2_APT_CANDIDATES="python-crypto python-lzo python-lzma python-pip python-tk"
 PYTHON3_APT_CANDIDATES="python3-crypto python3-pip python3-tk"
 PYTHON3_YUM_CANDIDATES=""
