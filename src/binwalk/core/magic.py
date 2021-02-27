@@ -97,7 +97,7 @@ class SignatureLine(object):
         # AND the data with 0xFF before the comparison is performed).
         #
         # We support the following operators:
-        for operator in ['&', '|', '*', '+', '-', '/', '~', '^']:
+        for operator in ['**', '<<', '>>', '&', '|', '*', '+', '-', '/', '~', '^']:
             # Look for each operator in self.type
             if operator in self.type:
                 # If found, split self.type into the type and operator value
@@ -632,7 +632,13 @@ class Magic(object):
                             opval = self._do_math(offset, line.opvalue)
 
                         # Perform the specified operation
-                        if line.operator == '&':
+                        if line.operator == '**':
+                            dvalue **= opval
+                        elif line.operator == '<<':
+                            dvalue <<= opval
+                        elif line.operator == '>>':
+                            dvalue >>= opval
+                        elif line.operator == '&':
                             dvalue &= opval
                         elif line.operator == '|':
                             dvalue |= opval
