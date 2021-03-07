@@ -282,6 +282,7 @@ class Entropy(Module):
     def plot_entropy(self, fname):
         try:
             import matplotlib.pyplot as plt
+            import matplotlib.ticker as ticker
         except ImportError as e:
             return
 
@@ -303,6 +304,10 @@ class Entropy(Module):
             ax = fig.add_subplot(1, 1, 1, autoscale_on=True, facecolor='black')
         except AttributeError:
             ax = fig.add_subplot(1, 1, 1, autoscale_on=True, axisbg='black')
+
+        # Format the X-axis position as hexadecimal integers
+        x_fmt = lambda x_value,offset: "{:x}".format(int(x_value))
+        ax.get_xaxis().set_major_formatter(ticker.FuncFormatter(x_fmt))
 
         ax.set_title(self.TITLE)
         ax.set_xlabel(self.XLABEL)
