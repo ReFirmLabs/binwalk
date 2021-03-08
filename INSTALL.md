@@ -58,8 +58,14 @@ $ sudo pip install pyqtgraph
 ```
 
 ```bash
-# Python3.x
+# Python3.x (Ubuntu 20.04 needs to use pyqt5 rather than pyqt4 see command variant below)
 $ sudo apt-get install libqt4-opengl python3-opengl python3-pyqt4 python3-pyqt4.qtopengl python3-numpy python3-scipy python3-pip
+$ sudo pip3 install pyqtgraph
+```
+
+```bash
+# Python3.x (On Ubuntu 20.04)
+$ sudo apt-get install libqt4-opengl python3-opengl python3-pyqt5 python3-pyqt5.qtopengl python3-numpy python3-scipy python3-pip
 $ sudo pip3 install pyqtgraph
 ```
 
