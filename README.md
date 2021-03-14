@@ -7,6 +7,10 @@
 
 Binwalk is a fast, easy to use tool for analyzing, reverse engineering, and extracting firmware images.
 
+### *** Python 2.7 Deprecation Notice ***
+
+Even though every major Linux distro is still shipping python 2.7 as the default interpreter in their currently stable release, we are making the difficult decision to move binwalk support exclusively into python3. This is likely to make many upset and others rejoice. If you need to install binwalk into a Python 2.7 environment we will be creating a tag `python27` that will be a snapshot of `master` before all of these major changes are made. Thank you for being patient with us through this transition process.
+
 ### Installation and Usage
 
 * [Installation](./INSTALL.md)
@@ -20,4 +24,4 @@ More information on [Wiki](https://github.com/ReFirmLabs/binwalk/wiki)
 
 # Binwalk Professional Edition
 
-After years of developing and supporting binwalk as an open source project we have finally sold out to the man and released a cloud-based firmware extraction engine called *Binwalk Pro*. After all someone needs to pay devttys0 so he can buy more milling equipment and feed his children (in that order). Please consider subscribing and reap the benefits of getting actual customer support for all your firmware extraction needs. Please visit https://www.refirmlabs.com/binwalk-pro/ for more information. 
+After years of developing and supporting binwalk as an open source project we have finally sold out to the man and released a cloud-based firmware extraction engine called *Binwalk Enterprise*. After all someone needs to pay devttys0 so he can buy more milling equipment and feed his children (in that order). Please consider subscribing and reap the benefits of getting actual customer support for all your firmware extraction and analysis needs. Please visit https://www.refirmlabs.com/binwalk-enterprise/ for more information. 
