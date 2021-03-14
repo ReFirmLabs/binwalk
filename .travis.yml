@@ -1,20 +1,31 @@
-dist:
-  - bionic
-  - focal
+os: linux
+dist: bionic
+language: python
+arch: amd64
 addons:
   apt:
     update: true
-language: python
-arch: 
- - amd64
-python:
- - "3.6"
- - "3.7"
- - "3.8"
- - "3.9"
 install:
- - ./deps.sh --yes
- - pip install coverage
- - ./setup.py install
+  - ./deps.sh --yes
+  - pip install coverage
+  - ./setup.py install
 script: ./setup.py test
 cache: pip
+jobs:
+  include:
+   - dist: bionic
+     python: 3.6
+   - dist: bionic
+     python: 3.7
+   - dist: bionic
+     python: 3.8
+   - dist: bionic
+     python: 3.9
+   - dist: focal
+     python: 3.6
+   - dist: focal
+     python: 3.7
+   - dist: focal
+     python: 3.8
+   - dist: focal
+     python: 3.9
