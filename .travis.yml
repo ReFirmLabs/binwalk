@@ -1,32 +1,20 @@
-dist: xenial
+dist:
+  - bionic
+  - focal
 addons:
   apt:
     update: true
 language: python
 arch: 
- - ppc64le
  - amd64
 python:
- - "3.4"
- - "3.5"
  - "3.6"
  - "3.7"
  - "3.8"
  - "3.9"
- - "nightly"
 install:
  - ./deps.sh --yes
  - pip install coverage
  - ./setup.py install
 script: ./setup.py test
 cache: pip
-jobs:
-  include:
-   - python: "3.6"
-     dist: bionic
-   - python: "3.8"
-     dist: focal
-   - python: "3.9"
-     dist: focal
-  allow_failures:
-   - python: nightly
