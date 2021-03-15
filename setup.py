@@ -1,10 +1,14 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+import io
 import os
 import sys
 import glob
 import shutil
 import subprocess
-from distutils.core import setup, Command
+try:
+    from setuptools import setup, Command
+except ImportError:
+    from distutils.core import setup, Command
 from distutils.dir_util import remove_tree
 
 MODULE_NAME = "binwalk"
@@ -24,7 +28,7 @@ except ImportError:
 # by binwalk.
 try:
     label = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=DEVNULL).decode('utf-8')
-    MODULE_VERSION = "%s-%s" % (MODULE_VERSION, label.strip())
+    MODULE_VERSION = "%s+%s" % (MODULE_VERSION, label.strip())
 except KeyboardInterrupt as e:
     raise e
 except Exception:
@@ -318,14 +322,21 @@ install_data_files = []
 for data_dir in ["magic", "config", "plugins", "modules", "core"]:
     install_data_files.append("%s%s*" % (data_dir, os.path.sep))
 
+this_directory = os.path.abspath(os.path.dirname(__file__))
+with io.open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+
 # Install the module, script, and support files
 setup(
     name=MODULE_NAME,
     version=MODULE_VERSION,
     description="Firmware analysis tool",
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     author="Craig Heffner",
     url="https://github.com/ReFirmLabs/%s" % MODULE_NAME,
     requires=[],
+    python_requires=">=3",
     package_dir={"": "src"},
     packages=[MODULE_NAME],
     package_data={MODULE_NAME: install_data_files},

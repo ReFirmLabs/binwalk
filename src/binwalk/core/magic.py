@@ -625,7 +625,7 @@ class Magic(object):
                     try:
                         # If the operator value of this signature line is just
                         # an integer value, use it
-                        if isinstance(line.opvalue, int) or isinstance(line.opvalue, long):
+                        if isinstance(line.opvalue, int):
                             opval = line.opvalue
                         # Else, evaluate the complex expression
                         else:

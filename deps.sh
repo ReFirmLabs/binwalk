@@ -41,24 +41,26 @@ APTGETCMD="apt-get"
 YUMCMD="yum"
 if [ $distro = "Kali" ]
 then
-    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract util-linux firmware-mod-kit cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop cpio"
-elif [ $distro_version = "17" ]
+    APT_CANDIDATES="git build-essential qt5base-dev mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract util-linux firmware-mod-kit cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop cpio"
+elif [ $distro_version = "14" ]
 then
-    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
+    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
+elif [ $distro_version = "15" ]
+then
+    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
+elif [ $distro_version = "16" ]
+then
+    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
 elif [ $distro_version = "18" ]
 then
     APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
 else
-    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
+    APT_CANDIDATES="git build-essential qtbase5-dev mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
 fi
-PYTHON2_APT_CANDIDATES="python-crypto python-lzo python-lzma python-pip python-tk"
-PYTHON3_APT_CANDIDATES="python3-crypto python3-pip python3-tk"
+PYTHON3_APT_CANDIDATES="python3-crypto python3-gnupg python3-pip python3-tk"
 PYTHON3_YUM_CANDIDATES=""
 YUM_CANDIDATES="git gcc gcc-c++ make openssl-devel qtwebkit-devel qt-devel gzip bzip2 tar arj p7zip p7zip-plugins cabextract squashfs-tools zlib zlib-devel lzo lzo-devel xz xz-compat-libs xz-libs xz-devel xz-lzma-compat python-backports-lzma lzip pyliblzma perl-Compress-Raw-Lzma lzop srecord"
-PYTHON2_YUM_CANDIDATES="python-pip python-Bottleneck cpio"
-APT_CANDIDATES="$APT_CANDIDATES $PYTHON2_APT_CANDIDATES"
-YUM_CANDIDATES="$YUM_CANDIDATES $PYTHON2_YUM_CANDIDATES"
-PIP_COMMANDS="pip"
+PIP_COMMANDS="pip3"
 
 # Check for root privileges
 if [ $UID -eq 0 ]
@@ -72,7 +74,7 @@ fi
 function install_yaffshiv
 {
     git clone https://github.com/devttys0/yaffshiv
-    (cd yaffshiv && $SUDO python2 setup.py install)
+    (cd yaffshiv && $SUDO python3 setup.py install)
     $SUDO rm -rf yaffshiv
 }
 
@@ -122,10 +124,7 @@ function install_cramfstools
 function install_ubireader
 {
     git clone https://github.com/jrspruitt/ubi_reader
-    # Some UBIFS extraction breaks after this commit, due to "Added fatal error check if UBI block extends beyond file size"
-    # (see this commit: https://github.com/jrspruitt/ubi_reader/commit/af678a5234dc891e8721ec985b1a6e74c77620b6)
-    # Reset to a known working commit.
-    (cd ubi_reader && git reset --hard 0955e6b95f07d849a182125919a1f2b6790d5b51 && $SUDO python setup.py install)
+    (cd ubi_reader && $SUDO python3 setup.py install)
     $SUDO rm -rf ubi_reader
 }
 
@@ -257,6 +256,7 @@ if [ $? -ne 0 ]
     echo "Package installation failed: $PKG_CANDIDATES"
     exit 1
 fi
+install_pip_package setuptools
 install_pip_package matplotlib
 install_pip_package capstone
 install_sasquatch

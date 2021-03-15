@@ -81,7 +81,4 @@ def user_input(prompt=''):
     '''
     For getting raw user input in Python 2 and 3.
     '''
-    if PY_MAJOR_VERSION > 2:
-        return input(prompt)
-    else:
-        return raw_input(prompt)
+    return input(prompt)
