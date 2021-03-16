@@ -15,9 +15,8 @@ jobs:
   include:
    - stage: test
      services: docker
-     install: 
-       - docker build .
-     script: no
+     install: echo "No install for this job"
+     script: docker build .
    - stage: test
      dist: bionic
      python: 3.6
