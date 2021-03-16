@@ -9,7 +9,7 @@ Binwalk is a fast, easy to use tool for analyzing, reverse engineering, and extr
 
 ### *** Python 2.7 Deprecation Notice ***
 
-Even though every major Linux distro is still shipping python 2.7 as the default interpreter in their currently stable release, we are making the difficult decision to move binwalk support exclusively into python3. This is likely to make many upset and others rejoice. If you need to install binwalk into a Python 2.7 environment we will be creating a tag `python27` that will be a snapshot of `master` before all of these major changes are made. Thank you for being patient with us through this transition process.
+Even though many major Linux distros are still shipping Python 2.7 as the default interpreter in their currently stable release, we are making the difficult decision to move binwalk support exclusively to Python 3. This is likely to make many upset and others rejoice. If you need to install binwalk into a Python 2.7 environment we will be creating a tag `python27` that will be a snapshot of `master` before all of these major changes are made. Thank you for being patient with us through this transition process.
 
 ### Installation and Usage
 
