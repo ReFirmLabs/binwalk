@@ -13,19 +13,31 @@ script: ./setup.py test
 cache: pip
 jobs:
   include:
-   - dist: bionic
+   - stage: test
+     dist: bionic
      python: 3.6
-   - dist: bionic
+   - stage: test
+     dist: bionic
      python: 3.7
-   - dist: bionic
+   - stage: test
+     dist: bionic
      python: 3.8
-   - dist: bionic
+   - stage: test
+     dist: bionic
      python: 3.9
-   - dist: focal
+   - stage: test
+     dist: focal
      python: 3.6
-   - dist: focal
+   - stage: test
+     dist: focal
      python: 3.7
-   - dist: focal
+   - stage: test
+     dist: focal
      python: 3.8
-   - dist: focal
+   - stage: test
+     dist: focal
      python: 3.9
+   - stage: test
+     services: docker
+     install: 
+       - docker build .

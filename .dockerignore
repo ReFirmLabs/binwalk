@@ -3,3 +3,9 @@ dist
 .coverage
 *.extracted
 *.pyc
+.editorconfig
+.gitignore
+images
+Dockerfile
+.dockerignore
+.git
