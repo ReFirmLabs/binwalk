@@ -106,6 +106,13 @@ $ (cd ubi_reader && sudo python setup.py install)
 ```
 
 ```bash
+# Install vmlinux-to-elf to convert raw Linux kernel in analyzable
+# .ELF files with symbols
+$ sudo apt-get install python3-pip
+$ sudo pip3 install --upgrade git+https://github.com/marin-m/vmlinux-to-elf
+```
+
+```bash
 # Install yaffshiv to extract YAFFS file systems
 $ git clone https://github.com/devttys0/yaffshiv
 $ (cd yaffshiv && sudo python setup.py install)
