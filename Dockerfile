@@ -1,10 +1,7 @@
 FROM python:3-buster AS build-and-install
 
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/src/app/bin \
-    DEBIAN_FRONTEND=noninteractive \
-    SASQUATCH_COMMIT=3e0cc40fc6dbe32bd3a5e6c553b3320d5d91ceed \
-    UBIREADER_COMMIT=0955e6b95f07d849a182125919a1f2b6790d5b51 \
-    BINWALK_COMMIT=3154b0012e7dbaf2b20edd5c0a2350ec64009869
+    DEBIAN_FRONTEND=noninteractive
 
 COPY . /tmp
 WORKDIR /tmp
