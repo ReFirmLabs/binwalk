@@ -69,7 +69,7 @@ then
     echo "UID is 0, sudo not required"
     SUDO=""
 else
-    SUDO="sudo"
+    SUDO="sudo -E"
     REQUIRED_UTILS="sudo $REQUIRED_UTILS"
 fi
 
