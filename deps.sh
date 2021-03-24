@@ -62,6 +62,7 @@ fi
 PYTHON3_APT_CANDIDATES=""
 PYTHON3_YUM_CANDIDATES=""
 YUM_CANDIDATES="git gcc gcc-c++ make openssl-devel qtwebkit-devel qt-devel gzip bzip2 tar arj p7zip p7zip-plugins cabextract squashfs-tools zlib zlib-devel lzo lzo-devel xz xz-compat-libs xz-libs xz-devel xz-lzma-compat python-backports-lzma lzip pyliblzma perl-Compress-Raw-Lzma lzop srecord"
+PYTHON="$(which python3)"
 
 # Check for root privileges
 if [ $UID -eq 0 ]
@@ -76,7 +77,7 @@ fi
 function install_yaffshiv
 {
     git clone https://github.com/devttys0/yaffshiv
-    (cd yaffshiv && $SUDO python3 setup.py install)
+    (cd yaffshiv && $SUDO $PYTHON setup.py install)
     $SUDO rm -rf yaffshiv
 }
 
@@ -90,7 +91,7 @@ function install_sasquatch
 function install_jefferson
 {
     git clone https://github.com/sviehb/jefferson
-    (cd jefferson && $SUDO pip3 install -r requirements.txt && $SUDO python3 setup.py install)
+    (cd jefferson && $SUDO $PYTHON -mpip install -r requirements.txt && $SUDO $PYTHON setup.py install)
     $SUDO rm -rf jefferson
 }
 
@@ -126,14 +127,14 @@ function install_cramfstools
 function install_ubireader
 {
     git clone https://github.com/jrspruitt/ubi_reader
-    (cd ubi_reader && $SUDO python3 setup.py install)
+    (cd ubi_reader && $SUDO $PYTHON setup.py install)
     $SUDO rm -rf ubi_reader
 }
 
 function install_pip_package
 {
     PACKAGE="$1"
-    $SUDO pip3 install $PACKAGE
+    $SUDO $PYTHON -mpip install $PACKAGE
 }
 
 function find_path
