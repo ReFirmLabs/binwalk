@@ -8,7 +8,9 @@ else
     YES=0
 fi
 
+set -eu
 set -o nounset
+set -x
 
 if ! which lsb_release > /dev/null
 then
@@ -65,6 +67,7 @@ PIP_COMMANDS="pip3"
 # Check for root privileges
 if [ $UID -eq 0 ]
 then
+    echo "UID is 0, sudo not required"
     SUDO=""
 else
     SUDO="sudo"
@@ -80,7 +83,7 @@ function install_yaffshiv
 
 function install_sasquatch
 {
-    git clone https://github.com/devttys0/sasquatch
+    git clone --quiet --depth 1 --branch "patch-1" https://github.com/eacmen/sasquatch
     (cd sasquatch && $SUDO ./build.sh)
     $SUDO rm -rf sasquatch
 }
