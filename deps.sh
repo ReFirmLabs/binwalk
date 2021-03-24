@@ -62,7 +62,7 @@ fi
 PYTHON3_APT_CANDIDATES=""
 PYTHON3_YUM_CANDIDATES=""
 YUM_CANDIDATES="git gcc gcc-c++ make openssl-devel qtwebkit-devel qt-devel gzip bzip2 tar arj p7zip p7zip-plugins cabextract squashfs-tools zlib zlib-devel lzo lzo-devel xz xz-compat-libs xz-libs xz-devel xz-lzma-compat python-backports-lzma lzip pyliblzma perl-Compress-Raw-Lzma lzop srecord"
-PIP_COMMANDS="pip3"
+PIP_COMMANDS="pip"
 
 # Check for root privileges
 if [ $UID -eq 0 ]
@@ -134,11 +134,7 @@ function install_ubireader
 function install_pip_package
 {
     PACKAGE="$1"
-
-    for PIP_COMMAND in $PIP_COMMANDS
-    do
-        $SUDO $PIP_COMMAND install $PACKAGE
-    done
+    $SUDO pip install $PACKAGE
 }
 
 function find_path
@@ -241,14 +237,6 @@ if [ "$NEEDED_UTILS" != "" ]
 then
     echo "Please install the following required utilities: $NEEDED_UTILS"
     exit 1
-fi
-
-# Check to see if we should install modules for python3 as well
-find_path python3
-if [ $? -eq 0 ]
-then
-     PKG_CANDIDATES="$PKG_CANDIDATES $PKG_PYTHON3_CANDIDATES"
-     PIP_COMMANDS="pip3 $PIP_COMMANDS"
 fi
 
 # Do the install(s)
