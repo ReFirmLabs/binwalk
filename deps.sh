@@ -90,7 +90,7 @@ function install_sasquatch
 function install_jefferson
 {
     git clone https://github.com/sviehb/jefferson
-    (cd jefferson && $SUDO pip install -r requirements.txt && $SUDO python3 setup.py install)
+    (cd jefferson && $SUDO pip3 install -r requirements.txt && $SUDO python3 setup.py install)
     $SUDO rm -rf jefferson
 }
 
@@ -133,7 +133,7 @@ function install_ubireader
 function install_pip_package
 {
     PACKAGE="$1"
-    $SUDO pip install $PACKAGE
+    $SUDO pip3 install $PACKAGE
 }
 
 function find_path
