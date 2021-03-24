@@ -62,7 +62,6 @@ fi
 PYTHON3_APT_CANDIDATES=""
 PYTHON3_YUM_CANDIDATES=""
 YUM_CANDIDATES="git gcc gcc-c++ make openssl-devel qtwebkit-devel qt-devel gzip bzip2 tar arj p7zip p7zip-plugins cabextract squashfs-tools zlib zlib-devel lzo lzo-devel xz xz-compat-libs xz-libs xz-devel xz-lzma-compat python-backports-lzma lzip pyliblzma perl-Compress-Raw-Lzma lzop srecord"
-PIP_COMMANDS="pip"
 
 # Check for root privileges
 if [ $UID -eq 0 ]
@@ -91,7 +90,7 @@ function install_sasquatch
 function install_jefferson
 {
     git clone https://github.com/sviehb/jefferson
-    (cd jefferson && $SUDO pip3 install -r requirements.txt && $SUDO python3 setup.py install)
+    (cd jefferson && $SUDO pip install -r requirements.txt && $SUDO python3 setup.py install)
     $SUDO rm -rf jefferson
 }
 

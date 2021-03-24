@@ -2,7 +2,6 @@ os: linux
 dist: bionic
 language: python
 arch: amd64
-sudo: true
 addons:
   apt:
     update: true
