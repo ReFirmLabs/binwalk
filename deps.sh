@@ -8,7 +8,9 @@ else
     YES=0
 fi
 
+set -eu
 set -o nounset
+set -x
 
 if ! which lsb_release > /dev/null
 then
@@ -60,35 +62,36 @@ fi
 PYTHON3_APT_CANDIDATES=""
 PYTHON3_YUM_CANDIDATES=""
 YUM_CANDIDATES="git gcc gcc-c++ make openssl-devel qtwebkit-devel qt-devel gzip bzip2 tar arj p7zip p7zip-plugins cabextract squashfs-tools zlib zlib-devel lzo lzo-devel xz xz-compat-libs xz-libs xz-devel xz-lzma-compat python-backports-lzma lzip pyliblzma perl-Compress-Raw-Lzma lzop srecord"
-PIP_COMMANDS="pip3"
+PYTHON="$(which python3)"
 
 # Check for root privileges
 if [ $UID -eq 0 ]
 then
+    echo "UID is 0, sudo not required"
     SUDO=""
 else
-    SUDO="sudo"
+    SUDO="sudo -E"
     REQUIRED_UTILS="sudo $REQUIRED_UTILS"
 fi
 
 function install_yaffshiv
 {
-    git clone https://github.com/devttys0/yaffshiv
-    (cd yaffshiv && $SUDO python3 setup.py install)
+    git clone --quiet --depth 1 --branch "master" https://github.com/devttys0/yaffshiv
+    (cd yaffshiv && $SUDO $PYTHON setup.py install)
     $SUDO rm -rf yaffshiv
 }
 
 function install_sasquatch
 {
-    git clone https://github.com/devttys0/sasquatch
+    git clone --quiet --depth 1 --branch "master" https://github.com/devttys0/sasquatch
     (cd sasquatch && $SUDO ./build.sh)
     $SUDO rm -rf sasquatch
 }
 
 function install_jefferson
 {
-    git clone https://github.com/sviehb/jefferson
-    (cd jefferson && $SUDO pip3 install -r requirements.txt && $SUDO python3 setup.py install)
+    git clone --quiet --depth 1 --branch "master" https://github.com/sviehb/jefferson
+    (cd jefferson && $SUDO $PYTHON -mpip install -r requirements.txt && $SUDO $PYTHON setup.py install)
     $SUDO rm -rf jefferson
 }
 
@@ -110,7 +113,7 @@ function install_cramfstools
   INSTALL_LOCATION=/usr/local/bin
 
   # https://github.com/torvalds/linux/blob/master/fs/cramfs/README#L106
-  git clone https://github.com/npitre/cramfs-tools
+  git clone --quiet --depth 1 --branch "master" https://github.com/npitre/cramfs-tools
   # There is no "make install"
   (cd cramfs-tools \
   && make \
@@ -123,19 +126,15 @@ function install_cramfstools
 
 function install_ubireader
 {
-    git clone https://github.com/jrspruitt/ubi_reader
-    (cd ubi_reader && $SUDO python3 setup.py install)
+    git clone --quiet --depth 1 --branch "master" https://github.com/jrspruitt/ubi_reader
+    (cd ubi_reader && $SUDO $PYTHON setup.py install)
     $SUDO rm -rf ubi_reader
 }
 
 function install_pip_package
 {
     PACKAGE="$1"
-
-    for PIP_COMMAND in $PIP_COMMANDS
-    do
-        $SUDO $PIP_COMMAND install $PACKAGE
-    done
+    $SUDO $PYTHON -mpip install $PACKAGE
 }
 
 function find_path
@@ -238,14 +237,6 @@ if [ "$NEEDED_UTILS" != "" ]
 then
     echo "Please install the following required utilities: $NEEDED_UTILS"
     exit 1
-fi
-
-# Check to see if we should install modules for python3 as well
-find_path python3
-if [ $? -eq 0 ]
-then
-     PKG_CANDIDATES="$PKG_CANDIDATES $PKG_PYTHON3_CANDIDATES"
-     PIP_COMMANDS="pip3 $PIP_COMMANDS"
 fi
 
 # Do the install(s)
