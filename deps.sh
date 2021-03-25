@@ -76,21 +76,21 @@ fi
 
 function install_yaffshiv
 {
-    git clone https://github.com/devttys0/yaffshiv
+    git clone --quiet --depth 1 --branch "master" https://github.com/devttys0/yaffshiv
     (cd yaffshiv && $SUDO $PYTHON setup.py install)
     $SUDO rm -rf yaffshiv
 }
 
 function install_sasquatch
 {
-    git clone --quiet --depth 1 --branch "patch-1" https://github.com/eacmen/sasquatch
+    git clone --quiet --depth 1 --branch "master" https://github.com/devttys0/sasquatch
     (cd sasquatch && $SUDO ./build.sh)
     $SUDO rm -rf sasquatch
 }
 
 function install_jefferson
 {
-    git clone https://github.com/sviehb/jefferson
+    git clone --quiet --depth 1 --branch "master" https://github.com/sviehb/jefferson
     (cd jefferson && $SUDO $PYTHON -mpip install -r requirements.txt && $SUDO $PYTHON setup.py install)
     $SUDO rm -rf jefferson
 }
@@ -113,7 +113,7 @@ function install_cramfstools
   INSTALL_LOCATION=/usr/local/bin
 
   # https://github.com/torvalds/linux/blob/master/fs/cramfs/README#L106
-  git clone https://github.com/npitre/cramfs-tools
+  git clone --quiet --depth 1 --branch "master" https://github.com/npitre/cramfs-tools
   # There is no "make install"
   (cd cramfs-tools \
   && make \
@@ -126,7 +126,7 @@ function install_cramfstools
 
 function install_ubireader
 {
-    git clone https://github.com/jrspruitt/ubi_reader
+    git clone --quiet --depth 1 --branch "master" https://github.com/jrspruitt/ubi_reader
     (cd ubi_reader && $SUDO $PYTHON setup.py install)
     $SUDO rm -rf ubi_reader
 }
