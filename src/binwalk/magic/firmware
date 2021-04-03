@@ -988,4 +988,73 @@
 >(28.L+36+15) belong x file_size: %d,
 >(28.L+36+15+4) belong x 
 
+# ESP32 Image Format
+# https://github.com/espressif/esp-idf
+0       ubyte               0xe9            ESP Image
+>11     ushort              0x0000          (ESP32):
+>11     ushort              0x0002          (ESP3252):
+>11     ushort              >0x0002         {invalid}
+>1      ubyte               <16             segment count: %d,
+>1      ubyte               >16             {invalid}
+>2      ubyte               >5              {invalid}
+>2      ubyte               0               flash mode: QUIO,
+>2      ubyte               1               flash mode: QUOUT,
+>2      ubyte               2               flash mode: DIO,
+>2      ubyte               3               flash mode: DOUT,
+>2      ubyte               4               flash mode: FAST_READ,
+>2      ubyte               5               flash mode: SLOW_READ,
+>3      ubyte&0xf           0x0             flash speed: 40MHz,
+>3      ubyte&0xf           0x1             flash speed: 26MHz,
+>3      ubyte&0xf           0x2             flash speed: 20MHz,
+>3      ubyte&0xf           0xf             flash speed: 80MHz,
+>3      ubyte>>4            0               flash size: 1MB,
+>3      ubyte>>4            1               flash size: 2MB,
+>3      ubyte>>4            2               flash size: 4MB,
+>3      ubyte>>4            3               flash size: 8MB,
+>3      ubyte>>4            4               flash size: 16MB,
+>3      ubyte>>4            5               flash size: MAX,
+>3      ubyte>>4            >5              {invalid}
+>4      ulelong             x               entry address: 0x%x
+
+
+# ESP32 Partition Table Entry
+# https://github.com/espressif/esp-idf
+0       uleshort            0x50aa          ESP32 Partition Table Entry:
+>12     string              x               label: "%s",
+>2      ubyte               0               type: APP,
+>2      ubyte               1               type: DATA,
+>2      ubyte               >1              {invalid}
+>3      ubyte               0x00            subtype: Factory/OTA DATA,
+>3      ubyte               0x01            subtype: PHY/RF,
+>3      ubyte               0x02            subtype: NVS,
+>3      ubyte               0x03            subtype: Coredump,
+>3      ubyte               0x04            subtype: NVS Keys,
+>3      ubyte               0x05            subtype: eFuse,
+>3      ubyte               0x10            subtype: OTA 0,
+>3      ubyte               0x11            subtype: OTA 1,
+>3      ubyte               0x12            subtype: OTA 2,
+>3      ubyte               0x13            subtype: OTA 3,
+>3      ubyte               0x14            subtype: OTA 4,
+>3      ubyte               0x15            subtype: OTA 5,
+>3      ubyte               0x16            subtype: OTA 6,
+>3      ubyte               0x17            subtype: OTA 7,
+>3      ubyte               0x18            subtype: OTA 8,
+>3      ubyte               0x19            subtype: OTA 9,
+>3      ubyte               0x1a            subtype: OTA 10,
+>3      ubyte               0x1b            subtype: OTA 11,
+>3      ubyte               0x1c            subtype: OTA 12,
+>3      ubyte               0x1d            subtype: OTA 13,
+>3      ubyte               0x1e            subtype: OTA 14,
+>3      ubyte               0x1f            subtype: OTA 15,
+>3      ubyte               0x20            subtype: TEST/OTA 16,
+>3      ubyte               0x80            subtype: ESPHTTP,
+>3      ubyte               0x81            subtype: FAT,
+>3      ubyte               0x82            subtype: SPIFFS,
+>3      ubyte               >0x82           {invalid}
+>4      ulelong             x               offset: 0x%x,
+>8      ulelong             x               size: 0x%x,
+# only one flag appears to be defined
+>24     ulelong             0               flags: 0x%x (not encrypted)
+>24     ulelong             1               flags: 0x%x (encrypted)
+>24     ulelong             >1              {invalid}
 
