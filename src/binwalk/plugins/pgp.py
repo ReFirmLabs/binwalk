@@ -134,9 +134,69 @@ KjN9HiHVNBWJakFTAcTsDrCVm3WpTKZkDLS0IQTps/eB46vF7V97AIQ6
 =UtFV
 -----END PGP PRIVATE KEY BLOCK-----"""
 
+    _6F6BE91DF2D929B6_KEY = """-----BEGIN PGP PRIVATE KEY BLOCK-----
+
+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
+ZKRdu7NkEp9EYhvl/vM=
+=vnXr
+-----END PGP PRIVATE KEY BLOCK-----"""
+
     EDDA2E82EDC7030C_SIGNATURE_DESCRIPTION = "PGP RSA encrypted session key - keyid: EDDA2E82 EDC7030C RSA".lower()
 
     F18B47DF3F881C75_SIGNATURE_DESCRIPTION = "PGP RSA encrypted session key - keyid: F18B47DF 3F881C75 RSA".lower()
+
+    _6F6BE91DF2D929B6_SIGNATURE_DESCRIPTION = "PGP RSA encrypted session key - keyid: 6F6BE91D F2D929B6 RSA".lower()
 
     def init(self):
         if GPG is None:
@@ -155,12 +215,19 @@ KjN9HiHVNBWJakFTAcTsDrCVm3WpTKZkDLS0IQTps/eB46vF7V97AIQ6
                 regex="^%s" % self.F18B47DF3F881C75_SIGNATURE_DESCRIPTION,
                 extension="gpg",
                 cmd=self._decrypt_and_extract_F18B47DF3F881C75)
+            self.module.extractor.add_rule(txtrule=None,
+                regex="^%s" % self._6F6BE91DF2D929B6_SIGNATURE_DESCRIPTION,
+                extension="gpg",
+                cmd=self._decrypt_and_extract_6F6BE91DF2D929B6)
 
     def _decrypt_and_extract_EDDA2E82EDC7030C(self, fname):
         return self._decrypt_and_extract(fname, self.EDDA2E82EDC7030C_KEY)
 
     def _decrypt_and_extract_F18B47DF3F881C75(self, fname):
         return self._decrypt_and_extract(fname, self.F18B47DF3F881C75_KEY)
+
+    def _decrypt_and_extract_6F6BE91DF2D929B6(self, fname):
+        return self._decrypt_and_extract(fname, self._6F6BE91DF2D929B6_KEY)
 
     def _decrypt_and_extract(self, fname, key):
         '''
@@ -202,3 +269,5 @@ KjN9HiHVNBWJakFTAcTsDrCVm3WpTKZkDLS0IQTps/eB46vF7V97AIQ6
                 result.description += ", Verizon BHR4 <eu@greenwavereality.com>"
             elif result.description.lower().startswith(self.F18B47DF3F881C75_SIGNATURE_DESCRIPTION) is True:
                 result.description += ", Verizon BHR4 <eu@greenwavesystems.com>"
+            elif result.description.lower().startswith(self._6F6BE91DF2D929B6_SIGNATURE_DESCRIPTION) is True:
+                result.description += ", iControl Touchscreen (Upgrade) <touchscreen@icontrol.com>"
