@@ -730,6 +730,7 @@ class Extractor(Module):
             if not callable(rule['cmd']):
                 ordered_rules.append(rule)
 
+        binwalk.core.common.debug("Found %d/%d matches for '%s'" % (len(ordered_rules), len(self.extract_rules), description))
         return ordered_rules
 
     def _parse_rule(self, rule):
