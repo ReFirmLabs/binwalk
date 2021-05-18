@@ -53,6 +53,13 @@ $ sudo apt-get install mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabex
 ```
 
 ```bash
+# For Ubuntu users, the cramfsprogs package is no longer available. It can be installed from source.
+$ git clone https://github.com/davidribyrne/cramfs
+$ (cd cramfs && make)
+$ sudo cp cramfs/cramfsck cramfs/mkcramfs /usr/local/bin/
+```
+
+```bash
 # Install sasquatch to extract non-standard SquashFS images
 $ sudo apt-get install zlib1g-dev liblzma-dev liblzo2-dev
 $ git clone https://github.com/devttys0/sasquatch
@@ -68,7 +75,7 @@ $ (cd jefferson && sudo python setup.py install)
 
 ```bash
 # Install ubi_reader to extract UBIFS file systems
-$ sudo apt-get install liblzo2-dev python-lzo
+$ sudo apt-get install liblzo2-dev python3-lzo
 $ git clone https://github.com/jrspruitt/ubi_reader
 $ (cd ubi_reader && sudo python setup.py install)
 ```
