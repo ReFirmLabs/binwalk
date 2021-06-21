@@ -7,11 +7,8 @@ import zlib
 import binwalk.core.common
 from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg
+import numpy as np
 
-#try:
-#    import numpy as np
-#except ImportError:
-#    pass
 try:
     from numba import njit
 except ImportError:
@@ -253,7 +250,7 @@ class Entropy(Module):
 
     def shannon_numpy(self, data):
         if data:
-            return self._shannon_numpy(bytes2str(data))
+            return self._shannon_numpy(data.encode('utf-8'))
         else:
             return 0
     
