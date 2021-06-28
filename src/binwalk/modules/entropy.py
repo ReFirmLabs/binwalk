@@ -250,7 +250,7 @@ class Entropy(Module):
 
     def shannon_numpy(self, data):
         if data:
-            return self._shannon_numpy(data.encode('utf-8'))
+            return self._shannon_numpy(data.encode('latin-1'))
         else:
             return 0
     
