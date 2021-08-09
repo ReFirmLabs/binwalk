@@ -17,7 +17,7 @@ then
     function lsb_release {
         if [ -f /etc/os-release ]
         then
-            [[ "$1" = "-i" ]] && cat /etc/os-release | grep ^"ID" | cut -d= -f 2
+            [[ "$1" = "-i" ]] && cat /etc/os-release | grep ^"ID=" | cut -d= -f 2
             [[ "$1" = "-r" ]] && cat /etc/os-release | grep "VERSION_ID" | cut -d= -d'"' -f 2
         elif [ -f /etc/lsb-release ]
         then
