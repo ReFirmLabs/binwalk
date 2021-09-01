@@ -11,6 +11,7 @@ import tempfile
 import subprocess
 import binwalk.core.common
 from binwalk.core.compat import *
+from binwalk.core.exceptions import ModuleException
 from binwalk.core.module import Module, Option, Kwarg
 from binwalk.core.common import file_size, file_md5, unique_file_name, BlockFile
 
@@ -49,7 +50,7 @@ class Extractor(Module):
     UNIQUE_PATH_DELIMITER = '%%'
 
     # Unprivileged user account to execute external extraction utilities
-    UNPRIVILEGED_USER_NAME = 'binwalksafe'
+    UNPRIVILEGED_USER_NAME = 'binwalk_safe_user_69'
 
     TITLE = 'Extraction'
     ORDER = 9
@@ -108,6 +109,10 @@ class Extractor(Module):
                long='subdirs',
                kwargs={'extract_into_subdirs': True},
                description="Extract into sub-directories named by the offset"),
+        Option(short='0',
+               long='unsafe',
+               kwargs={'unsafe_extraction': True},
+               description="Execute external extractions without dropping privileges"),
     ]
 
     KWARGS = [
@@ -122,12 +127,25 @@ class Extractor(Module):
         Kwarg(name='manual_rules', default=[]),
         Kwarg(name='matryoshka', default=0),
         Kwarg(name='enabled', default=False),
+        Kwarg(name='unsafe_extraction', default=False),
     ]
 
     def load(self):
-        user_info = pwd.getpwnam(self.UNPRIVILEGED_USER_NAME)
-        self.unpriv_uid = user_info.pw_uid
-        self.unpriv_gid = user_info.pw_gid
+        self.unpriv_uid = None
+        self.unpriv_gid = None
+
+        if self.enabled is True and self.unsafe_extraction is False:
+            if os.getuid() != 0:
+                raise ModuleException("Binwalk requires root privileges to safely execute external extraction utilities as an unprivileged user.")
+
+            self.shell_call('useradd %s' % self.UNPRIVILEGED_USER_NAME)
+
+            user_info = pwd.getpwnam(self.UNPRIVILEGED_USER_NAME)
+            self.unpriv_uid = user_info.pw_uid
+            self.unpriv_gid = user_info.pw_gid
+        else:
+            self.unpriv_uid = os.getuid()
+            self.unpriv_gid = os.getgid()
 
         # Holds a list of extraction rules loaded either from a file or when
         # manually specified.
@@ -860,7 +878,6 @@ class Extractor(Module):
 
         Returns True on success, False on failure, or None if the external extraction utility could not be found.
         '''
-        tmp = None
         rval = 0
         retval = True
         command_list = []
@@ -879,11 +896,6 @@ class Extractor(Module):
                     retval = False
                     binwalk.core.common.warning("Internal extractor '%s' failed with exception: '%s'" % (str(cmd), str(e)))
             elif cmd:
-                # If not in debug mode, create a temporary file to redirect
-                # stdout and stderr to
-                if not binwalk.core.common.DEBUG:
-                    tmp = tempfile.TemporaryFile()
-
                 # Generate unique file paths for all paths in the current
                 # command that are surrounded by UNIQUE_PATH_DELIMITER
                 while self.UNIQUE_PATH_DELIMITER in cmd:
@@ -898,21 +910,9 @@ class Extractor(Module):
                     # command with fname
                     command = command.strip().replace(self.FILE_NAME_PLACEHOLDER, fname)
 
-                    # Fork a child to drop privs
-                    child_pid = os.fork()
-                    if child_pid is 0:
-                        # Switch to unprivileged user
-                        binwalk.core.common.debug("Dropping privileges to user '%s'" % self.UNPRIVILEGED_USER_NAME)
-                        os.setgid(self.unpriv_uid)
-                        os.setuid(self.unpriv_gid)
-
-                        # Execute external extractor
-                        binwalk.core.common.debug("subprocess.call(%s, stdout=%s, stderr=%s)" % (command, str(tmp), str(tmp)))
-                        rval = subprocess.call(shlex.split(command), stdout=tmp, stderr=tmp)
-                        sys.exit(rval)
-                    else:
-                        rval = os.wait()
-
+                    # Execute external extractor
+                    rval = self.shell_call(command)
+                    
                     # Check the return value to see if extraction was successful or not
                     if rval in codes:
                         retval = True
@@ -935,7 +935,33 @@ class Extractor(Module):
             binwalk.core.common.warning("Extractor.execute failed to run external extractor '%s': %s, '%s' might not be installed correctly" % (str(cmd), str(e), str(cmd)))
             retval = None
 
-        if tmp is not None:
-            tmp.close()
-
         return (retval, '&&'.join(command_list))
+
+    def shell_call(self, command):
+        # Fork a child to drop privs
+        child_pid = os.fork()
+        if child_pid is 0:
+            # Switch to unprivileged user, if one has been set
+            if self.unpriv_uid is not None and self.unpriv_gid is not None:
+                binwalk.core.common.debug("Dropping privileges to %d:%d" % (self.unpriv_uid, self.unpriv_gid))
+                os.setgid(self.unpriv_uid)
+                os.setuid(self.unpriv_gid)
+
+            # If not in debug mode, create a temporary file to redirect
+            # stdout and stderr to
+            if not binwalk.core.common.DEBUG:
+                tmp = tempfile.TemporaryFile()
+            else:
+                tmp = None
+
+            # Execute command
+            binwalk.core.common.debug("subprocess.call(%s, stdout=%s, stderr=%s)" % (command, str(tmp), str(tmp)))
+            rval = subprocess.call(shlex.split(command), stdout=tmp, stderr=tmp)
+
+            # Clean up temp file
+            if tmp is not None:
+                tmp.close()
+
+            sys.exit(rval)
+        else:
+            return os.wait()[1]
