@@ -4,6 +4,7 @@
 
 import os
 import re
+import pwd
 import stat
 import shlex
 import tempfile
@@ -46,6 +47,9 @@ class Extractor(Module):
     # Useful when, for example, extracting two squashfs images (squashfs-root,
     # squashfs-root-0).
     UNIQUE_PATH_DELIMITER = '%%'
+
+    # Unprivileged user account to execute external extraction utilities
+    UNPRIVILEGED_USER_NAME = 'binwalksafe'
 
     TITLE = 'Extraction'
     ORDER = 9
@@ -121,6 +125,10 @@ class Extractor(Module):
     ]
 
     def load(self):
+        user_info = pwd.getpwnam(self.UNPRIVILEGED_USER_NAME)
+        self.unpriv_uid = user_info.pw_uid
+        self.unpriv_gid = user_info.pw_gid
+
         # Holds a list of extraction rules loaded either from a file or when
         # manually specified.
         self.extract_rules = []
@@ -534,6 +542,9 @@ class Extractor(Module):
         else:
             output_directory = self.extraction_directories[path]
 
+        # Make sure unpriv user can access this directory
+        os.chown(output_directory, self.unpriv_uid, self.unpriv_gid)
+
         return output_directory
 
     def cleanup_extracted_files(self, tf=None):
@@ -826,6 +837,9 @@ class Extractor(Module):
             # Cleanup
             fdout.close()
             fdin.close()
+
+            # Make sure unprivileged user can access this file
+            os.chown(fname, self.unpriv_uid, self.unpriv_gid)
         except KeyboardInterrupt as e:
             raise e
         except Exception as e:
@@ -873,8 +887,7 @@ class Extractor(Module):
                 # Generate unique file paths for all paths in the current
                 # command that are surrounded by UNIQUE_PATH_DELIMITER
                 while self.UNIQUE_PATH_DELIMITER in cmd:
-                    need_unique_path = cmd.split(self.UNIQUE_PATH_DELIMITER)[
-                        1].split(self.UNIQUE_PATH_DELIMITER)[0]
+                    need_unique_path = cmd.split(self.UNIQUE_PATH_DELIMITER)[1].split(self.UNIQUE_PATH_DELIMITER)[0]
                     unique_path = binwalk.core.common.unique_file_name(need_unique_path)
                     cmd = cmd.replace(self.UNIQUE_PATH_DELIMITER + need_unique_path + self.UNIQUE_PATH_DELIMITER, unique_path)
 
@@ -885,9 +898,22 @@ class Extractor(Module):
                     # command with fname
                     command = command.strip().replace(self.FILE_NAME_PLACEHOLDER, fname)
 
-                    binwalk.core.common.debug("subprocess.call(%s, stdout=%s, stderr=%s)" % (command, str(tmp), str(tmp)))
-                    rval = subprocess.call(shlex.split(command), stdout=tmp, stderr=tmp)
+                    # Fork a child to drop privs
+                    child_pid = os.fork()
+                    if child_pid is 0:
+                        # Switch to unprivileged user
+                        binwalk.core.common.debug("Dropping privileges to user '%s'" % self.UNPRIVILEGED_USER_NAME)
+                        os.setgid(self.unpriv_uid)
+                        os.setuid(self.unpriv_gid)
 
+                        # Execute external extractor
+                        binwalk.core.common.debug("subprocess.call(%s, stdout=%s, stderr=%s)" % (command, str(tmp), str(tmp)))
+                        rval = subprocess.call(shlex.split(command), stdout=tmp, stderr=tmp)
+                        sys.exit(rval)
+                    else:
+                        rval = os.wait()
+
+                    # Check the return value to see if extraction was successful or not
                     if rval in codes:
                         retval = True
                     else:
