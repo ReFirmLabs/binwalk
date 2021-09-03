@@ -174,8 +174,8 @@ class Extractor(Module):
             self.config.verbose = True
 
     def add_pending(self, f):
-        # Ignore symlinks
-        if os.path.islink(f):
+        # Ignore symlinks, don't add new files unless recursion was requested
+        if os.path.islink(f) or not self.matryoshka:
             return
 
         # Get the file mode to check and see if it's a block/char device
@@ -286,25 +286,27 @@ class Extractor(Module):
 
                     # If recursion was specified, and the file is not the same
                     # one we just dd'd
-                    if (self.matryoshka and
-                        file_path != dd_file_path and
-                        scan_extracted_files and
-                            self.directory in real_file_path):
-                        # If the recursion level of this file is less than or
-                        # equal to our desired recursion level
-                        if len(real_file_path.split(self.directory)[1].split(os.path.sep)) <= self.matryoshka:
-                            # If this is a directory and we are supposed to process directories for this extractor,
-                            # then add all files under that directory to the
-                            # list of pending files.
-                            if os.path.isdir(file_path):
-                                for root, dirs, files in os.walk(file_path):
-                                    for f in files:
-                                        full_path = os.path.join(root, f)
-                                        self.add_pending(full_path)
-                            # If it's just a file, it to the list of pending
-                            # files
-                            else:
-                                self.add_pending(file_path)
+                    if file_path != dd_file_path:
+                        # If this is a directory and we are supposed to process directories for this extractor,
+                        # then add all files under that directory to the
+                        # list of pending files.
+                        if os.path.isdir(file_path):
+                            for root, dirs, files in os.walk(file_path):
+                                for f in files:
+                                    full_path = os.path.join(root, f)
+                                    
+                                    if os.path.islink(full_path):
+                                        self.symlink_repair(full_path)
+
+                                    # If the recursion level of this file is less than or equal to our desired recursion level
+                                    if len(real_file_path.split(self.directory)[1].split(os.path.sep)) <= self.matryoshka:
+                                        if scan_extracted_files and self.directory in real_file_path:
+                                                self.add_pending(full_path)
+
+                        # If it's just a file, it to the list of pending
+                        # files
+                        elif scan_extracted_files and self.directory in real_file_path:
+                            self.add_pending(file_path)
 
                 # Update the last directory listing for the next time we
                 # extract a file to this same output directory
@@ -959,3 +961,10 @@ class Extractor(Module):
             sys.exit(rval)
         else:
             return os.wait()[1]
+
+    def symlink_repair(self, symlink):
+        linktarget = os.path.realpath(symlink)
+        if not linktarget.startswith(self.directory):
+            os.remove(symlink)
+            os.symlink(os.devnull, symlink)
+            binwalk.core.common.warning("Symlink points outside of the extraction directory: %s -> %s" % (symlink, linktarget))
