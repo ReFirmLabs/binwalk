@@ -142,7 +142,7 @@ class Extractor(Module):
 
                 # Don't run as root, unless explicitly instructed to
                 if user_info.pw_uid == 0:
-                    raise ModuleException("Binwalk extraction uses many third party utilities, which may not be secure.\nIf you wish to have extraction utilities executed as the current user, use --run-as=%s (binwalk itself must be run as root)." % user_info.pw_name)
+                    raise ModuleException("Binwalk extraction uses many third party utilities, which may not be secure. If you wish to have extraction utilities executed as the current user, use '--run-as=%s' (binwalk itself must be run as root)." % user_info.pw_name)
             
                 # Run external applications as the current user 
                 self.runas_uid = user_info.pw_uid
@@ -297,16 +297,19 @@ class Extractor(Module):
                     # If recursion was specified, and the file is not the same
                     # one we just dd'd
                     if file_path != dd_file_path:
+                        # Symlinks can cause security issues if they point outside the extraction directory.
+                        self.symlink_sanitizer(file_path)
+
                         # If this is a directory and we are supposed to process directories for this extractor,
                         # then add all files under that directory to the
                         # list of pending files.
                         if os.path.isdir(file_path):
                             for root, dirs, files in os.walk(file_path):
+                                # Symlinks can cause security issues if they point outside the extraction directory.
+                                self.symlink_sanitizer([os.path.join(root, x) for x in dirs+files])
+
                                 for f in files:
                                     full_path = os.path.join(root, f)
-                                    
-                                    if os.path.islink(full_path):
-                                        self.symlink_repair(full_path)
 
                                     # If the recursion level of this file is less than or equal to our desired recursion level
                                     if len(real_file_path.split(self.directory)[1].split(os.path.sep)) <= self.matryoshka:
@@ -972,9 +975,18 @@ class Extractor(Module):
         else:
             return os.wait()[1]
 
-    def symlink_repair(self, symlink):
-        linktarget = os.path.realpath(symlink)
-        if not linktarget.startswith(self.directory):
-            binwalk.core.common.warning("Symlink points outside of the extraction directory: %s -> %s; for security, changing link target to %s." % (symlink, linktarget, os.devnull))
-            os.remove(symlink)
-            os.symlink(os.devnull, symlink)
+    def symlink_sanitizer(self, file_list):
+        # Allows either a single file path, or a list of file paths to be passed in for sanitization.
+        if type(file_list) is not list:
+            file_list = [file_list]
+        
+        # Sanitize any files in the list that are symlinks outside of the self.directory extraction directory.
+        for file_name in file_list:
+            if os.path.islink(file_name):
+                linktarget = os.path.realpath(file_name)
+                binwalk.core.common.debug("Analysing symlink: %s -> %s" % (file_name, linktarget))
+
+                if not linktarget.startswith(self.directory) and linktarget != os.devnull:
+                    binwalk.core.common.warning("Symlink points outside of the extraction directory: %s -> %s; changing link target to %s for security purposes." % (file_name, linktarget, os.devnull))
+                    os.remove(file_name)
+                    os.symlink(os.devnull, file_name)
