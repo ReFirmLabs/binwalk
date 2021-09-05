@@ -137,15 +137,25 @@ class Extractor(Module):
 
         if self.enabled is True:
             if self.runas_user is None:
-                if os.getuid() == 0:
-                    raise ModuleException("Binwalk extraction uses many third party utilities, which may not be secure.\nIf you wish to have extraction utilities executed as the current user, use --run-as=<user name>.")
+                # Get some info about the current user we're running under
+                user_info = pwd.getpwuid(os.getuid())
+
+                # Don't run as root, unless explicitly instructed to
+                if user_info.pw_uid == 0:
+                    raise ModuleException("Binwalk extraction uses many third party utilities, which may not be secure.\nIf you wish to have extraction utilities executed as the current user, use --run-as=%s (binwalk itself must be run as root)." % user_info.pw_name)
             
-                self.runas_uid = os.getuid()
-                self.runas_gid = os.getgid()
+                # Run external applications as the current user 
+                self.runas_uid = user_info.pw_uid
+                self.runas_gid = user_info.pw_gid
             else:
+                # Run external applications as the specified user
                 user_info = pwd.getpwnam(self.runas_user)
                 self.runas_uid = user_info.pw_uid
                 self.runas_gid = user_info.pw_gid
+
+                # Make sure we'll have permissions to switch to the different user
+                if self.runas_uid != os.getuid() and os.getuid() != 0:
+                    raise ModuleException("In order to execute third party applications as %s, binwalk must be run with root privileges." % self.runas_user)
 
         # Holds a list of extraction rules loaded either from a file or when
         # manually specified.
@@ -858,7 +868,7 @@ class Extractor(Module):
             fdout.close()
             fdin.close()
 
-            # Make sure runasileged user can access this file
+            # Make sure run-as user can access this file
             os.chown(fname, self.runas_uid, self.runas_gid)
         except KeyboardInterrupt as e:
             raise e
@@ -965,6 +975,6 @@ class Extractor(Module):
     def symlink_repair(self, symlink):
         linktarget = os.path.realpath(symlink)
         if not linktarget.startswith(self.directory):
+            binwalk.core.common.warning("Symlink points outside of the extraction directory: %s -> %s; for security, changing link target to %s." % (symlink, linktarget, os.devnull))
             os.remove(symlink)
             os.symlink(os.devnull, symlink)
-            binwalk.core.common.warning("Symlink points outside of the extraction directory: %s -> %s" % (symlink, linktarget))
