@@ -49,9 +49,6 @@ class Extractor(Module):
     # squashfs-root-0).
     UNIQUE_PATH_DELIMITER = '%%'
 
-    # Unprivileged user account to execute external extraction utilities
-    UNPRIVILEGED_USER_NAME = 'binwalk_safe_user_69'
-
     TITLE = 'Extraction'
     ORDER = 9
     PRIMARY = False
@@ -143,8 +140,8 @@ class Extractor(Module):
                 # Don't run as root, unless explicitly instructed to
                 if user_info.pw_uid == 0:
                     raise ModuleException("Binwalk extraction uses many third party utilities, which may not be secure. If you wish to have extraction utilities executed as the current user, use '--run-as=%s' (binwalk itself must be run as root)." % user_info.pw_name)
-            
-                # Run external applications as the current user 
+
+                # Run external applications as the current user
                 self.runas_uid = user_info.pw_uid
                 self.runas_gid = user_info.pw_gid
             else:
@@ -323,8 +320,7 @@ class Extractor(Module):
 
                 # Update the last directory listing for the next time we
                 # extract a file to this same output directory
-                self.last_directory_listing[
-                    extraction_directory] = directory_listing
+                self.last_directory_listing[extraction_directory] = directory_listing
 
     def append_rule(self, r):
         self.extract_rules.append(r.copy())
@@ -575,7 +571,7 @@ class Extractor(Module):
         else:
             output_directory = self.extraction_directories[path]
 
-        # Make sure runas user can access this directory
+        # Make sure run-as user can access this directory
         os.chown(output_directory, self.runas_uid, self.runas_gid)
 
         return output_directory
@@ -927,7 +923,7 @@ class Extractor(Module):
 
                     # Execute external extractor
                     rval = self.shell_call(command)
-                    
+
                     # Check the return value to see if extraction was successful or not
                     if rval in codes:
                         retval = True
@@ -979,7 +975,7 @@ class Extractor(Module):
         # Allows either a single file path, or a list of file paths to be passed in for sanitization.
         if type(file_list) is not list:
             file_list = [file_list]
-        
+
         # Sanitize any files in the list that are symlinks outside of the self.directory extraction directory.
         for file_name in file_list:
             if os.path.islink(file_name):
