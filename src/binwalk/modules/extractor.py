@@ -990,7 +990,7 @@ class Extractor(Module):
         if type(file_list) is not list:
             file_list = [file_list]
 
-        # Sanitize any files in the list that are symlinks outside of the self.directory extraction directory.
+        # Sanitize any files in the list that are symlinks outside of the specified extraction directory.
         for file_name in file_list:
             if os.path.islink(file_name):
                 linktarget = os.path.realpath(file_name)
