@@ -1,31 +1,33 @@
 import os
 import binwalk
-from nose.tools import eq_, ok_
+from nose.tools import eq_, ok_, assert_equal, assert_not_equal
 
 def test_dirtraversal():
     '''
     Test: Open dirtraversal.tar, scan for signatures.
     Verify that dangerous symlinks have been sanitized.
     '''
-    bad_symlink_file_list = ['foo', 'bar', 'foo2', 'bar2']
-    good_symlink_file_list = ['README_link', 'README2_link']
+    bad_symlink_file_list = ['foo', 'bar', 'subdir/foo2', 'subdir/bar2']
+    good_symlink_file_list = ['subdir/README_link', 'README2_link']
 
     input_vector_file = os.path.join(os.path.dirname(__file__),
                                      "input-vectors",
                                      "dirtraversal.tar")
 
+    output_directory = os.path.join(os.path.dirname(__file__),
+                                    "input-vectors",
+                                    "_dirtraversal.tar.extracted")
+
     scan_result = binwalk.scan(input_vector_file,
                                signature=True,
                                extract=True,
-                               quiet=True)
-
-    # Test number of modules used
-    eq_(len(scan_result), 1)
+                               quiet=True)[0]
 
     # Make sure the bad symlinks have been sanitized and the
     # good symlinks have not been sanitized.
-    for result in scan_result[0].results:
-        if result.file.name in bad_symlink_file_list:
-            assert_equal(os.path.realpath(result.file.path), os.devnull)
-        elif result.file.name in good_symlink_file_list:
-            assert_not_equal(os.path.realpath(result.file.path), os.devnull)
+    for symlink in bad_symlink_file_list:
+        linktarget = os.path.realpath(os.path.join(output_directory, symlink))
+        assert_equal(linktarget, os.devnull)
+    for symlink in good_symlink_file_list:
+        linktarget = os.path.realpath(os.path.join(output_directory, symlink))
+        assert_not_equal(linktarget, os.devnull)

@@ -295,7 +295,7 @@ class Extractor(Module):
                     # one we just dd'd
                     if file_path != dd_file_path:
                         # Symlinks can cause security issues if they point outside the extraction directory.
-                        self.symlink_sanitizer(file_path)
+                        self.symlink_sanitizer(file_path, extraction_directory)
 
                         # If this is a directory and we are supposed to process directories for this extractor,
                         # then add all files under that directory to the
@@ -303,7 +303,7 @@ class Extractor(Module):
                         if os.path.isdir(file_path):
                             for root, dirs, files in os.walk(file_path):
                                 # Symlinks can cause security issues if they point outside the extraction directory.
-                                self.symlink_sanitizer([os.path.join(root, x) for x in dirs+files])
+                                self.symlink_sanitizer([os.path.join(root, x) for x in dirs+files], extraction_directory)
 
                                 for f in files:
                                     full_path = os.path.join(root, f)
@@ -949,29 +949,43 @@ class Extractor(Module):
         return (retval, '&&'.join(command_list))
 
     def shell_call(self, command):
-        child_pid = os.fork()
-        if child_pid is 0:
-            # Switch to the run-as user privileges, if one has been set
-            if self.runas_uid is not None and self.runas_gid is not None:
-                binwalk.core.common.debug("Switching privileges to %s (%d:%d)" % (self.runas_user, self.runas_uid, self.runas_gid))
-                os.setgid(self.runas_uid)
-                os.setuid(self.runas_gid)
+        # If not in debug mode, redirect output to /dev/null
+        if not binwalk.core.common.DEBUG:
+            tmp = subprocess.DEVNULL
+        else:
+            tmp = None
 
-            # If not in debug mode, redirect output to /dev/null
-            if not binwalk.core.common.DEBUG:
-                tmp = subprocess.DEVNULL
-            else:
-                tmp = None
-
-            # Execute command
+        # If a run-as user is not the current user, we'll need to switch privileges to that user account
+        if self.runas_uid != os.getuid():
+            binwalk.core.common.debug("Switching privileges to %s (%d:%d)" % (self.runas_user, self.runas_uid, self.runas_gid))
+            
+            # Fork a child process
+            child_pid = os.fork()
+            if child_pid is 0:
+                # Switch to the run-as user privileges, if one has been set
+                if self.runas_uid is not None and self.runas_gid is not None:
+                    os.setgid(self.runas_uid)
+                    os.setuid(self.runas_gid)
+        else:
+            # child_pid of None indicates that no os.fork() occured
+            child_pid = None
+            
+        # If we're the child, or there was no os.fork(), execute the command
+        if child_pid in [0, None]:
             binwalk.core.common.debug("subprocess.call(%s, stdout=%s, stderr=%s)" % (command, str(tmp), str(tmp)))
             rval = subprocess.call(shlex.split(command), stdout=tmp, stderr=tmp)
 
+        # A true child process should exit with the subprocess exit value
+        if child_pid is 0:
             sys.exit(rval)
+        # If no os.fork() happened, just return the subprocess exit value
+        elif child_pid is None:
+            return rval
+        # Else, os.fork() happened and we're the parent. Wait and return the child's exit value.
         else:
             return os.wait()[1]
 
-    def symlink_sanitizer(self, file_list):
+    def symlink_sanitizer(self, file_list, extraction_directory):
         # Allows either a single file path, or a list of file paths to be passed in for sanitization.
         if type(file_list) is not list:
             file_list = [file_list]
@@ -982,7 +996,7 @@ class Extractor(Module):
                 linktarget = os.path.realpath(file_name)
                 binwalk.core.common.debug("Analysing symlink: %s -> %s" % (file_name, linktarget))
 
-                if not linktarget.startswith(self.directory) and linktarget != os.devnull:
+                if not linktarget.startswith(extraction_directory) and linktarget != os.devnull:
                     binwalk.core.common.warning("Symlink points outside of the extraction directory: %s -> %s; changing link target to %s for security purposes." % (file_name, linktarget, os.devnull))
                     os.remove(file_name)
                     os.symlink(os.devnull, file_name)
