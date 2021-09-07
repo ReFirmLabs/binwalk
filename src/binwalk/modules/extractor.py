@@ -99,6 +99,10 @@ class Extractor(Module):
         #       type=int,
         #       kwargs={'recursive_max_size': 0},
         #       description="Limit the total size of all extracted files"),
+        Option(short='1',
+               long='preserve-symlinks',
+               kwargs={'do_not_sanitize_symlinks': True},
+               description="Do not sanitize extracted symlinks that point outside the extraction directory (dangerous)"),
         Option(short='r',
                long='rm',
                kwargs={'remove_after_execute': True},
@@ -118,6 +122,7 @@ class Extractor(Module):
         Kwarg(name='recursive_max_size', default=None),
         Kwarg(name='max_count', default=None),
         Kwarg(name='base_directory', default=None),
+        Kwarg(name='do_not_sanitize_symlinks', default=False),
         Kwarg(name='remove_after_execute', default=False),
         Kwarg(name='load_default_rules', default=False),
         Kwarg(name='run_extractors', default=True),
@@ -986,6 +991,10 @@ class Extractor(Module):
             return os.wait()[1]
 
     def symlink_sanitizer(self, file_list, extraction_directory):
+        # User can disable this if desired
+        if self.do_not_sanitize_symlinks is True:
+            return 
+
         # Allows either a single file path, or a list of file paths to be passed in for sanitization.
         if type(file_list) is not list:
             file_list = [file_list]
