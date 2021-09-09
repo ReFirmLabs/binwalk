@@ -1,3 +1,4 @@
+import idaapi
 if idaapi.IDA_SDK_VERSION <= 695:
     import idc
     import idaapi
