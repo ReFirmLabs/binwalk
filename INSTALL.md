@@ -1,17 +1,12 @@
 Before You Start
 ================
 
-Binwalk supports Python 2.7 - 3.x. Although most systems have Python2.7 set as their default Python interpreter, binwalk does run faster in Python3. Installation procedures for both are provided below.
+Binwalk supports Python 3.6+. 
 
 Installation
 ============
 
 Installation follows the typical Python installation procedure:
-
-```bash
-# Python2.7
-$ sudo python setup.py install
-```
 
 ```bash
 # Python3.x
@@ -25,40 +20,21 @@ Dependencies
 
 Besides a Python interpreter, there are no installation dependencies for binwalk. All dependencies are optional run-time dependencies, and unless otherwise specified, are available from most Linux package managers.
 
-Although all binwalk run-time dependencies are optional, the `python-lzma` module is highly recommended for improving the reliability of signature scans. This module is included by default in Python3, but must be installed separately for Python2.7:
-
-```bash
-$ sudo apt-get install python-lzma
-```
-
 Binwalk uses the `nosetest` library for tests and `coverage` for test-coverage:
 
 ```bash
 $ sudo pip install nose coverage
 ```
 
-Binwalk uses the `pycrypto` library to decrypt some known encrypted firmware images:
+Binwalk uses the `pycryptodome` (`pycrypto`-compatible module that is still maintained) library to decrypt some known encrypted firmware images:
 
 ```bash
-# Python2.7
-$ sudo apt-get install python-crypto
+$ sudo pip install pycryptodome
 ```
 
-```bash
-# Python3.x
-$ sudo apt-get install python3-crypto
-```
-
-Binwalk uses [pyqtgraph](http://www.pyqtgraph.org) to generate graphs and visualizations, which requires the following: 
+Binwalk uses [pyqtgraph](http://www.pyqtgraph.org) to generate graphs and visualizations, which requires the following (exact dependencies may vary based on your distro refer to `deps.sh` for more details): 
 
 ```bash
-# Python2.7
-$ sudo apt-get install libqt4-opengl python-opengl python-qt4 python-qt4-gl python-numpy python-scipy python-pip
-$ sudo pip install pyqtgraph
-```
-
-```bash
-# Python3.x
 $ sudo apt-get install libqt4-opengl python3-opengl python3-pyqt4 python3-pyqt4.qtopengl python3-numpy python3-scipy python3-pip
 $ sudo pip3 install pyqtgraph
 ```
@@ -66,15 +42,7 @@ $ sudo pip3 install pyqtgraph
 Binwalk's `--disasm` option requires the [Capstone](http://www.capstone-engine.org/) disassembly framework and its corresponding Python bindings:
 
 ```bash
-# Python2.7
-$ sudo apt-get install python-pip
 $ sudo pip install capstone
-```
-
-```bash
-# Python3.x
-$ sudo apt-get install python3-pip
-$ sudo pip3 install capstone
 ```
 
 Binwalk relies on multiple external utilties in order to automatically extract/decompress files and data:
@@ -143,11 +111,6 @@ Uninstalling Binwalk
 ====================
 
 If binwalk has been installed to a standard system location (e.g., via `setup.py install`), it can be removed by running:
-
-```bash
-# Python2.7
-$ sudo python setup.py uninstall
-```
 
 ```bash
 # Python3

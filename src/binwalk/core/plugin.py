@@ -120,6 +120,8 @@ class Plugins(object):
                 raise e
             except IgnoreFileException as e:
                 raise e
+            except SystemError as e:
+                raise e
             except Exception as e:
                 binwalk.core.common.warning("%s.%s failed [%s]: '%s'" % (callback.__module__, callback.__name__, type(e), e))
 

@@ -4,12 +4,14 @@
 
 import os
 import re
+import pwd
 import stat
 import shlex
 import tempfile
 import subprocess
 import binwalk.core.common
 from binwalk.core.compat import *
+from binwalk.core.exceptions import ModuleException
 from binwalk.core.module import Module, Option, Kwarg
 from binwalk.core.common import file_size, file_md5, unique_file_name, BlockFile
 
@@ -87,11 +89,20 @@ class Extractor(Module):
                type=int,
                kwargs={'max_count': 0},
                description='Limit the number of extracted files'),
+        Option(short='0',
+               long='run-as',
+               type=str,
+               kwargs={'runas_user': 0},
+               description="Execute external extraction utilities with the specified user's privileges"),
         #Option(short='u',
         #       long='limit',
         #       type=int,
         #       kwargs={'recursive_max_size': 0},
         #       description="Limit the total size of all extracted files"),
+        Option(short='1',
+               long='preserve-symlinks',
+               kwargs={'do_not_sanitize_symlinks': True},
+               description="Do not sanitize extracted symlinks that point outside the extraction directory (dangerous)"),
         Option(short='r',
                long='rm',
                kwargs={'remove_after_execute': True},
@@ -111,6 +122,7 @@ class Extractor(Module):
         Kwarg(name='recursive_max_size', default=None),
         Kwarg(name='max_count', default=None),
         Kwarg(name='base_directory', default=None),
+        Kwarg(name='do_not_sanitize_symlinks', default=False),
         Kwarg(name='remove_after_execute', default=False),
         Kwarg(name='load_default_rules', default=False),
         Kwarg(name='run_extractors', default=True),
@@ -118,9 +130,35 @@ class Extractor(Module):
         Kwarg(name='manual_rules', default=[]),
         Kwarg(name='matryoshka', default=0),
         Kwarg(name='enabled', default=False),
+        Kwarg(name='runas_user', default=None),
     ]
 
     def load(self):
+        self.runas_uid = None
+        self.runas_gid = None
+
+        if self.enabled is True:
+            if self.runas_user is None:
+                # Get some info about the current user we're running under
+                user_info = pwd.getpwuid(os.getuid())
+
+                # Don't run as root, unless explicitly instructed to
+                if user_info.pw_uid == 0:
+                    raise ModuleException("Binwalk extraction uses many third party utilities, which may not be secure. If you wish to have extraction utilities executed as the current user, use '--run-as=%s' (binwalk itself must be run as root)." % user_info.pw_name)
+
+                # Run external applications as the current user
+                self.runas_uid = user_info.pw_uid
+                self.runas_gid = user_info.pw_gid
+            else:
+                # Run external applications as the specified user
+                user_info = pwd.getpwnam(self.runas_user)
+                self.runas_uid = user_info.pw_uid
+                self.runas_gid = user_info.pw_gid
+
+                # Make sure we'll have permissions to switch to the different user
+                if self.runas_uid != os.getuid() and os.getuid() != 0:
+                    raise ModuleException("In order to execute third party applications as %s, binwalk must be run with root privileges." % self.runas_user)
+
         # Holds a list of extraction rules loaded either from a file or when
         # manually specified.
         self.extract_rules = []
@@ -148,8 +186,8 @@ class Extractor(Module):
             self.config.verbose = True
 
     def add_pending(self, f):
-        # Ignore symlinks
-        if os.path.islink(f):
+        # Ignore symlinks, don't add new files unless recursion was requested
+        if os.path.islink(f) or not self.matryoshka:
             return
 
         # Get the file mode to check and see if it's a block/char device
@@ -260,30 +298,34 @@ class Extractor(Module):
 
                     # If recursion was specified, and the file is not the same
                     # one we just dd'd
-                    if (self.matryoshka and
-                        file_path != dd_file_path and
-                        scan_extracted_files and
-                            self.directory in real_file_path):
-                        # If the recursion level of this file is less than or
-                        # equal to our desired recursion level
-                        if len(real_file_path.split(self.directory)[1].split(os.path.sep)) <= self.matryoshka:
-                            # If this is a directory and we are supposed to process directories for this extractor,
-                            # then add all files under that directory to the
-                            # list of pending files.
-                            if os.path.isdir(file_path):
-                                for root, dirs, files in os.walk(file_path):
-                                    for f in files:
-                                        full_path = os.path.join(root, f)
-                                        self.add_pending(full_path)
-                            # If it's just a file, it to the list of pending
-                            # files
-                            else:
-                                self.add_pending(file_path)
+                    if file_path != dd_file_path:
+                        # Symlinks can cause security issues if they point outside the extraction directory.
+                        self.symlink_sanitizer(file_path, extraction_directory)
+
+                        # If this is a directory and we are supposed to process directories for this extractor,
+                        # then add all files under that directory to the
+                        # list of pending files.
+                        if os.path.isdir(file_path):
+                            for root, dirs, files in os.walk(file_path):
+                                # Symlinks can cause security issues if they point outside the extraction directory.
+                                self.symlink_sanitizer([os.path.join(root, x) for x in dirs+files], extraction_directory)
+
+                                for f in files:
+                                    full_path = os.path.join(root, f)
+
+                                    # If the recursion level of this file is less than or equal to our desired recursion level
+                                    if len(real_file_path.split(self.directory)[1].split(os.path.sep)) <= self.matryoshka:
+                                        if scan_extracted_files and self.directory in real_file_path:
+                                                self.add_pending(full_path)
+
+                        # If it's just a file, it to the list of pending
+                        # files
+                        elif scan_extracted_files and self.directory in real_file_path:
+                            self.add_pending(file_path)
 
                 # Update the last directory listing for the next time we
                 # extract a file to this same output directory
-                self.last_directory_listing[
-                    extraction_directory] = directory_listing
+                self.last_directory_listing[extraction_directory] = directory_listing
 
     def append_rule(self, r):
         self.extract_rules.append(r.copy())
@@ -534,6 +576,9 @@ class Extractor(Module):
         else:
             output_directory = self.extraction_directories[path]
 
+        # Make sure run-as user can access this directory
+        os.chown(output_directory, self.runas_uid, self.runas_gid)
+
         return output_directory
 
     def cleanup_extracted_files(self, tf=None):
@@ -730,6 +775,7 @@ class Extractor(Module):
             if not callable(rule['cmd']):
                 ordered_rules.append(rule)
 
+        binwalk.core.common.debug("Found %d/%d matches for '%s'" % (len(ordered_rules), len(self.extract_rules), description))
         return ordered_rules
 
     def _parse_rule(self, rule):
@@ -825,6 +871,9 @@ class Extractor(Module):
             # Cleanup
             fdout.close()
             fdin.close()
+
+            # Make sure run-as user can access this file
+            os.chown(fname, self.runas_uid, self.runas_gid)
         except KeyboardInterrupt as e:
             raise e
         except Exception as e:
@@ -845,7 +894,6 @@ class Extractor(Module):
 
         Returns True on success, False on failure, or None if the external extraction utility could not be found.
         '''
-        tmp = None
         rval = 0
         retval = True
         command_list = []
@@ -864,16 +912,10 @@ class Extractor(Module):
                     retval = False
                     binwalk.core.common.warning("Internal extractor '%s' failed with exception: '%s'" % (str(cmd), str(e)))
             elif cmd:
-                # If not in debug mode, create a temporary file to redirect
-                # stdout and stderr to
-                if not binwalk.core.common.DEBUG:
-                    tmp = tempfile.TemporaryFile()
-
                 # Generate unique file paths for all paths in the current
                 # command that are surrounded by UNIQUE_PATH_DELIMITER
                 while self.UNIQUE_PATH_DELIMITER in cmd:
-                    need_unique_path = cmd.split(self.UNIQUE_PATH_DELIMITER)[
-                        1].split(self.UNIQUE_PATH_DELIMITER)[0]
+                    need_unique_path = cmd.split(self.UNIQUE_PATH_DELIMITER)[1].split(self.UNIQUE_PATH_DELIMITER)[0]
                     unique_path = binwalk.core.common.unique_file_name(need_unique_path)
                     cmd = cmd.replace(self.UNIQUE_PATH_DELIMITER + need_unique_path + self.UNIQUE_PATH_DELIMITER, unique_path)
 
@@ -884,9 +926,10 @@ class Extractor(Module):
                     # command with fname
                     command = command.strip().replace(self.FILE_NAME_PLACEHOLDER, fname)
 
-                    binwalk.core.common.debug("subprocess.call(%s, stdout=%s, stderr=%s)" % (command, str(tmp), str(tmp)))
-                    rval = subprocess.call(shlex.split(command), stdout=tmp, stderr=tmp)
+                    # Execute external extractor
+                    rval = self.shell_call(command)
 
+                    # Check the return value to see if extraction was successful or not
                     if rval in codes:
                         retval = True
                     else:
@@ -908,7 +951,61 @@ class Extractor(Module):
             binwalk.core.common.warning("Extractor.execute failed to run external extractor '%s': %s, '%s' might not be installed correctly" % (str(cmd), str(e), str(cmd)))
             retval = None
 
-        if tmp is not None:
-            tmp.close()
-
         return (retval, '&&'.join(command_list))
+
+    def shell_call(self, command):
+        # If not in debug mode, redirect output to /dev/null
+        if not binwalk.core.common.DEBUG:
+            tmp = subprocess.DEVNULL
+        else:
+            tmp = None
+
+        # If a run-as user is not the current user, we'll need to switch privileges to that user account
+        if self.runas_uid != os.getuid():
+            binwalk.core.common.debug("Switching privileges to %s (%d:%d)" % (self.runas_user, self.runas_uid, self.runas_gid))
+            
+            # Fork a child process
+            child_pid = os.fork()
+            if child_pid is 0:
+                # Switch to the run-as user privileges, if one has been set
+                if self.runas_uid is not None and self.runas_gid is not None:
+                    os.setgid(self.runas_uid)
+                    os.setuid(self.runas_gid)
+        else:
+            # child_pid of None indicates that no os.fork() occured
+            child_pid = None
+            
+        # If we're the child, or there was no os.fork(), execute the command
+        if child_pid in [0, None]:
+            binwalk.core.common.debug("subprocess.call(%s, stdout=%s, stderr=%s)" % (command, str(tmp), str(tmp)))
+            rval = subprocess.call(shlex.split(command), stdout=tmp, stderr=tmp)
+
+        # A true child process should exit with the subprocess exit value
+        if child_pid is 0:
+            sys.exit(rval)
+        # If no os.fork() happened, just return the subprocess exit value
+        elif child_pid is None:
+            return rval
+        # Else, os.fork() happened and we're the parent. Wait and return the child's exit value.
+        else:
+            return os.wait()[1]
+
+    def symlink_sanitizer(self, file_list, extraction_directory):
+        # User can disable this if desired
+        if self.do_not_sanitize_symlinks is True:
+            return 
+
+        # Allows either a single file path, or a list of file paths to be passed in for sanitization.
+        if type(file_list) is not list:
+            file_list = [file_list]
+
+        # Sanitize any files in the list that are symlinks outside of the specified extraction directory.
+        for file_name in file_list:
+            if os.path.islink(file_name):
+                linktarget = os.path.realpath(file_name)
+                binwalk.core.common.debug("Analysing symlink: %s -> %s" % (file_name, linktarget))
+
+                if not linktarget.startswith(extraction_directory) and linktarget != os.devnull:
+                    binwalk.core.common.warning("Symlink points outside of the extraction directory: %s -> %s; changing link target to %s for security purposes." % (file_name, linktarget, os.devnull))
+                    os.remove(file_name)
+                    os.symlink(os.devnull, file_name)

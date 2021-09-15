@@ -1,20 +1,45 @@
+os: linux
+dist: bionic
 language: python
-python:
- - "2.7"
- - "3.4"
- - "3.5"
- - "3.6"
- - "3.7"
- - "3.8"
- - "nightly"
- - "pypy"
- - "pypy3"
+arch: amd64
+addons:
+  apt:
+    update: true
 install:
- - pip install coverage
- - pip install backports.lzma
- - ./setup.py install
-script: ./setup.py test
-cache: pip
-matrix:
-  allow_failures:
-   - python: nightly
+  - export PYTHON=$(which python3)
+  - ./deps.sh --yes
+  - sudo -E $PYTHON -mpip install coverage
+  - sudo -E $PYTHON ./setup.py install
+script:
+  - export PYTHON=$(which python3)
+  - sudo -E $PYTHON ./setup.py test
+jobs:
+  include:
+   - stage: test
+     services: docker
+     install: echo "No install for this job"
+     script: docker build .
+   - stage: test
+     dist: bionic
+     python: 3.6
+   - stage: test
+     dist: bionic
+     python: 3.7
+   - stage: test
+     dist: bionic
+     python: 3.8
+   - stage: test
+     dist: bionic
+     python: 3.9
+   - stage: test
+     dist: focal
+     python: 3.6
+   - stage: test
+     dist: focal
+     python: 3.7
+   - stage: test
+     dist: focal
+     python: 3.8
+   - stage: test
+     dist: focal
+     python: 3.9

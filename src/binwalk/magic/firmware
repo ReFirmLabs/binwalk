@@ -3,9 +3,9 @@
 
 # uImage file     
 # From: Craig Heffner, U-Boot image.h header definitions file
-0      belong    0x27051956     uImage header, header size: 64 bytes,
+0      ubelong    0x27051956     uImage header, header size: 64 bytes,
 >4     ubelong   x              header CRC: 0x%X,
->8     ubedate    x              created: %s,
+>8     ubedate   x              created: %s,
 >12    belong    <1             {invalid}
 >12    ubelong   x              image size: %d bytes,
 >16    ubelong   x              Data Address: 0x%X,
@@ -51,7 +51,6 @@
 >29    byte      16             CPU: Blackfin,
 >29    byte      17             CPU: AVR,
 >29    byte      18             CPU: STMicroelectronics ST200,
-#>30    byte    x        image type: %d,
 >30    byte      0              image type: {invalid} Image,
 >30    byte      1              image type: Standalone Program,
 >30    byte      2              image type: OS Kernel Image,
@@ -65,7 +64,7 @@
 >31    byte      1              compression type: gzip,
 >31    byte      2              compression type: bzip2,
 >31    byte      3              compression type: lzma,
->32    string    x              image name: "%s"
+>32    string    x              image name: "%.32s"
 
 # Hilink encrypted uImage firmware.
 # Additional validation/processing is done by the hilink.py plugin.
@@ -910,3 +909,83 @@
 # Toshiba SSD Firmware Update
 # The version string seems to be at 0xe2f4, but I'm unsure if that offset is fixed
 0           string    ID\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00 Toshiba SSD Firmware Update
+
+# bix file
+# This is just a U-Boot header file with different magic at offset 0. It is
+# used by at least Zyxel in their GS1900-series switches, but shows up in
+# firmware for Cisco Sx220 switches as well.
+0      ubelong   0x83800000     bix header, header size: 64 bytes,
+>4     ubelong   x              header CRC: 0x%X,
+>8     ubedate   x              created: %s,
+>12    belong    <1             {invalid}
+>12    ubelong   x              image size: %d bytes,
+>16    ubelong   x              Data Address: 0x%X,
+>20    ubelong   x              Entry Point: 0x%X,
+>24    ubelong   x              data CRC: 0x%X,
+>28    byte      0              OS: {invalid}invalid OS,
+>28    byte      1              OS: OpenBSD,
+>28    byte      2              OS: NetBSD,
+>28    byte      3              OS: FreeBSD,
+>28    byte      4              OS: 4.4BSD,
+>28    byte      5              OS: Linux,
+>28    byte      6              OS: SVR4,
+>28    byte      7              OS: Esix,
+>28    byte      8              OS: Solaris,
+>28    byte      9              OS: Irix,
+>28    byte      10             OS: SCO,
+>28    byte      11             OS: Dell,
+>28    byte      12             OS: NCR,
+>28    byte      13             OS: LynxOS,
+>28    byte      14             OS: VxWorks,
+>28    byte      15             OS: pSOS,
+>28    byte      16             OS: QNX,
+>28    byte      17             OS: Firmware,
+>28    byte      18             OS: RTEMS,
+>28    byte      19             OS: ARTOS,
+>28    byte      20             OS: Unity OS,
+>29    byte      0              CPU: {invalid}invalid CPU,
+>29    byte      1              CPU: Alpha,
+>29    byte      2              CPU: ARM,
+>29    byte      3              CPU: Intel x86,
+>29    byte      4              CPU: IA64,
+>29    byte      5              CPU: MIPS,
+>29    byte      6              CPU: MIPS 64 bit,
+>29    byte      7              CPU: PowerPC,
+>29    byte      8              CPU: IBM S390,
+>29    byte      9              CPU: SuperH,
+>29    byte      10             CPU: Sparc,
+>29    byte      11             CPU: Sparc 64 bit,
+>29    byte      12             CPU: M68K,
+>29    byte      13             CPU: Nios-32,
+>29    byte      14             CPU: MicroBlaze,
+>29    byte      15             CPU: Nios-II,
+>29    byte      16             CPU: Blackfin,
+>29    byte      17             CPU: AVR,
+>29    byte      18             CPU: STMicroelectronics ST200,
+>30    byte      0              image type: {invalid} Image,
+>30    byte      1              image type: Standalone Program,
+>30    byte      2              image type: OS Kernel Image,
+>30    byte      3              image type: RAMDisk Image,
+>30    byte      4              image type: Multi-File Image,
+>30    byte      5              image type: Firmware Image,
+>30    byte      6              image type: Script file,
+>30    byte      7              image type: Filesystem Image,
+>30    byte      8              image type: Binary Flat Device Tree Blob
+>31    byte      0              compression type: none,
+>31    byte      1              compression type: gzip,
+>31    byte      2              compression type: bzip2,
+>31    byte      3              compression type: lzma,
+>32    string    x              image name: "%s"
+
+# AUTEL EVO I/II
+# https://github.com/anthok/autel
+0 string "<filetransfer>" Autel EVO Upgrade Transfer{overlap},
+>16 string "<fileinfo>"
+>28 belong x filename_size: {strlen:%d}%d,
+>32 belong x 
+>36 string x filename: {string}%s,
+>(28.L+36) string "<filecontent>"
+>(28.L+36+15) belong x file_size: %d,
+>(28.L+36+15+4) belong x 
+
+

@@ -37,15 +37,26 @@
 >>30    ubelong     !0x6d696d65     at least v2.0 to extract,
 >4      byte        0x2d
 >>30    ubelong     !0x6d696d65     at least v3.0 to extract,
+
+# From: https://github.com/threatstack/libmagic/blob/master/magic/Magdir/archive
+# Specialised zip formats which start with a member named 'mimetype'
+# (stored uncompressed, with no 'extra field') containing the file's MIME type.
+# Check for have 8-byte name, 0-byte extra field, name "mimetype", and
+# contents starting with "application/". These aren't normal ZIP files and they
+# don't extract properly; mark them as invalid.
+>26	string	    \x08\x00\x00\x00mimetypeapplication/    OpenDocument Text,{invalid}
+
 >18     lelong      !0
->>18    ulelong      x              compressed size: %d,
->>18    ulelong      x              {jump:%d}
+>>18    lelong      x              compressed size: %d,
+>>18    ulelong	    !0xFFFFFFFF
+>>>18   ulelong     x              {jump:%d}
 >22     lelong      !0
->>22    ulelong     x               uncompressed size: %d,
+>>22    lelong     x               uncompressed size: %d,
 >30     byte        <0x2D           {invalid}
 >30     byte        >0x7A           {invalid}
 >26     leshort     x               {strlen:%d}
 >30     string      x               name: {string}%s
+
 
 # ZIP footer
 0       string      PK\x05\x06      End of Zip archive,

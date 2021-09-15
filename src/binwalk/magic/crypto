@@ -138,6 +138,26 @@
 >72     string          sha512                  %s
 >72     string          ripemd160               %s
 
+#-------------------------------------------------------------------------------
+# Nagra Stuff
+0      string          \x00\x00\x01\6c         Nagra PK
+>4     ubelong         x                       Ird: %X
+>9     byte            <0x03                   {invalid}        
+>9     byte            >0x03                   {invalid}       
+>9     byte             0x03                   Padding?!
+#---------------------------NAGRA-----------------------------------------------
+0      string         \x10\x19\x24\x31         Nagra Constant_KEY
+0>     ubelong         x                       IDEA_Key: %X 
+4>     ubelong         x                       %X  
+8>     ubelong         x                       %X
+
+# The Rijndael S-Box
+0      string    \x63\x7C\x77\x7B   AES S-Box
+>4     string   !\xF2\x6B\x6F\xC5   {invalid} 
+        
+0      string    \x52\x09\x6a\xd5   AES Inverse S-Box 
+>4     string   !\x30\x36\xA5\x38   {invalid}
+
 # magic signatures to detect PGP crypto material (from stef)
 # detects and extracts metadata from:
 #  - symmetric encrypted packet header
@@ -249,3 +269,4 @@
 
 0   string \x80\x10\x80\x20\x80\x00\x80\x00\x00\x00\x80\x00\x00\x10\x80\x20\x00\x10\x00\x00\x00\x00\x00\x20\x80\x10\x00\x20\x80\x00\x80\x20 DES SP2, big endian
 0   string \x20\x80\x10\x80\x00\x80\x00\x80\x00\x80\x00\x00\x20\x80\x10\x00\x00\x00\x10\x00\x20\x00\x00\x00\x20\x00\x10\x80\x20\x80\x00\x80 DES SP2, little endian
+

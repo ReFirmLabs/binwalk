@@ -8,7 +8,9 @@ else
     YES=0
 fi
 
+set -eu
 set -o nounset
+set -x
 
 if ! which lsb_release > /dev/null
 then
@@ -41,52 +43,55 @@ APTGETCMD="apt-get"
 YUMCMD="yum"
 if [ $distro = "Kali" ]
 then
-    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract util-linux firmware-mod-kit cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop cpio"
-elif [ $distro_version = "17" ]
+    APT_CANDIDATES="git locales build-essential qt5base-dev mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract util-linux firmware-mod-kit cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop cpio"
+elif [ $distro_version = "14" ]
 then
-    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
+    APT_CANDIDATES="git locales build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
+elif [ $distro_version = "15" ]
+then
+    APT_CANDIDATES="git locales build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
+elif [ $distro_version = "16" ]
+then
+    APT_CANDIDATES="git locales build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
 elif [ $distro_version = "18" ]
 then
-    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
+    APT_CANDIDATES="git locales build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
 else
-    APT_CANDIDATES="git build-essential libqt4-opengl mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsprogs cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
+    APT_CANDIDATES="git locales build-essential qtbase5-dev mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop srecord cpio"
 fi
-PYTHON2_APT_CANDIDATES="python-crypto python-lzo python-lzma python-pip python-tk"
-PYTHON3_APT_CANDIDATES="python3-crypto python3-pip python3-tk"
+PYTHON3_APT_CANDIDATES=""
 PYTHON3_YUM_CANDIDATES=""
 YUM_CANDIDATES="git gcc gcc-c++ make openssl-devel qtwebkit-devel qt-devel gzip bzip2 tar arj p7zip p7zip-plugins cabextract squashfs-tools zlib zlib-devel lzo lzo-devel xz xz-compat-libs xz-libs xz-devel xz-lzma-compat python-backports-lzma lzip pyliblzma perl-Compress-Raw-Lzma lzop srecord"
-PYTHON2_YUM_CANDIDATES="python-pip python-Bottleneck cpio"
-APT_CANDIDATES="$APT_CANDIDATES $PYTHON2_APT_CANDIDATES"
-YUM_CANDIDATES="$YUM_CANDIDATES $PYTHON2_YUM_CANDIDATES"
-PIP_COMMANDS="pip"
+PYTHON="$(which python3)"
 
 # Check for root privileges
 if [ $UID -eq 0 ]
 then
+    echo "UID is 0, sudo not required"
     SUDO=""
 else
-    SUDO="sudo"
+    SUDO="sudo -E"
     REQUIRED_UTILS="sudo $REQUIRED_UTILS"
 fi
 
 function install_yaffshiv
 {
-    git clone https://github.com/devttys0/yaffshiv
-    (cd yaffshiv && $SUDO python2 setup.py install)
+    git clone --quiet --depth 1 --branch "master" https://github.com/devttys0/yaffshiv
+    (cd yaffshiv && $SUDO $PYTHON setup.py install)
     $SUDO rm -rf yaffshiv
 }
 
 function install_sasquatch
 {
-    git clone https://github.com/devttys0/sasquatch
+    git clone --quiet --depth 1 --branch "master" https://github.com/devttys0/sasquatch
     (cd sasquatch && $SUDO ./build.sh)
     $SUDO rm -rf sasquatch
 }
 
 function install_jefferson
 {
-    git clone https://github.com/sviehb/jefferson
-    (cd jefferson && $SUDO pip3 install -r requirements.txt && $SUDO python3 setup.py install)
+    git clone --quiet --depth 1 --branch "master" https://github.com/sviehb/jefferson
+    (cd jefferson && $SUDO $PYTHON -mpip install -r requirements.txt && $SUDO $PYTHON setup.py install)
     $SUDO rm -rf jefferson
 }
 
@@ -108,7 +113,7 @@ function install_cramfstools
   INSTALL_LOCATION=/usr/local/bin
 
   # https://github.com/torvalds/linux/blob/master/fs/cramfs/README#L106
-  git clone https://github.com/npitre/cramfs-tools
+  git clone --quiet --depth 1 --branch "master" https://github.com/npitre/cramfs-tools
   # There is no "make install"
   (cd cramfs-tools \
   && make \
@@ -121,22 +126,15 @@ function install_cramfstools
 
 function install_ubireader
 {
-    git clone https://github.com/jrspruitt/ubi_reader
-    # Some UBIFS extraction breaks after this commit, due to "Added fatal error check if UBI block extends beyond file size"
-    # (see this commit: https://github.com/jrspruitt/ubi_reader/commit/af678a5234dc891e8721ec985b1a6e74c77620b6)
-    # Reset to a known working commit.
-    (cd ubi_reader && git reset --hard 0955e6b95f07d849a182125919a1f2b6790d5b51 && $SUDO python setup.py install)
+    git clone --quiet --depth 1 --branch "master" https://github.com/jrspruitt/ubi_reader
+    (cd ubi_reader && $SUDO $PYTHON setup.py install)
     $SUDO rm -rf ubi_reader
 }
 
 function install_pip_package
 {
     PACKAGE="$1"
-
-    for PIP_COMMAND in $PIP_COMMANDS
-    do
-        $SUDO $PIP_COMMAND install $PACKAGE
-    done
+    $SUDO $PYTHON -mpip install $PACKAGE
 }
 
 function find_path
@@ -241,14 +239,6 @@ then
     exit 1
 fi
 
-# Check to see if we should install modules for python3 as well
-find_path python3
-if [ $? -eq 0 ]
-then
-     PKG_CANDIDATES="$PKG_CANDIDATES $PKG_PYTHON3_CANDIDATES"
-     PIP_COMMANDS="pip3 $PIP_COMMANDS"
-fi
-
 # Do the install(s)
 cd /tmp
 $SUDO $PKGCMD $PKGCMD_OPTS $PKG_CANDIDATES
@@ -257,8 +247,7 @@ if [ $? -ne 0 ]
     echo "Package installation failed: $PKG_CANDIDATES"
     exit 1
 fi
-install_pip_package matplotlib
-install_pip_package capstone
+install_pip_package "setuptools matplotlib capstone pycryptodome gnupg tk"
 install_sasquatch
 install_yaffshiv
 install_jefferson
