@@ -988,4 +988,64 @@
 >(28.L+36+15) belong x file_size: %d,
 >(28.L+36+15+4) belong x 
 
+# ARM update header (used with JBOOT bootloader)
+# More info in file: https://github.com/openwrt/openwrt/blob/master/tools/firmware-utils/src/mkdlinkfw.c
+0    regex    [A-Z]{3}[A-Z0-9]{9}.{52}\x42\x48  ARM update header (used with JBOOT),
+>0   string   DLK                               vendor: D-Link,
+>0   string   LVA                               vendor: Lava,
+>0   string   ZXL                               vendor: Zyxel,
+>0   string   x                                 ROM ID: %s,
+>12  uleshort !0                                {invalid}
+>14  uleshort x                                 header JBOOT checksum: 0x%X,
+>16  ulelong  !0                                {invalid}
+>20  ulelong  !0                                {invalid}
+>24  uleshort !0                                {invalid}
+>26  byte     x                                 lpvs: %d
+>27  byte     x                                 mbz: %d
+>28  ulelong  x                                 timestamp 0x%X,
+>32  ulelong  x                                 erease start: 0x%X,
+>36  ulelong  x                                 erease length: %d bytes,
+>40  ulelong  x                                 data start: 0x%X,
+>44  ulelong  x                                 data length: %d bytes,
+>48  ulelong  !0                                {invalid}
+>52  ulelong  !0                                {invalid}
+>56  ulelong  !0                                {invalid}
+>60  ulelong  !0                                {invalid}
+>64  uleshort !0x4842                           {invalid}
+>66  uleshort >0                                header version: %d,
+>68  uleshort !0                                {invalid}
+>70  byte     x                                 section id: %d,
+>71  byte     x                                 image info type: %d,
+>72  ulelong  x                                 image info address: 0x%X,
+>76  uleshort x                                 family member: 0x%X,
+>78  uleshort x                                 header JBOOT checksum: 0x%X
+
+#Amit JBOOT STAG header
+# More info in file: https://github.com/openwrt/openwrt/blob/master/tools/firmware-utils/src/mkdlinkfw.c
+0   regex    [\x00-\x10\xff][\x00-\x10]\x24\x2b  JBOOT STAG header,
+>1  ubyte    x                                   image id: %d,
+>4  ulelong  x                                   timestamp 0x%X, #TODO
+>8  ulelong  x                                   image size: %d bytes,
+>12 uleshort x                                   image JBOOT checksum: 0x%X,
+>14 uleshort x                                   header JBOOT checksum: 0x%X
+
+#Amit JBOOT SCH2 header
+# More info in file: https://github.com/openwrt/openwrt/blob/master/tools/firmware-utils/src/mkdlinkfw.c
+0   regex    \x24\x21[\x00-\x03]\x02  JBOOT SCH2 kernel header,
+>2  ubyte    >3                       {invalid}
+>2  ubyte    0                        compression type: none,
+>2  ubyte    1                        compression type: jz,
+>2  ubyte    2                        compression type: gzip,
+>2  ubyte    3                        compression type: lzma,
+>4  ulelong  x                        Entry Point: 0x%X,
+>8  ulelong  x                        image size: %d bytes,
+>12 ulelong  x                        data CRC: 0x%X,
+>16 ulelong  x                        Data Address: 0x%X,
+>20 ulelong  x                        rootfs offset: 0x%X,
+>24 ulelong  x                        rootfs size: %d bytes,
+>28 ulelong  x                        rootfs CRC: 0x%X,
+>32 ulelong  x                        header CRC: 0x%X,
+>36 uleshort >0x27                    {size:%d} header size: %d bytes,
+>36 uleshort <0x28                    {invalid}
+>38 uleshort x                        cmd line length: %d bytes
 
