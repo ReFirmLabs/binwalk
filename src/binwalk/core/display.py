@@ -71,7 +71,8 @@ class Display(object):
         if self.fp:
             if self.csv:
                 try:
-                    self.csv.writerow(columns)
+                    self.csv.writerow(
+                        (columns[0], '%X' % columns[1] if isinstance(columns[1], int) else columns[1], columns[2]))
                 except UnicodeEncodeError:
                     self.csv.writerow(self._fix_unicode_list(columns))
             else:
