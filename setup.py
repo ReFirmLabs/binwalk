@@ -340,11 +340,11 @@ setup(
     package_dir={"": "src"},
     packages=[MODULE_NAME],
     package_data={MODULE_NAME: install_data_files},
-    scripts=[
-        os.path.join(
-            "src",
-            "scripts",
-            SCRIPT_NAME)],
+    entry_points={
+        'console_scripts': [
+            'binwalk = binwalk.__main__:main',
+        ]
+    },
     cmdclass={
         'clean': CleanCommand,
         'uninstall': UninstallCommand,
