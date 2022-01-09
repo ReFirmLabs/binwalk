@@ -6,8 +6,10 @@ import os
 import re
 
 # Windows Python does not have pwd module
-if os.name == 'posix':
+try:
     import pwd
+except ImportError:
+   pwd = None
 
 import stat
 import shlex
@@ -141,7 +143,7 @@ class Extractor(Module):
         self.runas_uid = None
         self.runas_gid = None
 
-        if self.enabled is True and os.name == 'posix':
+        if self.enabled is True and pwd:
             if self.runas_user is None:
                 # Get some info about the current user we're running under
                 user_info = pwd.getpwuid(os.getuid())
@@ -580,7 +582,7 @@ class Extractor(Module):
         else:
             output_directory = self.extraction_directories[path]
 
-        if os.name == 'posix':
+        if hasattr(os, 'chown'):
             # Make sure run-as user can access this directory
             os.chown(output_directory, self.runas_uid, self.runas_gid)
 
@@ -877,7 +879,7 @@ class Extractor(Module):
             fdout.close()
             fdin.close()
 
-            if os.name == 'posix':
+            if hasattr(os, 'chown'):
                 # Make sure run-as user can access this file
                 os.chown(fname, self.runas_uid, self.runas_gid)
         except KeyboardInterrupt as e:
@@ -967,7 +969,7 @@ class Extractor(Module):
             tmp = None
 
         # If a run-as user is not the current user, we'll need to switch privileges to that user account
-        if os.name == 'posix' and self.runas_uid != os.getuid():
+        if pwd and self.runas_uid != os.getuid():
             binwalk.core.common.debug("Switching privileges to %s (%d:%d)" % (self.runas_user, self.runas_uid, self.runas_gid))
             
             # Fork a child process
