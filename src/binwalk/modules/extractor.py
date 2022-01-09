@@ -9,7 +9,7 @@ import re
 try:
     import pwd
 except ImportError:
-   pwd = None
+    pwd = None
 
 import stat
 import shlex
