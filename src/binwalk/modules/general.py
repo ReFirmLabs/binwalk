@@ -56,6 +56,10 @@ class General(Module):
                short='c',
                kwargs={'csv': True},
                description='Log results to file in CSV format'),
+        Option(long='reproducible',
+               short=None,
+               kwargs={'reproducible': True},
+               description='Display reproducible output'),
         Option(long='term',
                short='t',
                kwargs={'format_to_terminal': True},
@@ -110,6 +114,7 @@ class General(Module):
         Kwarg(name='format_to_terminal', default=False),
         Kwarg(name='quiet', default=False),
         Kwarg(name='verbose', default=False),
+        Kwarg(name='reproducible', default=False),
         Kwarg(name='files', default=[]),
         Kwarg(name='show_help', default=False),
         Kwarg(name='keep_going', default=False),
@@ -143,6 +148,7 @@ class General(Module):
                                                     csv=self.csv,
                                                     quiet=self.quiet,
                                                     verbose=self.verbose,
+                                                    reproducible=self.reproducible,
                                                     fit_to_screen=self.format_to_terminal)
 
         if self.show_help:
