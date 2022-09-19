@@ -76,6 +76,7 @@ fi
 
 function install_yaffshiv
 {
+    $SUDO rm -rf yaffshiv
     git clone --quiet --depth 1 --branch "master" https://github.com/devttys0/yaffshiv
     (cd yaffshiv && $SUDO $PYTHON setup.py install)
     $SUDO rm -rf yaffshiv
@@ -83,6 +84,7 @@ function install_yaffshiv
 
 function install_sasquatch
 {
+    $SUDO rm -rf sasquatch
     git clone --quiet --depth 1 --branch "master" https://github.com/devttys0/sasquatch
     (cd sasquatch && $SUDO ./build.sh)
     $SUDO rm -rf sasquatch
@@ -90,6 +92,7 @@ function install_sasquatch
 
 function install_jefferson
 {
+    $SUDO rm -rf jefferson
     git clone --quiet --depth 1 --branch "master" https://github.com/sviehb/jefferson
     (cd jefferson && $SUDO $PYTHON -mpip install -r requirements.txt && $SUDO $PYTHON setup.py install)
     $SUDO rm -rf jefferson
@@ -97,6 +100,7 @@ function install_jefferson
 
 function install_unstuff
 {
+    rm -rf /tmp/unstuff
     mkdir -p /tmp/unstuff
     cd /tmp/unstuff
 
@@ -112,6 +116,7 @@ function install_cramfstools
   TIME=`date +%s`
   INSTALL_LOCATION=/usr/local/bin
 
+  rm -rf cramfs-tools
   # https://github.com/torvalds/linux/blob/master/fs/cramfs/README#L106
   git clone --quiet --depth 1 --branch "master" https://github.com/npitre/cramfs-tools
   # There is no "make install"
