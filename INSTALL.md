@@ -79,12 +79,6 @@ $ git clone https://github.com/devttys0/yaffshiv
 $ (cd yaffshiv && sudo python setup.py install)
 ```
 
-```bash
-# Install unstuff (closed source) to extract StuffIt archive files
-$ wget -O - http://downloads.tuxfamily.org/sdtraces/stuffit520.611linux-i386.tar.gz | tar -zxv
-$ sudo cp bin/unstuff /usr/local/bin/
-```
-
 Note that for Debian/Ubuntu users, all of the above dependencies can be installed automatically using the included `deps.sh` script:
 
 ```bash
