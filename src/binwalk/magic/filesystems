@@ -38,11 +38,50 @@
 #>0x1e   string      minix       \b, bootable
 
 # YAFFS
-0    string     \x03\x00\x00\x00\x01\x00\x00\x00\xFF\xFF\x00\x00    YAFFS filesystem, little endian
-# The big endian signature has to be done a bit differently to prevent it from being self-overlapping
-4    string     \x00\x00\x00\x01\xFF\xFF                            YAFFS filesystem, big endian
->0   string     !\x00\x00\x00\x03                                   {invalid}(first object is not a directory)
->10  string     !\x00                                               {invalid}(unexpected name in the first object entry)
+# The layout itself is undocumented, determined by the memory layout of the 
+# reference implementation. This signature is derived from the
+# reference implementation code and generated test cases
+# We recognize the start of an object header defined by yaffs_obj_hdr:
+# (Note the values being encoded depending on platform endianess)
+
+# u32 type  /* enum yaffs_obj_type, valid 1-5  */
+# u32 parent_obj_id; /* 1 for root objects we recognize */
+# u16 sum_no_longer_used; /* checksum of name. Not used by YAFFS and memset to 0xFF */
+# YCHAR name[YAFFS_MAX_NAME_LENGTH + 1];
+
+# mkyaffsimage always writes a root directory with empty name, then processing the target directory contents
+# mkyaffs2image directly proceeds to writing entries with the appropriate u32 YAFFS_OBJECT_TYPE (1-5 valid), each with parent id 1
+
+#Little Endian: XX 00 00 00 01 00 00 00 FF FF YY
+#XX: 01 - 05 (object type)
+#YY: 00 for version 1 root directory, > 00 for version 2 (name data)
+0x1    string     \x00\x00\x00\x01\x00\x00\x00\xFF\xFF     YAFFS filesystem root entry, little endian,
+>0     ulelong    0                                        {invalid}(unknown type id)
+>0     ulelong    1                                        type file,
+>0     ulelong    2                                        type symlink,
+>0     ulelong    3                                        type root or directory,
+>0     ulelong    4                                        type hardlink,
+>0     ulelong    5                                        type special,
+>0     ulelong    >5                                       {invalid}(invalid type id)
+>0xA   byte       0                                        v1 root directory
+>0xA   byte       !0                                       object entry
+>>0xA  string     x                                        (name: "%s")
+
+#Big Endian: 00 00 00 XX 00 00 00 01 FF FF YY
+#XX: 01 - 05 (object type)
+#YY: 00 for version 1 root directory, > 00 for version 2 (name data)
+0x4     string     \x00\x00\x00\x01\xFF\xFF
+>0      string     \x00\x00\x00                            YAFFS filesystem root entry, big endian,
+>>0     ubelong    0                                       {invalid}(unknown type id)
+>>0     ubelong    1                                       type file,
+>>0     ubelong    2                                       type symlink,
+>>0     ubelong    3                                       type root or directory,
+>>0     ubelong    4                                       type hardlink,
+>>0     ubelong    5                                       type special,
+>>0     ubelong    >5                                      {invalid}(invalid type id)
+>>0xA   byte       0                                       v1 root directory
+>>0xA   byte       !0                                      object entry
+>>>0xA  string     x                                       (name: "%s")
 
 # EFS2 file system - jojo@utulsa.edu
 0      lelong       0x53000000       EFS2 Qualcomm filesystem super block, little endian,
