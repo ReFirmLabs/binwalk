@@ -104,7 +104,7 @@ class PFSExtractor(binwalk.core.plugin.Plugin):
                 data = binwalk.core.common.BlockFile(fname, 'rb')
                 data.seek(fs.get_end_of_meta_data())
                 for entry in fs.entries():
-                    outfile_path = os.path.join(out_dir, entry.fname)
+                    outfile_path = os.path.abspath(os.path.join(out_dir, entry.fname))
                     if not outfile_path.startswith(out_dir):
                         binwalk.core.common.warning("Unpfs extractor detected directory traversal attempt for file: '%s'. Refusing to extract." % outfile_path)
                     else:
