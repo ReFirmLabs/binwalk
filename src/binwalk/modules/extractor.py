@@ -4,7 +4,13 @@
 
 import os
 import re
-import pwd
+
+# Windows Python does not have pwd module
+try:
+    import pwd
+except ImportError:
+    pwd = None
+
 import stat
 import shlex
 import tempfile
@@ -137,7 +143,7 @@ class Extractor(Module):
         self.runas_uid = None
         self.runas_gid = None
 
-        if self.enabled is True:
+        if self.enabled is True and pwd:
             if self.runas_user is None:
                 # Get some info about the current user we're running under
                 user_info = pwd.getpwuid(os.getuid())
@@ -576,8 +582,9 @@ class Extractor(Module):
         else:
             output_directory = self.extraction_directories[path]
 
-        # Make sure run-as user can access this directory
-        os.chown(output_directory, self.runas_uid, self.runas_gid)
+        if hasattr(os, 'chown'):
+            # Make sure run-as user can access this directory
+            os.chown(output_directory, self.runas_uid, self.runas_gid)
 
         return output_directory
 
@@ -872,8 +879,9 @@ class Extractor(Module):
             fdout.close()
             fdin.close()
 
-            # Make sure run-as user can access this file
-            os.chown(fname, self.runas_uid, self.runas_gid)
+            if hasattr(os, 'chown'):
+                # Make sure run-as user can access this file
+                os.chown(fname, self.runas_uid, self.runas_gid)
         except KeyboardInterrupt as e:
             raise e
         except Exception as e:
@@ -961,7 +969,7 @@ class Extractor(Module):
             tmp = None
 
         # If a run-as user is not the current user, we'll need to switch privileges to that user account
-        if self.runas_uid != os.getuid():
+        if pwd and self.runas_uid != os.getuid():
             binwalk.core.common.debug("Switching privileges to %s (%d:%d)" % (self.runas_user, self.runas_uid, self.runas_gid))
             
             # Fork a child process
