@@ -570,14 +570,17 @@
 
 # Not to be confused with an actual romfs image!
 # ftp://ftp.dlink.eu/Products/dir/dir-600/driver_software/DIR-600_fw_revC1_3-05B15__all_en_20120216.zip
+# based on eCos romfs, but with lzma files compression
 0x10    string          ROMFS\x20v      D-Link ROMFS filesystem,
 >0x17   string          x               version %s,
 >0      string          !\x2EmoR
 >>0     string          !Rom\x2E        {invalid} unknown endianness
 >0      string          \x2EmoR         little endian,
+>>4     lelong          x               %d entries,
 >>8     lelong          x               size: <= %d
 #>>8     lelong-0x20     x               {jump:%d}
 >0      string          Rom\x2E         big endian,
+>>4     belong          x               %d entries,
 >>8     belong          x               size: <= %d
 #>>8     belong-0x20     x               {jump:%d}
 
