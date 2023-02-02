@@ -966,7 +966,7 @@ class Extractor(Module):
             
             # Fork a child process
             child_pid = os.fork()
-            if child_pid is 0:
+            if child_pid == 0:
                 # Switch to the run-as user privileges, if one has been set
                 if self.runas_uid is not None and self.runas_gid is not None:
                     os.setgid(self.runas_uid)
@@ -981,10 +981,10 @@ class Extractor(Module):
             rval = subprocess.call(shlex.split(command), stdout=tmp, stderr=tmp)
 
         # A true child process should exit with the subprocess exit value
-        if child_pid is 0:
+        if child_pid == 0:
             sys.exit(rval)
         # If no os.fork() happened, just return the subprocess exit value
-        elif child_pid is None:
+        elif child_pid == None:
             return rval
         # Else, os.fork() happened and we're the parent. Wait and return the child's exit value.
         else:
