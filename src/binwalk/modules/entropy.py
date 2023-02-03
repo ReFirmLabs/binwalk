@@ -105,12 +105,12 @@ class Entropy(Module):
                 self.algorithm = self.shannon
 
         # Get a list of all other module's results to mark on the entropy graph
-        for (module, obj) in iterator(self.modules):
+        for (module, obj) in self.modules.items():
             for result in obj.results:
                 if result.plot and result.file and result.description:
                     description = result.description.split(',')[0]
 
-                    if not has_key(self.file_markers, result.file.name):
+                    if not result.file.name in self.file_markers:
                         self.file_markers[result.file.name] = []
 
                     if len(description) > self.max_description_length:
@@ -314,7 +314,7 @@ class Entropy(Module):
         ax.plot(-(max(x)*.001), 1.1, lw=0)
         ax.plot(-(max(x)*.001), 0, lw=0)
 
-        if self.show_legend and has_key(self.file_markers, fname):
+        if self.show_legend and fname in self.file_markers:
             for (offset, description) in self.file_markers[fname]:
                 # If this description has already been plotted at a different offset, we need to
                 # use the same color for the marker, but set the description to None to prevent
@@ -322,7 +322,7 @@ class Entropy(Module):
                 #
                 # Else, get the next color and use it to mark descriptions of
                 # this type.
-                if has_key(plotted_colors, description):
+                if description in plotted_colors:
                     color = plotted_colors[description]
                     description = None
                 else:

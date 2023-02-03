@@ -18,7 +18,7 @@ from binwalk.core.common import file_size, file_md5, unique_file_name, BlockFile
 
 class ExtractDetails(object):
     def __init__(self, **kwargs):
-        for (k, v) in iterator(kwargs):
+        for (k, v) in kwargs.items():
             setattr(self, k, v)
 
 
@@ -246,7 +246,7 @@ class Extractor(Module):
         if r.valid and r.extract and r.display and (not self.max_count or self.extraction_count < self.max_count):
             # Create some extract output for this file, it it doesn't already
             # exist
-            if not binwalk.core.common.has_key(self.output, r.file.path):
+            if r.file.path not in self.output:
                 self.output[r.file.path] = ExtractInfo()
 
             # Attempt extraction
@@ -277,7 +277,7 @@ class Extractor(Module):
                 # If this is a newly created output directory, self.last_directory_listing won't have a record of it.
                 # If we've extracted other files to this directory before, it
                 # will.
-                if not has_key(self.last_directory_listing, extraction_directory):
+                if extraction_directory not in self.last_directory_listing:
                     self.last_directory_listing[extraction_directory] = set()
 
                 # Loop through a list of newly created files (i.e., files that
@@ -439,7 +439,7 @@ class Extractor(Module):
 
         for i in range(0, len(self.extract_rules)):
             if self.extract_rules[i]['regex'].search(description):
-                if has_key(self.extract_rules[i], key):
+                if key in self.extract_rules[i]:
                     self.extract_rules[i][key] = value
                     count += 1
 
@@ -540,7 +540,7 @@ class Extractor(Module):
         '''
         # If we have not already created an output directory for this target
         # file, create one now
-        if not has_key(self.extraction_directories, path):
+        if path not in self.extraction_directories:
             basedir = os.path.dirname(path)
             basename = os.path.basename(path)
 
@@ -902,7 +902,7 @@ class Extractor(Module):
 
         try:
             if callable(cmd):
-                command_list.append(get_class_name_from_method(cmd))
+                command_list.append(cmd.__self__.__class__.__name__)
 
                 try:
                     retval = cmd(fname)

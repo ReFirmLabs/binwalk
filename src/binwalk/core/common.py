@@ -200,7 +200,7 @@ def strings(filename, minimum=4):
 class GenericContainer(object):
 
     def __init__(self, **kwargs):
-        for (k, v) in iterator(kwargs):
+        for (k, v) in kwargs.items():
             setattr(self, k, v)
 
 

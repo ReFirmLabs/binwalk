@@ -90,10 +90,10 @@ class HexDiff(Module):
     def hexascii(self, target_data, byte, offset):
         color = "green"
 
-        for (fp_i, data_i) in iterator(target_data):
+        for (fp_i, data_i) in target_data.items():
             diff_count = 0
 
-            for (fp_j, data_j) in iterator(target_data):
+            for (fp_j, data_j) in target_data.items():
                 if fp_i == fp_j:
                     continue
 

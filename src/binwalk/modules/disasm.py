@@ -7,14 +7,14 @@ from binwalk.core.module import Module, Option, Kwarg
 class ArchResult(object):
 
     def __init__(self, **kwargs):
-        for (k, v) in binwalk.core.compat.iterator(kwargs):
+        for (k, v) in kwargs.items():
             setattr(self, k, v)
 
 
 class Architecture(object):
 
     def __init__(self, **kwargs):
-        for (k, v) in binwalk.core.compat.iterator(kwargs):
+        for (k, v) in kwargs.items():
             setattr(self, k, v)
 
 

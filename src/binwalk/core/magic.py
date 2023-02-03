@@ -167,7 +167,7 @@ class SignatureLine(object):
                 except Exception as e:
                     raise ParserException("Failed to expand string '%s' with integer '%s' in line '%s'" % (self.value, n, line))
             try:
-                self.value = binwalk.core.compat.string_decode(self.value)
+                self.value = bytes(self.value, 'utf-8').decode('unicode_escape')
             except ValueError as e:
                 raise ParserException("Failed to decode string value '%s' in line '%s'" % (self.value, line))
         # If a regex was specified, compile it
@@ -366,7 +366,7 @@ class Signature(object):
         #
         # Thus, unless a signature has been explicitly marked as knowingly overlapping ('{overlap}'),
         # spit out a warning about any self-overlapping signatures.
-        if not binwalk.core.compat.has_key(line.tags, 'overlap'):
+        if not 'overlap' in line.tags:
             for i in range(1, line.size):
                 if restr[i:] == restr[0:(line.size - i)]:
                     binwalk.core.common.warning("Signature '%s' is a self-overlapping signature!" % line.text)
@@ -497,7 +497,7 @@ class Magic(object):
 
                 # Have we already evaluated this offset expression? If so, skip
                 # it.
-                if binwalk.core.common.has_key(replacements, text):
+                if text in replacements:
                     continue
 
                 # The offset specified in the expression is relative to the
@@ -532,7 +532,7 @@ class Magic(object):
             # Finally, replace all offset expressions with their corresponding
             # text value
             v = expression
-            for (text, value) in binwalk.core.common.iterator(replacements):
+            for (text, value) in replacements.items():
                 v = v.replace(text, "%d" % value)
 
         # If no offset, then it's just an evaluatable math expression (e.g.,
@@ -606,7 +606,7 @@ class Magic(object):
                     if line.value is None:
                         # Check to see if this is a string whose size is known and has been specified on a previous
                         # signature line.
-                        if binwalk.core.compat.has_key(tags, 'strlen') and binwalk.core.compat.has_key(line.tags, 'string'):
+                        if 'strlen' in tags and 'string' in line.tags:
                             dvalue = self.data[start:(start + tags['strlen'])]
                         # Else, just terminate the string at the first newline,
                         # carriage return, or NULL byte
@@ -704,7 +704,7 @@ class Magic(object):
                     # Process tag keywords specified in the signature line. These have already been parsed out of the
                     # original format string so that they can be processed
                     # separately from the printed description string.
-                    for (tag_name, tag_value) in binwalk.core.compat.iterator(line.tags):
+                    for (tag_name, tag_value) in line.tags.items():
                         # If the tag value is a string, try to format it
                         if isinstance(tag_value, str):
                             # Generate the tuple for the format string

@@ -144,7 +144,7 @@ class Result(object):
         self.plot = True
         self.name = None
 
-        for (k, v) in iterator(kwargs):
+        for (k, v) in kwargs.items():
             setattr(self, k, v)
 
 
@@ -615,7 +615,7 @@ class Status(object):
         self.clear()
 
     def clear(self):
-        for (k, v) in iterator(self.kwargs):
+        for (k, v) in self.kwargs.items():
             setattr(self, k, v)
 
 
@@ -656,7 +656,7 @@ class Modules(object):
 
     def _set_arguments(self, argv=None, kargv=None):
         if kargv:
-            for (k, v) in iterator(kargv):
+            for (k, v) in kargv.items():
                     k = self._parse_api_opt(k)
                     if v is not True and v is not False and v is not None:
                         if not isinstance(v, list):
@@ -784,7 +784,7 @@ class Modules(object):
 
         # Add all loaded modules that marked themselves as enabled to the
         # run_modules list
-        for (module, obj) in iterator(self.executed_modules):
+        for (module, obj) in self.executed_modules.items():
             # Report the results if the module is enabled and if it is a
             # primary module or if it reported any results/errors
             if obj.enabled and (obj.PRIMARY or obj.results or obj.errors):
@@ -922,20 +922,20 @@ class Modules(object):
 
             if module_option.type == binwalk.core.common.BlockFile:
 
-                for k in get_keys(module_option.kwargs):
+                for k in list(module_option.kwargs.keys()):
                     kwargs[k] = []
                     for unk in unknown:
                         kwargs[k].append(unk)
 
-            elif has_key(args, module_option.long) and args[module_option.long] not in [None, False]:
+            elif module_option.long in args and args[module_option.long] not in [None, False]:
 
                 # Loop through all the kwargs for this command line option
-                for (name, default_value) in iterator(module_option.kwargs):
+                for (name, default_value) in module_option.kwargs.items():
 
                     # If this kwarg has not been previously processed, or if its priority is equal to or
                     # greater than the previously processed kwarg's priority,
                     # then let's process it.
-                    if not has_key(last_priority, name) or last_priority[name] <= module_option.priority:
+                    if not name in last_priority or last_priority[name] <= module_option.priority:
 
                         # Track the priority for future iterations that may
                         # process the same kwarg name
@@ -962,14 +962,14 @@ class Modules(object):
         '''
         if hasattr(obj, "KWARGS"):
             for module_argument in obj.KWARGS:
-                if has_key(kwargs, module_argument.name):
+                if module_argument.name in kwargs:
                     arg_value = kwargs[module_argument.name]
                 else:
                     arg_value = copy(module_argument.default)
 
                 setattr(obj, module_argument.name, arg_value)
 
-            for (k, v) in iterator(kwargs):
+            for (k, v) in kwargs.items():
                 if not hasattr(obj, k):
                     setattr(obj, k, v)
         else:
