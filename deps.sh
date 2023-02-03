@@ -41,7 +41,7 @@ REQUIRED_UTILS="wget tar python"
 APTCMD="apt"
 APTGETCMD="apt-get"
 YUMCMD="yum"
-if [ $distro = "Kali" ]
+if [ "$distro" = "Kali" ]
 then
     APT_CANDIDATES="git locales build-essential qt5base-dev mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabextract util-linux firmware-mod-kit cramfsswap squashfs-tools zlib1g-dev liblzma-dev liblzo2-dev sleuthkit default-jdk lzop cpio"
 elif [ $distro_version = "14" ]
@@ -152,7 +152,7 @@ then
     echo "         This script requires internet access."
     echo "         This script requires root privileges."
     echo ""
-    if [ $distro != Unknown ]
+    if [ "$distro" != Unknown ]
     then
         echo "         $distro $distro_version detected"
     else
@@ -166,7 +166,7 @@ then
         echo "Quitting..."
         exit 1
     fi
-elif [ $distro != Unknown ]
+elif [ "$distro" != Unknown ]
 then
      echo "$distro $distro_version detected"
 else
