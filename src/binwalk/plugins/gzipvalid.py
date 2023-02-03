@@ -1,7 +1,7 @@
 import zlib
-import binwalk.core.compat
 import binwalk.core.plugin
 from binwalk.core.common import BlockFile
+from binwalk.core.compat import str2bytes
 
 
 class GzipValidPlugin(binwalk.core.plugin.Plugin):
@@ -38,7 +38,7 @@ class GzipValidPlugin(binwalk.core.plugin.Plugin):
 
             # Check if this is valid deflate data (no zlib header)
             try:
-                zlib.decompress(binwalk.core.compat.str2bytes(data))
+                zlib.decompress(str2bytes(data))
             except zlib.error as e:
                 error = str(e)
                 # Truncated input data results in error -5.

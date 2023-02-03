@@ -3,12 +3,13 @@
 import io
 import os
 import re
+import string
 import sys
 import ast
 import platform
 import operator as op
 import binwalk.core.idb
-from binwalk.core.compat import *
+from binwalk.core.compat import str2bytes, bytes2str
 
 # Don't try to import hashlib when loaded into IDA; it doesn't work.
 if not binwalk.core.idb.LOADED_IN_IDA:
@@ -200,7 +201,7 @@ def strings(filename, minimum=4):
 class GenericContainer(object):
 
     def __init__(self, **kwargs):
-        for (k, v) in iterator(kwargs):
+        for (k, v) in kwargs.items():
             setattr(self, k, v)
 
 
@@ -352,10 +353,7 @@ def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
                                          swap=swap,
                                          size=0)
 
-            # Python 2.6 doesn't like modes like 'rb' or 'wb'
-            mode = self.args.mode.replace('b', '')
-
-            super(self.__class__, self).__init__(fname, mode)
+            super(self.__class__, self).__init__(fname, self.args.mode)
 
             self.swap_size = self.args.swap
 
@@ -398,12 +396,6 @@ def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
             if self.args.peek is not None:
                 self.block_peek_size = self.args.peek
             self.base_peek_size = self.block_peek_size
-
-            # Work around for python 2.6 where FileIO._name is not defined
-            try:
-                self.name
-            except AttributeError:
-                self._name = fname
 
             self.path = os.path.abspath(self.name)
             self.seek(self.offset)

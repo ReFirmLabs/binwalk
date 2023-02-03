@@ -1,6 +1,7 @@
 import struct
 import binascii
 import binwalk.core.plugin
+from binwalk.core.compat import str2bytes
 
 
 class JFFS2ValidPlugin(binwalk.core.plugin.Plugin):
@@ -16,7 +17,7 @@ class JFFS2ValidPlugin(binwalk.core.plugin.Plugin):
 
     def _check_crc(self, node_header):
         # struct and binascii want a bytes object in Python3
-        node_header = binwalk.core.compat.str2bytes(node_header)
+        node_header = str2bytes(node_header)
 
         # Get the header's reported CRC value
         if node_header[0:2] == b"\x19\x85":

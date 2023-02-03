@@ -5,7 +5,6 @@ import imp
 import inspect
 import binwalk.core.common
 import binwalk.core.settings
-from binwalk.core.compat import *
 from binwalk.core.exceptions import IgnoreFileException
 
 

@@ -1,20 +1,20 @@
 import capstone
 import binwalk.core.common
-import binwalk.core.compat
+from binwalk.core.compat import str2bytes
 from binwalk.core.module import Module, Option, Kwarg
 
 
 class ArchResult(object):
 
     def __init__(self, **kwargs):
-        for (k, v) in binwalk.core.compat.iterator(kwargs):
+        for (k, v) in kwargs.items():
             setattr(self, k, v)
 
 
 class Architecture(object):
 
     def __init__(self, **kwargs):
-        for (k, v) in binwalk.core.compat.iterator(kwargs):
+        for (k, v) in kwargs.items():
             setattr(self, k, v)
 
 
@@ -123,7 +123,7 @@ class Disasm(Module):
                     # Don't pass the entire data block into disasm_lite, it's horribly inefficient
                     # to pass large strings around in Python. Break it up into
                     # smaller code blocks instead.
-                    code_block = binwalk.core.compat.str2bytes(data[block_offset:block_offset + self.disasm_data_size])
+                    code_block = str2bytes(data[block_offset:block_offset + self.disasm_data_size])
 
                     # If this code block doesn't contain at least two different bytes, skip it
                     # to prevent false positives (e.g., "\x00\x00\x00\x00" is a

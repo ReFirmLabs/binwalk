@@ -8,7 +8,7 @@ import re
 import struct
 import datetime
 import binwalk.core.common
-import binwalk.core.compat
+from binwalk.core.compat import str2bytes
 from binwalk.core.exceptions import ParserException
 
 
@@ -167,7 +167,7 @@ class SignatureLine(object):
                 except Exception as e:
                     raise ParserException("Failed to expand string '%s' with integer '%s' in line '%s'" % (self.value, n, line))
             try:
-                self.value = binwalk.core.compat.string_decode(self.value)
+                self.value = bytes(self.value, 'utf-8').decode('unicode_escape')
             except ValueError as e:
                 raise ParserException("Failed to decode string value '%s' in line '%s'" % (self.value, line))
         # If a regex was specified, compile it
@@ -366,7 +366,7 @@ class Signature(object):
         #
         # Thus, unless a signature has been explicitly marked as knowingly overlapping ('{overlap}'),
         # spit out a warning about any self-overlapping signatures.
-        if not binwalk.core.compat.has_key(line.tags, 'overlap'):
+        if not 'overlap' in line.tags:
             for i in range(1, line.size):
                 if restr[i:] == restr[0:(line.size - i)]:
                     binwalk.core.common.warning("Signature '%s' is a self-overlapping signature!" % line.text)
@@ -497,7 +497,7 @@ class Magic(object):
 
                 # Have we already evaluated this offset expression? If so, skip
                 # it.
-                if binwalk.core.common.has_key(replacements, text):
+                if text in replacements:
                     continue
 
                 # The offset specified in the expression is relative to the
@@ -508,19 +508,19 @@ class Magic(object):
                 try:
                     # Big and little endian byte format
                     if t in ['b', 'B']:
-                        v = struct.unpack('b', binwalk.core.compat.str2bytes(self.data[o:o + 1]))[0]
+                        v = struct.unpack('b', str2bytes(self.data[o:o + 1]))[0]
                     # Little endian short format
                     elif t == 's':
-                        v = struct.unpack('<h', binwalk.core.compat.str2bytes(self.data[o:o + 2]))[0]
+                        v = struct.unpack('<h', str2bytes(self.data[o:o + 2]))[0]
                     # Little endian long format
                     elif t == 'l':
-                        v = struct.unpack('<i', binwalk.core.compat.str2bytes(self.data[o:o + 4]))[0]
+                        v = struct.unpack('<i', str2bytes(self.data[o:o + 4]))[0]
                     # Big endian short format
                     elif t == 'S':
-                        v = struct.unpack('>h', binwalk.core.compat.str2bytes(self.data[o:o + 2]))[0]
+                        v = struct.unpack('>h', str2bytes(self.data[o:o + 2]))[0]
                     # Bit endian long format
                     elif t == 'L':
-                        v = struct.unpack('>i', binwalk.core.compat.str2bytes(self.data[o:o + 4]))[0]
+                        v = struct.unpack('>i', str2bytes(self.data[o:o + 4]))[0]
                 # struct.error is thrown if there is not enough bytes in
                 # self.data for the specified format type
                 except struct.error as e:
@@ -532,7 +532,7 @@ class Magic(object):
             # Finally, replace all offset expressions with their corresponding
             # text value
             v = expression
-            for (text, value) in binwalk.core.common.iterator(replacements):
+            for (text, value) in replacements.items():
                 v = v.replace(text, "%d" % value)
 
         # If no offset, then it's just an evaluatable math expression (e.g.,
@@ -595,7 +595,7 @@ class Magic(object):
                 # If the line has a packed format string, unpack it
                 if line.pkfmt:
                     try:
-                        dvalue = struct.unpack(line.pkfmt, binwalk.core.compat.str2bytes(self.data[start:end]))[0]
+                        dvalue = struct.unpack(line.pkfmt, str2bytes(self.data[start:end]))[0]
                     # Not enough bytes left in self.data for the specified
                     # format size
                     except struct.error as e:
@@ -606,7 +606,7 @@ class Magic(object):
                     if line.value is None:
                         # Check to see if this is a string whose size is known and has been specified on a previous
                         # signature line.
-                        if binwalk.core.compat.has_key(tags, 'strlen') and binwalk.core.compat.has_key(line.tags, 'string'):
+                        if 'strlen' in tags and 'string' in line.tags:
                             dvalue = self.data[start:(start + tags['strlen'])]
                         # Else, just terminate the string at the first newline,
                         # carriage return, or NULL byte
@@ -704,7 +704,7 @@ class Magic(object):
                     # Process tag keywords specified in the signature line. These have already been parsed out of the
                     # original format string so that they can be processed
                     # separately from the printed description string.
-                    for (tag_name, tag_value) in binwalk.core.compat.iterator(line.tags):
+                    for (tag_name, tag_value) in line.tags.items():
                         # If the tag value is a string, try to format it
                         if isinstance(tag_value, str):
                             # Generate the tuple for the format string

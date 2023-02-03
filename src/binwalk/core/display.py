@@ -5,7 +5,7 @@ import sys
 import csv as pycsv
 import datetime
 import binwalk.core.common
-from binwalk.core.compat import *
+from binwalk.core.compat import bytes2str
 
 
 class Display(object):
@@ -90,7 +90,7 @@ class Display(object):
         file_name = None
         self.num_columns = len(args)
 
-        if has_key(kwargs, 'file_name'):
+        if 'file_name' in kwargs:
             file_name = kwargs['file_name']
 
         if self.verbose and file_name:

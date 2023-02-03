@@ -4,16 +4,12 @@
 import time
 import errno
 import threading
-import binwalk.core.compat
+import socketserver
 
-# Python 2/3 compatibility
-try:
-    import SocketServer
-except ImportError:
-    import socketserver as SocketServer
+from binwalk.core.compat import str2bytes
 
 
-class StatusRequestHandler(SocketServer.BaseRequestHandler):
+class StatusRequestHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
         message_format = "%s     %3d%%     [ %d / %d ]"
@@ -27,9 +23,9 @@ class StatusRequestHandler(SocketServer.BaseRequestHandler):
             time.sleep(0.1)
 
             try:
-                self.request.send(binwalk.core.compat.str2bytes('\b' * last_status_message_len))
-                self.request.send(binwalk.core.compat.str2bytes(' ' * last_status_message_len))
-                self.request.send(binwalk.core.compat.str2bytes('\b' * last_status_message_len))
+                self.request.send(str2bytes('\b' * last_status_message_len))
+                self.request.send(str2bytes(' ' * last_status_message_len))
+                self.request.send(str2bytes('\b' * last_status_message_len))
 
                 if self.server.binwalk.status.shutdown:
                     self.server.binwalk.status.finished = True
@@ -47,7 +43,7 @@ class StatusRequestHandler(SocketServer.BaseRequestHandler):
                     continue
 
                 last_status_message_len = len(status_message)
-                self.request.send(binwalk.core.compat.str2bytes(status_message))
+                self.request.send(str2bytes(status_message))
                 message_sent = True
             except IOError as e:
                 if e.errno == errno.EPIPE:
@@ -61,7 +57,7 @@ class StatusRequestHandler(SocketServer.BaseRequestHandler):
         return
 
 
-class ThreadedStatusServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
+class ThreadedStatusServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     daemon_threads = True
     allow_reuse_address = True
 
@@ -72,6 +68,5 @@ class StatusServer(object):
         self.server = ThreadedStatusServer(('127.0.0.1', port), StatusRequestHandler)
         self.server.binwalk = binwalk
 
-        t = threading.Thread(target=self.server.serve_forever)
-        t.setDaemon(True)
+        t = threading.Thread(target=self.server.serve_forever, daemon=True)
         t.start()
