@@ -3,12 +3,13 @@
 import io
 import os
 import re
+import string
 import sys
 import ast
 import platform
 import operator as op
 import binwalk.core.idb
-from binwalk.core.compat import *
+from binwalk.core.compat import str2bytes, bytes2str
 
 # Don't try to import hashlib when loaded into IDA; it doesn't work.
 if not binwalk.core.idb.LOADED_IN_IDA:

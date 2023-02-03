@@ -3,7 +3,6 @@
 
 import os
 import binwalk.core.common as common
-from binwalk.core.compat import *
 
 
 class Settings(object):

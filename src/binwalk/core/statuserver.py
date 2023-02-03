@@ -4,8 +4,9 @@
 import time
 import errno
 import threading
-import binwalk.core.compat
 import socketserver
+
+from binwalk.core.compat import str2bytes
 
 
 class StatusRequestHandler(socketserver.BaseRequestHandler):
@@ -22,9 +23,9 @@ class StatusRequestHandler(socketserver.BaseRequestHandler):
             time.sleep(0.1)
 
             try:
-                self.request.send(binwalk.core.compat.str2bytes('\b' * last_status_message_len))
-                self.request.send(binwalk.core.compat.str2bytes(' ' * last_status_message_len))
-                self.request.send(binwalk.core.compat.str2bytes('\b' * last_status_message_len))
+                self.request.send(str2bytes('\b' * last_status_message_len))
+                self.request.send(str2bytes(' ' * last_status_message_len))
+                self.request.send(str2bytes('\b' * last_status_message_len))
 
                 if self.server.binwalk.status.shutdown:
                     self.server.binwalk.status.finished = True
@@ -42,7 +43,7 @@ class StatusRequestHandler(socketserver.BaseRequestHandler):
                     continue
 
                 last_status_message_len = len(status_message)
-                self.request.send(binwalk.core.compat.str2bytes(status_message))
+                self.request.send(str2bytes(status_message))
                 message_sent = True
             except IOError as e:
                 if e.errno == errno.EPIPE:

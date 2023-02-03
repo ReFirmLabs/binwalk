@@ -5,7 +5,7 @@ import sys
 import csv as pycsv
 import datetime
 import binwalk.core.common
-from binwalk.core.compat import *
+from binwalk.core.compat import bytes2str
 
 
 class Display(object):

@@ -1,7 +1,6 @@
 import sys
 import string
 import binwalk.core.common as common
-from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg
 
 

@@ -5,7 +5,7 @@ import sys
 import math
 import zlib
 import binwalk.core.common
-from binwalk.core.compat import *
+from binwalk.core.compat import str2bytes
 from binwalk.core.module import Module, Option, Kwarg
 
 #try:

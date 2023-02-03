@@ -1,7 +1,7 @@
 import struct
 import binascii
 import binwalk.core.plugin
-import binwalk.core.compat
+from binwalk.core.compat import str2bytes
 
 
 class UBIValidPlugin(binwalk.core.plugin.Plugin):
@@ -58,7 +58,7 @@ class UBIValidPlugin(binwalk.core.plugin.Plugin):
             # Seek to and read the suspected UBI erase count header
             fd = self.module.config.open_file(result.file.path, offset=result.offset)
 
-            ec_header = binwalk.core.compat.str2bytes(fd.read(1024))
+            ec_header = str2bytes(fd.read(1024))
             fd.close()
 
             result.valid = self._check_crc(ec_header[0:64])

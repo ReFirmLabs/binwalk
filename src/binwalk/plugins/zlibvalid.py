@@ -1,7 +1,7 @@
 import zlib
-import binwalk.core.compat
 import binwalk.core.plugin
 from binwalk.core.common import BlockFile
+from binwalk.core.compat import str2bytes
 
 
 class ZlibValidPlugin(binwalk.core.plugin.Plugin):
@@ -37,7 +37,7 @@ class ZlibValidPlugin(binwalk.core.plugin.Plugin):
             #   1. It decompresses without error
             #   2. Decompression fails only because of truncated input
             try:
-                zlib.decompress(binwalk.core.compat.str2bytes(data))
+                zlib.decompress(str2bytes(data))
             except zlib.error as e:
                 # Error -5, incomplete or truncated data input
                 if not str(e).startswith("Error -5"):

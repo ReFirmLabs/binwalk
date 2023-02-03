@@ -2,19 +2,20 @@ import os
 import errno
 import struct
 import binwalk.core.common
-import binwalk.core.compat
 import binwalk.core.plugin
+from binwalk.core.compat import str2bytes
+
 
 class PFSCommon(object):
 
     def _make_short(self, data, endianness):
         """Returns a 2 byte integer."""
-        data = binwalk.core.compat.str2bytes(data)
+        data = str2bytes(data)
         return struct.unpack('%sH' % endianness, data)[0]
 
     def _make_int(self, data, endianness):
         """Returns a 4 byte integer."""
-        data = binwalk.core.compat.str2bytes(data)
+        data = str2bytes(data)
         return struct.unpack('%sI' % endianness, data)[0]
 
 class PFS(PFSCommon):

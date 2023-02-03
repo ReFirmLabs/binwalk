@@ -8,7 +8,7 @@ import re
 import struct
 import datetime
 import binwalk.core.common
-import binwalk.core.compat
+from binwalk.core.compat import str2bytes
 from binwalk.core.exceptions import ParserException
 
 
@@ -508,19 +508,19 @@ class Magic(object):
                 try:
                     # Big and little endian byte format
                     if t in ['b', 'B']:
-                        v = struct.unpack('b', binwalk.core.compat.str2bytes(self.data[o:o + 1]))[0]
+                        v = struct.unpack('b', str2bytes(self.data[o:o + 1]))[0]
                     # Little endian short format
                     elif t == 's':
-                        v = struct.unpack('<h', binwalk.core.compat.str2bytes(self.data[o:o + 2]))[0]
+                        v = struct.unpack('<h', str2bytes(self.data[o:o + 2]))[0]
                     # Little endian long format
                     elif t == 'l':
-                        v = struct.unpack('<i', binwalk.core.compat.str2bytes(self.data[o:o + 4]))[0]
+                        v = struct.unpack('<i', str2bytes(self.data[o:o + 4]))[0]
                     # Big endian short format
                     elif t == 'S':
-                        v = struct.unpack('>h', binwalk.core.compat.str2bytes(self.data[o:o + 2]))[0]
+                        v = struct.unpack('>h', str2bytes(self.data[o:o + 2]))[0]
                     # Bit endian long format
                     elif t == 'L':
-                        v = struct.unpack('>i', binwalk.core.compat.str2bytes(self.data[o:o + 4]))[0]
+                        v = struct.unpack('>i', str2bytes(self.data[o:o + 4]))[0]
                 # struct.error is thrown if there is not enough bytes in
                 # self.data for the specified format type
                 except struct.error as e:
@@ -595,7 +595,7 @@ class Magic(object):
                 # If the line has a packed format string, unpack it
                 if line.pkfmt:
                     try:
-                        dvalue = struct.unpack(line.pkfmt, binwalk.core.compat.str2bytes(self.data[start:end]))[0]
+                        dvalue = struct.unpack(line.pkfmt, str2bytes(self.data[start:end]))[0]
                     # Not enough bytes left in self.data for the specified
                     # format size
                     except struct.error as e:

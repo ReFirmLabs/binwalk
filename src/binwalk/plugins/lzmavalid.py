@@ -1,6 +1,6 @@
 import binwalk.core.plugin
-import binwalk.core.compat
 from binwalk.core.common import BlockFile
+from binwalk.core.compat import str2bytes
 
 
 class LZMAPlugin(binwalk.core.plugin.Plugin):
@@ -34,7 +34,7 @@ class LZMAPlugin(binwalk.core.plugin.Plugin):
             # The only acceptable exceptions are those indicating that the
             # input data was truncated.
             try:
-                self.decompressor(binwalk.core.compat.str2bytes(data))
+                self.decompressor(str2bytes(data))
             except IOError as e:
                 # The Python2 module gives this error on truncated input data.
                 if str(e) != "unknown BUF error":

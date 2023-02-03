@@ -10,7 +10,6 @@ import binwalk.core.idb
 import binwalk.core.common
 import binwalk.core.display
 import binwalk.core.settings
-from binwalk.core.compat import *
 from binwalk.core.module import Module, Option, Kwarg, show_help
 
 

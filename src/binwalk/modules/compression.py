@@ -4,8 +4,8 @@
 import os
 import zlib
 import struct
-import binwalk.core.compat
 import binwalk.core.common
+from binwalk.core.compat import str2bytes, bytes2str
 from binwalk.core.module import Option, Kwarg, Module
 try:
     import lzma
@@ -81,7 +81,7 @@ class LZMA(object):
 
     def parse_header(self, header):
         (pb, lp, lc) = self.parse_property(header[0])
-        dictionary = struct.unpack("<I", binwalk.core.compat.str2bytes(header[1:5]))[0]
+        dictionary = struct.unpack("<I", str2bytes(header[1:5]))[0]
         return LZMAHeader(pb=pb, lp=lp, lc=lc, dictionary=dictionary)
 
     def build_properties(self):
@@ -104,10 +104,10 @@ class LZMA(object):
 
         if self.module.partial_scan == True:
             # For partial scans, only use the largest dictionary value
-            self.dictionaries.append(binwalk.core.compat.bytes2str(struct.pack("<I", 2 ** 25)))
+            self.dictionaries.append(bytes2str(struct.pack("<I", 2 ** 25)))
         else:
             for n in range(16, 26):
-                self.dictionaries.append(binwalk.core.compat.bytes2str(struct.pack("<I", 2 ** n)))
+                self.dictionaries.append(bytes2str(struct.pack("<I", 2 ** n)))
 
     def build_headers(self):
         self.headers = set()
@@ -124,7 +124,7 @@ class LZMA(object):
             # The only acceptable exceptions are those indicating that the
             # input data was truncated.
             try:
-                final_data = binwalk.core.compat.str2bytes(header + data)
+                final_data = str2bytes(header + data)
                 lzma.decompress(final_data)
                 result = self.parse_header(header)
                 break
@@ -184,7 +184,7 @@ class Deflate(object):
                     in_data += data[:dlen]
 
                 try:
-                    out_data = zlib.decompress(binwalk.core.compat.str2bytes(in_data), -15)
+                    out_data = zlib.decompress(str2bytes(in_data), -15)
                     with binwalk.core.common.BlockFile(out_file, 'w') as fp_out:
                         fp_out.write(out_data)
                     retval = True
@@ -200,7 +200,7 @@ class Deflate(object):
         try:
             # Negative window size (e.g., -15) indicates that raw decompression
             # should be performed
-            zlib.decompress(binwalk.core.compat.str2bytes(data), -15)
+            zlib.decompress(str2bytes(data), -15)
         except zlib.error as e:
             if not str(e).startswith("Error -5"):
                 # Bad data.

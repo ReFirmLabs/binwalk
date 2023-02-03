@@ -16,7 +16,7 @@ import binwalk.core.statuserver
 import binwalk.core.common
 import binwalk.core.settings
 import binwalk.core.plugin
-from binwalk.core.compat import *
+from binwalk.core.compat import bytes2str
 from binwalk.core.exceptions import *
 
 
