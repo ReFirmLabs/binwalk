@@ -11,14 +11,7 @@ class LZMAExtractPlugin(binwalk.core.plugin.Plugin):
 
     def init(self):
         try:
-            # lzma package in Python 2.0 decompress() does not handle multiple
-            # compressed streams, only first stream is extracted.
-            # backports.lzma package could be used to keep consistent
-            # behaviour.
-            try:
-                import lzma
-            except ImportError:
-                from backports import lzma
+            import lzma
 
             self.decompressor = lzma.decompress
 

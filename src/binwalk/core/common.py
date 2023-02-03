@@ -352,10 +352,7 @@ def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
                                          swap=swap,
                                          size=0)
 
-            # Python 2.6 doesn't like modes like 'rb' or 'wb'
-            mode = self.args.mode.replace('b', '')
-
-            super(self.__class__, self).__init__(fname, mode)
+            super(self.__class__, self).__init__(fname, self.args.mode)
 
             self.swap_size = self.args.swap
 
@@ -398,12 +395,6 @@ def BlockFile(fname, mode='r', subclass=io.FileIO, **kwargs):
             if self.args.peek is not None:
                 self.block_peek_size = self.args.peek
             self.base_peek_size = self.block_peek_size
-
-            # Work around for python 2.6 where FileIO._name is not defined
-            try:
-                self.name
-            except AttributeError:
-                self._name = fname
 
             self.path = os.path.abspath(self.name)
             self.seek(self.offset)

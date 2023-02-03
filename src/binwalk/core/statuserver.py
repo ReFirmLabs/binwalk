@@ -5,15 +5,10 @@ import time
 import errno
 import threading
 import binwalk.core.compat
-
-# Python 2/3 compatibility
-try:
-    import SocketServer
-except ImportError:
-    import socketserver as SocketServer
+import socketserver
 
 
-class StatusRequestHandler(SocketServer.BaseRequestHandler):
+class StatusRequestHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
         message_format = "%s     %3d%%     [ %d / %d ]"
@@ -61,7 +56,7 @@ class StatusRequestHandler(SocketServer.BaseRequestHandler):
         return
 
 
-class ThreadedStatusServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
+class ThreadedStatusServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     daemon_threads = True
     allow_reuse_address = True
 
@@ -72,6 +67,5 @@ class StatusServer(object):
         self.server = ThreadedStatusServer(('127.0.0.1', port), StatusRequestHandler)
         self.server.binwalk = binwalk
 
-        t = threading.Thread(target=self.server.serve_forever)
-        t.setDaemon(True)
+        t = threading.Thread(target=self.server.serve_forever, daemon=True)
         t.start()
