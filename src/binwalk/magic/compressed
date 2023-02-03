@@ -180,3 +180,9 @@
 # http://justsolve.archiveteam.org/wiki/LZ4
 0    belong         0x04224D18    LZ4 compressed data
 0    belong         0x02214C18    LZ4 compressed data, legacy
+
+# http://justsolve.archiveteam.org/wiki/LZFSE
+0    belong         0x2d787662    LZFSE uncompressed raw data
+0    belong         0x31787662    LZFSE compressed data, uncompressed tables
+0    belong         0x62767832    LZFSE compressed data, compressed tables
+0    belong         0x6e787662    LZFSE lzvn compressed data
