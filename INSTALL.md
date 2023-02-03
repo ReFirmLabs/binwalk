@@ -20,10 +20,10 @@ Dependencies
 
 Besides a Python interpreter, there are no installation dependencies for binwalk. All dependencies are optional run-time dependencies, and unless otherwise specified, are available from most Linux package managers.
 
-Binwalk uses the `nosetest` library for tests and `coverage` for test-coverage:
+Binwalk uses Py.test for tests and `pytest-cov` for test coverage:
 
 ```bash
-$ sudo pip install nose coverage
+$ sudo pip install pytest==5.3.2 pytest-cov==2.8.1
 ```
 
 Binwalk uses the `pycryptodome` (`pycrypto`-compatible module that is still maintained) library to decrypt some known encrypted firmware images:

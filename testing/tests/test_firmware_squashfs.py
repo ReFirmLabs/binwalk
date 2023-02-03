@@ -1,7 +1,7 @@
 
 import os
 import binwalk
-from nose.tools import eq_, ok_
+
 
 def test_firmware_squashfs():
     '''
@@ -18,13 +18,13 @@ def test_firmware_squashfs():
                                quiet=True)
 
     # Test number of modules used
-    eq_(len(scan_result), 1)
+    assert len(scan_result) == 1
 
     # There should be only one result
-    eq_(len(scan_result[0].results), 1)
+    assert len(scan_result[0].results) == 1
 
     # That result should be at offset zero
-    eq_(scan_result[0].results[0].offset, 0)
+    assert scan_result[0].results[0].offset == 0
 
     # That result should be a squashfs file system
-    ok_(scan_result[0].results[0].description.startswith("Squashfs filesystem"))
+    assert scan_result[0].results[0].description.startswith("Squashfs filesystem")

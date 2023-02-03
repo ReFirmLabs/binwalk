@@ -2,7 +2,6 @@
 import io
 import os
 import sys
-import glob
 import shutil
 import subprocess
 try:
@@ -29,16 +28,10 @@ except ImportError:
 try:
     label = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=DEVNULL).decode('utf-8')
     MODULE_VERSION = "%s+%s" % (MODULE_VERSION, label.strip())
-except KeyboardInterrupt as e:
-    raise e
+except KeyboardInterrupt:
+    raise
 except Exception:
     pass
-
-# Python2/3 compliance
-try:
-    raw_input
-except NameError:
-    raw_input = input
 
 
 def which(command):
@@ -287,40 +280,8 @@ class TestCommand(Command):
         pass
 
     def run(self):
-        # Need the nose module for testing
-        import nose
+        os.system("py.test --cov=binwalk testing")
 
-        # cd into the testing directory. Otherwise, the src/binwalk
-        # directory gets imported by nose which a) clutters the src
-        # directory with a bunch of .pyc files and b) will fail anyway
-        # unless a build/install has already been run which creates
-        # the version.py file.
-        testing_directory = os.path.join(MODULE_DIRECTORY, "testing", "tests")
-        os.chdir(testing_directory)
-
-        # Run the tests
-        retval = nose.core.run(argv=['--exe','--with-coverage'])
-
-        sys.stdout.write("\n")
-
-        # Clean up the resulting pyc files in the testing directory
-        for pyc in glob.glob("%s/*.pyc" % testing_directory):
-            sys.stdout.write("removing '%s'\n" % pyc)
-            os.remove(pyc)
-
-        input_vectors_directory = os.path.join(testing_directory, "input-vectors")
-        for extracted_directory in glob.glob("%s/*.extracted" % input_vectors_directory):
-            remove_tree(extracted_directory)
-
-        if retval == True:
-           sys.exit(0)
-        else:
-           sys.exit(1)
-
-# The data files to install along with the module
-install_data_files = []
-for data_dir in ["magic", "config", "plugins", "modules", "core"]:
-    install_data_files.append("%s%s*" % (data_dir, os.path.sep))
 
 this_directory = os.path.abspath(os.path.dirname(__file__))
 with io.open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
@@ -338,17 +299,17 @@ setup(
     requires=[],
     python_requires=">=3",
     package_dir={"": "src"},
-    packages=[MODULE_NAME],
-    package_data={MODULE_NAME: install_data_files},
-    scripts=[
-        os.path.join(
-            "src",
-            "scripts",
-            SCRIPT_NAME)],
+    packages=setuptools.find_packages("src"),
+    include_package_data=True,
+    entry_points={
+        'console_scripts': ['binwalk=binwalk.__main__:main'],
+    },
     cmdclass={
         'clean': CleanCommand,
         'uninstall': UninstallCommand,
         'idainstall': IDAInstallCommand,
         'idauninstall': IDAUnInstallCommand,
         'autocomplete' : AutoCompleteCommand,
-        'test': TestCommand})
+        'test': TestCommand,
+    },
+)

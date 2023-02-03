@@ -1,6 +1,6 @@
 import os
 import binwalk
-from nose.tools import eq_, ok_, assert_equal, assert_not_equal
+
 
 def test_dirtraversal():
     '''
@@ -27,7 +27,7 @@ def test_dirtraversal():
     # good symlinks have not been sanitized.
     for symlink in bad_symlink_file_list:
         linktarget = os.path.realpath(os.path.join(output_directory, symlink))
-        assert_equal(linktarget, os.devnull)
+        assert linktarget == os.devnull
     for symlink in good_symlink_file_list:
         linktarget = os.path.realpath(os.path.join(output_directory, symlink))
-        assert_not_equal(linktarget, os.devnull)
+        assert linktarget != os.devnull

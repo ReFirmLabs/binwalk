@@ -8,7 +8,7 @@ addons:
 install:
   - export PYTHON=$(which python3)
   - ./deps.sh --yes
-  - sudo -E $PYTHON -mpip install coverage
+  - sudo -E $PYTHON -m pip install pytest pytest-cov
   - sudo -E $PYTHON ./setup.py install
 script:
   - export PYTHON=$(which python3)
