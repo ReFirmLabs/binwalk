@@ -45,7 +45,7 @@ Binwalk's `--disasm` option requires the [Capstone](http://www.capstone-engine.o
 $ sudo pip install capstone
 ```
 
-Binwalk relies on multiple external utilties in order to automatically extract/decompress files and data:
+Binwalk relies on multiple external utilities in order to automatically extract/decompress files and data:
 
 ```bash
 # Install standard extraction utilities
