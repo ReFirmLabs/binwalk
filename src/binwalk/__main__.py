@@ -54,7 +54,7 @@ def main():
         else:
             runme()
     except IOError:
-        pass
+        exit(1)
     except KeyboardInterrupt:
         sys.stdout.write("\n")
 
