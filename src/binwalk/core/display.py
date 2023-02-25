@@ -99,11 +99,15 @@ class Display(object):
 
             if self.csv:
                 self.log("", ["FILE", "MD5SUM", "TIMESTAMP"])
-                self.log("", [file_name, md5sum, timestamp])
+                if self.reproducible:
+                    self.log("", [file_name, md5sum, "REDACTED"])
+                else:
+                    self.log("", [file_name, md5sum, timestamp])
 
             self._fprint("%s", "\n", csv=False)
-            self._fprint("Scan Time:     %s\n", [
-                         timestamp], csv=False, filter=False)
+            if not self.reproducible:
+                self._fprint("Scan Time:     %s\n", [
+                    timestamp], csv=False, filter=False)
             self._fprint("Target File:   %s\n", [
                          file_name], csv=False, filter=False)
             self._fprint(
