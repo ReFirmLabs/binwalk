@@ -29,20 +29,20 @@ $ sudo pip install nose coverage
 Binwalk uses the `pycryptodome` (`pycrypto`-compatible module that is still maintained) library to decrypt some known encrypted firmware images:
 
 ```bash
-$ sudo pip install pycryptodome
+$ pip install pycryptodome
 ```
 
 Binwalk uses [pyqtgraph](http://www.pyqtgraph.org) to generate graphs and visualizations, which requires the following (exact dependencies may vary based on your distro refer to `deps.sh` for more details): 
 
 ```bash
 $ sudo apt-get install libqt4-opengl python3-opengl python3-pyqt4 python3-pyqt4.qtopengl python3-numpy python3-scipy python3-pip
-$ sudo pip3 install pyqtgraph
+$ pip3 install pyqtgraph
 ```
 
 Binwalk's `--disasm` option requires the [Capstone](http://www.capstone-engine.org/) disassembly framework and its corresponding Python bindings:
 
 ```bash
-$ sudo pip install capstone
+$ pip3 install capstone
 ```
 
 Binwalk relies on multiple external utilties in order to automatically extract/decompress files and data:
@@ -61,7 +61,7 @@ $ (cd sasquatch && ./build.sh)
 
 ```bash
 # Install jefferson to extract JFFS2 file systems
-$ sudo pip install cstruct
+$ pip install cstruct
 $ git clone https://github.com/sviehb/jefferson
 $ (cd jefferson && sudo python setup.py install)
 ```
