@@ -270,7 +270,7 @@
 #
 # Motorola S-Records, from Gerd Truschinski <gt@freebsd.first.gmd.de>
 # Improved by Martin Sundhaug <martinsundhaug@gmail.com>
-0   regex       (S[0-35-9]([0-9A-F]{4})([0-9A-F]{2})+\n)+       Motorola S-Record{many}; binary data in text format, record type:
+0   regex       (S[0-35-9]([0-9A-F]{4})([0-9A-F]{2})+\r?\n)+       Motorola S-Record{many}; binary data in text format, record type:
 >1  string      0                                               header
 >1  string      1                                               data (16-bit)
 >1  string      2                                               data (24-bit)
@@ -827,7 +827,7 @@
 
 
 # Intel HEX
-0   regex       (\:([0-9A-F]{2}){5,}\n)+    Intel HEX data{many}, record type:
+0   regex       (\:([0-9A-F]{2}){5,}\r?\n)+    Intel HEX data{many}, record type:
 >7  string      00                          data
 >7  string      01                          end of file
 >7  string      02                          extended segment address
