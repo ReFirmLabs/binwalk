@@ -17,12 +17,12 @@ then
     function lsb_release {
         if [ -f /etc/os-release ]
         then
-            [[ "$1" = "-i" ]] && cat /etc/os-release | grep ^"ID" | cut -d= -f 2
-            [[ "$1" = "-r" ]] && cat /etc/os-release | grep "VERSION_ID" | cut -d= -d'"' -f 2
+            [[ "$1" = "-i" ]] && grep -E "^\s*ID\s*=\s*" /etc/os-release | cut -d= -f 2
+            [[ "$1" = "-r" ]] && grep -E "^\s*VERSION_ID\s*=\s*" /etc/os-release | cut -d= -d'"' -f 2
         elif [ -f /etc/lsb-release ]
         then
-            [[ "$1" = "-i" ]] && cat /etc/lsb-release | grep "DISTRIB_ID" | cut -d= -f 2
-            [[ "$1" = "-r" ]] && cat /etc/lsb-release | grep "DISTRIB_RELEASE" | cut -d= -f 2
+            [[ "$1" = "-i" ]] && grep -E "^\s*DISTRIB_ID\s*=\s*" /etc/lsb-release |  cut -d= -f 2
+            [[ "$1" = "-r" ]] && grep -E "^\s*DISTRIB_RELEASE\s*=\s*" /etc/lsb-release | cut -d= -f 2
         else
             echo Unknown
         fi
