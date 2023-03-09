@@ -28,7 +28,7 @@ class PFS(PFSCommon):
         self.file_list_start = self.meta.tell()
 
         self.num_files = self._make_short(header[-2:], endianness)
-        self.node_size = self._get_fname_len() + 12
+        self.node_size = self._make_short(header[-4:-2], endianness) + 12
 
     def _get_fname_len(self, bufflen=128):
         """Returns the number of bytes designated for the filename."""
