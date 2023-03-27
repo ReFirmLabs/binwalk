@@ -4,7 +4,6 @@
 
 import os
 import re
-import pwd
 import stat
 import shlex
 import tempfile
@@ -137,7 +136,8 @@ class Extractor(Module):
         self.runas_uid = None
         self.runas_gid = None
 
-        if self.enabled is True:
+        if hasattr(os, 'getuid') and self.enabled is True:
+            import pwd
             if self.runas_user is None:
                 # Get some info about the current user we're running under
                 user_info = pwd.getpwuid(os.getuid())
@@ -577,7 +577,8 @@ class Extractor(Module):
             output_directory = self.extraction_directories[path]
 
         # Make sure run-as user can access this directory
-        os.chown(output_directory, self.runas_uid, self.runas_gid)
+        if hasattr(os, 'getuid'):
+            os.chown(output_directory, self.runas_uid, self.runas_gid)
 
         return output_directory
 
@@ -873,7 +874,8 @@ class Extractor(Module):
             fdin.close()
 
             # Make sure run-as user can access this file
-            os.chown(fname, self.runas_uid, self.runas_gid)
+            if hasattr(os, 'getuid'):
+                os.chown(fname, self.runas_uid, self.runas_gid)
         except KeyboardInterrupt as e:
             raise e
         except Exception as e:
@@ -961,12 +963,12 @@ class Extractor(Module):
             tmp = None
 
         # If a run-as user is not the current user, we'll need to switch privileges to that user account
-        if self.runas_uid != os.getuid():
+        if hasattr(os, 'getuid') and self.runas_uid != os.getuid():
             binwalk.core.common.debug("Switching privileges to %s (%d:%d)" % (self.runas_user, self.runas_uid, self.runas_gid))
             
             # Fork a child process
             child_pid = os.fork()
-            if child_pid is 0:
+            if child_pid == 0:
                 # Switch to the run-as user privileges, if one has been set
                 if self.runas_uid is not None and self.runas_gid is not None:
                     os.setgid(self.runas_uid)
@@ -981,7 +983,7 @@ class Extractor(Module):
             rval = subprocess.call(shlex.split(command), stdout=tmp, stderr=tmp)
 
         # A true child process should exit with the subprocess exit value
-        if child_pid is 0:
+        if child_pid == 0:
             sys.exit(rval)
         # If no os.fork() happened, just return the subprocess exit value
         elif child_pid is None:
