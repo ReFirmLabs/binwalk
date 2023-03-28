@@ -57,6 +57,8 @@ $ sudo apt-get install mtd-utils gzip bzip2 tar arj lhasa p7zip p7zip-full cabex
 $ sudo apt-get install zlib1g-dev liblzma-dev liblzo2-dev
 $ git clone https://github.com/devttys0/sasquatch
 $ (cd sasquatch && ./build.sh)
+# GCC 10 workaround
+$ (cd sasquatch && CFLAGS=-fcommon ./build.sh) 
 ```
 
 ```bash
