@@ -686,7 +686,7 @@ class Extractor(Module):
                     # Only clean up files if remove_after_execute was specified.
                     # Only clean up files if the file was extracted sucessfully, or if we've run
                     # out of extractors.
-                    if self.remove_after_execute and (extract_ok == True or i == (len(rules) - 1)):
+                    if self.remove_after_execute and (extract_ok or i == (len(rules) - 1)):
 
                         # Remove the original file that we extracted,
                         # if it has not been modified by the extractor.
@@ -695,7 +695,7 @@ class Extractor(Module):
                                 os.unlink(fname)
                         except KeyboardInterrupt as e:
                             raise e
-                        except Exception as e:
+                        except Exception:
                             pass
 
                     # If the command executed OK, don't try any more rules
@@ -852,7 +852,7 @@ class Extractor(Module):
                 fdout = BlockFile(fname, 'w')
             except KeyboardInterrupt as e:
                 raise e
-            except Exception as e:
+            except Exception:
                 # Fall back to the default name if the requested name fails
                 fname = unique_file_name(default_bname, extension)
                 fdout = BlockFile(fname, 'w')
@@ -966,7 +966,7 @@ class Extractor(Module):
             
             # Fork a child process
             child_pid = os.fork()
-            if child_pid is 0:
+            if child_pid == 0:
                 # Switch to the run-as user privileges, if one has been set
                 if self.runas_uid is not None and self.runas_gid is not None:
                     os.setgid(self.runas_uid)
@@ -974,14 +974,14 @@ class Extractor(Module):
         else:
             # child_pid of None indicates that no os.fork() occured
             child_pid = None
-            
+
         # If we're the child, or there was no os.fork(), execute the command
         if child_pid in [0, None]:
             binwalk.core.common.debug("subprocess.call(%s, stdout=%s, stderr=%s)" % (command, str(tmp), str(tmp)))
             rval = subprocess.call(shlex.split(command), stdout=tmp, stderr=tmp)
 
         # A true child process should exit with the subprocess exit value
-        if child_pid is 0:
+        if child_pid == 0:
             sys.exit(rval)
         # If no os.fork() happened, just return the subprocess exit value
         elif child_pid is None:
@@ -993,7 +993,7 @@ class Extractor(Module):
     def symlink_sanitizer(self, file_list, extraction_directory):
         # User can disable this if desired
         if self.do_not_sanitize_symlinks is True:
-            return 
+            return
 
         # Allows either a single file path, or a list of file paths to be passed in for sanitization.
         if type(file_list) is not list:
