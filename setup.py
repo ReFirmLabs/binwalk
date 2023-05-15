@@ -12,7 +12,7 @@ except ImportError:
 from distutils.dir_util import remove_tree
 
 MODULE_NAME = "binwalk"
-MODULE_VERSION = "2.3.3"
+MODULE_VERSION = "2.3.5"
 SCRIPT_NAME = MODULE_NAME
 MODULE_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 
@@ -351,4 +351,9 @@ setup(
         'idainstall': IDAInstallCommand,
         'idauninstall': IDAUnInstallCommand,
         'autocomplete' : AutoCompleteCommand,
-        'test': TestCommand})
+        'test': TestCommand},
+    entry_points={
+        'console_scripts': [
+            '%s=%s.__main__:main' % (SCRIPT_NAME, SCRIPT_NAME),
+        ],
+    })
