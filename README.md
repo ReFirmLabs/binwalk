@@ -1,3 +1,15 @@
+# Notice
+
+i basically just want a working docker image of binwalk that gets updated, so this repo reflects that desire. 
+
+go [here](https://hub.docker.com/r/bikeshedai/binwalk) for the dockerhub repo
+
+Also im going to try and pull in some of the pending PRs from the main binwalk repo that seem like they make sense, so if you have a different PR that werent merged yet, just make a new PR
+
+so far ive brought in the following:
+- https://github.com/ReFirmLabs/binwalk/pull/633
+
+
 # Binwalk
 
 [![Build Status](https://travis-ci.org/ReFirmLabs/binwalk.svg?branch=master)](https://travis-ci.org/ReFirmLabs/binwalk)
