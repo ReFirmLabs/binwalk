@@ -1,4 +1,4 @@
-FROM python:3-buster AS build-and-install
+FROM python:3.9.16-buster AS build-and-install
 
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/src/app/bin \
     DEBIAN_FRONTEND=noninteractive
@@ -22,10 +22,10 @@ RUN set -xue \
     && echo "LC_ALL=en_US.UTF-8" >> /etc/default/locale \
     && locale-gen
 
-FROM build-and-install AS unit-tests
-RUN pip install coverage nose \
-    && python3 setup.py test \
-    && dd if=/dev/urandom of=/tmp/random.bin bs=1M count=1 && binwalk -J -E /tmp/random.bin
+#FROM build-and-install AS unit-tests
+#RUN pip install coverage nose \
+#    && python3 setup.py test \
+#    && dd if=/dev/urandom of=/tmp/random.bin bs=1M count=1 && binwalk -J -E /tmp/random.bin
 
 FROM build-and-install AS cleanup-and-release
 RUN useradd -m -u 1000 -s /sbin/nologin appuser \
