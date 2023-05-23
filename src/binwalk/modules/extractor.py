@@ -4,7 +4,16 @@
 
 import os
 import re
-import pwd
+
+# Windows workaround for missing module 'pwd'
+if os.name == 'nt':
+    class Pwd():
+        def pwgetnam(self, user):
+            pass
+    pwd = Pwd()
+else:
+    import pwd
+
 import stat
 import shlex
 import tempfile
