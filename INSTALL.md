@@ -70,7 +70,7 @@ $ (cd jefferson && sudo python setup.py install)
 # Install ubi_reader to extract UBIFS file systems
 $ sudo apt-get install liblzo2-dev python-lzo
 $ git clone https://github.com/jrspruitt/ubi_reader
-$ (cd ubi_reader && sudo python setup.py install)
+$ (cd ubi_reader && poetry install)
 ```
 
 ```bash
