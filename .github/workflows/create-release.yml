@@ -1,0 +1,18 @@
+name: Create release 
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Archive project artifacts
+        run: tar -czvf binwalk.tar.gz .  # tar the current directory
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./binwalk.tar.gz
