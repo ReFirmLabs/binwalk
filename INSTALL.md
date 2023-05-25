@@ -5,8 +5,12 @@ Binwalk supports Python 3.6+.
 
 Installation
 ============
+* If you are on Mac OS X, just simply install with [brew](https://brew.sh):
+```bash
+$ brew install binwalk
+```
 
-Installation follows the typical Python installation procedure:
+* On others, installation follows the typical Python installation procedure:
 
 ```bash
 # Python3.x
