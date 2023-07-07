@@ -1,0 +1,8 @@
+# WAV files
+# by Folkert van Heusden <mail@vanheusden.com>
+0       string  RIFF        RIFF data
+>4      lelong  x           size - 8 bytes: %d
+>8      string  WAVE        .WAV
+
+0       string  fLaC        FLAC data
+
