@@ -232,7 +232,6 @@ install_pip_package "setuptools matplotlib capstone pycryptodome gnupg tk ubi_re
 install_sasquatch
 install_yaffshiv
 install_jefferson
-install_ubireader
 
 if [ $distro_version = "18" ]
 then
