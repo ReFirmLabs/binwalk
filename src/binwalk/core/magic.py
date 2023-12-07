@@ -428,7 +428,7 @@ class Magic(object):
         # Regex rule to find format strings
         self.fmtstr = re.compile("%[^%]")
         # Regex rule to find periods (see self._do_math)
-        self.period = re.compile("\.")
+        self.period = re.compile(r"\.")
 
     def reset(self):
         self.display_once = set()
