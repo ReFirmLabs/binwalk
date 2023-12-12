@@ -95,17 +95,6 @@ function install_jefferson
     $SUDO rm -rf jefferson
 }
 
-function install_unstuff
-{
-    mkdir -p /tmp/unstuff
-    cd /tmp/unstuff
-
-    wget -O - http://downloads.tuxfamily.org/sdtraces/stuffit520.611linux-i386.tar.gz | tar -zxv
-    $SUDO cp bin/unstuff /usr/local/bin/
-    cd -
-    rm -rf /tmp/unstuff
-}
-
 function install_cramfstools
 {
   # Downloads cramfs tools from sourceforge and installs them to $INSTALL_LOCATION
@@ -251,7 +240,6 @@ install_pip_package "setuptools matplotlib capstone pycryptodome gnupg tk"
 install_sasquatch
 install_yaffshiv
 install_jefferson
-install_unstuff
 install_ubireader
 
 if [ $distro_version = "18" ]
