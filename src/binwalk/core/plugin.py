@@ -1,7 +1,16 @@
 # Core code for supporting and managing plugins.
 
 import os
-import imp
+
+try:
+    import imp
+    load_module_source = imp.load_source
+except ImportError:
+    # Python 3.12 compatibility
+    import importlib.machinery
+    load_module_source = importlib.machinery.SourceFileLoader
+
+
 import inspect
 import binwalk.core.common
 import binwalk.core.settings
@@ -180,7 +189,7 @@ class Plugins(object):
                         module = file_name[:-len(self.MODULE_EXTENSION)]
 
                         try:
-                            plugin = imp.load_source(module, os.path.join(plugins[key]['path'], file_name))
+                            plugin = load_module_source(module, os.path.join(plugins[key]['path'], file_name))
                             plugin_class = self._find_plugin_class(plugin)
 
                             plugins[key]['enabled'][module] = True
@@ -222,7 +231,7 @@ class Plugins(object):
                 continue
 
             try:
-                plugin = imp.load_source(module, file_path)
+                plugin = load_module_source(module, file_path)
                 plugin_class = self._find_plugin_class(plugin)
 
                 class_instance = plugin_class(self.parent)
