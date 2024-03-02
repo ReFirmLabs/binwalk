@@ -80,11 +80,11 @@ function install_yaffshiv
     (cd yaffshiv && $SUDO $PYTHON setup.py install)
     $SUDO rm -rf yaffshiv
 }
-
+#Sasquatch requires a patch to be applied before running the build command or else it fails on install. I Added the wget download link and the mv command in-order to get this to install correctly. It still installs with many warnings but seems to be working fine.
 function install_sasquatch
 {
     git clone --quiet --depth 1 --branch "master" https://github.com/devttys0/sasquatch
-    (cd sasquatch && $SUDO ./build.sh)
+    (cd sasquatch && wget https://raw.githubusercontent.com/devttys0/sasquatch/82da12efe97a37ddcd33dba53933bc96db4d7c69/patches/patch0.txt && mv patch0.txt patches && $SUDO ./build.sh)
     $SUDO rm -rf sasquatch
 }
 
@@ -112,11 +112,11 @@ function install_cramfstools
   rm -rf cramfs-tools
 }
 
-
+#Ubireader changed from setup.py to a pyproject.toml so it needs to have the install command changed. I used pip3 because I dont think that python2 has .toml support. I also had to remove the python3-lzallright package with apt before It would allow me to install this.
 function install_ubireader
 {
     git clone --quiet --depth 1 --branch "master" https://github.com/jrspruitt/ubi_reader
-    (cd ubi_reader && $SUDO $PYTHON setup.py install)
+    (cd ubi_reader && $SUDO pip3 install .)
     $SUDO rm -rf ubi_reader
 }
 
