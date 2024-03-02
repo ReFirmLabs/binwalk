@@ -988,4 +988,21 @@
 >(28.L+36+15) belong x file_size: %d,
 >(28.L+36+15+4) belong x 
 
-
+# ZTE FIRMWARE
+# https://github.com/0xXA/hacking-sharp-vision
+# Added by Yuvraj Saxena <ysaxenax@gmail.com>
+0       string      \x99\x99\x99\x99\x44\x44\x44\x44\x55\x55\x55\x55\xaa\xaa\xaa\xaa            ZTE firmware,
+>16     byte        !0x0                                                                        {invalid} padding bytes
+>36     string      x                                                                           Firmware version: "%s",
+>64     ulelong     0x1
+>>76    ulelong     x                                                                           Header size: %d bytes,
+>80     ulelong     0x1
+>>92    ulelong     x                                                                           Header size: %d bytes,
+>164    ulelong     0x1
+>>168   lelong      x                                                                           Header CRC: 0x%X
+>180    ulelong     0x1
+>>184   lelong      x                                                                           Header CRC: 0x%X
+>196    ulelong     0x1
+>>200   lelong      x                                                                           Header CRC: 0x%X
+>212    ulelong     0x1
+>>216   lelong      x                                                                           Header CRC: 0x%X
