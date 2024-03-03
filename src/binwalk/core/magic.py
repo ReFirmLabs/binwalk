@@ -227,6 +227,12 @@ class SignatureLine(object):
         elif self.type in ['long', 'date']:
             self.fmt = 'i'
             self.size = 4
+        # In certain firmware implementations, dates are stored as strings with a fixed length of 14 bytes, 
+        # where each byte represents a specific component of the date and time (e.g., '20200131041849' corresponds to '2020-01-31 04:18:49').
+        # Added by Yuvraj Saxena <ysaxenax@gmail.com>
+        elif self.type == 'sdate':
+            self.fmt = None
+            self.size = 14
         else:
             raise ParserException("Unknown data type '%s' in line '%s'" % (self.type, line))
 
@@ -687,6 +693,15 @@ class Magic(object):
                             raise e
                         except Exception:
                             dvalue = "invalid timestamp"
+
+                    # Added by Yuvraj Saxena <ysaxenax@gmail.com>
+                    if line.type == 'sdate':
+                        try:
+                            dvalue = datetime.datetime.strptime(dvalue, '%Y%m%d%H%M%S')
+                        except KeyboardInterrupt as e:
+                            raise e
+                        except Exception:
+                            dvalue = "invalid time string"
 
                     # Generate the tuple for the format string
                     dvalue_tuple = ()
