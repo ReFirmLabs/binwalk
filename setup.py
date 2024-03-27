@@ -12,7 +12,7 @@ except ImportError:
 from distutils.dir_util import remove_tree
 
 MODULE_NAME = "binwalk"
-MODULE_VERSION = "2.3.3"
+MODULE_VERSION = "2.3.4"
 SCRIPT_NAME = MODULE_NAME
 MODULE_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 
