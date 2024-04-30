@@ -116,7 +116,7 @@ function install_cramfstools
 function install_ubireader
 {
     git clone --quiet --depth 1 --branch "main" https://github.com/jrspruitt/ubi_reader
-    (cd ubi_reader && poetry install)
+    pip install ./ubi_reader
     $SUDO rm -rf ubi_reader
 }
 
