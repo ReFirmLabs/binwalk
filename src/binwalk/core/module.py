@@ -704,14 +704,21 @@ class Modules(object):
                 modules[module] = module.PRIORITY
 
         # user-defined modules
-        import imp
+        if sys.version_info.major == 3 and sys.version_info.minor >= 12:
+            import importlib
+        else:
+            import imp
         user_modules = binwalk.core.settings.Settings().user.modules
         for file_name in os.listdir(user_modules):
             if not file_name.endswith('.py'):
                 continue
             module_name = file_name[:-3]
             try:
-                user_module = imp.load_source(module_name, os.path.join(user_modules, file_name))
+                if sys.version_info.major == 3 and sys.version_info.minor >= 12:
+                    spec = importlib.util.spec_from_file_location(module_name, os.path.join(user_modules, file_name))
+                    user_module = importlib.util.module_from_spec(spec)
+                else:
+                    user_module = imp.load_source(module_name, os.path.join(user_modules, file_name))
             except KeyboardInterrupt as e:
                 raise e
             except Exception as e:

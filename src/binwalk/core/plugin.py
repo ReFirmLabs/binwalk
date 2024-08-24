@@ -1,7 +1,11 @@
 # Core code for supporting and managing plugins.
 
 import os
-import imp
+import sys
+if sys.version_info.major == 3 and sys.version_info.minor >= 12:
+    import importlib.util
+else:
+    import imp
 import inspect
 import binwalk.core.common
 import binwalk.core.settings
@@ -180,7 +184,11 @@ class Plugins(object):
                         module = file_name[:-len(self.MODULE_EXTENSION)]
 
                         try:
-                            plugin = imp.load_source(module, os.path.join(plugins[key]['path'], file_name))
+                            if sys.version_info.major == 3 and sys.version_info.minor >= 12:
+                                spec = importlib.util.spec_from_file_location(module, os.path.join(plugins[key]['path'], file_name))
+                                plugin = importlib.util.module_from_spec(spec)
+                            else:
+                                plugin = imp.load_source(module, os.path.join(plugins[key]['path'], file_name))
                             plugin_class = self._find_plugin_class(plugin)
 
                             plugins[key]['enabled'][module] = True
@@ -222,7 +230,11 @@ class Plugins(object):
                 continue
 
             try:
-                plugin = imp.load_source(module, file_path)
+                if sys.version_info.major == 3 and sys.version_info.minor >= 12:
+                    spec = importlib.util.spec_from_file_location(module, file_path)
+                    plugin = importlib.util.module_from_spec(spec)
+                else:
+                    plugin = imp.load_source(module, file_path)
                 plugin_class = self._find_plugin_class(plugin)
 
                 class_instance = plugin_class(self.parent)
