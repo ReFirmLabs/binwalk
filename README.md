@@ -43,8 +43,8 @@ To download and build the Binwalk source code:
 
 ```
 sudo apt install git
-git clone https://github.com/devttys0/binwalk-rs
-cd binwalk-rs
+git clone -b binwalkv3 https://github.com/ReFirmLabs/binwalk.git
+cd binwalk
 cargo build --release
 ./target/release/binwalk --help
 ```
