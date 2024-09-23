@@ -1,20 +1,47 @@
 use crate::signatures;
 use aho_corasick::AhoCorasick;
 use std::collections::HashMap;
-use crate::structures::ubi::{ parse_ubi_volume_header, parse_ubi_ec_header };
+use crate::structures::ubi::{ parse_ubi_volume_header, parse_ubi_ec_header, parse_ubi_superblock_header };
 
-pub const DESCRIPTION: &str = "UBI image";
+pub const UBI_FS_DESCRIPTION: &str = "UBIFS image";
+pub const UBI_IMAGE_DESCRIPTION: &str = "UBI image";
 
 pub fn ubi_magic() -> Vec<Vec<u8>> {
     // Erase block magic bytes; header version is assumed to be 1
     return vec![b"UBI#\x01\x00\x00\x00".to_vec()];
 }
 
+pub fn ubifs_magic() -> Vec<Vec<u8>> {
+    // UBI node magic; this matches *any* UBI node, but ubifs_parser ensures that only superblock nodes are reported
+    return vec![b"\x31\x18\x10\x06".to_vec()];
+}
+
+pub fn ubifs_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+
+    let mut result = signatures::common::SignatureResult {
+                                            offset: offset,
+                                            description: UBI_FS_DESCRIPTION.to_string(),
+                                            confidence: signatures::common::CONFIDENCE_HIGH,
+                                            ..Default::default()
+    };
+
+    // Parse the UBIFS superblock header
+    if let Ok(sb_header) = parse_ubi_superblock_header(&file_data[offset..]) {
+
+        // Image size is the number of logical erase blocks times the size of each logical erase block
+        result.size = sb_header.leb_count * sb_header.leb_size;
+        result.description = format!("{}, total size: {} bytes", result.description, result.size);
+        return Ok(result);
+    }
+
+    return Err(signatures::common::SignatureError);
+}
+
 pub fn ubi_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
 
     let mut result = signatures::common::SignatureResult {
                                             offset: offset,
-                                            description: DESCRIPTION.to_string(),
+                                            description: UBI_IMAGE_DESCRIPTION.to_string(),
                                             confidence: signatures::common::CONFIDENCE_HIGH,
                                             ..Default::default()
     };

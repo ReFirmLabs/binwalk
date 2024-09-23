@@ -559,8 +559,20 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
                                         always_display: false,
                                         magic: signatures::ubi::ubi_magic(),
                                         parser: signatures::ubi::ubi_parser,
-                                        description: signatures::ubi::DESCRIPTION.to_string(),
+                                        description: signatures::ubi::UBI_IMAGE_DESCRIPTION.to_string(),
                                         extractor: Some(extractors::ubi::ubi_extractor()),
+    });
+
+    // ubifs
+    binary_signatures.push(signatures::common::Signature {
+                                        name: "ubifs".to_string(),
+                                        short: false,
+                                        magic_offset: 0,
+                                        always_display: false,
+                                        magic: signatures::ubi::ubifs_magic(),
+                                        parser: signatures::ubi::ubifs_parser,
+                                        description: signatures::ubi::UBI_FS_DESCRIPTION.to_string(),
+                                        extractor: Some(extractors::ubi::ubifs_extractor()),
     });
 
     // cfe bootloader
