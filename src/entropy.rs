@@ -1,9 +1,9 @@
-use std::path;
+use crate::common::read_file;
+use entropy::shannon_entropy;
 use log::error;
 use plotters::prelude::*;
-use entropy::shannon_entropy;
-use crate::common::read_file;
-use serde::{ Serialize, Deserialize };
+use serde::{Deserialize, Serialize};
+use std::path;
 
 #[derive(Debug, Clone)]
 pub struct EntropyError;
@@ -37,8 +37,10 @@ fn blocks(data: &[u8]) -> Vec<BlockEntropy> {
     }
 
     while offset < data.len() {
-        let mut block = BlockEntropy { ..Default::default() };
-        
+        let mut block = BlockEntropy {
+            ..Default::default()
+        };
+
         block.start = offset;
         block.end = block.start + block_size;
 
@@ -64,17 +66,21 @@ pub fn plot(target_file: &String) -> Result<FileEntropy, EntropyError> {
     const SHANNON_MAX_VALUE: i32 = 8;
     const IMAGE_PIXEL_WIDTH: u32 = 2048;
     const IMAGE_PIXEL_HEIGHT: u32 = ((IMAGE_PIXEL_WIDTH as f64) * 0.6) as u32;
-    
-    // Get the base name of the target file
-    let target_file_name = path::Path::new(target_file).file_name().unwrap().to_str().unwrap();
 
-    let mut file_entropy = FileEntropy { 
-            file: format!("{}.{}", target_file_name, FILE_EXTENSION),
-            ..Default::default()
+    // Get the base name of the target file
+    let target_file_name = path::Path::new(target_file)
+        .file_name()
+        .unwrap()
+        .to_str()
+        .unwrap();
+
+    let mut file_entropy = FileEntropy {
+        file: format!("{}.{}", target_file_name, FILE_EXTENSION),
+        ..Default::default()
     };
 
     let png_path = file_entropy.file.clone();
-    
+
     // Make sure the output file doesn't already exist
     if path::Path::new(&png_path).exists() == true {
         error!("Cannot create entropy graph {}: File exists", png_path);
@@ -84,7 +90,7 @@ pub fn plot(target_file: &String) -> Result<FileEntropy, EntropyError> {
     // Read in the target file data
     if let Ok(file_data) = read_file(&target_file) {
         let mut points: Vec<(i32, i32)> = vec![];
-        
+
         // Calculate the entropy for each file block
         file_entropy.blocks = blocks(&file_data);
 
@@ -96,7 +102,8 @@ pub fn plot(target_file: &String) -> Result<FileEntropy, EntropyError> {
         }
 
         // Use the BitMapBackend to create a PNG, make the background black
-        let root_area = BitMapBackend::new(&png_path, (IMAGE_PIXEL_WIDTH, IMAGE_PIXEL_HEIGHT)).into_drawing_area();
+        let root_area = BitMapBackend::new(&png_path, (IMAGE_PIXEL_WIDTH, IMAGE_PIXEL_HEIGHT))
+            .into_drawing_area();
         root_area.fill(&BLACK).unwrap();
 
         // Build a 2D chart to plot the file entropy
@@ -104,7 +111,10 @@ pub fn plot(target_file: &String) -> Result<FileEntropy, EntropyError> {
             .margin(50)
             .set_label_area_size(LabelAreaPosition::Left, 40)
             .set_label_area_size(LabelAreaPosition::Bottom, 40)
-            .caption(target_file_name, TextStyle::from(("sans-serif", 30).into_font()).color(&GREEN))
+            .caption(
+                target_file_name,
+                TextStyle::from(("sans-serif", 30).into_font()).color(&GREEN),
+            )
             .build_cartesian_2d(0..file_data.len() as i32, 0..SHANNON_MAX_VALUE)
             .unwrap();
 
@@ -116,9 +126,11 @@ pub fn plot(target_file: &String) -> Result<FileEntropy, EntropyError> {
             .unwrap();
 
         // Line plot of the entropy points
-        ctx.draw_series(
-            LineSeries::new(points.into_iter().map(|(x, y)| (x, y)), &YELLOW)
-        ).unwrap();
+        ctx.draw_series(LineSeries::new(
+            points.into_iter().map(|(x, y)| (x, y)),
+            &YELLOW,
+        ))
+        .unwrap();
     }
 
     /*
@@ -126,7 +138,10 @@ pub fn plot(target_file: &String) -> Result<FileEntropy, EntropyError> {
      * Make sure the output file was created.
      */
     if path::Path::new(&png_path).exists() == false {
-        error!("Failed to create entropy graph {}: possible permissions error?", png_path);
+        error!(
+            "Failed to create entropy graph {}: possible permissions error?",
+            png_path
+        );
         return Err(EntropyError);
     }
 

@@ -31,21 +31,11 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, structures::common
     ];
 
     // Just enough of the ELF structure to grab some system info
-    let elf_info_structure = vec![
-        ("type", "u16"),
-        ("machine", "u16"),
-        ("version", "u32"),
-    ];
+    let elf_info_structure = vec![("type", "u16"), ("machine", "u16"), ("version", "u32")];
 
-    let elf_classes = HashMap::from([
-        (1, 32),
-        (2, 64),
-    ]);
+    let elf_classes = HashMap::from([(1, 32), (2, 64)]);
 
-    let elf_endianness = HashMap::from([
-        (1, "little"),
-        (2, "big"),
-    ]);
+    let elf_endianness = HashMap::from([(1, "little"), (2, "big")]);
 
     let elf_osabi = HashMap::from([
         (0, "System-V (Unix)"),
@@ -147,12 +137,18 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, structures::common
         (258, "LoongArch"),
     ]);
 
-    let mut elf_hdr_info = ELFHeader { ..Default::default() };
+    let mut elf_hdr_info = ELFHeader {
+        ..Default::default()
+    };
 
     // Sanity check the size of available data
     if elf_data.len() >= MIN_ELF_SIZE {
         // Endianness doesn't matter here, and we don't know what the ELF's endianness is yet
-        let e_ident = structures::common::parse(&elf_data[0..ELF_IDENT_STRUCT_SIZE], &elf_ident_structure, "little");
+        let e_ident = structures::common::parse(
+            &elf_data[0..ELF_IDENT_STRUCT_SIZE],
+            &elf_ident_structure,
+            "little",
+        );
 
         // Sanity check the e_ident fields
         if e_ident["padding_1"] == 0 && e_ident["padding_2"] == 0 {
@@ -163,22 +159,29 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, structures::common
                             // Set the ident info
                             elf_hdr_info.class = elf_classes[&e_ident["class"]].to_string();
                             elf_hdr_info.osabi = elf_osabi[&e_ident["osabi"]].to_string();
-                            elf_hdr_info.endianness = elf_endianness[&e_ident["endianness"]].to_string();
+                            elf_hdr_info.endianness =
+                                elf_endianness[&e_ident["endianness"]].to_string();
 
                             // The rest of the ELF info comes immediately after the ident structure
                             let elf_info_start: usize = ELF_IDENT_STRUCT_SIZE;
                             let elf_info_end: usize = elf_info_start + ELF_INFO_STRUCT_SIZE;
 
                             // Parse the remaining info from the ELF header
-                            let elf_info = structures::common::parse(&elf_data[elf_info_start..elf_info_end], &elf_info_structure, elf_endianness[&e_ident["endianness"]]);
+                            let elf_info = structures::common::parse(
+                                &elf_data[elf_info_start..elf_info_end],
+                                &elf_info_structure,
+                                elf_endianness[&e_ident["endianness"]],
+                            );
 
                             // Sanity check the remaining ELF header fields
                             if elf_info["version"] == EXPECTED_VERSION {
                                 if elf_types.contains_key(&elf_info["type"]) {
                                     if elf_machines.contains_key(&elf_info["machine"]) {
                                         // Set the ELF info, erm, info
-                                        elf_hdr_info.exe_type = elf_types[&elf_info["type"]].to_string();
-                                        elf_hdr_info.machine = elf_machines[&elf_info["machine"]].to_string();
+                                        elf_hdr_info.exe_type =
+                                            elf_types[&elf_info["type"]].to_string();
+                                        elf_hdr_info.machine =
+                                            elf_machines[&elf_info["machine"]].to_string();
 
                                         return Ok(elf_hdr_info);
                                     }

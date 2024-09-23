@@ -1,5 +1,5 @@
 use crate::signatures;
-use crate::structures::ext::{ parse_ext_header, SUPERBLOCK_SIZE, SUPERBLOCK_OFFSET };
+use crate::structures::ext::{parse_ext_header, SUPERBLOCK_OFFSET, SUPERBLOCK_SIZE};
 
 pub const DESCRIPTION: &str = "EXT filesystem";
 
@@ -16,19 +16,22 @@ pub fn ext_magic() -> Vec<Vec<u8>> {
         b"\x53\xEF\x01\x00\x03\x00\x00\x00".to_vec(),
         b"\x53\xEF\x02\x00\x01\x00\x00\x00".to_vec(),
         b"\x53\xEF\x02\x00\x02\x00\x00\x00".to_vec(),
-        b"\x53\xEF\x02\x00\x03\x00\x00\x00".to_vec()
+        b"\x53\xEF\x02\x00\x03\x00\x00\x00".to_vec(),
     ];
 }
 
-pub fn ext_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+pub fn ext_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     const MAGIC_OFFSET: usize = 1080;
 
     let mut result = signatures::common::SignatureResult {
-                                            description: DESCRIPTION.to_string(),
-                                            offset: offset,
-                                            size: 0,
-                                            confidence: signatures::common::CONFIDENCE_MEDIUM,
-                                            ..Default::default()
+        description: DESCRIPTION.to_string(),
+        offset: offset,
+        size: 0,
+        confidence: signatures::common::CONFIDENCE_MEDIUM,
+        ..Default::default()
     };
 
     let available_data: usize = file_data.len() - offset;
@@ -37,7 +40,7 @@ pub fn ext_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::comm
     if available_data >= (SUPERBLOCK_OFFSET + SUPERBLOCK_SIZE) {
         // Set the reported offset to the actual beginning of the EXT image
         result.offset = offset - MAGIC_OFFSET;
-        
+
         if let Ok(ext_header) = parse_ext_header(&file_data[result.offset..]) {
             result.size = ext_header.image_size;
             result.description = format!("{} for {}, inodes: {}, block size: {}, block count: {}, free blocks: {}, reserved blocks: {}, total size: {} bytes", result.description,

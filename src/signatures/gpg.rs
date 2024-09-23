@@ -1,5 +1,5 @@
 use crate::extractors::zlib::zlib_decompress;
-use crate::signatures::common::{ SignatureResult, SignatureError, CONFIDENCE_HIGH };
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 
 pub const GPG_SIGNED_DESCRIPTION: &str = "GPG signed file";
 
@@ -11,7 +11,10 @@ pub fn gpg_signed_magic() -> Vec<Vec<u8>> {
  * NOTE: The provided offset will always be 0; this is enforced by the 'short: true' specification
  *       in the magic.rs GPG signature definition.
  */
-pub fn gpg_signed_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn gpg_signed_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<SignatureResult, SignatureError> {
     let result = SignatureResult {
         offset: offset,
         confidence: CONFIDENCE_HIGH,

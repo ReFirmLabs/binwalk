@@ -5,7 +5,9 @@ pub struct WebPHeader {
     pub chunk_type: String,
 }
 
-pub fn parse_webp_header(webp_data: &[u8]) -> Result<WebPHeader, structures::common::StructureError> {
+pub fn parse_webp_header(
+    webp_data: &[u8],
+) -> Result<WebPHeader, structures::common::StructureError> {
     const MAGIC1: usize = 0x46464952;
     const MAGIC2: usize = 0x50424557;
 
@@ -25,12 +27,13 @@ pub fn parse_webp_header(webp_data: &[u8]) -> Result<WebPHeader, structures::com
 
     // Sanity check the size of available data
     if webp_data.len() >= webp_struct_size {
-
         // Parse the webp header
         let webp_header = structures::common::parse(&webp_data, &webp_structure, "little");
 
         if webp_header["magic1"] == MAGIC1 && webp_header["magic2"] == MAGIC2 {
-            if let Ok(type_string) = String::from_utf8(webp_data[CHUNK_TYPE_START..CHUNK_TYPE_END].to_vec()) {
+            if let Ok(type_string) =
+                String::from_utf8(webp_data[CHUNK_TYPE_START..CHUNK_TYPE_END].to_vec())
+            {
                 return Ok(WebPHeader {
                     size: webp_header["file_size"] + FILE_SIZE_OFFSET,
                     chunk_type: type_string.trim().to_string(),

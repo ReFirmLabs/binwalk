@@ -1,13 +1,13 @@
+use crate::extractors::common::{create_file, safe_path_join};
+use crate::extractors::common::{ExtractionResult, Extractor, ExtractorType};
 use aho_corasick::AhoCorasick;
-use crate::extractors::common::{ create_file, safe_path_join };
-use crate::extractors::common::{ Extractor, ExtractorType, ExtractionResult };
 
 // Defines the internal extractor function for carving out PEM keys
 pub fn pem_key_extractor() -> Extractor {
     return Extractor {
         do_not_recurse: true,
         utility: ExtractorType::Internal(pem_key_carver),
-        ..Default::default() 
+        ..Default::default()
     };
 }
 
@@ -20,18 +20,38 @@ pub fn pem_certificate_extractor() -> Extractor {
     };
 }
 
-pub fn pem_certificate_carver(file_data: &Vec<u8>, offset: usize, output_directory: Option<&String>) -> ExtractionResult {
+pub fn pem_certificate_carver(
+    file_data: &Vec<u8>,
+    offset: usize,
+    output_directory: Option<&String>,
+) -> ExtractionResult {
     const CERTIFICATE_FILE_NAME: &str = "pem.crt";
-    return pem_carver(file_data, offset, output_directory, Some(CERTIFICATE_FILE_NAME));
+    return pem_carver(
+        file_data,
+        offset,
+        output_directory,
+        Some(CERTIFICATE_FILE_NAME),
+    );
 }
 
-pub fn pem_key_carver(file_data: &Vec<u8>, offset: usize, output_directory: Option<&String>) -> ExtractionResult {
+pub fn pem_key_carver(
+    file_data: &Vec<u8>,
+    offset: usize,
+    output_directory: Option<&String>,
+) -> ExtractionResult {
     const KEY_FILE_NAME: &str = "pem.key";
     return pem_carver(file_data, offset, output_directory, Some(KEY_FILE_NAME));
 }
 
-pub fn pem_carver(file_data: &Vec<u8>, offset: usize, output_directory: Option<&String>, fname: Option<&str>) -> ExtractionResult {
-    let mut result = ExtractionResult { ..Default::default() };
+pub fn pem_carver(
+    file_data: &Vec<u8>,
+    offset: usize,
+    output_directory: Option<&String>,
+    fname: Option<&str>,
+) -> ExtractionResult {
+    let mut result = ExtractionResult {
+        ..Default::default()
+    };
 
     if let Some(pem_size) = get_pem_size(file_data, offset) {
         result.size = Some(pem_size);

@@ -7,14 +7,16 @@ pub struct PCHRomHeader {
 }
 
 // TODO: Needs testing
-pub fn parse_pchrom_header(pch_data: &[u8]) -> Result<PCHRomHeader, structures::common::StructureError> {
+pub fn parse_pchrom_header(
+    pch_data: &[u8],
+) -> Result<PCHRomHeader, structures::common::StructureError> {
     const HEADER_STRUCTURE_SIZE: usize = 8;
     const HEADER_STRUCTURE_OFFSET: usize = 16;
 
     // All "expected" values are derived from the Intel PCH Programming Manual
     const EXPECTED_FCBA: usize = 3;
     const EXPECTED_FRBA: usize = 4;
-    
+
     let expected_nc_values: Vec<usize> = vec![0, 1];
 
     let pch_rom_header_structure = vec![
@@ -26,20 +28,25 @@ pub fn parse_pchrom_header(pch_data: &[u8]) -> Result<PCHRomHeader, structures::
 
     // Sanity check the offset where the magic bytes were found
     if pch_data.len() > (HEADER_STRUCTURE_OFFSET + HEADER_STRUCTURE_SIZE) {
-    
         // Calculate the header structure start and end offsets
         let struct_start: usize = HEADER_STRUCTURE_OFFSET;
         let struct_end: usize = struct_start + HEADER_STRUCTURE_SIZE;
 
         // Parse the header structure
-        let pch_header = structures::common::parse(&pch_data[struct_start..struct_end], &pch_rom_header_structure, "little");
+        let pch_header = structures::common::parse(
+            &pch_data[struct_start..struct_end],
+            &pch_rom_header_structure,
+            "little",
+        );
 
         // Sanity check the expected header values
         if pch_header["flmap0_fcba"] == EXPECTED_FCBA {
             if pch_header["flmap0_frba_nr"] == EXPECTED_FRBA {
                 if expected_nc_values.contains(&pch_header["flmap0_nc"]) {
                     // Parse the flash rom region entries to determine the total image size
-                    if let Ok(pch_regions_size) = get_pch_regions_size(&pch_data, 0, pch_header["flmap0_fcba"]) {
+                    if let Ok(pch_regions_size) =
+                        get_pch_regions_size(&pch_data, 0, pch_header["flmap0_fcba"])
+                    {
                         // Update the reported size
                         return Ok(PCHRomHeader {
                             header_size: HEADER_STRUCTURE_OFFSET,
@@ -50,11 +57,15 @@ pub fn parse_pchrom_header(pch_data: &[u8]) -> Result<PCHRomHeader, structures::
             }
         }
     }
-    
+
     return Err(structures::common::StructureError);
 }
 
-fn get_pch_regions_size(pch_data: &[u8], offset: usize, fcba: usize) -> Result<usize, structures::common::StructureError> {
+fn get_pch_regions_size(
+    pch_data: &[u8],
+    offset: usize,
+    fcba: usize,
+) -> Result<usize, structures::common::StructureError> {
     // There are 5 defined flash regions: Descriptor, BIOS, ME, GBE, PDATA
     const FLASH_REGION_COUNT: usize = 5;
 
@@ -62,9 +73,7 @@ fn get_pch_regions_size(pch_data: &[u8], offset: usize, fcba: usize) -> Result<u
     const FLASH_REGION_ENTRY_SIZE: usize = 4;
 
     // There is a 32-bit entry for each possible region in the PCH image
-    let region_entry_structure = vec![
-        ("region_value", "u32"),
-    ];
+    let region_entry_structure = vec![("region_value", "u32")];
 
     let mut image_size: usize = 0;
 
@@ -72,13 +81,20 @@ fn get_pch_regions_size(pch_data: &[u8], offset: usize, fcba: usize) -> Result<u
     let flash_region_base_address: usize = ((fcba >> 16) & 0xFF) << 4;
 
     // There must be enough data in the file to store the flash region entries
-    if pch_data.len() >= (offset + flash_region_base_address + (FLASH_REGION_COUNT * FLASH_REGION_ENTRY_SIZE)) {
+    if pch_data.len()
+        >= (offset + flash_region_base_address + (FLASH_REGION_COUNT * FLASH_REGION_ENTRY_SIZE))
+    {
         for i in 0..FLASH_REGION_COUNT {
             // Region entries are 32-bit values stored seqeuntially starting at the flash region base address
-            let region_entry_offset = offset + flash_region_base_address + (i * FLASH_REGION_ENTRY_SIZE);
+            let region_entry_offset =
+                offset + flash_region_base_address + (i * FLASH_REGION_ENTRY_SIZE);
 
             // Get the 32-bit entry value for this region
-            let region_entry = structures::common::parse(&pch_data[region_entry_offset..region_entry_offset+FLASH_REGION_ENTRY_SIZE], &region_entry_structure, "little");
+            let region_entry = structures::common::parse(
+                &pch_data[region_entry_offset..region_entry_offset + FLASH_REGION_ENTRY_SIZE],
+                &region_entry_structure,
+                "little",
+            );
             let region_value = region_entry["region_value"];
 
             // The base (starting offset) and limit (ending offset) of the region is encoded into the 32-bit entry value
@@ -99,4 +115,3 @@ fn get_pch_regions_size(pch_data: &[u8], offset: usize, fcba: usize) -> Result<u
 
     return Err(structures::common::StructureError);
 }
-

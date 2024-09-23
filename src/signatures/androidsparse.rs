@@ -1,5 +1,5 @@
-use crate::signatures;
 use crate::extractors::androidsparse::extract_android_sparse;
+use crate::signatures;
 use crate::structures::androidsparse::parse_android_sparse_header;
 
 pub const DESCRIPTION: &str = "Android sparse image";
@@ -8,14 +8,16 @@ pub fn android_sparse_magic() -> Vec<Vec<u8>> {
     return vec![b"\x3A\xFF\x26\xED".to_vec()];
 }
 
-pub fn android_sparse_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-
+pub fn android_sparse_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     let mut result = signatures::common::SignatureResult {
-                                            size: 0,
-                                            offset: offset,
-                                            description: DESCRIPTION.to_string(),
-                                            confidence: signatures::common::CONFIDENCE_HIGH,
-                                            ..Default::default()
+        size: 0,
+        offset: offset,
+        description: DESCRIPTION.to_string(),
+        confidence: signatures::common::CONFIDENCE_HIGH,
+        ..Default::default()
     };
 
     let dry_run = extract_android_sparse(file_data, offset, None);

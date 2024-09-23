@@ -1,5 +1,5 @@
 use crate::extractors::zlib::zlib_decompress;
-use crate::signatures::common::{ SignatureResult, SignatureError, CONFIDENCE_HIGH };
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 
 pub const DESCRIPTION: &str = "Zlib compressed file";
 

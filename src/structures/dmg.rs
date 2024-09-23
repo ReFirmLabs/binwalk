@@ -8,29 +8,23 @@ pub struct DMGFooter {
 }
 
 pub fn parse_dmg_footer(dmg_data: &[u8]) -> Result<DMGFooter, structures::common::StructureError> {
-
     // https://newosxbook.com/DMG.html
     let dmg_footer_structure = vec![
         ("magic", "u32"),
         ("version", "u32"),
         ("header_size", "u32"),
         ("flags", "u32"),
-        
         ("running_data_fork_offset", "u64"),
         ("data_fork_offset", "u64"),
         ("data_fork_length", "u64"),
         ("rsrc_fork_offset", "u64"),
         ("rsrc_fork_length", "u64"),
-        
         ("segment_number", "u32"),
         ("segment_count", "u32"),
-        
         ("segment_id_p1", "u64"),
         ("segment_id_p2", "u64"),
-        
         ("data_checksum_type", "u32"),
         ("data_checksum_size", "u32"),
-        
         ("data_checksum_1", "u32"),
         ("data_checksum_2", "u32"),
         ("data_checksum_3", "u32"),
@@ -63,10 +57,8 @@ pub fn parse_dmg_footer(dmg_data: &[u8]) -> Result<DMGFooter, structures::common
         ("data_checksum_30", "u32"),
         ("data_checksum_31", "u32"),
         ("data_checksum_32", "u32"),
-        
         ("xml_offset", "u64"),
         ("xml_length", "u64"),
-        
         ("reserved_1", "u64"),
         ("reserved_2", "u64"),
         ("reserved_3", "u64"),
@@ -82,10 +74,8 @@ pub fn parse_dmg_footer(dmg_data: &[u8]) -> Result<DMGFooter, structures::common
         ("reserved_13", "u64"),
         ("reserved_14", "u64"),
         ("reserved_15", "u64"),
-        
         ("checksum_type", "u32"),
         ("checksum_size", "u32"),
-        
         ("checksum_1", "u32"),
         ("checksum_2", "u32"),
         ("checksum_3", "u32"),
@@ -118,30 +108,26 @@ pub fn parse_dmg_footer(dmg_data: &[u8]) -> Result<DMGFooter, structures::common
         ("checksum_30", "u32"),
         ("checksum_31", "u32"),
         ("checksum_32", "u32"),
-        
         ("image_variant", "u32"),
         ("sector_count", "u64"),
-        
         ("reserved_16", "u32"),
         ("reserved_17", "u32"),
         ("reserved_18", "u32"),
     ];
 
     let structure_size: usize = structures::common::size(&dmg_footer_structure);
-    
+
     // Sanity check, make sure there is enough data to parse the footer structure
     if dmg_data.len() >= structure_size {
-
         // Parse the DMG footer
         let dmg_footer = structures::common::parse(&dmg_data, &dmg_footer_structure, "big");
 
         // Sanity check, make sure the reported header size is the size of this structure
         if dmg_footer["header_size"] == structure_size {
-                
             return Ok(DMGFooter {
-                            data_offset: dmg_footer["data_fork_offset"],
-                            xml_offset: dmg_footer["xml_offset"],
-                            footer_size: structure_size,
+                data_offset: dmg_footer["data_fork_offset"],
+                xml_offset: dmg_footer["xml_offset"],
+                footer_size: structure_size,
             });
         }
     }

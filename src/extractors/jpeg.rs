@@ -1,20 +1,28 @@
+use crate::extractors::common::{create_file, safe_path_join};
+use crate::extractors::common::{ExtractionResult, Extractor, ExtractorType};
 use aho_corasick::AhoCorasick;
-use crate::extractors::common::{ create_file, safe_path_join };
-use crate::extractors::common::{ Extractor, ExtractorType, ExtractionResult };
 
 // Defines the internal extractor function for carving out JPEG images
 pub fn jpeg_extractor() -> Extractor {
-    return Extractor { utility: ExtractorType::Internal(extract_jpeg_image), ..Default::default() };
+    return Extractor {
+        utility: ExtractorType::Internal(extract_jpeg_image),
+        ..Default::default()
+    };
 }
 
-pub fn extract_jpeg_image(file_data: &Vec<u8>, offset: usize, output_directory: Option<&String>) -> ExtractionResult {
+pub fn extract_jpeg_image(
+    file_data: &Vec<u8>,
+    offset: usize,
+    output_directory: Option<&String>,
+) -> ExtractionResult {
     const OUTFILE_NAME: &str = "image.jpg";
 
-    let mut result = ExtractionResult { ..Default::default() };
+    let mut result = ExtractionResult {
+        ..Default::default()
+    };
 
     // Find the JPEG EOF to identify the total JPEG size
     if let Some(jpeg_data_size) = get_jpeg_data_size(&file_data[offset..]) {
-
         result.size = Some(jpeg_data_size);
         result.success = true;
 

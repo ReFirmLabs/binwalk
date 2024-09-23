@@ -5,7 +5,9 @@ pub struct SeamaHeader {
     pub header_size: usize,
 }
 
-pub fn parse_seama_header(seama_data: &[u8]) -> Result<SeamaHeader, structures::common::StructureError> {
+pub fn parse_seama_header(
+    seama_data: &[u8],
+) -> Result<SeamaHeader, structures::common::StructureError> {
     const MAGIC: usize = 0x5EA3A417;
 
     let seama_structure = vec![
@@ -32,7 +34,6 @@ pub fn parse_seama_header(seama_data: &[u8]) -> Result<SeamaHeader, structures::
 
         // Sanity check the reported size of the firmware description string
         if seama_data.len() >= (header_size + seama_header["description_size"]) {
-
             return Ok(SeamaHeader {
                 data_size: seama_header["data_size"],
                 header_size: header_size + seama_header["description_size"],

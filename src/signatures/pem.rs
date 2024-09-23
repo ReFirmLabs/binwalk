@@ -1,16 +1,14 @@
-use base64::Engine;
 use crate::extractors::pem;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 use base64::prelude::BASE64_STANDARD;
-use crate::signatures::common::{ SignatureResult, SignatureError, CONFIDENCE_HIGH };
+use base64::Engine;
 
 pub const PEM_PUBLIC_KEY_DESCRIPTION: &str = "PEM public key";
 pub const PEM_PRIVATE_KEY_DESCRIPTION: &str = "PEM private key";
 pub const PEM_CERTIFICATE_DESCRIPTION: &str = "PEM certificate";
 
 pub fn pem_public_key_magic() -> Vec<Vec<u8>> {
-    return vec![
-        b"-----BEGIN PUBLIC KEY-----".to_vec(),
-    ];
+    return vec![b"-----BEGIN PUBLIC KEY-----".to_vec()];
 }
 
 pub fn pem_private_key_magic() -> Vec<Vec<u8>> {
@@ -24,9 +22,7 @@ pub fn pem_private_key_magic() -> Vec<Vec<u8>> {
 }
 
 pub fn pem_certificate_magic() -> Vec<Vec<u8>> {
-    return vec![
-        b"-----BEGIN CERTIFICATE-----".to_vec(),
-    ];
+    return vec![b"-----BEGIN CERTIFICATE-----".to_vec()];
 }
 
 // Validates both PEM certificates and keys
@@ -38,7 +34,7 @@ pub fn pem_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };
-    
+
     /*
      * Build a list of magic signatures for public, prvate, and certificate PEMs.
      * These magics are truncated to MIN_PEM_LEN bytes, which is enough to check if
@@ -64,7 +60,7 @@ pub fn pem_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
     // Sanity check available data
     if file_data.len() > (offset + MIN_PEM_LEN) {
         // Grab the magic bytes for this PEM candidate
-        let pem_magic = &file_data[offset..offset+MIN_PEM_LEN].to_vec();
+        let pem_magic = &file_data[offset..offset + MIN_PEM_LEN].to_vec();
 
         // Check if this magic is for a PEM cert or a PEM key
         if public_magics.contains(pem_magic) == true {
@@ -82,10 +78,8 @@ pub fn pem_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         let dry_run = pem::pem_carver(file_data, offset, None, None);
         if dry_run.success == true {
             if let Some(pem_size) = dry_run.size {
-
                 // Make sure the PEM data can be base64 decoded
-                if let Ok(_) = decode_pem_data(&file_data[offset..offset+pem_size]) {
-
+                if let Ok(_) = decode_pem_data(&file_data[offset..offset + pem_size]) {
                     // If the file starts and end with this PEM data, no sense in carving it out to another file on disk
                     if offset == 0 && pem_size == file_data.len() {
                         result.extraction_declined = true;
@@ -106,13 +100,11 @@ fn decode_pem_data(pem_file_data: &[u8]) -> Result<usize, SignatureError> {
 
     // Make sure the PEM data can be converted to a string
     if let Ok(pem_file_string) = String::from_utf8(pem_file_data.to_vec()) {
-
         let mut delim_count: usize = 0;
         let mut base64_string: String = "".to_string();
 
         // Loop through PEM file lines
         for line in pem_file_string.lines() {
-
             // PEM begin and end delimiter strings both start with hyphens
             if line.starts_with(DELIM) {
                 delim_count += 1;

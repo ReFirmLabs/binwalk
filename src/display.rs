@@ -1,13 +1,13 @@
-use termsize;
-use std::io;
-use std::time;
-use crate::worker;
-use std::io::Write;
 use crate::extractors;
 use crate::signatures;
-use colored::Colorize;
+use crate::worker;
 use colored::ColoredString;
+use colored::Colorize;
 use std::collections::HashMap;
+use std::io;
+use std::io::Write;
+use std::time;
+use termsize;
 
 const DELIM_CHARACTER: &str = "-";
 const DEFAULT_TERMINAL_WIDTH: u16 = 200;
@@ -46,7 +46,7 @@ fn center_text(text: &String) -> String {
     }
 
     if padding_width < 0 {
-        padding_width  = 0;
+        padding_width = 0;
     }
 
     for _i in 0..padding_width {
@@ -100,11 +100,13 @@ fn line_wrap(text: &String, prefix_size: usize) -> String {
     return formatted_string.trim().to_string();
 }
 
-fn print_column_headers(col1: &str, col2: &str, col3:&str) {
-    let header_string = format!("{}{}{}",
-                                pad_to_length(col1, COLUMN1_WIDTH),
-                                pad_to_length(col2, COLUMN2_WIDTH),
-                                col3);
+fn print_column_headers(col1: &str, col2: &str, col3: &str) {
+    let header_string = format!(
+        "{}{}{}",
+        pad_to_length(col1, COLUMN1_WIDTH),
+        pad_to_length(col2, COLUMN2_WIDTH),
+        col3
+    );
 
     println!("{}", header_string.bold().bright_blue());
 }
@@ -112,7 +114,7 @@ fn print_column_headers(col1: &str, col2: &str, col3:&str) {
 fn print_delimiter() {
     println!("{}", line_delimiter().bold().bright_blue());
 }
-    
+
 fn print_header(title_text: &String) {
     println!("");
     println!("{}", center_text(title_text).bold().magenta());
@@ -129,9 +131,12 @@ fn print_footer() {
 fn print_signature(signature: &signatures::common::SignatureResult) {
     let decimal_string = format!("{}", signature.offset);
     let hexadecimal_string = format!("{:#X}", signature.offset);
-    let display_string = format!("{}{}{}", pad_to_length(&decimal_string, COLUMN1_WIDTH),
-                                           pad_to_length(&hexadecimal_string, COLUMN2_WIDTH),
-                                           line_wrap(&signature.description, COLUMN1_WIDTH + COLUMN2_WIDTH));
+    let display_string = format!(
+        "{}{}{}",
+        pad_to_length(&decimal_string, COLUMN1_WIDTH),
+        pad_to_length(&hexadecimal_string, COLUMN2_WIDTH),
+        line_wrap(&signature.description, COLUMN1_WIDTH + COLUMN2_WIDTH)
+    );
 
     if signature.confidence >= signatures::common::CONFIDENCE_HIGH {
         println!("{}", display_string.green());
@@ -148,19 +153,35 @@ fn print_signatures(signatures: &Vec<signatures::common::SignatureResult>) {
     }
 }
 
-fn print_extraction(signature: &signatures::common::SignatureResult, extraction_result: &extractors::common::ExtractionResult) {
+fn print_extraction(
+    signature: &signatures::common::SignatureResult,
+    extraction_result: &extractors::common::ExtractionResult,
+) {
     let extraction_message: ColoredString;
 
     if extraction_result.success == true {
-        extraction_message = format!("[+] Extraction of {} data at offset {:#X} completed successfully", signature.name, signature.offset).bold().green();
+        extraction_message = format!(
+            "[+] Extraction of {} data at offset {:#X} completed successfully",
+            signature.name, signature.offset
+        )
+        .bold()
+        .green();
     } else {
-        extraction_message = format!("[-] Extraction of {} data at offset {:#X} failed!", signature.name, signature.offset).bold().red();
+        extraction_message = format!(
+            "[-] Extraction of {} data at offset {:#X} failed!",
+            signature.name, signature.offset
+        )
+        .bold()
+        .red();
     }
 
     println!("{extraction_message}");
 }
 
-fn print_extractions(signatures: &Vec<signatures::common::SignatureResult>, extraction_results: &HashMap<String, extractors::common::ExtractionResult>) {
+fn print_extractions(
+    signatures: &Vec<signatures::common::SignatureResult>,
+    extraction_results: &HashMap<String, extractors::common::ExtractionResult>,
+) {
     for signature in signatures {
         if extraction_results.contains_key(&signature.id) {
             print_extraction(signature, &extraction_results[&signature.id]);
@@ -176,11 +197,11 @@ pub fn print_analysis_results(quiet: bool, results: &worker::AnalysisResults) {
     // Print signature results
     print_header(&results.file_path);
     print_signatures(&results.file_map);
- 
+
     if results.extractions.len() > 0 {
         // Print a delimiter to delimit extractor messages from signatures results in terminal
         print_delimiter();
- 
+
         // Display extractions
         print_extractions(&results.file_map, &results.extractions);
     }
@@ -210,13 +231,19 @@ pub fn print_signature_list(quiet: bool, signatures: &Vec<signatures::common::Si
 
     // Print column headers
     print_delimiter();
-    print_column_headers("Signature Description", "Signature Name", "Extraction Utility");
+    print_column_headers(
+        "Signature Description",
+        "Signature Name",
+        "Extraction Utility",
+    );
     print_delimiter();
 
     // Loop through all signatures
     for signature in signatures {
         // Convenience struct for storing some basic info about each signature
-        let mut signature_info = SignatureInfo { ..Default::default() };
+        let mut signature_info = SignatureInfo {
+            ..Default::default()
+        };
 
         // Keep track of signature name, description, and if the signature is a "short" signature
         signature_info.name = signature.name.clone();
@@ -228,16 +255,23 @@ pub fn print_signature_list(quiet: bool, signatures: &Vec<signatures::common::Si
             None => {
                 signature_info.has_extractor = false;
                 signature_info.extractor = "None".to_string();
-            },
+            }
             Some(extractor) => {
                 signature_info.has_extractor = true;
 
                 match &extractor.utility {
-                    extractors::common::ExtractorType::External(command) => {signature_info.extractor = command.to_string(); },
-                    extractors::common::ExtractorType::Internal(_) => { signature_info.extractor = "Built-in".to_string(); },
-                    extractors::common::ExtractorType::None => panic!("An invalid extractor type exists for the '{}' signature", signature.description),
+                    extractors::common::ExtractorType::External(command) => {
+                        signature_info.extractor = command.to_string();
+                    }
+                    extractors::common::ExtractorType::Internal(_) => {
+                        signature_info.extractor = "Built-in".to_string();
+                    }
+                    extractors::common::ExtractorType::None => panic!(
+                        "An invalid extractor type exists for the '{}' signature",
+                        signature.description
+                    ),
                 }
-            },
+            }
         }
 
         // Increment signature count
@@ -262,14 +296,18 @@ pub fn print_signature_list(quiet: bool, signatures: &Vec<signatures::common::Si
     for description in sorted_descriptions {
         let siginfo = &signature_lookup[&description];
 
-        let display_line = format!("{}{}{}", pad_to_length(&description, COLUMN1_WIDTH), pad_to_length(&siginfo.name, COLUMN2_WIDTH), siginfo.extractor);
+        let display_line = format!(
+            "{}{}{}",
+            pad_to_length(&description, COLUMN1_WIDTH),
+            pad_to_length(&siginfo.name, COLUMN2_WIDTH),
+            siginfo.extractor
+        );
 
         if siginfo.is_short == true {
             println!("{}", display_line.yellow());
         } else {
             println!("{}", display_line.green());
         }
-
     }
 
     print_delimiter();
@@ -278,7 +316,13 @@ pub fn print_signature_list(quiet: bool, signatures: &Vec<signatures::common::Si
     println!("Extractable signatures: {}", extractor_count);
 }
 
-pub fn print_stats(quiet: bool, run_time: time::Instant, file_count: usize, signature_count: usize, pattern_count: usize) {
+pub fn print_stats(
+    quiet: bool,
+    run_time: time::Instant,
+    file_count: usize,
+    signature_count: usize,
+    pattern_count: usize,
+) {
     const MS_IN_A_SECOND: f64 = 1000.0;
     const SECONDS_IN_A_MINUTE: f64 = 60.0;
     const MINUTES_IN_AN_HOUR: f64 = 60.0;
@@ -311,7 +355,10 @@ pub fn print_stats(quiet: bool, run_time: time::Instant, file_count: usize, sign
         file_plural = "s";
     }
 
-    println!("Analyzed {} file{} for {} file signatures ({} magic patterns) in {:.1} {}", file_count, file_plural, signature_count, pattern_count, display_time, units);
+    println!(
+        "Analyzed {} file{} for {} file signatures ({} magic patterns) in {:.1} {}",
+        file_count, file_plural, signature_count, pattern_count, display_time, units
+    );
 }
 
 pub fn print_plain(quiet: bool, msg: &str) {

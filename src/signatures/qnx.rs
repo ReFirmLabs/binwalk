@@ -11,13 +11,15 @@ pub fn qnx_ifs_magic() -> Vec<Vec<u8>> {
     return vec![b"\xEB\x7E\xFF\x00\x01\x00".to_vec()];
 }
 
-pub fn qnx_ifs_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-
+pub fn qnx_ifs_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     let mut result = signatures::common::SignatureResult {
-                                            size: 0,
-                                            offset: offset,
-                                            description: IFS_DESCRIPTION.to_string(),
-                                            ..Default::default()
+        size: 0,
+        offset: offset,
+        description: IFS_DESCRIPTION.to_string(),
+        ..Default::default()
     };
 
     let available_data: usize = file_data.len() - offset;
@@ -28,7 +30,8 @@ pub fn qnx_ifs_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::
 
         // Sanity check that the total size doesn't exceed the available data size
         if result.size <= available_data {
-            result.description = format!("{}, total size: {} bytes", result.description, result.size);
+            result.description =
+                format!("{}, total size: {} bytes", result.description, result.size);
             return Ok(result);
         }
     }

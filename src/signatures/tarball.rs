@@ -11,13 +11,13 @@ const TARBALL_MIN_EXPECTED_HEADERS: usize = 10;
 pub const DESCRIPTION: &str = "POSIX tar archive";
 
 pub fn tarball_magic() -> Vec<Vec<u8>> {
-    return vec![
-            b"ustar\x00".to_vec(),
-            b"ustar\x20\x20\x00".to_vec(),
-    ];
+    return vec![b"ustar\x00".to_vec(), b"ustar\x20\x20\x00".to_vec()];
 }
 
-pub fn tarball_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+pub fn tarball_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     // Stores the running total size of the tarball
     let mut tarball_total_size: usize = 0;
 
@@ -68,11 +68,12 @@ pub fn tarball_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::
         }
 
         return Ok(signatures::common::SignatureResult {
-                                                description: format!("{}, file count: {}", DESCRIPTION, valid_header_count),
-                                                offset: tarball_start_offset,
-                                                size: tarball_total_size,
-                                                confidence: confidence,
-                                                ..Default::default()});
+            description: format!("{}, file count: {}", DESCRIPTION, valid_header_count),
+            offset: tarball_start_offset,
+            size: tarball_total_size,
+            confidence: confidence,
+            ..Default::default()
+        });
     }
 
     return Err(signatures::common::SignatureError);
@@ -97,20 +98,25 @@ fn header_checksum_is_valid(header_block: &[u8]) -> bool {
     return sum == reported_checksum;
 }
 
-fn tarball_entry_size(tarball_entry_data: &[u8]) -> Result<usize, signatures::common::SignatureError> {
+fn tarball_entry_size(
+    tarball_entry_data: &[u8],
+) -> Result<usize, signatures::common::SignatureError> {
     // Get the tarball entry's magic bytes
-    let entry_magic: &[u8] = &tarball_entry_data[TARBALL_MAGIC_OFFSET..TARBALL_MAGIC_OFFSET+TARBALL_MAGIC_SIZE];
+    let entry_magic: &[u8] =
+        &tarball_entry_data[TARBALL_MAGIC_OFFSET..TARBALL_MAGIC_OFFSET + TARBALL_MAGIC_SIZE];
 
     // Make sure the magic bytes are valid
     if entry_magic == TARBALL_UNIVERSAL_MAGIC {
         // Pull this tarball entry's data size, stored as ASCII octal, out of the header
-        let entry_size_string: &[u8] = &tarball_entry_data[TARBALL_SIZE_OFFSET..TARBALL_SIZE_OFFSET+TARBALL_SIZE_LEN];
+        let entry_size_string: &[u8] =
+            &tarball_entry_data[TARBALL_SIZE_OFFSET..TARBALL_SIZE_OFFSET + TARBALL_SIZE_LEN];
 
         // Convert the ASCII octal to a number
         let reported_entry_size: usize = tarball_octal(entry_size_string);
 
         // The actual size of this entry will be the data size, rounded up to the nearest block size, PLUS one block for the entry header
-        let block_count: usize = 1 + (reported_entry_size as f32 / TARBALL_BLOCK_SIZE as f32).ceil() as usize;
+        let block_count: usize =
+            1 + (reported_entry_size as f32 / TARBALL_BLOCK_SIZE as f32).ceil() as usize;
 
         // Total size is the total number of blocks times the block size
         return Ok(block_count * TARBALL_BLOCK_SIZE);

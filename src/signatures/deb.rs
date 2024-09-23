@@ -7,13 +7,16 @@ pub fn deb_magic() -> Vec<Vec<u8>> {
     return vec![b"!<arch>\ndebian-binary\x20\x20\x20".to_vec()];
 }
 
-pub fn deb_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+pub fn deb_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     let mut result = signatures::common::SignatureResult {
-                                            size: 0,
-                                            offset: offset,
-                                            description: DESCRIPTION.to_string(),
-                                            confidence: signatures::common::CONFIDENCE_HIGH,
-                                            ..Default::default()
+        size: 0,
+        offset: offset,
+        description: DESCRIPTION.to_string(),
+        confidence: signatures::common::CONFIDENCE_HIGH,
+        ..Default::default()
     };
 
     if let Ok(deb_header) = parse_deb_header(&file_data[offset..]) {
@@ -21,7 +24,8 @@ pub fn deb_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::comm
 
         // Make sure the reported size of the DEB file is sane
         if result.size <= (file_data.len() - offset) {
-            result.description = format!("{}, total size: {} bytes", result.description, result.size);
+            result.description =
+                format!("{}, total size: {} bytes", result.description, result.size);
             return Ok(result);
         }
     }

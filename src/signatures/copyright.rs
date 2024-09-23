@@ -1,5 +1,5 @@
-use crate::signatures;
 use crate::common::get_cstring;
+use crate::signatures;
 
 pub const DESCRIPTION: &str = "Copyright text";
 
@@ -11,14 +11,17 @@ pub fn copyright_magic() -> Vec<Vec<u8>> {
     ];
 }
 
-pub fn copyright_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+pub fn copyright_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     const MAGIC_SIZE: usize = 9;
 
     let mut result = signatures::common::SignatureResult {
-                                            offset: offset,
-                                            description: DESCRIPTION.to_string(),
-                                            confidence: signatures::common::CONFIDENCE_HIGH,
-                                            ..Default::default()
+        offset: offset,
+        description: DESCRIPTION.to_string(),
+        confidence: signatures::common::CONFIDENCE_HIGH,
+        ..Default::default()
     };
 
     let copyright_string = get_cstring(&file_data[offset..]);

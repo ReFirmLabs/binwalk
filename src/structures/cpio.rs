@@ -11,7 +11,9 @@ pub struct CPIOEntryHeader {
 }
 
 // TODO: If file mode parsing is added, internal extractor would be pretty easy to implement...
-pub fn parse_cpio_entry_header(cpio_data: &[u8]) -> Result<CPIOEntryHeader, structures::common::StructureError> {
+pub fn parse_cpio_entry_header(
+    cpio_data: &[u8],
+) -> Result<CPIOEntryHeader, structures::common::StructureError> {
     const NULL_BYTE_SIZE: usize = 1;
     const CPIO_MAGIC_START: usize = 0;
     const CPIO_MAGIC_END: usize = 6;
@@ -27,26 +29,34 @@ pub fn parse_cpio_entry_header(cpio_data: &[u8]) -> Result<CPIOEntryHeader, stru
         let header_magic = cpio_data[CPIO_MAGIC_START..CPIO_MAGIC_END].to_vec();
 
         // Get the ASCII hex string representing the file's data size
-        if let Ok(file_data_size_str) = String::from_utf8(cpio_data[FILE_SIZE_START..FILE_SIZE_END].to_vec()) {
+        if let Ok(file_data_size_str) =
+            String::from_utf8(cpio_data[FILE_SIZE_START..FILE_SIZE_END].to_vec())
+        {
             // Convert the file data size from ASCII hex to an integer
             if let Ok(file_data_size) = usize::from_str_radix(&file_data_size_str, 16) {
                 // Get the ASCII hex string representing the file name's size
-                if let Ok(file_name_size_str) = String::from_utf8(cpio_data[FILE_NAME_SIZE_START..FILE_NAME_SIZE_END].to_vec()) {
+                if let Ok(file_name_size_str) =
+                    String::from_utf8(cpio_data[FILE_NAME_SIZE_START..FILE_NAME_SIZE_END].to_vec())
+                {
                     // Convert the file name size from ASCII hex to an integer
                     if let Ok(file_name_size) = usize::from_str_radix(&file_name_size_str, 16) {
                         // The file name immediately follows the fixed-length header data.
                         let file_name_start: usize = CPIO_HEADER_SIZE;
-                        let file_name_end: usize = file_name_start + file_name_size - NULL_BYTE_SIZE;
+                        let file_name_end: usize =
+                            file_name_start + file_name_size - NULL_BYTE_SIZE;
 
                         if available_data > file_name_end {
-                            if let Ok(file_name) = String::from_utf8(cpio_data[file_name_start..file_name_end].to_vec()) {
+                            if let Ok(file_name) = String::from_utf8(
+                                cpio_data[file_name_start..file_name_end].to_vec(),
+                            ) {
                                 let header_total_size = CPIO_HEADER_SIZE + file_name_size;
 
                                 return Ok(CPIOEntryHeader {
-                                                magic: header_magic.clone(),
-                                                file_name: file_name.clone(),
-                                                data_size: file_data_size + byte_padding(file_data_size),
-                                                header_size: header_total_size + byte_padding(header_total_size),
+                                    magic: header_magic.clone(),
+                                    file_name: file_name.clone(),
+                                    data_size: file_data_size + byte_padding(file_data_size),
+                                    header_size: header_total_size
+                                        + byte_padding(header_total_size),
                                 });
                             }
                         }

@@ -1,5 +1,5 @@
-use crate::signatures;
 use crate::extractors::lzma;
+use crate::signatures;
 use crate::structures::lzma::parse_lzma_header;
 
 pub const DESCRIPTION: &str = "LZMA compressed data";
@@ -42,17 +42,18 @@ pub fn lzma_magic() -> Vec<Vec<u8>> {
     return magic_signatures;
 }
 
-pub fn lzma_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-
+pub fn lzma_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     let mut result = signatures::common::SignatureResult {
-                                                offset: offset,
-                                                description: DESCRIPTION.to_string(),
-                                                confidence: signatures::common::CONFIDENCE_HIGH,
-                                                ..Default::default()
+        offset: offset,
+        description: DESCRIPTION.to_string(),
+        confidence: signatures::common::CONFIDENCE_HIGH,
+        ..Default::default()
     };
 
     if let Ok(lzma_header) = parse_lzma_header(&file_data[offset..]) {
-
         /*
          * LZMA signatures are very prone to false positives, so do a dry-run extraction.
          * If it succeeds, we have high confidence that this signature is valid.
@@ -60,13 +61,16 @@ pub fn lzma_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::com
          */
         let dry_run = lzma::lzma_decompress(file_data, offset, None);
         if dry_run.success == true {
-            result.description = format!("{}, properties: {:#04X}, dictionary size: {} bytes, uncompressed size: {} bytes", result.description,
-                                                                                                                            lzma_header.properties,
-                                                                                                                            lzma_header.dictionary_size,
-                                                                                                                            lzma_header.decompressed_size);
+            result.description = format!(
+                "{}, properties: {:#04X}, dictionary size: {} bytes, uncompressed size: {} bytes",
+                result.description,
+                lzma_header.properties,
+                lzma_header.dictionary_size,
+                lzma_header.decompressed_size
+            );
             return Ok(result);
         }
     }
-            
+
     return Err(signatures::common::SignatureError);
 }

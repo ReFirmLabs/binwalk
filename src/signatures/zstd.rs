@@ -1,5 +1,5 @@
 use crate::signatures;
-use crate::structures::zstd::{ parse_zstd_header, parse_block_header };
+use crate::structures::zstd::{parse_block_header, parse_zstd_header};
 
 pub const DESCRIPTION: &str = "ZSTD compressed data";
 
@@ -7,17 +7,20 @@ pub fn zstd_magic() -> Vec<Vec<u8>> {
     return vec![b"\x28\xb5\x2f\xfd".to_vec()];
 }
 
-pub fn zstd_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+pub fn zstd_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     const EOF_CHECKSUM_SIZE: usize = 4;
 
     // More or less arbitrarily chosen
     const MIN_BLOCK_COUNT: usize = 2;
 
     let mut result = signatures::common::SignatureResult {
-                                            offset: offset,
-                                            description: DESCRIPTION.to_string(),
-                                            confidence: signatures::common::CONFIDENCE_HIGH,
-                                            ..Default::default()
+        offset: offset,
+        description: DESCRIPTION.to_string(),
+        confidence: signatures::common::CONFIDENCE_HIGH,
+        ..Default::default()
     };
 
     // Parse the ZSTD header
@@ -61,13 +64,11 @@ pub fn zstd_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::com
 
         // We now know where the first block header starts, loop through all the blocks to determine where the ZSTD data ends
         while file_data.len() > next_block_header_start {
-
             // Parse the block header
             match parse_block_header(&file_data[next_block_header_start..]) {
-
                 Err(_) => {
                     break;
-                },
+                }
 
                 Ok(block_header) => {
                     // Block header looks valid, increment block counter
@@ -80,7 +81,7 @@ pub fn zstd_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::com
                     if block_header.last_block == true {
                         // Update the total size, which is the difference between the end of the last block and the start of the ZSTD header
                         result.size = next_block_header_start - offset;
-    
+
                         // If a checksum is included at the end of the block stream, add the checksum size to the total size
                         if zstd_header.content_checksum_present {
                             result.size += EOF_CHECKSUM_SIZE;
@@ -88,7 +89,10 @@ pub fn zstd_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::com
 
                         // Make sure we've processed more than one block; if so, return Ok, else break and return Err below
                         if block_count >= MIN_BLOCK_COUNT {
-                            result.description = format!("{}, total size: {} bytes", result.description, result.size);
+                            result.description = format!(
+                                "{}, total size: {} bytes",
+                                result.description, result.size
+                            );
                             return Ok(result);
                         } else {
                             break;

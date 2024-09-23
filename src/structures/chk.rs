@@ -1,5 +1,5 @@
-use crate::structures;
 use crate::common::get_cstring;
+use crate::structures;
 
 #[derive(Debug, Clone, Default)]
 pub struct CHKHeader {
@@ -9,7 +9,9 @@ pub struct CHKHeader {
     pub board_id: String,
 }
 
-pub fn parse_chk_header(header_data: &[u8]) -> Result<CHKHeader, structures::common::StructureError> {
+pub fn parse_chk_header(
+    header_data: &[u8],
+) -> Result<CHKHeader, structures::common::StructureError> {
     // Somewhat arbitrarily chosen
     const MAX_EXPECTED_HEADER_SIZE: usize = 100;
 
@@ -31,13 +33,14 @@ pub fn parse_chk_header(header_data: &[u8]) -> Result<CHKHeader, structures::com
 
     // Sanity check the available data
     if header_data.len() > struct_size {
-
         // Parse the CHK header
-        let chk_header = structures::common::parse(&header_data[0..struct_size], &chk_header_structure, "big");
+        let chk_header =
+            structures::common::parse(&header_data[0..struct_size], &chk_header_structure, "big");
 
         // Validate the reported header size
-        if chk_header["header_size"] > struct_size && chk_header["header_size"] <= MAX_EXPECTED_HEADER_SIZE {
-
+        if chk_header["header_size"] > struct_size
+            && chk_header["header_size"] <= MAX_EXPECTED_HEADER_SIZE
+        {
             // Read in the board ID string which immediately follows the fixed size structure and extends to the end of the header
             let board_id_start: usize = struct_size;
             let board_id_end: usize = chk_header["header_size"];

@@ -1,5 +1,5 @@
-use crate::signatures;
 use crate::extractors::png::extract_png_image;
+use crate::signatures;
 
 pub const DESCRIPTION: &str = "PNG image";
 
@@ -11,15 +11,17 @@ pub fn png_magic() -> Vec<Vec<u8>> {
     return vec![b"\x89PNG\x0D\x0A\x1A\x0A\x00\x00\x00\x0DIHDR".to_vec()];
 }
 
-pub fn png_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-
+pub fn png_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     let mut result = signatures::common::SignatureResult {
-                                            offset: offset,
-                                            description: DESCRIPTION.to_string(),
-                                            confidence: signatures::common::CONFIDENCE_HIGH,
-                                            ..Default::default()
+        offset: offset,
+        description: DESCRIPTION.to_string(),
+        confidence: signatures::common::CONFIDENCE_HIGH,
+        ..Default::default()
     };
-    
+
     // Perform an extraction dry-run
     let dry_run = extract_png_image(file_data, offset, None);
 
@@ -27,7 +29,6 @@ pub fn png_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::comm
     if dry_run.success == true {
         // Get the total size of the PNG
         if let Some(png_size) = dry_run.size {
-
             // If this file, from start to finish, is just a PNG, there's no need to extract it
             if offset == 0 && file_data.len() == png_size {
                 result.extraction_declined = true;
@@ -35,7 +36,8 @@ pub fn png_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::comm
 
             // Report signature result
             result.size = png_size;
-            result.description = format!("{}, total size: {} bytes", result.description, result.size);
+            result.description =
+                format!("{}, total size: {} bytes", result.description, result.size);
             return Ok(result);
         }
     }

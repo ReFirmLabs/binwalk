@@ -34,7 +34,11 @@ pub struct StructureError;
  *  println!("Reported size is: {}", header["size"]);
  *
  */
-pub fn parse(raw_data: &[u8], structure: &Vec<(&str, &str)>, endianness: &str) -> HashMap<String, usize> {
+pub fn parse(
+    raw_data: &[u8],
+    structure: &Vec<(&str, &str)>,
+    endianness: &str,
+) -> HashMap<String, usize> {
     const U24_SIZE: usize = 3;
 
     let mut value: usize;
@@ -45,54 +49,63 @@ pub fn parse(raw_data: &[u8], structure: &Vec<(&str, &str)>, endianness: &str) -
     // Sanity check the provided data fits in the defined structure
     let structure_size = size(structure);
     if structure_size > raw_data.len() {
-        panic!("Not enough data supplied to parse structure; need {} bytes, got {} bytes", structure_size, raw_data.len());
+        panic!(
+            "Not enough data supplied to parse structure; need {} bytes, got {} bytes",
+            structure_size,
+            raw_data.len()
+        );
     }
 
     for (name, ctype) in structure {
         let data_type: String = ctype.to_string();
-        
+
         csize = type_to_size(&ctype);
 
         if csize == std::mem::size_of::<u8>() {
-
             // u8, endianness doesn't matter
-            value = u8::from_be_bytes(raw_data[offset..offset+csize].try_into().unwrap()) as usize;
-        
+            value =
+                u8::from_be_bytes(raw_data[offset..offset + csize].try_into().unwrap()) as usize;
         } else if csize == std::mem::size_of::<u16>() {
-
             if endianness == "big" {
-                value = u16::from_be_bytes(raw_data[offset..offset+csize].try_into().unwrap()) as usize;
+                value = u16::from_be_bytes(raw_data[offset..offset + csize].try_into().unwrap())
+                    as usize;
             } else {
-                value = u16::from_le_bytes(raw_data[offset..offset+csize].try_into().unwrap()) as usize;
+                value = u16::from_le_bytes(raw_data[offset..offset + csize].try_into().unwrap())
+                    as usize;
             }
 
         // Yes Virginia, u24's are real
         } else if csize == U24_SIZE {
-
             if endianness == "big" {
-                value = ((raw_data[offset] as usize) << 16) + ((raw_data[offset+1] as usize) << 8) + (raw_data[offset+2] as usize);
+                value = ((raw_data[offset] as usize) << 16)
+                    + ((raw_data[offset + 1] as usize) << 8)
+                    + (raw_data[offset + 2] as usize);
             } else {
-                value = ((raw_data[offset+2] as usize) << 16) + ((raw_data[offset+1] as usize) << 8) + (raw_data[offset] as usize);
+                value = ((raw_data[offset + 2] as usize) << 16)
+                    + ((raw_data[offset + 1] as usize) << 8)
+                    + (raw_data[offset] as usize);
             }
-
         } else if csize == std::mem::size_of::<u32>() {
-
             if endianness == "big" {
-                value = u32::from_be_bytes(raw_data[offset..offset+csize].try_into().unwrap()) as usize;
+                value = u32::from_be_bytes(raw_data[offset..offset + csize].try_into().unwrap())
+                    as usize;
             } else {
-                value = u32::from_le_bytes(raw_data[offset..offset+csize].try_into().unwrap()) as usize;
+                value = u32::from_le_bytes(raw_data[offset..offset + csize].try_into().unwrap())
+                    as usize;
             }
-
         } else if csize == std::mem::size_of::<u64>() {
-
             if endianness == "big" {
-                value = u64::from_be_bytes(raw_data[offset..offset+csize].try_into().unwrap()) as usize;
+                value = u64::from_be_bytes(raw_data[offset..offset + csize].try_into().unwrap())
+                    as usize;
             } else {
-                value = u64::from_le_bytes(raw_data[offset..offset+csize].try_into().unwrap()) as usize;
+                value = u64::from_le_bytes(raw_data[offset..offset + csize].try_into().unwrap())
+                    as usize;
             }
-
         } else {
-            panic!("Cannot parse structure element with unknown data type '{}'", data_type);
+            panic!(
+                "Cannot parse structure element with unknown data type '{}'",
+                data_type
+            );
         }
 
         offset += csize;
@@ -117,13 +130,8 @@ pub fn size(structure: &Vec<(&str, &str)>) -> usize {
 
 fn type_to_size(ctype: &str) -> usize {
     // This table must be updated when new data types are added
-    let size_lookup_table: HashMap<&str, usize> = HashMap::from([
-        ("u8", 1),
-        ("u16", 2),
-        ("u24", 3),
-        ("u32", 4),
-        ("u64", 8),
-    ]);
+    let size_lookup_table: HashMap<&str, usize> =
+        HashMap::from([("u8", 1), ("u16", 2), ("u24", 3), ("u32", 4), ("u64", 8)]);
 
     if size_lookup_table.contains_key(ctype) == false {
         panic!("Unknown size for structure type '{}'!", ctype);

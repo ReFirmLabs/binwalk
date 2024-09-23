@@ -14,18 +14,23 @@ pub fn pe_magic() -> Vec<Vec<u8>> {
     ];
 }
 
-pub fn pe_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-
+pub fn pe_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     let mut result = signatures::common::SignatureResult {
-                                            size: 0,
-                                            offset: offset,
-                                            description: DESCRIPTION.to_string(),
-                                            confidence: signatures::common::CONFIDENCE_MEDIUM,
-                                            ..Default::default()
+        size: 0,
+        offset: offset,
+        description: DESCRIPTION.to_string(),
+        confidence: signatures::common::CONFIDENCE_MEDIUM,
+        ..Default::default()
     };
 
     if let Ok(pe_header) = parse_pe_header(&file_data[offset..]) {
-        result.description = format!("{}, machine type: {}", result.description, pe_header.machine);
+        result.description = format!(
+            "{}, machine type: {}",
+            result.description, pe_header.machine
+        );
         return Ok(result);
     }
 
