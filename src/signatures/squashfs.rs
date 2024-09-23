@@ -1,6 +1,7 @@
 use crate::signatures;
 use std::collections::HashMap;
 use crate::common::epoch_to_string;
+use crate::extractors::squashfs::squashfs_v4_be_extractor;
 use crate::structures::squashfs::{ parse_squashfs_header, parse_squashfs_uid_entry };
 
 pub const DESCRIPTION: &str = "SquashFS filesystem";
@@ -19,6 +20,7 @@ pub fn squashfs_magic() -> Vec<Vec<u8>> {
 
 /* Responsible for parsing and validating a suspected SquashFS image header */
 pub fn squashfs_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+    const SQUASHFSV4: usize = 4;
 
     let squashfs_compression_types = HashMap::from([
         (0, "unknown"),
@@ -74,9 +76,15 @@ pub fn squashfs_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures:
 
                         // Format the modified time into something human readable
                         let create_date = epoch_to_string(squashfs_header.timestamp as u32);
-        
+
+                        // Make sure the compression type is supported
                         if squashfs_compression_types.contains_key(&squashfs_header.compression) {
                             let compression_type_str = squashfs_compression_types[&squashfs_header.compression].to_string();
+
+                            // Standard SquashFSv4 is little endian only; devices that implement a custom big endian version must use a custom extractor
+                            if squashfs_header.major_version == SQUASHFSV4 && squashfs_header.endianness == "big" {
+                                result.preferred_extractor = Some(squashfs_v4_be_extractor());
+                            }
 
                             result.size = squashfs_header.image_size;
                             result.description = format!("{}, {} endian, version: {}.{}, compression: {}, inode count: {}, block size: {}, image size: {} bytes, created: {}", result.description,

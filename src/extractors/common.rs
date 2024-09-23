@@ -264,14 +264,24 @@ pub fn execute(file_data: &Vec<u8>, file_path: &String, signature: &SignatureRes
     // Create an output directory for the extraction
     if let Ok(output_directory) = create_output_directory(file_path, signature.offset) {
 
-        // Make sure an extractor was actually defined (this function should not be called if signature.extractor is None)
+        // Make sure a defalut extractor was actually defined (this function should not be called if signature.extractor is None)
         match &extractor {
 
             None => {
                 error!("Attempted to extract {} data, but no extractor is defined!", signature.name);
             },
 
-            Some(extractor_definition) => {
+            Some(default_extractor) => {
+                
+                let extractor_definition: Extractor;
+
+                // If the signature result specified a preferred extractor, use that instead of the default signature extractor
+                if let Some(preferred_extractor) = &signature.preferred_extractor {
+                    extractor_definition = preferred_extractor.clone();
+                } else {
+                    extractor_definition = default_extractor.clone();
+                }
+
                 // Decide how to execute the extractor depending on the extractor type
                 match &extractor_definition.utility {
 

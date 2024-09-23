@@ -41,6 +41,9 @@ pub struct SignatureResult {
     pub always_display: bool,
     // Set to true to disable extraction for this particular signature result (default: false)
     pub extraction_declined: bool,
+    // Signatures may specify a preferred extractor, which overrides the default extractor specified in magic.rs
+    #[serde(skip_deserializing, skip_serializing)]
+    pub preferred_extractor: Option<extractors::common::Extractor>,
 }
 
 /*
