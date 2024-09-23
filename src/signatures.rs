@@ -51,3 +51,4 @@ pub mod vxworks;
 pub mod ecos;
 pub mod dmg;
 pub mod webp;
+pub mod openssl;

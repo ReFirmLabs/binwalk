@@ -731,5 +731,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
                                         extractor: Some(extractors::webp::webp_extractor()),
     });
 
+    // openssl
+    binary_signatures.push(signatures::common::Signature {
+                                        name: "openssl".to_string(),
+                                        short: false,
+                                        magic_offset: 0,
+                                        always_display: false,
+                                        magic: signatures::openssl::openssl_crypt_magic(),
+                                        parser: signatures::openssl::openssl_crypt_parser,
+                                        description: signatures::openssl::DESCRIPTION.to_string(),
+                                        extractor: None,
+    });
+
     return binary_signatures;
 }

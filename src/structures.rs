@@ -36,3 +36,4 @@ pub mod png;
 pub mod vxworks;
 pub mod dmg;
 pub mod webp;
+pub mod openssl;
