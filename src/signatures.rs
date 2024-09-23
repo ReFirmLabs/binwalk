@@ -50,3 +50,4 @@ pub mod copyright;
 pub mod vxworks;
 pub mod ecos;
 pub mod dmg;
+pub mod webp;

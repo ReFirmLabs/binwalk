@@ -27,3 +27,4 @@ pub mod jpeg;
 pub mod arcadyan;
 pub mod vxworks;
 pub mod dmg;
+pub mod webp;

@@ -35,3 +35,4 @@ pub mod rar;
 pub mod png;
 pub mod vxworks;
 pub mod dmg;
+pub mod webp;

@@ -719,5 +719,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
                                         extractor: Some(extractors::dmg::dmg_extractor()),
     });
 
+    // webp
+    binary_signatures.push(signatures::common::Signature {
+                                        name: "webp".to_string(),
+                                        short: false,
+                                        magic_offset: 0,
+                                        always_display: false,
+                                        magic: signatures::webp::webp_magic(),
+                                        parser: signatures::webp::webp_parser,
+                                        description: signatures::webp::DESCRIPTION.to_string(),
+                                        extractor: Some(extractors::webp::webp_extractor()),
+    });
+
     return binary_signatures;
 }
