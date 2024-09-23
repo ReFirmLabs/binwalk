@@ -1,10 +1,10 @@
-# *** Binwalkv2 Depreciation Notice ***
+# *** Binwalk v2 Deprecation Notice ***
 
 ### This version of Binwalk is largely unmaintained.
 
 ### [Binwalkv3](https://github.com/ReFirmLabs/binwalk/tree/binwalkv3) is currently under active development.
 ### While still experimental, we recommend trying it out; issues/bug reports welcome! :)
-
+### A fork of Binwalk v2 is still actively maintained by [OSPG](https://github.com/OSPG/binwalk).
 
 ## 
 [![Build Status](https://travis-ci.org/ReFirmLabs/binwalk.svg?branch=master)](https://travis-ci.org/ReFirmLabs/binwalk)
