@@ -136,6 +136,7 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, structures::common
         (77, "Infineon Technologies 32-bit CPU"),
         (78, "Element 14 64-bit DSP"),
         (79, "LSI Logic 16-bit DSP"),
+        (94, "Tensilica Xtensa"),
         (140, "TMS320C6000"),
         (175, "MCST Elbrus e2k"),
         (183, "ARM 64-bit"),
