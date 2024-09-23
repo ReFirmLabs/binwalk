@@ -719,16 +719,16 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         extractor: Some(extractors::dmg::dmg_extractor()),
     });
 
-    // webp
+    // riff
     binary_signatures.push(signatures::common::Signature {
-        name: "webp".to_string(),
+        name: "riff".to_string(),
         short: false,
         magic_offset: 0,
         always_display: false,
-        magic: signatures::webp::webp_magic(),
-        parser: signatures::webp::webp_parser,
-        description: signatures::webp::DESCRIPTION.to_string(),
-        extractor: Some(extractors::webp::webp_extractor()),
+        magic: signatures::riff::riff_magic(),
+        parser: signatures::riff::riff_parser,
+        description: signatures::riff::DESCRIPTION.to_string(),
+        extractor: Some(extractors::riff::riff_extractor()),
     });
 
     // openssl
