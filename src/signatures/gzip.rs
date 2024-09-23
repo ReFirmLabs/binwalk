@@ -1,7 +1,7 @@
 use crate::common;
 use crate::extractors::gzip::gzip_decompress;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 use crate::structures::gzip::parse_gzip_header;
-use crate::signatures::common::{ SignatureError, SignatureResult, CONFIDENCE_HIGH };
 
 pub const DESCRIPTION: &str = "gzip compressed data";
 
@@ -10,7 +10,6 @@ pub fn gzip_magic() -> Vec<Vec<u8>> {
 }
 
 pub fn gzip_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
-
     // Do a dry-run decompression
     let dry_run = gzip_decompress(file_data, offset, None);
 
@@ -22,17 +21,21 @@ pub fn gzip_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
             let mut original_file_name_text: String = "".to_string();
 
             if gzip_header.original_name.len() > 0 {
-                original_file_name_text = format!(" original file name: \"{}\",", gzip_header.original_name);
+                original_file_name_text =
+                    format!(" original file name: \"{}\",", gzip_header.original_name);
             }
 
             return Ok(SignatureResult {
-                            offset: offset,
-                            confidence: CONFIDENCE_HIGH,
-                            description: format!("{},{} operating system: {}, timestamp: {}", DESCRIPTION,
-                                                                                             original_file_name_text,
-                                                                                             gzip_header.os,
-                                                                                             common::epoch_to_string(gzip_header.timestamp)),
-                            ..Default::default()
+                offset: offset,
+                confidence: CONFIDENCE_HIGH,
+                description: format!(
+                    "{},{} operating system: {}, timestamp: {}",
+                    DESCRIPTION,
+                    original_file_name_text,
+                    gzip_header.os,
+                    common::epoch_to_string(gzip_header.timestamp)
+                ),
+                ..Default::default()
             });
         }
     }

@@ -7,15 +7,17 @@ pub fn pch_rom_magic() -> Vec<Vec<u8>> {
     return vec![b"\x5a\xa5\xf0\x0f".to_vec()];
 }
 
-pub fn pch_rom_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-
+pub fn pch_rom_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     const MAGIC_OFFSET: usize = 16;
 
     let mut result = signatures::common::SignatureResult {
-                                            size: 0,
-                                            offset: 0,
-                                            description: DESCRIPTION.to_string(),
-                                            ..Default::default()
+        size: 0,
+        offset: 0,
+        description: DESCRIPTION.to_string(),
+        ..Default::default()
     };
 
     // Sanity check the offset where the magic bytes were found
@@ -28,6 +30,6 @@ pub fn pch_rom_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::
             return Ok(result);
         }
     }
-    
+
     return Err(signatures::common::SignatureError);
 }

@@ -1,5 +1,5 @@
-use crc32_v2;
 use crate::structures;
+use crc32_v2;
 
 pub const JFFS2_NODE_STRUCT_SIZE: usize = 12;
 
@@ -10,8 +10,9 @@ pub struct JFFS2Node {
     pub endianness: String,
 }
 
-pub fn parse_jffs2_node_header(node_data: &[u8]) -> Result<JFFS2Node, structures::common::StructureError> {
-
+pub fn parse_jffs2_node_header(
+    node_data: &[u8],
+) -> Result<JFFS2Node, structures::common::StructureError> {
     const JFFS2_CORRECT_MAGIC: usize = 0x1985;
     const JFFS2_HEADER_CRC_SIZE: usize = 8;
 
@@ -22,7 +23,9 @@ pub fn parse_jffs2_node_header(node_data: &[u8]) -> Result<JFFS2Node, structures
         ("crc", "u32"),
     ];
 
-    let mut node = JFFS2Node { ..Default::default() };
+    let mut node = JFFS2Node {
+        ..Default::default()
+    };
     let node_header_size = JFFS2_NODE_STRUCT_SIZE;
 
     // Try little endian first
@@ -31,17 +34,24 @@ pub fn parse_jffs2_node_header(node_data: &[u8]) -> Result<JFFS2Node, structures
     // Sanity check size of available data
     if node_data.len() >= node_header_size {
         // Parse the node header
-        let mut node_header = structures::common::parse(&node_data[0..node_header_size], &jffs2_node_structure, &node.endianness);
+        let mut node_header = structures::common::parse(
+            &node_data[0..node_header_size],
+            &jffs2_node_structure,
+            &node.endianness,
+        );
 
         // If the node header magic isn't correct, try parsing the header as big endian
         if node_header["magic"] != JFFS2_CORRECT_MAGIC {
             node.endianness = "big".to_string();
-            node_header = structures::common::parse(&node_data[0..node_header_size], &jffs2_node_structure, &node.endianness);
+            node_header = structures::common::parse(
+                &node_data[0..node_header_size],
+                &jffs2_node_structure,
+                &node.endianness,
+            );
         }
 
         // Node magic must be correct at this point, else this node is invalid
         if node_header["magic"] == JFFS2_CORRECT_MAGIC {
-
             // Calculate the node header CRC
             let first_node_calculated_crc = jffs2_node_crc(&node_data[0..JFFS2_HEADER_CRC_SIZE]);
 

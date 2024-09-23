@@ -13,7 +13,7 @@ pub struct CliArgs {
 
     /// During recursive extraction display *all* results
     #[arg(short, long)]
-    pub verbose: bool, 
+    pub verbose: bool,
 
     /// Automatically extract known file types
     #[arg(short, long)]

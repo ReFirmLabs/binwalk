@@ -4,7 +4,6 @@ use std::collections::HashMap;
 pub const SUPERBLOCK_SIZE: usize = 1024;
 pub const SUPERBLOCK_OFFSET: usize = 1024;
 
-
 #[derive(Debug, Default, Clone)]
 pub struct EXTHeader {
     pub os: String,
@@ -17,7 +16,6 @@ pub struct EXTHeader {
 }
 
 pub fn parse_ext_header(ext_data: &[u8]) -> Result<EXTHeader, structures::common::StructureError> {
-
     const SUPERBLOCK_STRUCT_SIZE: usize = 84;
 
     const MAX_BLOCK_LOG: usize = 2;
@@ -62,7 +60,9 @@ pub fn parse_ext_header(ext_data: &[u8]) -> Result<EXTHeader, structures::common
         (4, "Lites"),
     ]);
 
-    let mut ext_header = EXTHeader { ..Default::default() };
+    let mut ext_header = EXTHeader {
+        ..Default::default()
+    };
 
     // Sanity check the reported offset of the magic bytes
     if ext_data.len() >= (SUPERBLOCK_OFFSET + SUPERBLOCK_SIZE) {
@@ -71,7 +71,11 @@ pub fn parse_ext_header(ext_data: &[u8]) -> Result<EXTHeader, structures::common
         let superblock_end: usize = superblock_start + SUPERBLOCK_STRUCT_SIZE;
 
         // Parse the EXT superblock structure
-        let ext_superblock = structures::common::parse(&ext_data[superblock_start..superblock_end], &ext_superblock_structure, "little");
+        let ext_superblock = structures::common::parse(
+            &ext_data[superblock_start..superblock_end],
+            &ext_superblock_structure,
+            "little",
+        );
 
         // Sanity check the reported OS this EXT image was created on
         if supported_os.contains_key(&ext_superblock["creator_os"]) {
@@ -88,7 +92,8 @@ pub fn parse_ext_header(ext_data: &[u8]) -> Result<EXTHeader, structures::common
                         ext_header.free_blocks_count = ext_superblock["free_blocks_count"];
                         ext_header.os = supported_os[&ext_superblock["creator_os"]].to_string();
                         ext_header.reserved_blocks_count = ext_superblock["reserved_blocks_count"];
-                        ext_header.image_size = ext_header.block_size * ext_superblock["blocks_count"];
+                        ext_header.image_size =
+                            ext_header.block_size * ext_superblock["blocks_count"];
 
                         return Ok(ext_header);
                     }

@@ -1,7 +1,9 @@
+use crate::extractors::common::{
+    create_directory, create_file, create_symlink, make_executable, safe_path_join,
+};
+use crate::extractors::common::{ExtractionError, ExtractionResult, Extractor, ExtractorType};
+use crate::structures::romfs::{parse_romfs_file_entry, parse_romfs_header};
 use log::warn;
-use crate::structures::romfs::{ parse_romfs_header, parse_romfs_file_entry };
-use crate::extractors::common::{ Extractor, ExtractorType, ExtractionResult, ExtractionError };
-use crate::extractors::common::{ create_file, create_directory, create_symlink, make_executable, safe_path_join};
 
 #[derive(Default, Debug, Clone)]
 struct RomFSEntry {
@@ -20,15 +22,24 @@ struct RomFSEntry {
 
 /* Defines the internal extractor function for extracting RomFS file systems */
 pub fn romfs_extractor() -> Extractor {
-    return Extractor { utility: ExtractorType::Internal(extract_romfs), ..Default::default() };
+    return Extractor {
+        utility: ExtractorType::Internal(extract_romfs),
+        ..Default::default()
+    };
 }
 
 /*
  * Main RomFS extraction function.
  */
-pub fn extract_romfs(file_data: &Vec<u8>, offset: usize, output_directory: Option<&String>) -> ExtractionResult {
+pub fn extract_romfs(
+    file_data: &Vec<u8>,
+    offset: usize,
+    output_directory: Option<&String>,
+) -> ExtractionResult {
     let do_extraction: bool;
-    let mut result = ExtractionResult { ..Default::default() };
+    let mut result = ExtractionResult {
+        ..Default::default()
+    };
 
     // Only perform extraction if an output directory was provided
     match output_directory {
@@ -55,14 +66,16 @@ pub fn extract_romfs(file_data: &Vec<u8>, offset: usize, output_directory: Optio
                 // Everything looks good
                 result.success = true;
                 result.size = Some(romfs_header.image_size);
-            
+
                 // Do extraction, if an output directory was provided
                 if do_extraction {
                     // Extracted files will be placed in the specified output directory, under a sub-directory named after the RomFS volume
-                    let extraction_directory: String = safe_path_join(&output_directory.unwrap(), &romfs_header.volume_name);
+                    let extraction_directory: String =
+                        safe_path_join(&output_directory.unwrap(), &romfs_header.volume_name);
 
                     // Do the extraction
-                    let file_count = extract_romfs_entries(romfs_data, &root_entries, &extraction_directory);
+                    let file_count =
+                        extract_romfs_entries(romfs_data, &root_entries, &extraction_directory);
 
                     // If no files were extracted, extraction was a failure
                     if file_count == 0 {
@@ -77,8 +90,10 @@ pub fn extract_romfs(file_data: &Vec<u8>, offset: usize, output_directory: Optio
 }
 
 // Recursively processes all RomFS file entries and their children, and returns a list of RomFSEntry structures
-fn process_romfs_entries(romfs_data: &[u8], offset: usize) -> Result<Vec<RomFSEntry>, ExtractionError> {
-
+fn process_romfs_entries(
+    romfs_data: &[u8],
+    offset: usize,
+) -> Result<Vec<RomFSEntry>, ExtractionError> {
     let mut file_entries: Vec<RomFSEntry> = vec![];
     let mut processed_entries: Vec<usize> = vec![];
     let ignore_file_names: Vec<String> = vec![".".to_string(), "..".to_string()];
@@ -100,9 +115,10 @@ fn process_romfs_entries(romfs_data: &[u8], offset: usize) -> Result<Vec<RomFSEn
 
         // Parse the next file entry
         if let Ok(file_header) = parse_romfs_file_entry(&romfs_data[file_offset..]) {
-    
             // Instantiate a new RomFSEntry structure
-            let mut file_entry = RomFSEntry { ..Default::default() };
+            let mut file_entry = RomFSEntry {
+                ..Default::default()
+            };
 
             // Populate basic info
             file_entry.size = file_header.size;
@@ -125,17 +141,18 @@ fn process_romfs_entries(romfs_data: &[u8], offset: usize) -> Result<Vec<RomFSEn
 
             // Don't do anything special for '.' or '..' directory entries
             if ignore_file_names.contains(&file_entry.name) == false {
-
                 // Symlinks need their target paths
                 if file_entry.symlink == true {
-                    match String::from_utf8(romfs_data[file_entry.offset..file_entry.offset+file_entry.size].to_vec()) {
+                    match String::from_utf8(
+                        romfs_data[file_entry.offset..file_entry.offset + file_entry.size].to_vec(),
+                    ) {
                         Err(e) => {
                             warn!("Failed to convert symlink target path to string: {}", e);
                             return Err(ExtractionError);
-                        },
+                        }
                         Ok(path) => {
                             file_entry.symlink_target = path.clone();
-                        },
+                        }
                     }
                 }
 
@@ -165,7 +182,11 @@ fn process_romfs_entries(romfs_data: &[u8], offset: usize) -> Result<Vec<RomFSEn
 }
 
 // Recursively extract all RomFS entries, returns the number of extracted files/directories
-fn extract_romfs_entries(romfs_data: &[u8], romfs_files: &Vec<RomFSEntry>, output_directory: &String) -> usize {
+fn extract_romfs_entries(
+    romfs_data: &[u8],
+    romfs_files: &Vec<RomFSEntry>,
+    output_directory: &String,
+) -> usize {
     let mut file_count: usize = 0;
 
     for file_entry in romfs_files {
@@ -177,7 +198,8 @@ fn extract_romfs_entries(romfs_data: &[u8], romfs_files: &Vec<RomFSEntry>, outpu
         } else if file_entry.symlink {
             extraction_success = create_symlink(&file_path, &file_entry.symlink_target);
         } else if file_entry.regular {
-            extraction_success = create_file(&file_path, romfs_data, file_entry.offset, file_entry.size);
+            extraction_success =
+                create_file(&file_path, romfs_data, file_entry.offset, file_entry.size);
         } else {
             // This should never happen, panic if it does
             panic!("RomFS entry is an unsupported type: {:?}", file_entry);

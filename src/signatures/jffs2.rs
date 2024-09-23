@@ -1,6 +1,6 @@
 use crate::signatures;
+use crate::structures::jffs2::{parse_jffs2_node_header, JFFS2_NODE_STRUCT_SIZE};
 use aho_corasick::AhoCorasick;
-use crate::structures::jffs2::{ parse_jffs2_node_header, JFFS2_NODE_STRUCT_SIZE };
 
 pub const DESCRIPTION: &str = "JFFS2 filesystem";
 
@@ -11,30 +11,31 @@ pub fn jffs2_magic() -> Vec<Vec<u8>> {
      * Longer signatures are less prone to false positive matches.
      */
     return vec![
-            b"\x19\x85\xe0\x01".to_vec(),
-            b"\x19\x85\xe0\x02".to_vec(),
-            b"\x19\x85\x20\x03".to_vec(),
-            b"\x85\x19\x01\xe0".to_vec(),
-            b"\x85\x19\x02\xe0".to_vec(),
-            b"\x85\x19\x03\x20".to_vec(),
+        b"\x19\x85\xe0\x01".to_vec(),
+        b"\x19\x85\xe0\x02".to_vec(),
+        b"\x19\x85\x20\x03".to_vec(),
+        b"\x85\x19\x01\xe0".to_vec(),
+        b"\x85\x19\x02\xe0".to_vec(),
+        b"\x85\x19\x03\x20".to_vec(),
     ];
 }
 
-pub fn jffs2_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-
+pub fn jffs2_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     const MAX_PAGE_SIZE: usize = 0x10000;
     const MIN_VALID_NODE_COUNT: usize = 2;
     const JFFS2_BIG_ENDIAN_MAGIC: &[u8; 2] = b"\x19\x85";
     const JFFS2_LITTLE_ENDIAN_MAGIC: &[u8; 2] = b"\x85\x19";
 
     let mut result = signatures::common::SignatureResult {
-                                            size: 0,
-                                            offset: offset,
-                                            description: DESCRIPTION.to_string(),
-                                            confidence: signatures::common::CONFIDENCE_HIGH,
-                                            ..Default::default()
+        size: 0,
+        offset: offset,
+        description: DESCRIPTION.to_string(),
+        confidence: signatures::common::CONFIDENCE_HIGH,
+        ..Default::default()
     };
-
 
     // Parse this first JFFS2 node header to ensure correctness
     if let Ok(first_node_header) = parse_jffs2_node_header(&file_data[offset..]) {
@@ -55,13 +56,13 @@ pub fn jffs2_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::co
 
         // Need to grep for all JFFS2 nodes to figure out how big this file system really is
         let grep = AhoCorasick::new(vec![node_magic]).unwrap();
- 
+
         // Find all matching JFFS2 node magic bytes
         for magic_match in grep.find_overlapping_iter(&file_data[grep_offset..].to_vec()) {
             // Calculate the start and end of the node header inside the file data
             let header_start: usize = grep_offset + magic_match.start();
             let header_end: usize = header_start + JFFS2_NODE_STRUCT_SIZE;
-            
+
             // This is a false positive that is inside the node data of a previously validated node
             if header_start < jffs2_eof {
                 continue;
@@ -78,7 +79,9 @@ pub fn jffs2_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::co
             }
 
             // Parse this node's header
-            if let Ok(this_node_header) = parse_jffs2_node_header(&file_data[header_start..header_end]) {
+            if let Ok(this_node_header) =
+                parse_jffs2_node_header(&file_data[header_start..header_end])
+            {
                 node_count += 1;
                 jffs2_eof = header_start + roundup(this_node_header.size);
             }
@@ -87,7 +90,10 @@ pub fn jffs2_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::co
         // Make sure we've processed at least a few JFFS2 nodes
         if node_count > MIN_VALID_NODE_COUNT {
             result.size = jffs2_eof - result.offset;
-            result.description = format!("{}, {} endian, nodes: {}, total size: {} bytes", result.description, first_node_header.endianness, node_count, result.size);
+            result.description = format!(
+                "{}, {} endian, nodes: {}, total size: {} bytes",
+                result.description, first_node_header.endianness, node_count, result.size
+            );
             return Ok(result);
         }
     }

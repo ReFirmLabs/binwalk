@@ -4,26 +4,28 @@ pub const DESCRIPTION: &str = "bzip2 compressed data";
 
 pub fn bzip2_magic() -> Vec<Vec<u8>> {
     return vec![
-            b"BZh91AY&SY".to_vec(),
-            b"BZh81AY&SY".to_vec(),
-            b"BZh71AY&SY".to_vec(),
-            b"BZh61AY&SY".to_vec(),
-            b"BZh51AY&SY".to_vec(),
-            b"BZh41AY&SY".to_vec(),
-            b"BZh31AY&SY".to_vec(),
-            b"BZh21AY&SY".to_vec(),
-            b"BZh11AY&SY".to_vec(),
+        b"BZh91AY&SY".to_vec(),
+        b"BZh81AY&SY".to_vec(),
+        b"BZh71AY&SY".to_vec(),
+        b"BZh61AY&SY".to_vec(),
+        b"BZh51AY&SY".to_vec(),
+        b"BZh41AY&SY".to_vec(),
+        b"BZh31AY&SY".to_vec(),
+        b"BZh21AY&SY".to_vec(),
+        b"BZh11AY&SY".to_vec(),
     ];
 }
 
-pub fn bzip2_parser(_file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-
+pub fn bzip2_parser(
+    _file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     let result = signatures::common::SignatureResult {
-                                            description: DESCRIPTION.to_string(),
-                                            offset: offset,
-                                            confidence: signatures::common::CONFIDENCE_MEDIUM,
-                                            size: 0,
-                                            ..Default::default()
+        description: DESCRIPTION.to_string(),
+        offset: offset,
+        confidence: signatures::common::CONFIDENCE_MEDIUM,
+        size: 0,
+        ..Default::default()
     };
 
     /*

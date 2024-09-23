@@ -1,6 +1,6 @@
 use crate::signatures;
+use crate::structures::yaffs::{parse_yaffs_file_header, parse_yaffs_obj_header};
 use std::collections::HashMap;
-use crate::structures::yaffs::{ parse_yaffs_obj_header, parse_yaffs_file_header };
 
 const MIN_NUMBER_OF_OBJS: usize = 2;
 
@@ -13,17 +13,19 @@ pub fn yaffs_magic() -> Vec<Vec<u8>> {
     ];
 }
 
-pub fn yaffs_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-
+pub fn yaffs_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     const MAX_OBJ_SIZE: usize = 16896;
     const LITTLE_ENDIAN_FIRST_BYTE: u8 = 3;
 
     let mut result = signatures::common::SignatureResult {
-                                            description: DESCRIPTION.to_string(),
-                                            offset: offset,
-                                            size: 0,
-                                            confidence: signatures::common::CONFIDENCE_HIGH,
-                                            ..Default::default()
+        description: DESCRIPTION.to_string(),
+        offset: offset,
+        size: 0,
+        confidence: signatures::common::CONFIDENCE_HIGH,
+        ..Default::default()
     };
 
     let mut endianness = "big";
@@ -36,9 +38,14 @@ pub fn yaffs_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::co
         }
 
         if let Ok((page_size, spare_size)) = get_page_spare_size(&file_data[offset..], endianness) {
-            if let Ok(image_size) = get_image_size(&file_data[offset..], page_size, spare_size, endianness) {
+            if let Ok(image_size) =
+                get_image_size(&file_data[offset..], page_size, spare_size, endianness)
+            {
                 result.size = image_size;
-                result.description = format!("{}, {} endian, page size: {}, spare size: {}, image size: {} bytes", result.description, endianness, page_size, spare_size, image_size);
+                result.description = format!(
+                    "{}, {} endian, page size: {}, spare size: {}, image size: {} bytes",
+                    result.description, endianness, page_size, spare_size, image_size
+                );
                 return Ok(result);
             }
         }
@@ -48,12 +55,15 @@ pub fn yaffs_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::co
 }
 
 // Returns a tuple of (page_size, spare_size)
-fn get_page_spare_size(file_data: &[u8], endianness: &str) -> Result<(usize, usize), signatures::common::SignatureError> {
+fn get_page_spare_size(
+    file_data: &[u8],
+    endianness: &str,
+) -> Result<(usize, usize), signatures::common::SignatureError> {
     let mut obj_sizes: Vec<usize> = vec![];
     let mut page_spare_lookup: HashMap<usize, (usize, usize)> = HashMap::new();
 
     let spare_sizes: Vec<usize> = vec![16, 32, 64, 128, 256, 512];
-    let page_sizes: Vec<usize>= vec![512, 1024, 2048, 4096, 8192, 16384];
+    let page_sizes: Vec<usize> = vec![512, 1024, 2048, 4096, 8192, 16384];
 
     /*
      * Build a list of possible "object sizes", which is the distance between the start of one object header and the next, by
@@ -73,7 +83,7 @@ fn get_page_spare_size(file_data: &[u8], endianness: &str) -> Result<(usize, usi
 
     // Try each "object size" value to determine the distance to the next object header
     for obj_size in obj_sizes {
-        /* 
+        /*
          * Parse the candidate header, if it is valid then we know the page and spare data sizes.
          * NOTE: Size of available file data is not sanity checked here, as yaffs_parser has already
          *       guarunteed that there is enough data for more than one object.
@@ -87,7 +97,12 @@ fn get_page_spare_size(file_data: &[u8], endianness: &str) -> Result<(usize, usi
 }
 
 // Returns the total size of the image, in bytes
-fn get_image_size(file_data: &[u8], page_size: usize, spare_size: usize, endianness: &str) -> Result<usize, signatures::common::SignatureError> {
+fn get_image_size(
+    file_data: &[u8],
+    page_size: usize,
+    spare_size: usize,
+    endianness: &str,
+) -> Result<usize, signatures::common::SignatureError> {
     const FILE_TYPE: usize = 1;
 
     let mut image_size: usize = 0;
@@ -109,13 +124,13 @@ fn get_image_size(file_data: &[u8], page_size: usize, spare_size: usize, endiann
 
                 // If this is a file, the file data wil take up additional data blocks
                 if header.obj_type == FILE_TYPE {
-                    match get_file_block_count(&obj_data, page_size, endianness){
+                    match get_file_block_count(&obj_data, page_size, endianness) {
                         Err(e) => {
                             return Err(e);
-                        },
+                        }
                         Ok(block_count) => {
                             data_blocks += block_count;
-                        },
+                        }
                     }
                 }
 
@@ -128,12 +143,12 @@ fn get_image_size(file_data: &[u8], page_size: usize, spare_size: usize, endiann
                 } else {
                     break;
                 }
-            },
+            }
         }
     }
 
     // Sanity check the calculated image size
-    if image_size > (block_size * MIN_NUMBER_OF_OBJS) && image_size <= file_data.len(){
+    if image_size > (block_size * MIN_NUMBER_OF_OBJS) && image_size <= file_data.len() {
         return Ok(image_size);
     }
 
@@ -141,14 +156,19 @@ fn get_image_size(file_data: &[u8], page_size: usize, spare_size: usize, endiann
 }
 
 // Returns the number of data blocks used to store file data; this size is only valid for file type objects
-fn get_file_block_count(obj_data: &[u8], page_size: usize, endianness: &str) -> Result<usize, signatures::common::SignatureError> {
+fn get_file_block_count(
+    obj_data: &[u8],
+    page_size: usize,
+    endianness: &str,
+) -> Result<usize, signatures::common::SignatureError> {
     // parse_yaffs_file_header only parses a portion of the header that we need; the partial structure starts this many bytes into the object data
     const INFO_STRUCT_START: usize = 268;
 
     // Parse the partial object header.
     if let Ok(file_info) = parse_yaffs_file_header(&obj_data[INFO_STRUCT_START..], endianness) {
         // File data is broken up into blocks of page_size bytes
-        let file_block_count: usize = ((file_info.file_size as f64) / (page_size as f64)).ceil() as usize;
+        let file_block_count: usize =
+            ((file_info.file_size as f64) / (page_size as f64)).ceil() as usize;
         return Ok(file_block_count);
     }
 

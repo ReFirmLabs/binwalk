@@ -1,13 +1,13 @@
+use crate::signatures::common::SignatureResult;
+use log::{debug, error, info, warn};
+use serde::{Deserialize, Serialize};
 use std::fs;
+use std::io::Write;
+use std::os::unix;
+use std::os::unix::fs::PermissionsExt;
 use std::path;
 use std::process;
-use std::os::unix;
-use std::io::Write;
 use walkdir::WalkDir;
-use log::{debug, info, warn, error};
-use serde::{Serialize, Deserialize};
-use std::os::unix::fs::PermissionsExt;
-use crate::signatures::common::SignatureResult;
 
 /* This contstant in command line arguments will be replaced with the path to the input file */
 pub const SOURCE_FILE_PLACEHOLDER: &str = "%e";
@@ -19,7 +19,7 @@ pub struct ExtractionError;
  * Built-in internal extractors must provide a function conforming to this definition.
  * Arguments: file_data, offset, output_directory.
  */
-pub type InternalExtractor = fn (&Vec<u8>, usize, Option<&String>) -> ExtractionResult;
+pub type InternalExtractor = fn(&Vec<u8>, usize, Option<&String>) -> ExtractionResult;
 
 #[derive(Debug, Default, Clone, Eq, PartialEq, Ord, PartialOrd)]
 pub enum ExtractorType {
@@ -32,7 +32,7 @@ pub enum ExtractorType {
 /*
  * Describes an extractor.
  */
-#[derive(Debug,  Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Extractor {
     // External command or internal function to execute
     pub utility: ExtractorType,
@@ -49,7 +49,7 @@ pub struct Extractor {
 /*
  * Stores information about a completed extraction.
  * When constructing this structure, only the `size` and `success` fields should be populated;
- * the others are automatically populated (see: execute(), below). 
+ * the others are automatically populated (see: execute(), below).
  */
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ExtractionResult {
@@ -82,10 +82,10 @@ pub struct ProcInfo {
  */
 pub fn safe_path_join(chroot_directory: &String, file_path: &String) -> String {
     const DIR_TRAVERSAL: &str = "..";
-    
+
     let mut exclude_indicies: Vec<usize> = vec![];
     let mut sanitized_path: String = chroot_directory.clone();
-    
+
     // Split the file path on '/'
     let path_parts: Vec<&str> = file_path.split(path::MAIN_SEPARATOR).collect();
 
@@ -111,7 +111,12 @@ pub fn safe_path_join(chroot_directory: &String, file_path: &String) -> String {
     // Append each non-excluded part of the file path to the specified chroot directory path
     for i in 0..path_parts.len() {
         if exclude_indicies.contains(&i) == false {
-            sanitized_path = format!("{}{}{}", sanitized_path, path::MAIN_SEPARATOR, path_parts[i]);
+            sanitized_path = format!(
+                "{}{}{}",
+                sanitized_path,
+                path::MAIN_SEPARATOR,
+                path_parts[i]
+            );
         }
     }
 
@@ -128,13 +133,16 @@ pub fn create_file(file_path: &String, data: &[u8], start: usize, size: usize) -
         match fs::write(file_path, data[start..end].to_vec()) {
             Ok(_) => {
                 return true;
-            },
+            }
             Err(e) => {
                 error!("Failed to write data to {}: {}", file_path, e);
-            },
+            }
         }
     } else {
-        error!("Failed to create file {}: offset/size provided exceeds available data", file_path);
+        error!(
+            "Failed to create file {}: offset/size provided exceeds available data",
+            file_path
+        );
     }
 
     return false;
@@ -144,18 +152,20 @@ pub fn create_file(file_path: &String, data: &[u8], start: usize, size: usize) -
  * Append the provided data to the specified file path.
  */
 pub fn append_to_file(file_path: &String, data: &[u8]) -> bool {
-    match fs::OpenOptions::new().create(true).append(true).open(file_path) {
+    match fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(file_path)
+    {
         Err(e) => {
             error!("Failed to open file '{}' for appending: {}", file_path, e);
-        },
-        Ok(mut fp) => {
-            match fp.write(data) {
-                Err(e) => {
-                    error!("Failed to append to file '{}': {}", file_path, e);
-                },
-                Ok(_) => {
-                    return true;
-                },
+        }
+        Ok(mut fp) => match fp.write(data) {
+            Err(e) => {
+                error!("Failed to append to file '{}': {}", file_path, e);
+            }
+            Ok(_) => {
+                return true;
             }
         },
     }
@@ -170,10 +180,10 @@ pub fn create_directory(dir_path: &String) -> bool {
     match fs::create_dir_all(dir_path) {
         Ok(_) => {
             return true;
-        },
+        }
         Err(e) => {
             error!("Failed to create output directory {}: {}", dir_path, e);
-        },
+        }
     }
 
     return false;
@@ -191,7 +201,7 @@ pub fn make_executable(file_path: &String) -> bool {
     match fs::metadata(file_path) {
         Err(e) => {
             error!("Failed to get permissions for file {}: {}", file_path, e);
-        },
+        }
         Ok(metadata) => {
             let mut permissions = metadata.permissions();
             permissions.set_mode(permissions.mode() | UNIX_EXEC_FLAG);
@@ -199,12 +209,12 @@ pub fn make_executable(file_path: &String) -> bool {
             match fs::set_permissions(file_path, permissions) {
                 Err(e) => {
                     error!("Failed to set permissions for file {}: {}", file_path, e);
-                },
+                }
                 Ok(_) => {
                     return true;
-                },
+                }
             }
-        },
+        }
     }
 
     return false;
@@ -219,11 +229,14 @@ pub fn create_symlink(symlink: &String, target: &String) -> bool {
     match unix::fs::symlink(&target_path, &symlink_path) {
         Ok(_) => {
             return true;
-        },
+        }
         Err(e) => {
-            error!("Failed to created symlink from {} -> {}: {}", symlink, target, e);
+            error!(
+                "Failed to created symlink from {} -> {}: {}",
+                symlink, target, e
+            );
             return false;
-        },
+        }
     }
 }
 
@@ -246,9 +259,9 @@ pub fn get_extracted_files(directory: &String) -> Vec<String> {
                         if md.is_file() && md.len() > 0 {
                             regular_files.push(entry_path.to_str().unwrap().to_string());
                         }
-                    },
+                    }
                 }
-            },
+            }
         }
     }
 
@@ -258,21 +271,28 @@ pub fn get_extracted_files(directory: &String) -> Vec<String> {
 /*
  * Executes an extractor for the provided SignatureResult.
  */
-pub fn execute(file_data: &Vec<u8>, file_path: &String, signature: &SignatureResult, extractor: &Option<Extractor>) -> ExtractionResult {
-    let mut result = ExtractionResult { ..Default::default() };
+pub fn execute(
+    file_data: &Vec<u8>,
+    file_path: &String,
+    signature: &SignatureResult,
+    extractor: &Option<Extractor>,
+) -> ExtractionResult {
+    let mut result = ExtractionResult {
+        ..Default::default()
+    };
 
     // Create an output directory for the extraction
     if let Ok(output_directory) = create_output_directory(file_path, signature.offset) {
-
         // Make sure a defalut extractor was actually defined (this function should not be called if signature.extractor is None)
         match &extractor {
-
             None => {
-                error!("Attempted to extract {} data, but no extractor is defined!", signature.name);
-            },
+                error!(
+                    "Attempted to extract {} data, but no extractor is defined!",
+                    signature.name
+                );
+            }
 
             Some(default_extractor) => {
-                
                 let extractor_definition: Extractor;
 
                 // If the signature result specified a preferred extractor, use that instead of the default signature extractor
@@ -284,47 +304,54 @@ pub fn execute(file_data: &Vec<u8>, file_path: &String, signature: &SignatureRes
 
                 // Decide how to execute the extractor depending on the extractor type
                 match &extractor_definition.utility {
-
                     ExtractorType::None => {
                         panic!("An extractor of type None is invalid!");
-                    },
+                    }
 
                     ExtractorType::Internal(func) => {
                         // Run the internal extractor function
                         result = func(file_data, signature.offset, Some(&output_directory));
                         // Set the extractor name to "<signature name>_built_in"
                         result.extractor = format!("{}_built_in", signature.name);
-                    },
+                    }
 
                     ExtractorType::External(cmd) => {
                         // Spawn the external extractor command
-                        match spawn(file_data, file_path, &output_directory, signature, extractor_definition.clone()) {
-
+                        match spawn(
+                            file_data,
+                            file_path,
+                            &output_directory,
+                            signature,
+                            extractor_definition.clone(),
+                        ) {
                             Err(e) => {
-                                error!("Failed to spawn external extractor for '{}' signature: {}", signature.name, e);
-                            },
+                                error!(
+                                    "Failed to spawn external extractor for '{}' signature: {}",
+                                    signature.name, e
+                                );
+                            }
 
                             Ok(proc_info) => {
                                 // Wait for the external process to exit
                                 match proc_wait(proc_info) {
                                     Err(_) => {
                                         warn!("External extractor failed!");
-                                    },
+                                    }
                                     Ok(ext_result) => {
                                         result = ext_result;
                                         // Set the extractor name to the name of the extraction utility
                                         result.extractor = cmd.to_string();
-                                    },
+                                    }
                                 }
                             }
                         }
-                    },
+                    }
                 }
-                
+
                 // Populate these ExtractionResult fields automatically for all extractors
                 result.output_directory = output_directory.clone();
                 result.do_not_recurse = extractor_definition.do_not_recurse;
-                        
+
                 // If the extractor reported success, make sure it extracted something other than just an empty file
                 if result.success == true {
                     if was_something_extracted(&result.output_directory) == false {
@@ -332,46 +359,76 @@ pub fn execute(file_data: &Vec<u8>, file_path: &String, signature: &SignatureRes
                         warn!("Extractor exited successfully, but no data was extracted");
                     }
                 }
-            },
+            }
         }
 
         // Clean up extractor's output directory if extraction failed
         if result.success == false {
             if let Err(e) = fs::remove_dir_all(&output_directory) {
-                warn!("Failed to clean up extraction directory {} after extraction failure: {}", output_directory, e);
+                warn!(
+                    "Failed to clean up extraction directory {} after extraction failure: {}",
+                    output_directory, e
+                );
             }
         }
     }
 
-    return result
+    return result;
 }
 
 /*
  * Spawn an external extractor process.
  */
-fn spawn(file_data: &Vec<u8>, file_path: &String, output_directory: &String, signature: &SignatureResult, mut extractor: Extractor) -> Result<ProcInfo, std::io::Error> {
+fn spawn(
+    file_data: &Vec<u8>,
+    file_path: &String,
+    output_directory: &String,
+    signature: &SignatureResult,
+    mut extractor: Extractor,
+) -> Result<ProcInfo, std::io::Error> {
     let command: String;
 
     // This function *only* handles execution of external extraction utilities; internal extractors must be invoked directly
     match &extractor.utility {
         ExtractorType::External(cmd) => command = cmd.clone(),
-        ExtractorType::Internal(_ext) => panic!("Tried to run an internal extractor as an external command!"),
+        ExtractorType::Internal(_ext) => {
+            panic!("Tried to run an internal extractor as an external command!")
+        }
         ExtractorType::None => panic!("An extractor command was defined, but is set to None!"),
     }
 
     // Carved file path will be <output directory>/<signature.name>_<hex offset>.<extractor.extension>
-    let carved_file = format!("{}{}{}_{:X}.{}", output_directory, path::MAIN_SEPARATOR, signature.name, signature.offset, extractor.extension);
-    info!("Carving data from {} {:#X}..{:#X} to {}", file_path, signature.offset, signature.offset+signature.size, carved_file);
-    
+    let carved_file = format!(
+        "{}{}{}_{:X}.{}",
+        output_directory,
+        path::MAIN_SEPARATOR,
+        signature.name,
+        signature.offset,
+        extractor.extension
+    );
+    info!(
+        "Carving data from {} {:#X}..{:#X} to {}",
+        file_path,
+        signature.offset,
+        signature.offset + signature.size,
+        carved_file
+    );
+
     // If the entirety of the source file is this one file type, no need to carve a copy of it, just create a symlink
     if signature.offset == 0 && signature.size == file_data.len() {
         if create_symlink(&carved_file, &file_path) == false {
-            return Err(std::io::Error::new(std::io::ErrorKind::Other, "Failed to create carved file symlink"));
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "Failed to create carved file symlink",
+            ));
         }
     } else {
         // Copy file data to carved file path
         if create_file(&carved_file, file_data, signature.offset, signature.size) == false {
-            return Err(std::io::Error::new(std::io::ErrorKind::Other, "Failed to carve data to disk"));
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "Failed to carve data to disk",
+            ));
         }
     }
 
@@ -381,29 +438,33 @@ fn spawn(file_data: &Vec<u8>, file_path: &String, output_directory: &String, sig
             extractor.arguments[i] = carved_file.clone();
         }
     }
-    
+
     info!("Spawning process {} {:?}", command, extractor.arguments);
     match process::Command::new(&command)
-                           .args(&extractor.arguments)
-                           .stdout(process::Stdio::null())
-                           .stderr(process::Stdio::null())
-                           .current_dir(&output_directory)
-                           .spawn() {
+        .args(&extractor.arguments)
+        .stdout(process::Stdio::null())
+        .stderr(process::Stdio::null())
+        .current_dir(&output_directory)
+        .spawn()
+    {
         Err(e) => {
-            error!("Failed to execute command {}{:?}: {}", command, extractor.arguments, e);
+            error!(
+                "Failed to execute command {}{:?}: {}",
+                command, extractor.arguments, e
+            );
             return Err(e);
-        },
-        
+        }
+
         Ok(child) => {
             // If the process was spawned successfully, return some information about the process
             let proc_info = ProcInfo {
-                            child: child,
-                            carved_file: carved_file.clone(),
-                            exit_codes: extractor.exit_codes,
+                child: child,
+                carved_file: carved_file.clone(),
+                exit_codes: extractor.exit_codes,
             };
 
             return Ok(proc_info);
-        },
+        }
     }
 }
 
@@ -417,29 +478,31 @@ fn proc_wait(mut worker_info: ProcInfo) -> Result<ExtractionResult, ExtractionEr
 
     // Block until child process has terminated
     match worker_info.child.wait() {
-
         // Child was terminated from an external signal, status unknown, assume failure but do nothing else
         Err(e) => {
             error!("Failed to retreive child process status: {}", e);
             return Err(ExtractionError);
-        },
+        }
 
         // Child terminated with an exit status
         Ok(status) => {
             // Assume failure until proven otherwise
             let mut extraction_success: bool = false;
-                    
+
             // Clean up the carved file used as input to the extractor
             debug!("Deleting carved file {}", worker_info.carved_file);
             if let Err(e) = fs::remove_file(worker_info.carved_file.clone()) {
-                warn!("Failed to remove carved file '{}': {}", worker_info.carved_file, e);
+                warn!(
+                    "Failed to remove carved file '{}': {}",
+                    worker_info.carved_file, e
+                );
             };
 
             // Check the extractor's exit status
             match status.code() {
                 None => {
                     extraction_success = false;
-                },
+                }
 
                 Some(code) => {
                     // Make sure the extractor's exit code is an expected one
@@ -448,25 +511,34 @@ fn proc_wait(mut worker_info: ProcInfo) -> Result<ExtractionResult, ExtractionEr
                     } else {
                         warn!("Child process exited with unexpected code: {}", code);
                     }
-                },
+                }
             }
 
             // Return an ExtractionResult with the appropriate success status
-            return Ok(ExtractionResult { success: extraction_success, ..Default::default() });
-        },
+            return Ok(ExtractionResult {
+                success: extraction_success,
+                ..Default::default()
+            });
+        }
     }
 }
 
 // Create an output directory in which to place extraction results
 fn create_output_directory(file_path: &String, offset: usize) -> Result<String, std::io::Error> {
     // Output directory will be: <file_path.extracted/<hex offset>
-    let output_directory = format!("{}.extracted{}{:X}", file_path,
-                                                         path::MAIN_SEPARATOR,
-                                                         offset);
+    let output_directory = format!(
+        "{}.extracted{}{:X}",
+        file_path,
+        path::MAIN_SEPARATOR,
+        offset
+    );
 
     // Create the output directory, equivalent of mkdir -p
     if create_directory(&output_directory) == false {
-        return Err(std::io::Error::new(std::io::ErrorKind::Other, "Directory creation failed"));
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            "Directory creation failed",
+        ));
     }
 
     return Ok(output_directory);
@@ -486,7 +558,7 @@ fn was_something_extracted(output_directory: &String) -> bool {
             Err(e) => {
                 warn!("Failed to retrieve output directory entry: {}", e);
                 continue;
-            },
+            }
             Ok(entry) => {
                 // Don't include the base output directory path itself
                 if entry.path() == output_directory_path {

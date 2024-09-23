@@ -1,7 +1,7 @@
+use crate::extractors::common::{create_file, safe_path_join, ExtractionResult};
 use miniz_oxide::inflate;
-use crate::extractors::common::{ create_file, safe_path_join, ExtractionResult };
 
-/* 
+/*
  * The inflate_decompressor extractor is currently not directly used by any signature definitions.
  *
 use crate::extractors::common::{ Extractor, ExtractorType };
@@ -16,7 +16,11 @@ pub fn inflate_extractor() -> Extractor {
  * Inflates deflated data.
  * WARNING: The decompressed data is stored completely in memory. Use flate2 wrapper instead?
  */
-pub fn inflate_decompressor(file_data: &Vec<u8>, offset: usize, output_directory: Option<&String>) -> ExtractionResult {
+pub fn inflate_decompressor(
+    file_data: &Vec<u8>,
+    offset: usize,
+    output_directory: Option<&String>,
+) -> ExtractionResult {
     const MIN_DECOMPRESSED_SIZE: usize = 1;
     const DECOMPRESS_TEST_SIZE: usize = 512;
     const OUTPUT_FILE_NAME: &str = "decompressed.bin";
@@ -25,15 +29,17 @@ pub fn inflate_decompressor(file_data: &Vec<u8>, offset: usize, output_directory
     let compressed_data_start: usize = offset;
     let mut compressed_data_end: usize = file_data.len();
 
-    let mut result = ExtractionResult { ..Default::default() };
+    let mut result = ExtractionResult {
+        ..Default::default()
+    };
 
     match output_directory {
         None => {
             dry_run = true;
-        },
+        }
         Some(_) => {
             dry_run = false;
-        },
+        }
     }
 
     // During a dry run, limit the size of compressed data to DECOMPRESS_TEST_SIZE.
@@ -49,23 +55,30 @@ pub fn inflate_decompressor(file_data: &Vec<u8>, offset: usize, output_directory
                 if dry_run == true {
                     result.success = true;
                 } else {
-                    let output_file_path = safe_path_join(&output_directory.unwrap(), &OUTPUT_FILE_NAME.to_string());
-                    result.success = create_file(&output_file_path, &decompressed_data, 0, decompressed_data.len());
+                    let output_file_path =
+                        safe_path_join(&output_directory.unwrap(), &OUTPUT_FILE_NAME.to_string());
+                    result.success = create_file(
+                        &output_file_path,
+                        &decompressed_data,
+                        0,
+                        decompressed_data.len(),
+                    );
                 }
             }
-        },
+        }
         Err(e) => {
             /*
              * Failure due to truncated data is possible, and expected, when doing a dry run since
              * the compressed data provided to the inflate function is truncated to DECOMPRESS_TEST_SIZE bytes.
              * In this case, consider decompression a success.
              */
-            if dry_run == true &&
-               e.status == inflate::TINFLStatus::FailedCannotMakeProgress &&
-               e.output.len() >= MIN_DECOMPRESSED_SIZE {
+            if dry_run == true
+                && e.status == inflate::TINFLStatus::FailedCannotMakeProgress
+                && e.output.len() >= MIN_DECOMPRESSED_SIZE
+            {
                 result.success = true;
             }
-        },
+        }
     }
 
     return result;

@@ -8,8 +8,9 @@ pub struct CabinetHeader {
     pub folder_count: usize,
 }
 
-pub fn parse_cab_header(header_data: &[u8]) -> Result<CabinetHeader, structures::common::StructureError> {
-
+pub fn parse_cab_header(
+    header_data: &[u8],
+) -> Result<CabinetHeader, structures::common::StructureError> {
     const MAJOR_VERSION: usize = 1;
     const MINOR_VERSION: usize = 3;
     const FLAG_EXTRA_DATA_PRESENT: usize = 4;
@@ -34,7 +35,6 @@ pub fn parse_cab_header(header_data: &[u8]) -> Result<CabinetHeader, structures:
         ("extra_header_size", "u16"),
         ("cbCFFolder", "u8"),
         ("cbCFData", "u8"),
-
     ];
 
     let cab_extra_header_structure = vec![
@@ -42,21 +42,33 @@ pub fn parse_cab_header(header_data: &[u8]) -> Result<CabinetHeader, structures:
         ("data_offset", "u32"),
         ("data_size", "u32"),
         ("unknown2", "u32"),
-        ("unknown3", "u32")
+        ("unknown3", "u32"),
     ];
 
     let available_data: usize = header_data.len();
-    let mut header_info = CabinetHeader { header_size: CAB_STRUCT_SIZE, ..Default::default() };
+    let mut header_info = CabinetHeader {
+        header_size: CAB_STRUCT_SIZE,
+        ..Default::default()
+    };
 
     // Sanity check the size of available data
     if available_data > CAB_STRUCT_SIZE {
         // Parse the CAB header
-        let cab_header = structures::common::parse(&header_data[0..CAB_STRUCT_SIZE], &cab_header_structure, "little");
+        let cab_header = structures::common::parse(
+            &header_data[0..CAB_STRUCT_SIZE],
+            &cab_header_structure,
+            "little",
+        );
 
         // All reserved fields must be 0
-        if cab_header["reserved1"] == 0 && cab_header["reserved2"] == 0 && cab_header["reserved3"] == 0 {
+        if cab_header["reserved1"] == 0
+            && cab_header["reserved2"] == 0
+            && cab_header["reserved3"] == 0
+        {
             // Version must be 1.3
-            if cab_header["major_version"] == MAJOR_VERSION && cab_header["minor_version"] == MINOR_VERSION {
+            if cab_header["major_version"] == MAJOR_VERSION
+                && cab_header["minor_version"] == MINOR_VERSION
+            {
                 // Update the CabinetHeader fields
                 header_info.total_size = cab_header["size"];
                 header_info.file_count = cab_header["file_count"];
@@ -68,7 +80,9 @@ pub fn parse_cab_header(header_data: &[u8]) -> Result<CabinetHeader, structures:
                     let mut everything_ok: bool = false;
 
                     // If the extra data flag was set, we need to parse the extra data header to get the size of the extra data
-                    if (cab_header["flags"] & FLAG_EXTRA_DATA_PRESENT) != 0 && cab_header["extra_header_size"] == CAB_EXTRA_STRUCT_SIZE {
+                    if (cab_header["flags"] & FLAG_EXTRA_DATA_PRESENT) != 0
+                        && cab_header["extra_header_size"] == CAB_EXTRA_STRUCT_SIZE
+                    {
                         // Calclate the start and end of the extra header
                         let extra_header_start: usize = CAB_STRUCT_SIZE;
                         let extra_header_end: usize = extra_header_start + CAB_EXTRA_STRUCT_SIZE;
@@ -76,7 +90,11 @@ pub fn parse_cab_header(header_data: &[u8]) -> Result<CabinetHeader, structures:
                         // Sanity check available data
                         if header_data.len() > extra_header_end {
                             // Parse the header
-                            let extra_header = structures::common::parse(&header_data[extra_header_start..extra_header_end], &cab_extra_header_structure, "little");
+                            let extra_header = structures::common::parse(
+                                &header_data[extra_header_start..extra_header_end],
+                                &cab_extra_header_structure,
+                                "little",
+                            );
 
                             // The extra data is expected to come immediately after the data specified in the main CAB header
                             if extra_header["data_offset"] == cab_header["size"] {

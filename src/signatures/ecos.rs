@@ -23,13 +23,15 @@ pub fn exception_handler_magic() -> Vec<Vec<u8>> {
     ];
 }
 
-pub fn exception_handler_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-
+pub fn exception_handler_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     let mut result = signatures::common::SignatureResult {
-                                            offset: offset,
-                                            description: EXCEPTION_HANDLER_DESCRIPTION.to_string(),
-                                            confidence: signatures::common::CONFIDENCE_LOW,
-                                            ..Default::default()
+        offset: offset,
+        description: EXCEPTION_HANDLER_DESCRIPTION.to_string(),
+        confidence: signatures::common::CONFIDENCE_LOW,
+        ..Default::default()
     };
 
     let mut endianness: &str = "big";

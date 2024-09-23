@@ -1,6 +1,6 @@
+use crate::common::{crc32, get_cstring};
 use crate::structures;
 use std::collections::HashMap;
-use crate::common::{ crc32, get_cstring };
 
 #[derive(Debug, Default, Clone)]
 pub struct UImageHeader {
@@ -14,8 +14,9 @@ pub struct UImageHeader {
     pub image_type: String,
 }
 
-pub fn parse_uimage_header(uimage_data: &[u8]) -> Result<UImageHeader, structures::common::StructureError> {
-
+pub fn parse_uimage_header(
+    uimage_data: &[u8],
+) -> Result<UImageHeader, structures::common::StructureError> {
     const UIMAGE_HEADER_SIZE: usize = 64;
     const UIMAGE_NAME_OFFSET: usize = 32;
 
@@ -67,7 +68,7 @@ pub fn parse_uimage_header(uimage_data: &[u8]) -> Result<UImageHeader, structure
 
     let valid_cpu_types = HashMap::from([
         (1, "Alpha"),
-        (2, "ARM"), 
+        (2, "ARM"),
         (3, "Intel x86"),
         (4, "IA64"),
         (5, "MIPS32"),
@@ -103,7 +104,7 @@ pub fn parse_uimage_header(uimage_data: &[u8]) -> Result<UImageHeader, structure
         (5, "lz4"),
         (6, "zstd"),
     ]);
-       
+
     let valid_image_types = HashMap::from([
         (1, "Standalone Program"),
         (2, "OS Kernel Image"),
@@ -153,26 +154,34 @@ pub fn parse_uimage_header(uimage_data: &[u8]) -> Result<UImageHeader, structure
 
     // Sanity check available data length
     if uimage_data.len() >= UIMAGE_HEADER_SIZE {
-
         // Parse the first half of the header
-        let uimage_header = structures::common::parse(&uimage_data[0..UIMAGE_HEADER_SIZE], &uimage_structure, "big");
-   
+        let uimage_header = structures::common::parse(
+            &uimage_data[0..UIMAGE_HEADER_SIZE],
+            &uimage_structure,
+            "big",
+        );
+
         // Sanity check header fields, validate CRC
         if valid_os_types.contains_key(&uimage_header["os_type"]) {
             if valid_cpu_types.contains_key(&uimage_header["cpu_type"]) {
                 if valid_image_types.contains_key(&uimage_header["image_type"]) {
                     if valid_compression_types.contains_key(&uimage_header["compression_type"]) {
-                        if calculate_uimage_header_checksum(&uimage_data[0..UIMAGE_HEADER_SIZE].to_vec()) ==  uimage_header["header_crc"] {
-
+                        if calculate_uimage_header_checksum(
+                            &uimage_data[0..UIMAGE_HEADER_SIZE].to_vec(),
+                        ) == uimage_header["header_crc"]
+                        {
                             return Ok(UImageHeader {
                                 header_size: UIMAGE_HEADER_SIZE,
                                 name: get_cstring(&uimage_data[UIMAGE_NAME_OFFSET..]),
                                 data_size: uimage_header["data_size"],
                                 timestamp: uimage_header["creation_timestamp"],
-                                compression_type: valid_compression_types[&uimage_header["compression_type"]].to_string(),
+                                compression_type: valid_compression_types
+                                    [&uimage_header["compression_type"]]
+                                    .to_string(),
                                 cpu_type: valid_cpu_types[&uimage_header["cpu_type"]].to_string(),
                                 os_type: valid_os_types[&uimage_header["os_type"]].to_string(),
-                                image_type: valid_image_types[&uimage_header["image_type"]].to_string(),
+                                image_type: valid_image_types[&uimage_header["image_type"]]
+                                    .to_string(),
                             });
                         }
                     }

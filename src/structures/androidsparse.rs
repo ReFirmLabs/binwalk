@@ -9,7 +9,9 @@ pub struct AndroidSparseHeader {
     pub chunk_count: usize,
 }
 
-pub fn parse_android_sparse_header(sparse_data: &[u8]) -> Result<AndroidSparseHeader, structures::common::StructureError> {
+pub fn parse_android_sparse_header(
+    sparse_data: &[u8],
+) -> Result<AndroidSparseHeader, structures::common::StructureError> {
     // Version must be 1.0
     const MAJOR_VERSION: usize = 1;
     const MINOR_VERSION: usize = 0;
@@ -36,23 +38,22 @@ pub fn parse_android_sparse_header(sparse_data: &[u8]) -> Result<AndroidSparseHe
 
     // Sanity check the size of available data
     if sparse_data.len() > header_size {
-
         // Parse the header
         let header = structures::common::parse(&sparse_data, &android_sparse_structure, "little");
 
         // Sanity check header values
-        if header["major_version"] == MAJOR_VERSION &&
-           header["minor_version"] == MINOR_VERSION &&
-           header["header_size"] == header_size &&
-           header["chunk_header_size"] == CHUNK_HEADER_SIZE &&
-           (header["block_size"] % BLOCK_ALIGNMENT) == 0 {
-
-               return Ok(AndroidSparseHeader {
-                    major_version: header["major_version"],
-                    minor_version: header["minor_version"],
-                    header_size: header["header_size"],
-                    block_size: header["block_size"],
-                    chunk_count: header["total_chunks"],
+        if header["major_version"] == MAJOR_VERSION
+            && header["minor_version"] == MINOR_VERSION
+            && header["header_size"] == header_size
+            && header["chunk_header_size"] == CHUNK_HEADER_SIZE
+            && (header["block_size"] % BLOCK_ALIGNMENT) == 0
+        {
+            return Ok(AndroidSparseHeader {
+                major_version: header["major_version"],
+                minor_version: header["minor_version"],
+                header_size: header["header_size"],
+                block_size: header["block_size"],
+                chunk_count: header["total_chunks"],
             });
         }
     }
@@ -71,7 +72,9 @@ pub struct AndroidSparseChunkHeader {
     pub is_dont_care: bool,
 }
 
-pub fn parse_android_sparse_chunk_header(chunk_data: &[u8]) -> Result<AndroidSparseChunkHeader, structures::common::StructureError> {
+pub fn parse_android_sparse_chunk_header(
+    chunk_data: &[u8],
+) -> Result<AndroidSparseChunkHeader, structures::common::StructureError> {
     // Known chunk types
     const CHUNK_TYPE_RAW: usize = 0xCAC1;
     const CHUNK_TYPE_FILL: usize = 0xCAC2;
@@ -85,7 +88,10 @@ pub fn parse_android_sparse_chunk_header(chunk_data: &[u8]) -> Result<AndroidSpa
         ("total_size", "u32"),
     ];
 
-    let mut chonker = AndroidSparseChunkHeader { header_size: structures::common::size(&chunk_structure), ..Default::default() };
+    let mut chonker = AndroidSparseChunkHeader {
+        header_size: structures::common::size(&chunk_structure),
+        ..Default::default()
+    };
 
     // Sanity check available data
     if chunk_data.len() >= chonker.header_size {
@@ -94,7 +100,6 @@ pub fn parse_android_sparse_chunk_header(chunk_data: &[u8]) -> Result<AndroidSpa
 
         // Make sure the reserved field is zero
         if chunk_header["reserved"] == 0 {
-
             // Populate the structure values
             chonker.block_count = chunk_header["output_block_count"];
             chonker.data_size = chunk_header["total_size"] - chonker.header_size;
@@ -104,11 +109,11 @@ pub fn parse_android_sparse_chunk_header(chunk_data: &[u8]) -> Result<AndroidSpa
             chonker.is_dont_care = chunk_header["chunk_type"] == CHUNK_TYPE_DONT_CARE;
 
             // The chunk type must be one of the known chunk types
-            if chonker.is_crc == true ||
-               chonker.is_raw == true ||
-               chonker.is_fill == true ||
-               chonker.is_dont_care == true {
-
+            if chonker.is_crc == true
+                || chonker.is_raw == true
+                || chonker.is_fill == true
+                || chonker.is_dont_care == true
+            {
                 return Ok(chonker);
             }
         }

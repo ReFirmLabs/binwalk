@@ -1,10 +1,9 @@
-use crate::signatures;
 use crate::common::get_cstring;
 use crate::extractors::vxworks::extract_symbol_table;
+use crate::signatures;
 
 pub const SYMTAB_DESCRIPTION: &str = "VxWorks symbol table";
 pub const WIND_KERNEL_DESCRIPTION: &str = "VxWorks WIND kernel version";
-
 
 pub fn wind_kernel_magic() -> Vec<Vec<u8>> {
     // Magic version string for WIND kernels
@@ -23,14 +22,17 @@ pub fn symbol_table_magic() -> Vec<Vec<u8>> {
     ];
 }
 
-pub fn wind_kernel_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+pub fn wind_kernel_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     const MAGIC_SIZE: usize = 13;
 
     let mut result = signatures::common::SignatureResult {
-                                            offset: offset,
-                                            description: WIND_KERNEL_DESCRIPTION.to_string(),
-                                            confidence: signatures::common::CONFIDENCE_LOW,
-                                            ..Default::default()
+        offset: offset,
+        description: WIND_KERNEL_DESCRIPTION.to_string(),
+        confidence: signatures::common::CONFIDENCE_LOW,
+        ..Default::default()
     };
 
     let version_offset: usize = offset + MAGIC_SIZE;
@@ -50,18 +52,20 @@ pub fn wind_kernel_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatur
     return Err(signatures::common::SignatureError);
 }
 
-pub fn symbol_table_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+pub fn symbol_table_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     const MAGIC_OFFSET: usize = 8;
 
     let mut result = signatures::common::SignatureResult {
-                                            description: SYMTAB_DESCRIPTION.to_string(),
-                                            confidence: signatures::common::CONFIDENCE_HIGH,
-                                            ..Default::default()
+        description: SYMTAB_DESCRIPTION.to_string(),
+        confidence: signatures::common::CONFIDENCE_HIGH,
+        ..Default::default()
     };
 
     // The magic bytes are not at the beginning of the VxWorks symbol table; sanity check the specified offset
     if offset >= MAGIC_OFFSET {
-
         // Actual start of the symbol table
         let symtab_start: usize = offset - MAGIC_OFFSET;
 
@@ -70,13 +74,12 @@ pub fn symbol_table_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatu
 
         // If dry run was a success, this is very likely a valid symbol table
         if dry_run.success == true {
-
             // Get the size of the symbol table from the dry-run
             if let Some(symtab_size) = dry_run.size {
-                
                 result.size = symtab_size;
                 result.offset = symtab_start;
-                result.description = format!("{}, total size: {} bytes", result.description, result.size);
+                result.description =
+                    format!("{}, total size: {} bytes", result.description, result.size);
 
                 return Ok(result);
             }

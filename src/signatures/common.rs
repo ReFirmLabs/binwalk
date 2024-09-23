@@ -1,5 +1,5 @@
 use crate::extractors;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 // Some pre-defined confidence levels for SignatureResult structures
 pub const CONFIDENCE_LOW: u8 = 0;
@@ -14,7 +14,7 @@ pub struct SignatureError;
  * All signature parsers take a vector of u8 bytes, and an offset into that vector where the signature's magic bytes were found.
  * They return either a SignatureResult struct, or, if the signature is not valid, a SignatureError.
  */
-pub type SignatureParser = fn (&Vec<u8>, usize) -> Result<SignatureResult, SignatureError>;
+pub type SignatureParser = fn(&Vec<u8>, usize) -> Result<SignatureResult, SignatureError>;
 
 /*
  * This struct is returned by all signature parser functions (see: SignatureParser and Signature, below).
@@ -52,7 +52,7 @@ pub struct SignatureResult {
  * Signature.parser is a function of type SignatureParser, responsible for parsing and validating hits on those "magic" byte patterns.
  * If always_display is true, then this signature will always be displayed (during recursive extraction files with no extractable signatures
  * are not displayed by default; see main.rs).
- * 
+ *
  */
 #[derive(Debug, Clone)]
 pub struct Signature {

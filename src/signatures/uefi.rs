@@ -1,9 +1,8 @@
 use crate::signatures;
-use crate::structures::uefi::{ parse_uefi_volume_header, parse_uefi_capsule_header };
+use crate::structures::uefi::{parse_uefi_capsule_header, parse_uefi_volume_header};
 
 pub const VOLUME_DESCRIPTION: &str = "UEFI PI firmware volume";
 pub const CAPSULE_DESCRIPTION: &str = "UEFI capsule image";
-
 
 pub fn uefi_volume_magic() -> Vec<Vec<u8>> {
     return vec![b"_FVH".to_vec()];
@@ -17,16 +16,19 @@ pub fn uefi_capsule_magic() -> Vec<Vec<u8>> {
     ];
 }
 
-pub fn uefi_volume_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+pub fn uefi_volume_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     // The magic signature begins this many bytes from the start of the UEFI volume
     const UEFI_MAGIC_OFFSET: usize = 40;
 
     let mut result = signatures::common::SignatureResult {
-                                            size: 0,
-                                            offset: 0,
-                                            description: VOLUME_DESCRIPTION.to_string(),
-                                            confidence: signatures::common::CONFIDENCE_MEDIUM,
-                                            ..Default::default()
+        size: 0,
+        offset: 0,
+        description: VOLUME_DESCRIPTION.to_string(),
+        confidence: signatures::common::CONFIDENCE_MEDIUM,
+        ..Default::default()
     };
 
     // Volume actually starts UEFI_MAGIC_OFFSET bytes before the magic bytes; make sure there are at least that many bytes preceeding the magic offset
@@ -36,14 +38,16 @@ pub fn uefi_volume_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatur
 
         // Parse the volume header
         if let Ok(uefi_volume_header) = parse_uefi_volume_header(&file_data[result.offset..]) {
-
             // Make sure the volume size is sane
             if file_data.len() >= (result.offset + uefi_volume_header.volume_size) {
                 result.size = uefi_volume_header.volume_size;
-                result.description = format!("{}, header CRC: {:#X}, header size: {} bytes, total size: {} bytes", result.description,
-                                                                                                                   uefi_volume_header.header_crc as u32,
-                                                                                                                   uefi_volume_header.header_size,
-                                                                                                                   uefi_volume_header.volume_size);
+                result.description = format!(
+                    "{}, header CRC: {:#X}, header size: {} bytes, total size: {} bytes",
+                    result.description,
+                    uefi_volume_header.header_crc as u32,
+                    uefi_volume_header.header_size,
+                    uefi_volume_header.volume_size
+                );
                 return Ok(result);
             }
         }
@@ -52,24 +56,28 @@ pub fn uefi_volume_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatur
     return Err(signatures::common::SignatureError);
 }
 
-pub fn uefi_capsule_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+pub fn uefi_capsule_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     let mut result = signatures::common::SignatureResult {
-                                            description: CAPSULE_DESCRIPTION.to_string(),
-                                            offset: offset,
-                                            size: 0,
-                                            confidence: signatures::common::CONFIDENCE_MEDIUM,
-                                            ..Default::default()
+        description: CAPSULE_DESCRIPTION.to_string(),
+        offset: offset,
+        size: 0,
+        confidence: signatures::common::CONFIDENCE_MEDIUM,
+        ..Default::default()
     };
-
 
     let available_data: usize = file_data.len() - offset;
 
     if let Ok(capsule_header) = parse_uefi_capsule_header(&file_data[offset..]) {
-
         // Sanity check on header total size field
         if capsule_header.total_size >= available_data {
             result.size = capsule_header.total_size;
-            result.description = format!("{}, header size: {} bytes, total size: {} bytes", result.description, capsule_header.header_size, capsule_header.total_size);
+            result.description = format!(
+                "{}, header size: {} bytes, total size: {} bytes",
+                result.description, capsule_header.header_size, capsule_header.total_size
+            );
             return Ok(result);
         }
     }

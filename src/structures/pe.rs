@@ -6,30 +6,29 @@ pub struct PEHeader {
 }
 
 pub fn parse_pe_header(pe_data: &[u8]) -> Result<PEHeader, structures::common::StructureError> {
-
     const PE_MAGIC: usize = 0x00004550;
 
     let dos_structure = vec![
-        ("e_magic", "u16"),     // "MZ"
-        ("e_cblp", "u16"),      // Bytes on last page of file
-        ("e_cp", "u16"),        // Pages in file
-        ("e_crlc", "u16"),      // Relocations
-        ("e_cparhdr", "u16"),   // Header size, in paragraphs
-        ("e_minalloc", "u16"),  // Min extra paragraphs needed
-        ("e_maxalloc", "u16"),  // Max extra paragraphs needed
-        ("e_ss", "u16"),        // Initial relative SS value
-        ("e_sp", "u16"),        // Initial SP value
-        ("e_csum", "u16"),      // Checksum
-        ("e_ip", "u16"),        // Initial IP value
-        ("e_cs", "u16"),        // Initial relative CS value
-        ("e_lfarlc", "u16"),    // File address of relocation table
-        ("e_ovno", "u16"),      // Overlay number
+        ("e_magic", "u16"),    // "MZ"
+        ("e_cblp", "u16"),     // Bytes on last page of file
+        ("e_cp", "u16"),       // Pages in file
+        ("e_crlc", "u16"),     // Relocations
+        ("e_cparhdr", "u16"),  // Header size, in paragraphs
+        ("e_minalloc", "u16"), // Min extra paragraphs needed
+        ("e_maxalloc", "u16"), // Max extra paragraphs needed
+        ("e_ss", "u16"),       // Initial relative SS value
+        ("e_sp", "u16"),       // Initial SP value
+        ("e_csum", "u16"),     // Checksum
+        ("e_ip", "u16"),       // Initial IP value
+        ("e_cs", "u16"),       // Initial relative CS value
+        ("e_lfarlc", "u16"),   // File address of relocation table
+        ("e_ovno", "u16"),     // Overlay number
         ("e_res_1", "u16"),
         ("e_res_2", "u16"),
         ("e_res_3", "u16"),
         ("e_res_4", "u16"),
-        ("e_oemid", "u16"),     // OEM identifier
-        ("e_oeminfo", "u16"),   // OEM specific information
+        ("e_oemid", "u16"),   // OEM identifier
+        ("e_oeminfo", "u16"), // OEM specific information
         ("e_res_5", "u16"),
         ("e_res_6", "u16"),
         ("e_res_7", "u16"),
@@ -40,7 +39,7 @@ pub fn parse_pe_header(pe_data: &[u8]) -> Result<PEHeader, structures::common::S
         ("e_res_12", "u16"),
         ("e_res_13", "u16"),
         ("e_res_14", "u16"),
-        ("e_lfanew", "u32"),    // Offset to the PE header
+        ("e_lfanew", "u32"), // Offset to the PE header
     ];
 
     let pe_structure = vec![
@@ -96,24 +95,28 @@ pub fn parse_pe_header(pe_data: &[u8]) -> Result<PEHeader, structures::common::S
     // Sanity check the size of available data
     if pe_data.len() > dos_header_end {
         // Parse the DOS header
-        let dos_header = structures::common::parse(&pe_data[dos_header_start..dos_header_end], &dos_structure, "little");
+        let dos_header = structures::common::parse(
+            &pe_data[dos_header_start..dos_header_end],
+            &dos_structure,
+            "little",
+        );
 
         // Sanity check the reserved header fields; they should all be 0
-        if dos_header["e_res_1"] == 0 &&
-           dos_header["e_res_2"] == 0 &&
-           dos_header["e_res_3"] == 0 &&
-           dos_header["e_res_4"] == 0 &&
-           dos_header["e_res_5"] == 0 &&
-           dos_header["e_res_6"] == 0 &&
-           dos_header["e_res_7"] == 0 &&
-           dos_header["e_res_8"] == 0 &&
-           dos_header["e_res_9"] == 0 &&
-           dos_header["e_res_10"] == 0 &&
-           dos_header["e_res_11"] == 0 &&
-           dos_header["e_res_12"] == 0 &&
-           dos_header["e_res_13"] == 0 &&
-           dos_header["e_res_14"] == 0 {
-
+        if dos_header["e_res_1"] == 0
+            && dos_header["e_res_2"] == 0
+            && dos_header["e_res_3"] == 0
+            && dos_header["e_res_4"] == 0
+            && dos_header["e_res_5"] == 0
+            && dos_header["e_res_6"] == 0
+            && dos_header["e_res_7"] == 0
+            && dos_header["e_res_8"] == 0
+            && dos_header["e_res_9"] == 0
+            && dos_header["e_res_10"] == 0
+            && dos_header["e_res_11"] == 0
+            && dos_header["e_res_12"] == 0
+            && dos_header["e_res_13"] == 0
+            && dos_header["e_res_14"] == 0
+        {
             // Start and end offsets of the PE header
             let pe_header_start: usize = dos_header["e_lfanew"];
             let pe_header_end: usize = pe_header_start + pe_header_size;
@@ -121,7 +124,11 @@ pub fn parse_pe_header(pe_data: &[u8]) -> Result<PEHeader, structures::common::S
             // Sanity check the PE header offsets
             if pe_header_start > dos_header_end && pe_data.len() > pe_header_end {
                 // Parse the second part of the header
-                let pe_header = structures::common::parse(&pe_data[pe_header_start..pe_header_end], &pe_structure, "little");
+                let pe_header = structures::common::parse(
+                    &pe_data[pe_header_start..pe_header_end],
+                    &pe_structure,
+                    "little",
+                );
 
                 // Check the PE magic bytes
                 if pe_header["magic"] == PE_MAGIC {

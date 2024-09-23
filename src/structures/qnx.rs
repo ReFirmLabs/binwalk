@@ -34,13 +34,20 @@ pub fn parse_ifs_header(ifs_data: &[u8]) -> Result<IFSHeader, structures::common
     // Sanity check the size of available data
     if ifs_data.len() >= IFS_HEADER_SIZE {
         // Parse the IFS header
-        let ifs_header = structures::common::parse(&ifs_data[0..IFS_HEADER_SIZE], &ifs_structure, "little");
+        let ifs_header =
+            structures::common::parse(&ifs_data[0..IFS_HEADER_SIZE], &ifs_structure, "little");
 
         // The flags2 field is unused and should be 0
         if ifs_header["flags2"] == 0 {
             // Verify that all the zero fields are, in fact, zero
-            if ifs_header["zero_0"] == 0 && ifs_header["zero_1"] == 0 && ifs_header["zero_2"] == 0 && ifs_header["zero_3"] == 0 {
-                return Ok(IFSHeader { total_size: ifs_header["stored_size"] });
+            if ifs_header["zero_0"] == 0
+                && ifs_header["zero_1"] == 0
+                && ifs_header["zero_2"] == 0
+                && ifs_header["zero_3"] == 0
+            {
+                return Ok(IFSHeader {
+                    total_size: ifs_header["stored_size"],
+                });
             }
         }
     }

@@ -4,22 +4,22 @@ use crate::structures::cpio;
 pub const DESCRIPTION: &str = "CPIO ASCII archive";
 
 pub fn cpio_magic() -> Vec<Vec<u8>> {
-    return vec![
-        b"070701".to_vec(),
-        b"070702".to_vec(),
-    ];
+    return vec![b"070701".to_vec(), b"070702".to_vec()];
 }
 
-pub fn cpio_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+pub fn cpio_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     const EOF_MARKER: &str = "TRAILER!!!";
 
     let mut header_count: usize = 0;
     let mut result = signatures::common::SignatureResult {
-                                            description: DESCRIPTION.to_string(),
-                                            offset: offset,
-                                            size: 0,
-                                            confidence: signatures::common::CONFIDENCE_HIGH,
-                                            ..Default::default()
+        description: DESCRIPTION.to_string(),
+        offset: offset,
+        size: 0,
+        confidence: signatures::common::CONFIDENCE_HIGH,
+        ..Default::default()
     };
 
     // Loop while there is still the possibility of having a CPIO header
@@ -39,12 +39,13 @@ pub fn cpio_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::com
 
             // Update the total size of the CPIO file to include this header and its data
             result.size += cpio_header.header_size + cpio_header.data_size;
-        
+
             // If EOF marker has been found, we're done
             if cpio_header.file_name == EOF_MARKER {
                 // We should have processed more than just an EOF entry!
                 if header_count > 1 {
-                    result.description = format!("{}, file count: {}", result.description, header_count - 1);
+                    result.description =
+                        format!("{}, file count: {}", result.description, header_count - 1);
                     return Ok(result);
                 } else {
                     break;

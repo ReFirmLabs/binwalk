@@ -31,28 +31,38 @@ pub fn parse_iso_header(iso_data: &[u8]) -> Result<ISOHeader, structures::common
         ("path_table_size_msb", "u32"),
     ];
 
-    let mut iso_info = ISOHeader { ..Default::default() };
+    let mut iso_info = ISOHeader {
+        ..Default::default()
+    };
 
     if iso_data.len() >= ISO_STRUCT_END {
-        let iso_header = structures::common::parse(&iso_data[ISO_STRUCT_START..ISO_STRUCT_END], &iso_structure, "little");
+        let iso_header = structures::common::parse(
+            &iso_data[ISO_STRUCT_START..ISO_STRUCT_END],
+            &iso_structure,
+            "little",
+        );
 
         // Make sure all the unused fields are, in fact, unused
-        if iso_header["unused1"] == 0 &&
-           iso_header["unused2"] == 0 &&
-           iso_header["unused3"] == 0 &&
-           iso_header["unused4"] == 0 &&
-           iso_header["unused5"] == 0 {
-
+        if iso_header["unused1"] == 0
+            && iso_header["unused2"] == 0
+            && iso_header["unused3"] == 0
+            && iso_header["unused4"] == 0
+            && iso_header["unused5"] == 0
+        {
             /*
              * Make sure all the identical, but byte-swapped, fields agree.
              * NOTE: The to_be() as usizeas usizeconversions probably won't work on big-endian systems.
              */
-            if iso_header["set_size_lsb"] == (iso_header["set_size_msb"] as u16).to_be() as usize &&
-               iso_header["block_size_lsb"] == (iso_header["block_size_msb"] as u16).to_be() as usize &&
-               iso_header["volume_size_lsb"] == (iso_header["volume_size_msb"] as u32).to_be() as usize &&
-               iso_header["sequence_number_lsb"] == (iso_header["sequence_number_msb"] as u16).to_be() as usize &&
-               iso_header["path_table_size_lsb"] == (iso_header["path_table_size_msb"] as u32).to_be() as usize {
-                
+            if iso_header["set_size_lsb"] == (iso_header["set_size_msb"] as u16).to_be() as usize
+                && iso_header["block_size_lsb"]
+                    == (iso_header["block_size_msb"] as u16).to_be() as usize
+                && iso_header["volume_size_lsb"]
+                    == (iso_header["volume_size_msb"] as u32).to_be() as usize
+                && iso_header["sequence_number_lsb"]
+                    == (iso_header["sequence_number_msb"] as u16).to_be() as usize
+                && iso_header["path_table_size_lsb"]
+                    == (iso_header["path_table_size_msb"] as u32).to_be() as usize
+            {
                 iso_info.image_size = iso_header["volume_size_lsb"] * iso_header["block_size_lsb"];
                 return Ok(iso_info);
             }

@@ -1,23 +1,23 @@
-use std::time;
+use log::{debug, error};
+use std::collections::VecDeque;
 use std::panic;
-use std::thread;
 use std::process;
 use std::sync::mpsc;
-use log::{debug, error};
+use std::thread;
+use std::time;
 use threadpool::ThreadPool;
-use std::collections::VecDeque;
 
-mod json;
-mod magic;
-mod common;
-mod worker;
 mod binwalk;
+mod cliparser;
+mod common;
 mod display;
 mod entropy;
-mod cliparser;
 mod extractors;
+mod json;
+mod magic;
 mod signatures;
 mod structures;
+mod worker;
 
 fn main() {
     // Only use one thread if unable to auto-detect available core info
@@ -32,14 +32,14 @@ fn main() {
 
     // Boolean flag to indicate if a result should be displayed to screen or not
     let mut display_results: bool;
-    
+
     // Queue of files to be analyzed
     let mut target_files = VecDeque::new();
 
     // Thread pool related variables
     let mut pending_jobs = 0;
     let mut available_workers = DEFAULT_WORKER_COUNT;
-    
+
     // Initialize logging
     env_logger::init();
 
@@ -56,23 +56,32 @@ fn main() {
     match cliargs.file_name {
         None => {
             panic!("No target file name specified! Try --help.");
-        },
+        }
         Some(file_name) => {
             // Initialize binwalk
-            match binwalk::init(&file_name, &cliargs.directory, cliargs.extract, cliargs.include, cliargs.exclude) {
+            match binwalk::init(
+                &file_name,
+                &cliargs.directory,
+                cliargs.extract,
+                cliargs.include,
+                cliargs.exclude,
+            ) {
                 Err(_e) => panic!("Binwalk initialization failed"),
                 Ok(config) => bwconfig = config,
             }
-        },
+        }
     }
 
     // If entropy analysis was requested, generate the entropy graph and return
     if cliargs.entropy == true {
         display::print_plain(cliargs.quiet, "Calculating file entropy...");
-        
+
         if let Ok(entropy_results) = entropy::plot(&bwconfig.base_target_file) {
             // Log entropy results to JSON file, if requested
-            json::log(&cliargs.log, json::JSONType::Entropy(entropy_results.clone()));
+            json::log(
+                &cliargs.log,
+                json::JSONType::Entropy(entropy_results.clone()),
+            );
 
             display::print_plain(cliargs.quiet, "entropy graph saved to: ");
             display::println_plain(cliargs.quiet, &entropy_results.file);
@@ -87,23 +96,26 @@ fn main() {
     match cliargs.threads {
         Some(threads) => {
             available_workers = threads;
-        },
+        }
         None => {
             // Get CPU core info
             match thread::available_parallelism() {
                 Err(e) => error!("Failed to retrieve CPU core info: {}", e),
                 Ok(coreinfo) => available_workers = coreinfo.get(),
             }
-        },
+        }
     }
-    
+
     // Sanity check the number of available worker threads
     if available_workers < 1 {
         panic!("No available worker threads!");
     }
 
     // Initialize thread pool
-    debug!("Initializing thread pool with {} workers", available_workers);
+    debug!(
+        "Initializing thread pool with {} workers",
+        available_workers
+    );
     let workers = ThreadPool::new(available_workers);
     let (worker_tx, worker_rx) = mpsc::channel();
 
@@ -127,12 +139,12 @@ fn main() {
      * Loop until all pending thread jobs are complete and there are no more files in the queue.
      */
     while target_files.is_empty() == false || pending_jobs > 0 {
-
         // If there are files in the queue and there is at least one worker not doing anything
         if target_files.is_empty() == false && pending_jobs < available_workers {
-
             // Get the next file in the list
-            let target_file = target_files.pop_front().expect("Failed to retrieve the name of the next file to scan");
+            let target_file = target_files
+                .pop_front()
+                .expect("Failed to retrieve the name of the next file to scan");
 
             // Clone the transmit channel so the worker thread can send response data back to this main thread
             let worker_tx = worker_tx.clone();
@@ -146,7 +158,10 @@ fn main() {
                 let results = worker::analyze(&binwalk_config, &target_file, cliargs.extract);
                 // Report file results back to main thread
                 if let Err(e) = worker_tx.send(results) {
-                    panic!("Worker thread for {} failed to send results back to main thread: {}", target_file, e);
+                    panic!(
+                        "Worker thread for {} failed to send results back to main thread: {}",
+                        target_file, e
+                    );
                 }
             });
             /* End of worker thread code */
@@ -211,7 +226,9 @@ fn main() {
                 if cliargs.matryoshka {
                     for (_signature_id, extraction_result) in results.extractions.into_iter() {
                         if extraction_result.do_not_recurse == false {
-                            for file_path in extractors::common::get_extracted_files(&extraction_result.output_directory) {
+                            for file_path in extractors::common::get_extracted_files(
+                                &extraction_result.output_directory,
+                            ) {
                                 debug!("Queuing {} for analysis", file_path);
                                 target_files.insert(target_files.len(), file_path.clone());
                             }
@@ -223,5 +240,11 @@ fn main() {
     }
 
     // All done, show some basic statistics
-    display::print_stats(cliargs.quiet, run_time, file_count, bwconfig.signature_count, bwconfig.patterns.len());
+    display::print_stats(
+        cliargs.quiet,
+        run_time,
+        file_count,
+        bwconfig.signature_count,
+        bwconfig.patterns.len(),
+    );
 }

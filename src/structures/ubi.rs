@@ -1,5 +1,5 @@
-use crate::structures;
 use crate::common::crc32;
+use crate::structures;
 
 #[derive(Debug, Default, Clone)]
 pub struct UbiSuperBlockHeader {
@@ -7,13 +7,15 @@ pub struct UbiSuperBlockHeader {
     pub leb_count: usize,
 }
 
-pub fn parse_ubi_superblock_header(ubi_data: &[u8]) -> Result<UbiSuperBlockHeader, structures::common::StructureError> {
+pub fn parse_ubi_superblock_header(
+    ubi_data: &[u8],
+) -> Result<UbiSuperBlockHeader, structures::common::StructureError> {
     const MAX_GROUP_TYPE: usize = 2;
     const CRC_START_OFFSET: usize = 8;
     const SUPERBLOCK_NODE_TYPE: usize = 6;
 
     // There are some other fields in the superblock header that we don't parse because we don't really care about them...
-    const SUPERBLOCK_STRUCTURE_EXTRA_SIZE: usize  = 3968;
+    const SUPERBLOCK_STRUCTURE_EXTRA_SIZE: usize = 3968;
 
     let ubi_sb_structure = vec![
         ("magic", "u32"),
@@ -49,7 +51,8 @@ pub fn parse_ubi_superblock_header(ubi_data: &[u8]) -> Result<UbiSuperBlockHeade
         ("ro_compat_version", "u32"),
     ];
 
-    let sb_struct_size: usize = structures::common::size(&ubi_sb_structure) + SUPERBLOCK_STRUCTURE_EXTRA_SIZE;
+    let sb_struct_size: usize =
+        structures::common::size(&ubi_sb_structure) + SUPERBLOCK_STRUCTURE_EXTRA_SIZE;
 
     // Sanity check the size of available data
     if ubi_data.len() >= sb_struct_size {
@@ -57,15 +60,14 @@ pub fn parse_ubi_superblock_header(ubi_data: &[u8]) -> Result<UbiSuperBlockHeade
 
         // Make sure the padding fields are NULL
         if sb_header["padding1"] == 0 && sb_header["padding2"] == 0 {
-
             // Make sure the node type is SUPERBLOCK
             if sb_header["node_type"] == SUPERBLOCK_NODE_TYPE {
-
                 // Make sure the group type is valid
                 if sb_header["group_type"] <= MAX_GROUP_TYPE {
-
                     // Validate the header CRC, which is calculated over the entire header except for the magic bytes and CRC field
-                    if ubi_crc(&ubi_data[CRC_START_OFFSET..sb_struct_size]) == sb_header["header_crc"] {
+                    if ubi_crc(&ubi_data[CRC_START_OFFSET..sb_struct_size])
+                        == sb_header["header_crc"]
+                    {
                         return Ok(UbiSuperBlockHeader {
                             leb_size: sb_header["leb_size"],
                             leb_count: sb_header["leb_count"],
@@ -86,8 +88,9 @@ pub struct UbiECHeader {
     pub volume_id_offset: usize,
 }
 
-pub fn parse_ubi_ec_header(ubi_data: &[u8]) -> Result<UbiECHeader, structures::common::StructureError> {
-
+pub fn parse_ubi_ec_header(
+    ubi_data: &[u8],
+) -> Result<UbiECHeader, structures::common::StructureError> {
     let ubi_ec_structure = vec![
         ("magic", "u32"),
         ("version", "u8"),
@@ -108,21 +111,20 @@ pub fn parse_ubi_ec_header(ubi_data: &[u8]) -> Result<UbiECHeader, structures::c
 
     // Sanity check the size of available data
     if ubi_data.len() > ec_header_size {
-
         // Parse the first half of the header
         let ubi_ec_header = structures::common::parse(&ubi_data, &ubi_ec_structure, "big");
 
         // Padding fields must be NULL
-        if ubi_ec_header["padding1"] == 0 &&
-           ubi_ec_header["padding2"] == 0 &&
-           ubi_ec_header["padding3"] == 0 &&
-           ubi_ec_header["padding4"] == 0 &&
-           ubi_ec_header["padding5"] == 0 {
-
+        if ubi_ec_header["padding1"] == 0
+            && ubi_ec_header["padding2"] == 0
+            && ubi_ec_header["padding3"] == 0
+            && ubi_ec_header["padding4"] == 0
+            && ubi_ec_header["padding5"] == 0
+        {
             // Offsets should be beyond the EC header
-            if ubi_ec_header["data_offset"] >= ec_header_size &&
-               ubi_ec_header["volume_id_header_offset"] >= ec_header_size {
-    
+            if ubi_ec_header["data_offset"] >= ec_header_size
+                && ubi_ec_header["volume_id_header_offset"] >= ec_header_size
+            {
                 // Validate the header CRC
                 if ubi_crc(&ubi_data[0..crc_data_size]) == ubi_ec_header["header_crc"] {
                     return Ok(UbiECHeader {
@@ -142,7 +144,9 @@ pub fn parse_ubi_ec_header(ubi_data: &[u8]) -> Result<UbiECHeader, structures::c
 #[derive(Debug, Default, Clone)]
 pub struct UbiVolumeHeader;
 
-pub fn parse_ubi_volume_header(ubi_data: &[u8]) -> Result<UbiVolumeHeader, structures::common::StructureError> {
+pub fn parse_ubi_volume_header(
+    ubi_data: &[u8],
+) -> Result<UbiVolumeHeader, structures::common::StructureError> {
     let ubi_vol_structure = vec![
         ("magic", "u32"),
         ("version", "u8"),
@@ -168,16 +172,15 @@ pub fn parse_ubi_volume_header(ubi_data: &[u8]) -> Result<UbiVolumeHeader, struc
 
     // Sanity check size of available data
     if ubi_data.len() > vol_header_size {
-
         // Parse the volume header
         let ubi_vol_header = structures::common::parse(&ubi_data, &ubi_vol_structure, "big");
 
         // Sanity check padding fields, they should all be null
-        if ubi_vol_header["padding1"] == 0 &&
-           ubi_vol_header["padding2"] == 0 &&
-           ubi_vol_header["padding3"] == 0 &&
-           ubi_vol_header["padding4"] == 0 {
-
+        if ubi_vol_header["padding1"] == 0
+            && ubi_vol_header["padding2"] == 0
+            && ubi_vol_header["padding3"] == 0
+            && ubi_vol_header["padding4"] == 0
+        {
             // Validate the header CRC
             if ubi_crc(&ubi_data[0..crc_data_size]) == ubi_vol_header["header_crc"] {
                 return Ok(UbiVolumeHeader);

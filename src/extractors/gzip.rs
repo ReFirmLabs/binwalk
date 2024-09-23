@@ -1,14 +1,20 @@
+use crate::extractors::common::{ExtractionResult, Extractor, ExtractorType};
 use crate::extractors::inflate;
 use crate::structures::gzip::parse_gzip_header;
-use crate::extractors::common::{ Extractor, ExtractorType, ExtractionResult };
 
 // Defines the internal extractor function for decompressing gzip data
 pub fn gzip_extractor() -> Extractor {
-    return Extractor { utility: ExtractorType::Internal(gzip_decompress), ..Default::default() };
+    return Extractor {
+        utility: ExtractorType::Internal(gzip_decompress),
+        ..Default::default()
+    };
 }
 
-pub fn gzip_decompress(file_data: &Vec<u8>, offset: usize, output_directory: Option<&String>) -> ExtractionResult {
-
+pub fn gzip_decompress(
+    file_data: &Vec<u8>,
+    offset: usize,
+    output_directory: Option<&String>,
+) -> ExtractionResult {
     // Parse the gzip header
     if let Ok(gzip_header) = parse_gzip_header(&file_data[offset..]) {
         // Deflate compressed data starts at the end of the gzip header
@@ -20,5 +26,7 @@ pub fn gzip_decompress(file_data: &Vec<u8>, offset: usize, output_directory: Opt
     }
 
     // Return failure
-    return ExtractionResult { ..Default::default() };
+    return ExtractionResult {
+        ..Default::default()
+    };
 }

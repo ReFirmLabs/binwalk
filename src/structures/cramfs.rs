@@ -8,16 +8,15 @@ pub struct CramFSHeader {
     pub endianness: String,
 }
 
-pub fn parse_cramfs_header(cramfs_data: &[u8]) -> Result<CramFSHeader, structures::common::StructureError> {
+pub fn parse_cramfs_header(
+    cramfs_data: &[u8],
+) -> Result<CramFSHeader, structures::common::StructureError> {
     const HEADER_SIZE: usize = 48;
-    
+
     const BIG_ENDIAN_MAGIC: usize = 0x453DCD28;
     const LITTLE_ENDIAN_MAGIC: usize = 0x28CD3D45;
 
-    let allowed_magics: Vec<usize> = vec![
-        BIG_ENDIAN_MAGIC,
-        LITTLE_ENDIAN_MAGIC,
-    ];
+    let allowed_magics: Vec<usize> = vec![BIG_ENDIAN_MAGIC, LITTLE_ENDIAN_MAGIC];
 
     let cramfs_header_structure = vec![
         ("magic", "u32"),
@@ -32,7 +31,9 @@ pub fn parse_cramfs_header(cramfs_data: &[u8]) -> Result<CramFSHeader, structure
         ("file_count", "u32"),
     ];
 
-    let mut cramfs_info = CramFSHeader { ..Default::default() };
+    let mut cramfs_info = CramFSHeader {
+        ..Default::default()
+    };
 
     // Default to little endian
     cramfs_info.endianness = "little".to_string();
@@ -40,14 +41,22 @@ pub fn parse_cramfs_header(cramfs_data: &[u8]) -> Result<CramFSHeader, structure
     // Sanity check the size available data
     if cramfs_data.len() > HEADER_SIZE {
         // Parse the CramFS header, try little endian first
-        let mut cramfs_header = structures::common::parse(&cramfs_data[0..HEADER_SIZE], &cramfs_header_structure, &cramfs_info.endianness);
-            
+        let mut cramfs_header = structures::common::parse(
+            &cramfs_data[0..HEADER_SIZE],
+            &cramfs_header_structure,
+            &cramfs_info.endianness,
+        );
+
         // Do the magic bytes match?
         if allowed_magics.contains(&cramfs_header["magic"]) {
             // If the magic bytes endianness don't match what's expected for little endian, switch to big endian
             if cramfs_header["magic"] == BIG_ENDIAN_MAGIC {
                 cramfs_info.endianness = "big".to_string();
-                cramfs_header = structures::common::parse(&cramfs_data[0..HEADER_SIZE], &cramfs_header_structure, &cramfs_info.endianness);
+                cramfs_header = structures::common::parse(
+                    &cramfs_data[0..HEADER_SIZE],
+                    &cramfs_header_structure,
+                    &cramfs_info.endianness,
+                );
             }
 
             // Populate info about the CramFS image

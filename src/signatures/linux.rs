@@ -11,16 +11,19 @@ pub fn linux_kernel_version_magic() -> Vec<Vec<u8>> {
     return vec![b"Linux\x20version\x20".to_vec()];
 }
 
-pub fn linux_boot_image_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+pub fn linux_boot_image_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     // There should be the string "!HdrS" 514 bytes from the start of the magic signature
     const HDRS_OFFSET: usize = 514;
     const HDRS_EXPECTED_VALUE: &str = "!HdrS";
 
     let result = signatures::common::SignatureResult {
-                                            description: LINUX_BOOT_IMAGE_DESCRIPTION.to_string(),
-                                            offset: offset,
-                                            size: 0,
-                                            ..Default::default()
+        description: LINUX_BOOT_IMAGE_DESCRIPTION.to_string(),
+        offset: offset,
+        size: 0,
+        ..Default::default()
     };
 
     // Sanity check the size of available data
@@ -41,29 +44,36 @@ pub fn linux_boot_image_parser(file_data: &Vec<u8>, offset: usize) -> Result<sig
     return Err(signatures::common::SignatureError);
 }
 
-pub fn linux_kernel_version_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+pub fn linux_kernel_version_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     // Kernel version string format is expected to be something like: "2.6.36"
-    const KERNEL_VERSION_STRING_START: usize= 14;
+    const KERNEL_VERSION_STRING_START: usize = 14;
     const KERNEL_VERSION_STRING_END: usize = 20;
     const PERIOD: u8 = 0x2E;
     const PERIOD_OFFSET_1: usize = 1;
     const PERIOD_OFFSET_2: usize = 3;
 
     let mut result = signatures::common::SignatureResult {
-                                            description: LINUX_KERNEL_VERSION_DESCRIPTION.to_string(),
-                                            offset: offset,
-                                            size: 0,
-                                            ..Default::default()
+        description: LINUX_KERNEL_VERSION_DESCRIPTION.to_string(),
+        offset: offset,
+        size: 0,
+        ..Default::default()
     };
 
     // Sanity check the size of available data
     if file_data.len() >= (offset + KERNEL_VERSION_STRING_END) {
         // Pull out the raw bytes that should be the Linux kernel version string
-        let kernel_version_string_bytes = file_data[offset+KERNEL_VERSION_STRING_START..offset+KERNEL_VERSION_STRING_END].to_vec();
+        let kernel_version_string_bytes = file_data
+            [offset + KERNEL_VERSION_STRING_START..offset + KERNEL_VERSION_STRING_END]
+            .to_vec();
 
         // Convert the version string bytes into a string and do some sanity checking
         if let Ok(kernel_version_string) = String::from_utf8(kernel_version_string_bytes.clone()) {
-            if kernel_version_string_bytes[PERIOD_OFFSET_1] == PERIOD && kernel_version_string_bytes[PERIOD_OFFSET_2] == PERIOD {
+            if kernel_version_string_bytes[PERIOD_OFFSET_1] == PERIOD
+                && kernel_version_string_bytes[PERIOD_OFFSET_2] == PERIOD
+            {
                 result.description = format!("{} {}", result.description, kernel_version_string);
                 return Ok(result);
             }

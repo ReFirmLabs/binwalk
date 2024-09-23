@@ -1,8 +1,8 @@
+use chrono::prelude::DateTime;
 use crc32_v2;
+use log::{debug, error};
 use std::fs::File;
 use std::io::Read;
-use log::{ debug, error };
-use chrono::prelude::DateTime;
 
 /*
  * Read a file into memory and return its contents.
@@ -14,17 +14,15 @@ pub fn read_file(file_path: &String) -> Result<Vec<u8>, std::io::Error> {
         Err(e) => {
             error!("Failed to open file {}: {}", file_path, e);
             return Err(e);
-        },
-        Ok(mut fp) => {
-            match fp.read_to_end(&mut file_data) {
-                Err(e) => {
-                    error!("Failed to read file {} into memory: {}", file_path, e);
-                    return Err(e);
-                },
-                Ok(file_size) => {
-                    debug!("Loaded {} bytes from {}", file_size, file_path);
-                    return Ok(file_data);
-                },
+        }
+        Ok(mut fp) => match fp.read_to_end(&mut file_data) {
+            Err(e) => {
+                error!("Failed to read file {} into memory: {}", file_path, e);
+                return Err(e);
+            }
+            Ok(file_size) => {
+                debug!("Loaded {} bytes from {}", file_size, file_path);
+                return Ok(file_data);
             }
         },
     }
