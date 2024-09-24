@@ -250,7 +250,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
 
     // UEFI PI volume
     binary_signatures.push(signatures::common::Signature {
-        name: "ueif_pi_volume".to_string(),
+        name: "uefi_pi_volume".to_string(),
         short: false,
         magic_offset: 0,
         always_display: false,
