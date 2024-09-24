@@ -139,3 +139,7 @@
 
 # nop
 0 ulelong 0xd503201f AArch64 instructions, nop
+
+# Renesas rxv3 prologue
+0   regex   \x7e[\xa1-\xaf]\x71\x00[\x80-\xff] rxv3 instructions, function prologue (push.l, add)
+0   regex   \x6e[\x12-\xef]\x71\x00[\x80-\xff] rxv3 instructions, function prologue (pushm, add)
