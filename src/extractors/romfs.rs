@@ -195,8 +195,6 @@ fn extract_romfs_entries(
 
         if file_entry.directory {
             extraction_success = create_directory(&file_path);
-        } else if file_entry.symlink {
-            extraction_success = create_symlink(&file_path, &file_entry.symlink_target);
         } else if file_entry.regular {
             extraction_success =
                 create_file(&file_path, romfs_data, file_entry.offset, file_entry.size);
@@ -219,6 +217,19 @@ fn extract_romfs_entries(
             }
         } else {
             warn!("Failed to extract RomFS file {}", file_path);
+        }
+    }
+
+    // Do symlinks last
+    for file_entry in romfs_files {
+        if file_entry.symlink {
+            let symlink_path = safe_path_join(output_directory, &file_entry.name);
+
+            if create_symlink(&symlink_path, &file_entry.symlink_target) == true {
+                file_count += 1;
+            } else {
+                warn!("Failed to create RomFS symlink: {}", symlink_path);
+            }
         }
     }
 

@@ -129,20 +129,35 @@ pub fn safe_path_join(chroot_directory: &String, file_path: &String) -> String {
 pub fn create_file(file_path: &String, data: &[u8], start: usize, size: usize) -> bool {
     let end: usize = start + size;
 
-    if data.len() >= end {
-        match fs::write(file_path, data[start..end].to_vec()) {
-            Ok(_) => {
-                return true;
+    if path::Path::new(file_path).exists() == false {
+        if data.len() >= end {
+            match fs::write(file_path, data[start..end].to_vec()) {
+                Ok(_) => {
+                    return true;
+                }
+                Err(e) => {
+                    error!("Failed to write data to {}: {}", file_path, e);
+                }
             }
-            Err(e) => {
-                error!("Failed to write data to {}: {}", file_path, e);
-            }
+        } else {
+            error!(
+                "Failed to create file {}: offset/size provided exceeds available data",
+                file_path
+            );
         }
     } else {
-        error!(
-            "Failed to create file {}: offset/size provided exceeds available data",
-            file_path
-        );
+        error!("Failed to create file {}: path already exists", file_path);
+    }
+
+    return false;
+}
+
+/*
+ * Returns true if the file path is a symlink.
+ */
+pub fn is_symlink(file_path: &String) -> bool {
+    if let Ok(metadata) = fs::symlink_metadata(file_path) {
+        return metadata.file_type().is_symlink();
     }
 
     return false;
@@ -152,22 +167,26 @@ pub fn create_file(file_path: &String, data: &[u8], start: usize, size: usize) -
  * Append the provided data to the specified file path.
  */
 pub fn append_to_file(file_path: &String, data: &[u8]) -> bool {
-    match fs::OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(file_path)
-    {
-        Err(e) => {
-            error!("Failed to open file '{}' for appending: {}", file_path, e);
-        }
-        Ok(mut fp) => match fp.write(data) {
+    if is_symlink(file_path) == false {
+        match fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(file_path)
+        {
             Err(e) => {
-                error!("Failed to append to file '{}': {}", file_path, e);
+                error!("Failed to open file '{}' for appending: {}", file_path, e);
             }
-            Ok(_) => {
-                return true;
-            }
-        },
+            Ok(mut fp) => match fp.write(data) {
+                Err(e) => {
+                    error!("Failed to append to file '{}': {}", file_path, e);
+                }
+                Ok(_) => {
+                    return true;
+                }
+            },
+        }
+    } else {
+        error!("Attempted to append data to a symlink: {}", file_path);
     }
 
     return false;
