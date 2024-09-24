@@ -28,6 +28,44 @@
 >8      uleshort    x                                                   exception vector table base address: 0x%.4X
 >12     uleshort    x                                                   \b%.4X
 
+# eCos vector table initialization handlers
+#
+# la	$v0,__default_exception_vsr
+# la	$v1, hal_vsr_table
+# sw	$v0, 0($v1)
+# sw	$v0, 1*4($v1)
+# sw	$v0, 2*4($v1)
+# sw	$v0, 3*4($v1)
+# sw	$v0, 4*4($v1)
+# sw	$v0, 5*4($v1)
+# sw	$v0, 6*4($v1)
+# sw	$v0, 7*4($v1)
+# sw	$v0, 8*4($v1)
+# sw	$v0, 9*4($v1)
+# sw	$v0, 10*4($v1)
+# ...
+
+2       uleshort    0x3C02                                              eCos vector table initialization handler, architecture: MIPSEL,
+>6      uleshort    !0x2442                                             {invalid}
+>10     uleshort    !0x3C03                                             {invalid}
+>14     uleshort    !0x2463                                             {invalid}
+>16     ulelong     !0xAC620004                                         {invalid}
+>20     ulelong     !0xAC620008                                         {invalid}
+>24     ulelong     !0xAC62000C                                         {invalid}
+>28     ulelong     !0xAC620010                                         {invalid}
+>32     ulelong     !0xAC620014                                         {invalid}
+>36     ulelong     !0xAC620018                                         {invalid}
+>40     ulelong     !0xAC62001C                                         {invalid}
+>44     ulelong     !0xAC620020                                         {invalid}
+>48     ulelong     !0xAC620024                                         {invalid}
+>52     ulelong     !0xAC620028                                         {invalid}
+>56     ulelong     !0xAC62002C                                         {invalid}
+>60     ulelong     !0xAC620030                                         {invalid}
+>0      uleshort    x                                                   default exception vector table base address: 0x%.4X
+>4      uleshort    x                                                   \b%.4X,
+>8      uleshort    x                                                   hal_vsr_table base address: 0x%.4X
+>12     uleshort    x                                                   \b%.4X
+
 0       string      \x40\x1A\x68\x00\x00\x00\x00\x00\x33\x5A\x00\x7F    eCos kernel exception handler, architecture: MIPS,
 >12     beshort     !0x3C1B                                             {invalid}
 >16     beshort     !0x277B                                             {invalid}
