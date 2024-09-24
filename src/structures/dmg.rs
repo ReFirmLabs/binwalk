@@ -3,8 +3,8 @@ use crate::structures;
 #[derive(Debug, Default, Clone)]
 pub struct DMGFooter {
     pub footer_size: usize,
-    pub data_offset: usize,
-    pub xml_offset: usize,
+    pub data_length: usize,
+    pub xml_length: usize,
 }
 
 pub fn parse_dmg_footer(dmg_data: &[u8]) -> Result<DMGFooter, structures::common::StructureError> {
@@ -125,8 +125,8 @@ pub fn parse_dmg_footer(dmg_data: &[u8]) -> Result<DMGFooter, structures::common
         // Sanity check, make sure the reported header size is the size of this structure
         if dmg_footer["header_size"] == structure_size {
             return Ok(DMGFooter {
-                data_offset: dmg_footer["data_fork_offset"],
-                xml_offset: dmg_footer["xml_offset"],
+                data_length: dmg_footer["data_fork_length"],
+                xml_length: dmg_footer["xml_length"],
                 footer_size: structure_size,
             });
         }

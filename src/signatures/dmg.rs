@@ -24,26 +24,27 @@ pub fn dmg_parser(
     // Parse the DMG footer
     if let Ok(dmg_footer) = parse_dmg_footer(&file_data[offset..]) {
         /*
-        * According to internet lore, DMG files have the following layout:
-        *
-        *      [ image data ]  [ xml data ]  [ footer ]
-        *
-        * We can only signature reliably on the footer, which does contain the offsets and sizes of the image data and xml data.
-        * In theory, this would allow us to calculate the starting offset, and size, of the DMG image.
-        *
-        * In practice, there is, more often than not, additional data between the XML and the footer. This extra data appears to
-        * be related to signing certificates and is variable in length, making the above theoretical calculations of the DMG offset
-        * and size invalid.
-        *
-        * Until a better way can be found, this signature only works for DMG images whose starting file offset is 0. This is the most
-        * common case, and means that the DMG size is just the offset of the footer (identified by the footer magic bytes), plus the
-        * footer size, which is reliable.
+         * DMG files have the following layout:
+         *
+         *      [ image data ]  [ xml data ]  [ footer ]
+         *
+         * We can only signature reliably on the footer, which does contain the offsets and sizes of the image data and xml data.
+         * In theory, this would allow us to calculate the starting offset, and size, of the DMG image.
+         *
+         * In practice, signed DMG files have additional data between the XML and the footer. This extra data appears to
+         * be related to signing certificates and is variable in length, making the above theoretical calculations of the DMG offset
+         * and size invalid.
+         *
+         * The current extractor (7z) cannot handle these signed DMGs anyway, and the beginning of the DMG is often compressed.
+         * So while the DMG will not be matched, the compressed data will, and at least something gets extracted.
+         *
+         * Non-signed DMGs should be identified and extracted correctly.
+         */
 
-        * This also means that DMGs embedded inside other files will not be identified. :(
-        */
-        if dmg_footer.data_offset == 0 {
-            // Calculate the start and end offset of the XML tag, based on the XML offset provided in the DMG footer
-            let start_xml_signature: usize = dmg_footer.xml_offset;
+        // Make sure the length of image data and length of XML data are sane
+        if (dmg_footer.data_length + dmg_footer.xml_length) <= offset {
+            // Calculate the start and end offset of the XML tag, based on the XML data length provided in the DMG footer
+            let start_xml_signature: usize = offset - dmg_footer.xml_length;
             let end_xml_signature: usize = start_xml_signature + XML_SIGNATURE.len();
 
             // Sanity check that this XML data falls inside the file data
@@ -55,8 +56,9 @@ pub fn dmg_parser(
                     // XML tag should start with "<?xml"
                     if xml_signature == XML_SIGNATURE {
                         // Report the result
-                        result.size = offset + dmg_footer.footer_size;
-                        result.offset = dmg_footer.data_offset;
+                        result.size =
+                            dmg_footer.data_length + dmg_footer.xml_length + dmg_footer.footer_size;
+                        result.offset = offset - (dmg_footer.data_length + dmg_footer.xml_length);
                         result.description =
                             format!("{}, total size: {} bytes", result.description, result.size);
                         return Ok(result);

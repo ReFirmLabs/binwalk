@@ -11,7 +11,6 @@ pub fn riff_parser(
     file_data: &Vec<u8>,
     offset: usize,
 ) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-
     let mut result = signatures::common::SignatureResult {
         offset: offset,
         description: DESCRIPTION.to_string(),
@@ -20,7 +19,6 @@ pub fn riff_parser(
     };
 
     if let Ok(riff_header) = parse_riff_header(&file_data[offset..]) {
-
         // No sense in extracting an image if the entire file is just the image itself
         if offset == 0 && riff_header.size == file_data.len() {
             result.extraction_declined = true;
