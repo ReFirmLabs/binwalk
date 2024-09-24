@@ -7,6 +7,7 @@ const MIN_NUMBER_OF_OBJS: usize = 2;
 pub const DESCRIPTION: &str = "YAFFS filesystem";
 
 pub fn yaffs_magic() -> Vec<Vec<u8>> {
+    // YAFFS v1 always starts with an empty directory entry
     return vec![
         b"\x03\x00\x00\x00\x01\x00\x00\x00\xFF\xFF\x00\x00".to_vec(),
         b"\x00\x00\x00\x03\x00\x00\x00\x01\xFF\xFF\x00\x00".to_vec(),
@@ -18,7 +19,7 @@ pub fn yaffs_parser(
     offset: usize,
 ) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
     const MAX_OBJ_SIZE: usize = 16896;
-    const LITTLE_ENDIAN_FIRST_BYTE: u8 = 3;
+    const BIG_ENDIAN_FIRST_BYTE: u8 = 0;
 
     let mut result = signatures::common::SignatureResult {
         description: DESCRIPTION.to_string(),
@@ -28,13 +29,13 @@ pub fn yaffs_parser(
         ..Default::default()
     };
 
-    let mut endianness = "big";
+    let mut endianness = "little";
 
     // Sanity check the amount of available data
     if file_data.len() >= (MAX_OBJ_SIZE * MIN_NUMBER_OF_OBJS) {
         // Detect endianness
-        if file_data[offset] == LITTLE_ENDIAN_FIRST_BYTE {
-            endianness = "little";
+        if file_data[offset] == BIG_ENDIAN_FIRST_BYTE {
+            endianness = "big";
         }
 
         if let Ok((page_size, spare_size)) = get_page_spare_size(&file_data[offset..], endianness) {
@@ -83,13 +84,16 @@ fn get_page_spare_size(
 
     // Try each "object size" value to determine the distance to the next object header
     for obj_size in obj_sizes {
-        /*
-         * Parse the candidate header, if it is valid then we know the page and spare data sizes.
-         * NOTE: Size of available file data is not sanity checked here, as yaffs_parser has already
-         *       guarunteed that there is enough data for more than one object.
-         */
-        if let Ok(_header) = parse_yaffs_obj_header(&file_data[obj_size..], endianness) {
-            return Ok(page_spare_lookup[&obj_size]);
+        // Sanity check available size
+        if obj_size < file_data.len() {
+            /*
+             * Parse the candidate header, if it is valid then we know the page and spare data sizes.
+             * NOTE: Size of available file data is not sanity checked here, as yaffs_parser has already
+             *       guarunteed that there is enough data for more than one object.
+             */
+            if let Ok(_header) = parse_yaffs_obj_header(&file_data[obj_size..], endianness) {
+                return Ok(page_spare_lookup[&obj_size]);
+            }
         }
     }
 
