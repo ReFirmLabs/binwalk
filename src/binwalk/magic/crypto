@@ -7,6 +7,7 @@
 0       string  -----BEGIN\x20RSA\x20PRIVATE        PEM RSA private key
 0       string  -----BEGIN\x20DSA\x20PRIVATE        PEM DSA private key
 0       string  -----BEGIN\x20EC\x20PRIVATE         PEM EC private key
+0       string  -----BEGIN\x20PRIVATE               PEM PKCS8 private key
 
 # Type: OpenSSH key files
 # From: Nicolas Collignon <tsointsoin@gmail.com>
