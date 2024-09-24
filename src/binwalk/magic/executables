@@ -487,3 +487,13 @@
 >>8     byte            !0x2F           {invalid}
 >3      string          x               shebang: "%s"
 
+# Microware OS-9/68000 module
+0       string   \x4a\xfc   Microware OS-9/68000 module, 
+>2      beshort  x          Revision: %d,
+>4      belong   x          Size: %d,
+>4      belong   x          {size:%d}
+>4      belong   x          {jump:%d}
+>8      beshort  x          Group ID: %d,
+>10     beshort  x          User ID: %d,
+>(12.L) string   x          Name: %s
+>(12.L) string   x          {name:%s}
