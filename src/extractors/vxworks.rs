@@ -1,5 +1,4 @@
-use crate::extractors::common::{create_file, safe_path_join};
-use crate::extractors::common::{ExtractionResult, Extractor, ExtractorType};
+use crate::extractors::common::{create_file, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::vxworks::{
     get_symtab_endianness, parse_symtab_entry, VxWorksSymbolTableEntry,
 };
@@ -22,7 +21,6 @@ pub fn extract_symbol_table(
     const OUTFILE_NAME: &str = "symtab.json";
 
     let dry_run: bool;
-    let output_file_path: String;
     let mut result = ExtractionResult {
         ..Default::default()
     };
@@ -32,13 +30,11 @@ pub fn extract_symbol_table(
 
     // Check if this is just a dry-run or a full extraction
     match output_directory {
-        Some(dir) => {
+        Some(_) => {
             dry_run = false;
-            output_file_path = safe_path_join(dir, &OUTFILE_NAME.to_string());
         }
         None => {
             dry_run = true;
-            output_file_path = "".to_string();
         }
     }
 
@@ -79,10 +75,11 @@ pub fn extract_symbol_table(
                 // Write JSON to file
                 Ok(symtab_json) => {
                     result.success = create_file(
-                        &output_file_path,
+                        &OUTFILE_NAME.to_string(),
                         &symtab_json.clone().into_bytes(),
                         0,
                         symtab_json.len(),
+                        output_directory.unwrap(),
                     );
                 }
             }

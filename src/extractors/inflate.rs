@@ -1,4 +1,4 @@
-use crate::extractors::common::{create_file, safe_path_join, ExtractionResult};
+use crate::extractors::common::{create_file, ExtractionResult};
 use miniz_oxide::inflate;
 
 /*
@@ -55,13 +55,12 @@ pub fn inflate_decompressor(
                 if dry_run == true {
                     result.success = true;
                 } else {
-                    let output_file_path =
-                        safe_path_join(&output_directory.unwrap(), &OUTPUT_FILE_NAME.to_string());
                     result.success = create_file(
-                        &output_file_path,
+                        &OUTPUT_FILE_NAME.to_string(),
                         &decompressed_data,
                         0,
                         decompressed_data.len(),
+                        &output_directory.unwrap(),
                     );
                 }
             }

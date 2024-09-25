@@ -1,5 +1,6 @@
 use crate::extractors::common::{
-    create_directory, create_file, create_symlink, make_executable, safe_path_join,
+    chrooted_path, create_block_device, create_character_device, create_directory, create_fifo,
+    create_file, create_socket, create_symlink, make_executable, safe_path_join,
 };
 use crate::extractors::common::{ExtractionError, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::romfs::{parse_romfs_file_entry, parse_romfs_header};
@@ -15,8 +16,14 @@ struct RomFSEntry {
     executable: bool,
     directory: bool,
     regular: bool,
+    block_device: bool,
+    character_device: bool,
+    fifo: bool,
+    socket: bool,
     symlink: bool,
     symlink_target: String,
+    device_major: usize,
+    device_minor: usize,
     children: Vec<RomFSEntry>,
 }
 
@@ -69,13 +76,25 @@ pub fn extract_romfs(
 
                 // Do extraction, if an output directory was provided
                 if do_extraction {
-                    // Extracted files will be placed in the specified output directory, under a sub-directory named after the RomFS volume
-                    let extraction_directory: String =
-                        safe_path_join(&output_directory.unwrap(), &romfs_header.volume_name);
+                    let mut file_count: usize = 0;
+                    let root_parent = "".to_string();
+                    let extraction_directory = output_directory.unwrap();
 
-                    // Do the extraction
-                    let file_count =
-                        extract_romfs_entries(romfs_data, &root_entries, &extraction_directory);
+                    // RomFS files will be extracted to a sub-directory under the specified
+                    // extraction directory whose name is the RomFS volume name.
+                    let romfs_chroot_dir =
+                        chrooted_path(&romfs_header.volume_name, &extraction_directory);
+
+                    // Create the romfs output directory, ensuring that it is contained inside the specified extraction directory
+                    if create_directory(&romfs_chroot_dir, extraction_directory) == true {
+                        // Extract RomFS contents
+                        file_count = extract_romfs_entries(
+                            romfs_data,
+                            &root_entries,
+                            &root_parent,
+                            &romfs_chroot_dir,
+                        );
+                    }
 
                     // If no files were extracted, extraction was a failure
                     if file_count == 0 {
@@ -129,6 +148,10 @@ fn process_romfs_entries(
             file_entry.directory = file_header.directory;
             file_entry.file_type = file_header.file_type;
             file_entry.executable = file_header.executable;
+            file_entry.block_device = file_header.block_device;
+            file_entry.character_device = file_header.character_device;
+            file_entry.fifo = file_header.fifo;
+            file_entry.socket = file_header.socket;
 
             // Make file_entry.offset an offset relative to the beginning of the RomFS image
             file_entry.offset = file_offset + file_header.data_offset;
@@ -154,6 +177,10 @@ fn process_romfs_entries(
                             file_entry.symlink_target = path.clone();
                         }
                     }
+                // Device files have their major/minor numbers encoded into the info field
+                } else if file_entry.block_device || file_entry.character_device {
+                    file_entry.device_minor = file_entry.info & 0xFFFF;
+                    file_entry.device_major = (file_entry.info >> 16) & 0xFFFF;
                 }
 
                 // Directories have children; process them
@@ -185,22 +212,48 @@ fn process_romfs_entries(
 fn extract_romfs_entries(
     romfs_data: &[u8],
     romfs_files: &Vec<RomFSEntry>,
-    output_directory: &String,
+    parent_directory: &String,
+    chroot_directory: &String,
 ) -> usize {
     let mut file_count: usize = 0;
 
     for file_entry in romfs_files {
         let extraction_success: bool;
-        let file_path = safe_path_join(output_directory, &file_entry.name);
+        let file_path = safe_path_join(parent_directory, &file_entry.name, chroot_directory);
 
         if file_entry.directory {
-            extraction_success = create_directory(&file_path);
+            extraction_success = create_directory(&file_path, chroot_directory);
         } else if file_entry.regular {
+            extraction_success = create_file(
+                &file_path,
+                romfs_data,
+                file_entry.offset,
+                file_entry.size,
+                chroot_directory,
+            );
+        } else if file_entry.symlink {
             extraction_success =
-                create_file(&file_path, romfs_data, file_entry.offset, file_entry.size);
+                create_symlink(&file_path, &file_entry.symlink_target, chroot_directory);
+        } else if file_entry.fifo {
+            extraction_success = create_fifo(&file_path, chroot_directory);
+        } else if file_entry.socket {
+            extraction_success = create_socket(&file_path, chroot_directory);
+        } else if file_entry.block_device {
+            extraction_success = create_block_device(
+                &file_path,
+                file_entry.device_major,
+                file_entry.device_minor,
+                chroot_directory,
+            );
+        } else if file_entry.character_device {
+            extraction_success = create_character_device(
+                &file_path,
+                file_entry.device_major,
+                file_entry.device_minor,
+                chroot_directory,
+            );
         } else {
-            // This should never happen, panic if it does
-            panic!("RomFS entry is an unsupported type: {:?}", file_entry);
+            continue;
         }
 
         if extraction_success == true {
@@ -208,28 +261,20 @@ fn extract_romfs_entries(
 
             // Extract the children of a directory
             if file_entry.directory == true && file_entry.children.len() > 0 {
-                file_count += extract_romfs_entries(romfs_data, &file_entry.children, &file_path);
+                file_count += extract_romfs_entries(
+                    romfs_data,
+                    &file_entry.children,
+                    &file_path,
+                    chroot_directory,
+                );
             }
 
             // Make executable files executable
             if file_entry.regular == true && file_entry.executable == true {
-                make_executable(&file_path);
+                make_executable(&file_path, chroot_directory);
             }
         } else {
             warn!("Failed to extract RomFS file {}", file_path);
-        }
-    }
-
-    // Do symlinks last
-    for file_entry in romfs_files {
-        if file_entry.symlink {
-            let symlink_path = safe_path_join(output_directory, &file_entry.name);
-
-            if create_symlink(&symlink_path, &file_entry.symlink_target) == true {
-                file_count += 1;
-            } else {
-                warn!("Failed to create RomFS symlink: {}", symlink_path);
-            }
         }
     }
 

@@ -1,6 +1,4 @@
-use crate::extractors::common::{
-    create_file, safe_path_join, ExtractionResult, Extractor, ExtractorType,
-};
+use crate::extractors::common::{create_file, ExtractionResult, Extractor, ExtractorType};
 use lzma;
 
 // Defines the internal extractor function for decompressing gzip data
@@ -22,7 +20,6 @@ pub fn lzma_decompress(
 
     let dry_run: bool;
     let lzma_data_size: usize;
-    let output_file_path: String;
     let available_data: usize = file_data.len() - offset;
     let mut result = ExtractionResult {
         ..Default::default()
@@ -32,12 +29,10 @@ pub fn lzma_decompress(
         None => {
             dry_run = true;
             lzma_data_size = TEST_BUF_SIZE;
-            output_file_path = "".to_string();
         }
-        Some(dir) => {
+        Some(_) => {
             dry_run = false;
             lzma_data_size = available_data;
-            output_file_path = safe_path_join(&dir, &OUTPUT_FILE_NAME.to_string());
         }
     }
 
@@ -47,10 +42,11 @@ pub fn lzma_decompress(
             Ok(decompressed_data) => {
                 if dry_run == false {
                     result.success = create_file(
-                        &output_file_path,
+                        &OUTPUT_FILE_NAME.to_string(),
                         &decompressed_data,
                         0,
                         decompressed_data.len(),
+                        output_directory.unwrap(),
                     );
                 } else {
                     result.success = true;

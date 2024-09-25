@@ -77,14 +77,24 @@ pub struct ProcInfo {
     pub carved_file: String,
 }
 
-/*
- * Joins two paths, ensuring that the file_path does not traverse outside of the chroot directory.
- */
-pub fn safe_path_join(chroot_directory: &String, file_path: &String) -> String {
+fn strip_double_slash(path: &String) -> String {
+    // Replace '//' with '/'; this is for asthetics only
+    return path.replace(
+        &format!("{}{}", path::MAIN_SEPARATOR, path::MAIN_SEPARATOR),
+        &path::MAIN_SEPARATOR.to_string(),
+    );
+}
+
+// Interprets a given path containing '..' directories.
+fn sanitize_path(file_path: &String, preserve_root_path_sep: bool) -> String {
     const DIR_TRAVERSAL: &str = "..";
 
     let mut exclude_indicies: Vec<usize> = vec![];
-    let mut sanitized_path: String = chroot_directory.clone();
+    let mut sanitized_path: String = "".to_string();
+
+    if preserve_root_path_sep == true && file_path.starts_with(path::MAIN_SEPARATOR) {
+        sanitized_path = path::MAIN_SEPARATOR.to_string();
+    }
 
     // Split the file path on '/'
     let path_parts: Vec<&str> = file_path.split(path::MAIN_SEPARATOR).collect();
@@ -108,7 +118,7 @@ pub fn safe_path_join(chroot_directory: &String, file_path: &String) -> String {
         }
     }
 
-    // Append each non-excluded part of the file path to the specified chroot directory path
+    // Concatenate each non-excluded part of the file path, with each part separated by '/'
     for i in 0..path_parts.len() {
         if exclude_indicies.contains(&i) == false {
             sanitized_path = format!(
@@ -120,36 +130,132 @@ pub fn safe_path_join(chroot_directory: &String, file_path: &String) -> String {
         }
     }
 
-    return sanitized_path;
+    return strip_double_slash(&sanitized_path);
+}
+
+/*
+ * Joins two paths, ensuring that the final path does not traverse outside of the chroot directory.
+ *
+ * Example: For a chroot_dir of "/tmp/foobar", file_paths will be translated as follows:
+ *
+ *      "/etc/passwd" -> /tmp/foobar/etc/passwd
+ *      "/etc/../../passwd" -> /tmp/foobar/passwd
+ *      "../../../etc/passwd" -> /tmp/foobar/etc/passwd
+ */
+pub fn safe_path_join(path1: &String, path2: &String, chroot_dir: &String) -> String {
+    // Join and sanitize both paths; retain the leading '/' (if there is one)
+    let mut joined_path: String =
+        sanitize_path(&format!("{}{}{}", path1, path::MAIN_SEPARATOR, path2), true);
+
+    // If the joined path does not start with the chroot directory,
+    // prepend the chroot directory to the final joined path.
+    if joined_path.starts_with(chroot_dir) == false {
+        joined_path = format!("{}{}{}", chroot_dir, path::MAIN_SEPARATOR, joined_path);
+    }
+
+    return strip_double_slash(&joined_path);
+}
+
+/*
+ * Given a file path, returns a sanitized path that is chrooted inside the specified chroot directory.
+ */
+pub fn chrooted_path(file_path: &String, chroot_dir: &String) -> String {
+    return safe_path_join(file_path, &"".to_string(), chroot_dir);
 }
 
 /*
  * Creates a regular file and writes the provided data to it.
  */
-pub fn create_file(file_path: &String, data: &[u8], start: usize, size: usize) -> bool {
+pub fn create_file(
+    file_path: &String,
+    data: &[u8],
+    start: usize,
+    size: usize,
+    chroot: &String,
+) -> bool {
     let end: usize = start + size;
+    let safe_file_path: String = chrooted_path(file_path, chroot);
 
-    if path::Path::new(file_path).exists() == false {
+    if path::Path::new(&safe_file_path).exists() == false {
         if data.len() >= end {
-            match fs::write(file_path, data[start..end].to_vec()) {
+            match fs::write(safe_file_path.clone(), data[start..end].to_vec()) {
                 Ok(_) => {
                     return true;
                 }
                 Err(e) => {
-                    error!("Failed to write data to {}: {}", file_path, e);
+                    error!("Failed to write data to {}: {}", safe_file_path, e);
                 }
             }
         } else {
             error!(
                 "Failed to create file {}: offset/size provided exceeds available data",
-                file_path
+                safe_file_path
             );
         }
     } else {
-        error!("Failed to create file {}: path already exists", file_path);
+        error!(
+            "Failed to create file {}: path already exists",
+            safe_file_path
+        );
     }
 
     return false;
+}
+
+// Creates a device file
+fn create_device(
+    file_path: &String,
+    device_type: &str,
+    major: usize,
+    minor: usize,
+    chroot: &String,
+) -> bool {
+    let device_file_contents: String = format!("{} {} {}", device_type, major, minor);
+    return create_file(
+        file_path,
+        &device_file_contents.clone().into_bytes(),
+        0,
+        device_file_contents.len(),
+        chroot,
+    );
+}
+
+/*
+ * Creates a character device
+ */
+pub fn create_character_device(
+    file_path: &String,
+    major: usize,
+    minor: usize,
+    chroot: &String,
+) -> bool {
+    return create_device(file_path, "c", major, minor, chroot);
+}
+
+/*
+ * Creates a block device
+ */
+pub fn create_block_device(
+    file_path: &String,
+    major: usize,
+    minor: usize,
+    chroot: &String,
+) -> bool {
+    return create_device(file_path, "b", major, minor, chroot);
+}
+
+/*
+ * Creates a fifo file
+ */
+pub fn create_fifo(file_path: &String, chroot: &String) -> bool {
+    return create_file(file_path, b"fifo", 0, 4, chroot);
+}
+
+/*
+ * Creates a socket file
+ */
+pub fn create_socket(file_path: &String, chroot: &String) -> bool {
+    return create_file(file_path, b"socket", 0, 6, chroot);
 }
 
 /*
@@ -166,19 +272,24 @@ pub fn is_symlink(file_path: &String) -> bool {
 /*
  * Append the provided data to the specified file path.
  */
-pub fn append_to_file(file_path: &String, data: &[u8]) -> bool {
-    if is_symlink(file_path) == false {
+pub fn append_to_file(file_path: &String, data: &[u8], chroot_dir: &String) -> bool {
+    let safe_file_path: String = chrooted_path(file_path, chroot_dir);
+
+    if is_symlink(&safe_file_path) == false {
         match fs::OpenOptions::new()
             .create(true)
             .append(true)
             .open(file_path)
         {
             Err(e) => {
-                error!("Failed to open file '{}' for appending: {}", file_path, e);
+                error!(
+                    "Failed to open file '{}' for appending: {}",
+                    safe_file_path, e
+                );
             }
             Ok(mut fp) => match fp.write(data) {
                 Err(e) => {
-                    error!("Failed to append to file '{}': {}", file_path, e);
+                    error!("Failed to append to file '{}': {}", safe_file_path, e);
                 }
                 Ok(_) => {
                     return true;
@@ -186,7 +297,7 @@ pub fn append_to_file(file_path: &String, data: &[u8]) -> bool {
             },
         }
     } else {
-        error!("Attempted to append data to a symlink: {}", file_path);
+        error!("Attempted to append data to a symlink: {}", safe_file_path);
     }
 
     return false;
@@ -195,13 +306,15 @@ pub fn append_to_file(file_path: &String, data: &[u8]) -> bool {
 /*
  * Equivalent to mkdir -p
  */
-pub fn create_directory(dir_path: &String) -> bool {
-    match fs::create_dir_all(dir_path) {
+pub fn create_directory(dir_path: &String, chroot: &String) -> bool {
+    let safe_dir_path: String = chrooted_path(dir_path, chroot);
+
+    match fs::create_dir_all(safe_dir_path.clone()) {
         Ok(_) => {
             return true;
         }
         Err(e) => {
-            error!("Failed to create output directory {}: {}", dir_path, e);
+            error!("Failed to create output directory {}: {}", safe_dir_path, e);
         }
     }
 
@@ -213,13 +326,18 @@ pub fn create_directory(dir_path: &String) -> bool {
  * Other ownership/permissions are generally not set by extractors, as they can lead to
  * extracted files that cannot be opened and analyzed.
  */
-pub fn make_executable(file_path: &String) -> bool {
+pub fn make_executable(file_path: &String, chroot: &String) -> bool {
     // Make the file globally executable
     const UNIX_EXEC_FLAG: u32 = 1;
 
-    match fs::metadata(file_path) {
+    let safe_file_path: String = chrooted_path(file_path, chroot);
+
+    match fs::metadata(safe_file_path.clone()) {
         Err(e) => {
-            error!("Failed to get permissions for file {}: {}", file_path, e);
+            error!(
+                "Failed to get permissions for file {}: {}",
+                safe_file_path, e
+            );
         }
         Ok(metadata) => {
             let mut permissions = metadata.permissions();
@@ -227,7 +345,10 @@ pub fn make_executable(file_path: &String) -> bool {
 
             match fs::set_permissions(file_path, permissions) {
                 Err(e) => {
-                    error!("Failed to set permissions for file {}: {}", file_path, e);
+                    error!(
+                        "Failed to set permissions for file {}: {}",
+                        safe_file_path, e
+                    );
                 }
                 Ok(_) => {
                     return true;
@@ -240,12 +361,44 @@ pub fn make_executable(file_path: &String) -> bool {
 }
 
 /*
- * Creates a symlink named symlink which points to target.
+ * Creates a symbolic link named symlink which points to target.
+ * Note that both the symlink and target paths will be sanitized.
  */
-pub fn create_symlink(symlink: &String, target: &String) -> bool {
-    let target_path = path::Path::new(target);
-    let symlink_path = path::Path::new(symlink);
-    match unix::fs::symlink(&target_path, &symlink_path) {
+pub fn create_symlink(symlink: &String, target: &String, chroot: &String) -> bool {
+    let safe_target: String;
+    let safe_target_path: &path::Path;
+
+    // Chroot the symlink file path and create a Path object
+    let safe_symlink = chrooted_path(symlink, chroot);
+    let safe_symlink_path = path::Path::new(&safe_symlink);
+
+    if target.starts_with(path::MAIN_SEPARATOR) {
+        // If the target path is absolute, just chroot it inside the chroot directory
+        safe_target = chrooted_path(target, chroot);
+        safe_target_path = path::Path::new(&safe_target);
+    } else {
+        // Else, the target path is relative to the symlink file's directory
+        let relative_dir: String;
+
+        // Get the symlink file's parent directory path
+        match safe_symlink_path.parent() {
+            None => {
+                // There is no parent, or parent is the root directory; assume the root directory
+                relative_dir = path::MAIN_SEPARATOR.to_string();
+            }
+            Some(parent_dir) => {
+                // Got the parent directory
+                relative_dir = parent_dir.to_str().unwrap().to_string();
+            }
+        }
+
+        // Join the target path with its relative directory, ensuring it does not traverse outside
+        // the specified chroot directory
+        safe_target = safe_path_join(&relative_dir, target, chroot);
+        safe_target_path = path::Path::new(&safe_target);
+    }
+
+    match unix::fs::symlink(&safe_target_path, &safe_symlink_path) {
         Ok(_) => {
             return true;
         }
@@ -406,6 +559,7 @@ fn spawn(
     mut extractor: Extractor,
 ) -> Result<ProcInfo, std::io::Error> {
     let command: String;
+    let root_dir: String = path::MAIN_SEPARATOR.to_string();
 
     // This function *only* handles execution of external extraction utilities; internal extractors must be invoked directly
     match &extractor.utility {
@@ -435,7 +589,7 @@ fn spawn(
 
     // If the entirety of the source file is this one file type, no need to carve a copy of it, just create a symlink
     if signature.offset == 0 && signature.size == file_data.len() {
-        if create_symlink(&carved_file, &file_path) == false {
+        if create_symlink(&carved_file, &file_path, &root_dir) == false {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 "Failed to create carved file symlink",
@@ -443,7 +597,14 @@ fn spawn(
         }
     } else {
         // Copy file data to carved file path
-        if create_file(&carved_file, file_data, signature.offset, signature.size) == false {
+        if create_file(
+            &carved_file,
+            file_data,
+            signature.offset,
+            signature.size,
+            &root_dir,
+        ) == false
+        {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 "Failed to carve data to disk",
@@ -553,7 +714,7 @@ fn create_output_directory(file_path: &String, offset: usize) -> Result<String, 
     );
 
     // Create the output directory, equivalent of mkdir -p
-    if create_directory(&output_directory) == false {
+    if create_directory(&output_directory, &path::MAIN_SEPARATOR.to_string()) == false {
         return Err(std::io::Error::new(
             std::io::ErrorKind::Other,
             "Directory creation failed",

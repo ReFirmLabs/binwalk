@@ -25,7 +25,7 @@ External extractor definitions describe:
 Internal extractor definitions need only specify the internal extractor function to call. This function must conform
 to the `extractors::common::InternalExtractor` type definition.
 
-The extraction funtion will be passed:
+The extraction function will be passed:
 
 - The entirety of the file data
 - An offset inside the file data at which to begin processing data
@@ -34,6 +34,21 @@ The extraction funtion will be passed:
 If the output directory is `None`, the extractor function should perform a "dry run", processing the intended file format
 as normal, but not extract any data; this allows signatures to use the extractor function to validate potential signature
 matches without performing an actual extraction.
+
+The `extractors::common` API functions *should* be used for the creation of files/symlinks/directories, constructing file paths, etc.
+These functions protect against common path traversal attacks by effectively chrooting file paths inside the specified "chroot directory":
+
+- `create_file`
+- `create_fifo`
+- `create_socket`
+- `chrooted_path`
+- `append_to_file`
+- `create_symlink`
+- `safe_path_join`
+- `make_executable`
+- `create_directory`
+- `create_block_device`
+- `create_character_device`
 
 Internal extractors must return an `extractors::common::ExtractionResult` struct.
 
@@ -88,7 +103,7 @@ Alternatively, you may write your own internal extractor from scratch. Writing y
 longer than just defining an external extractor, but internal extractors have several advantages:
 
 - They are generally faster, since input data to the extractor does not need to be carved to disk
-- They *can* be made safer, as they are written in Rust and can take advantage of internal Binwalk code, such as `extractors::common::safe_path_join`
+- They *can* be made safer, as they are written in Rust and can take advantage of internal safe APIs
 - Signatures can tell internal extractors to perform a "dry run", where the extractor parses the file data, but does not perform any extraction;
 if the dry run is successful, then the signature code can almost certianly be assured that the data it is inspecting is a true positive
 

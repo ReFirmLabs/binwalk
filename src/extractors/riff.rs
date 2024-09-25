@@ -1,5 +1,4 @@
-use crate::extractors::common::{create_file, safe_path_join};
-use crate::extractors::common::{ExtractionResult, Extractor, ExtractorType};
+use crate::extractors::common::{create_file, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::riff::parse_riff_header;
 
 pub fn riff_extractor() -> Extractor {
@@ -31,12 +30,13 @@ pub fn extract_riff_image(
             let file_path: String;
 
             if riff_header.chunk_type == WAV_TYPE {
-                file_path = safe_path_join(outdir, &WAV_OUTFILE_NAME.to_string());
+                file_path = WAV_OUTFILE_NAME.to_string();
             } else {
-                file_path = safe_path_join(outdir, &OUTFILE_NAME.to_string());
+                file_path = OUTFILE_NAME.to_string();
             }
 
-            result.success = create_file(&file_path, file_data, offset, result.size.unwrap());
+            result.success =
+                create_file(&file_path, file_data, offset, result.size.unwrap(), outdir);
         }
     }
 

@@ -63,6 +63,10 @@ pub struct RomFSFileHeader {
     pub symlink: bool,
     pub directory: bool,
     pub regular: bool,
+    pub block_device: bool,
+    pub character_device: bool,
+    pub fifo: bool,
+    pub socket: bool,
     // Offset to the next file header, *relative to the beginning of the RomFS image*
     pub next_header_offset: usize,
 }
@@ -78,6 +82,10 @@ pub fn parse_romfs_file_entry(
     const ROMFS_DIRECTORY: usize = 1;
     const ROMFS_REGULAR_FILE: usize = 2;
     const ROMFS_SYMLINK: usize = 3;
+    const ROMFS_BLOCK_DEVICE: usize = 4;
+    const ROMFS_CHAR_DEVICE: usize = 5;
+    const ROMFS_SOCKET: usize = 6;
+    const ROMFS_FIFO: usize = 7;
 
     let file_header_structure = vec![
         ("next_header_offset", "u32"),
@@ -123,9 +131,13 @@ pub fn parse_romfs_file_entry(
                 (file_entry_header["next_header_offset"] & FILE_EXEC_MASK) != 0;
 
             // Set the type of entry this is
+            file_header.fifo = file_header.file_type == ROMFS_FIFO;
+            file_header.socket = file_header.file_type == ROMFS_SOCKET;
             file_header.symlink = file_header.file_type == ROMFS_SYMLINK;
             file_header.regular = file_header.file_type == ROMFS_REGULAR_FILE;
             file_header.directory = file_header.file_type == ROMFS_DIRECTORY;
+            file_header.block_device = file_header.file_type == ROMFS_BLOCK_DEVICE;
+            file_header.character_device = file_header.file_type == ROMFS_CHAR_DEVICE;
 
             // The next file header offset is an offset from the beginning of the RomFS image
             file_header.next_header_offset =

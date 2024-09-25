@@ -1,5 +1,4 @@
-use crate::extractors::common::{create_file, safe_path_join};
-use crate::extractors::common::{ExtractionResult, Extractor, ExtractorType};
+use crate::extractors::common::{create_file, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::png::parse_png_chunk_header;
 
 // Defines the internal extractor function for carving out PNG images
@@ -30,8 +29,13 @@ pub fn extract_png_image(
 
         // If extraction was requested, extract the PNG
         if let Some(outdir) = output_directory {
-            let file_path = safe_path_join(outdir, &OUTFILE_NAME.to_string());
-            result.success = create_file(&file_path, file_data, offset, result.size.unwrap());
+            result.success = create_file(
+                &OUTFILE_NAME.to_string(),
+                file_data,
+                offset,
+                result.size.unwrap(),
+                outdir,
+            );
         }
     }
 
