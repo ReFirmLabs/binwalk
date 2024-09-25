@@ -36,7 +36,7 @@ as normal, but not extract any data; this allows signatures to use the extractor
 matches without performing an actual extraction.
 
 The `extractors::common` API functions *should* be used for the creation of files/symlinks/directories, constructing file paths, etc.
-These functions protect against common path traversal attacks by effectively chrooting file paths inside the specified "chroot directory":
+These functions protect against common path traversal attacks by ensuring that paths are not created outside of the specified "chroot directory":
 
 - `create_file`
 - `create_fifo`
