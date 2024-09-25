@@ -42,59 +42,63 @@ pub fn jffs2_parser(
         // The known end of JFFS2 data in the raw file data. This will be updated as we find more nodes.
         let mut jffs2_eof: usize = offset + roundup(first_node_header.size);
 
-        // Start searching for subsequent JFFS2 nodes at the end of this node's data
-        let grep_offset: usize = jffs2_eof;
+        // Make sure that jffs2_eof is sane
+        if jffs2_eof < file_data.len() {
 
-        // Keep a count of how many valid nodes were found
-        let mut node_count: usize = 1;
+            // Start searching for subsequent JFFS2 nodes at the end of this node's data
+            let grep_offset: usize = jffs2_eof;
 
-        // Determine which node magic bytes to search for based on the first node's endianness
-        let mut node_magic = JFFS2_LITTLE_ENDIAN_MAGIC;
-        if first_node_header.endianness == "big" {
-            node_magic = JFFS2_BIG_ENDIAN_MAGIC;
-        }
+            // Keep a count of how many valid nodes were found
+            let mut node_count: usize = 1;
 
-        // Need to grep for all JFFS2 nodes to figure out how big this file system really is
-        let grep = AhoCorasick::new(vec![node_magic]).unwrap();
-
-        // Find all matching JFFS2 node magic bytes
-        for magic_match in grep.find_overlapping_iter(&file_data[grep_offset..].to_vec()) {
-            // Calculate the start and end of the node header inside the file data
-            let header_start: usize = grep_offset + magic_match.start();
-            let header_end: usize = header_start + JFFS2_NODE_STRUCT_SIZE;
-
-            // This is a false positive that is inside the node data of a previously validated node
-            if header_start < jffs2_eof {
-                continue;
+            // Determine which node magic bytes to search for based on the first node's endianness
+            let mut node_magic = JFFS2_LITTLE_ENDIAN_MAGIC;
+            if first_node_header.endianness == "big" {
+                node_magic = JFFS2_BIG_ENDIAN_MAGIC;
             }
 
-            // If we haven't found a valid header within MAX_PAGE_SIZE bytes, quit
-            if (header_start - jffs2_eof) > MAX_PAGE_SIZE {
-                break;
+            // Need to grep for all JFFS2 nodes to figure out how big this file system really is
+            let grep = AhoCorasick::new(vec![node_magic]).unwrap();
+
+            // Find all matching JFFS2 node magic bytes
+            for magic_match in grep.find_overlapping_iter(&file_data[grep_offset..].to_vec()) {
+                // Calculate the start and end of the node header inside the file data
+                let header_start: usize = grep_offset + magic_match.start();
+                let header_end: usize = header_start + JFFS2_NODE_STRUCT_SIZE;
+
+                // This is a false positive that is inside the node data of a previously validated node
+                if header_start < jffs2_eof {
+                    continue;
+                }
+
+                // If we haven't found a valid header within MAX_PAGE_SIZE bytes, quit
+                if (header_start - jffs2_eof) > MAX_PAGE_SIZE {
+                    break;
+                }
+
+                // If we've run out of data, quit
+                if file_data.len() < header_end {
+                    break;
+                }
+
+                // Parse this node's header
+                if let Ok(this_node_header) =
+                    parse_jffs2_node_header(&file_data[header_start..header_end])
+                {
+                    node_count += 1;
+                    jffs2_eof = header_start + roundup(this_node_header.size);
+                }
             }
 
-            // If we've run out of data, quit
-            if file_data.len() < header_end {
-                break;
+            // Make sure we've processed at least a few JFFS2 nodes
+            if node_count > MIN_VALID_NODE_COUNT {
+                result.size = jffs2_eof - result.offset;
+                result.description = format!(
+                    "{}, {} endian, nodes: {}, total size: {} bytes",
+                    result.description, first_node_header.endianness, node_count, result.size
+                );
+                return Ok(result);
             }
-
-            // Parse this node's header
-            if let Ok(this_node_header) =
-                parse_jffs2_node_header(&file_data[header_start..header_end])
-            {
-                node_count += 1;
-                jffs2_eof = header_start + roundup(this_node_header.size);
-            }
-        }
-
-        // Make sure we've processed at least a few JFFS2 nodes
-        if node_count > MIN_VALID_NODE_COUNT {
-            result.size = jffs2_eof - result.offset;
-            result.description = format!(
-                "{}, {} endian, nodes: {}, total size: {} bytes",
-                result.description, first_node_header.endianness, node_count, result.size
-            );
-            return Ok(result);
         }
     }
 
