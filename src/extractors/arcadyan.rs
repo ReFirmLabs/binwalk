@@ -14,7 +14,7 @@ pub fn extract_obfuscated_lzma(
     output_directory: Option<&String>,
 ) -> ExtractionResult {
     const LZMA_DATA_OFFSET: usize = 4;
-    const MIN_DATA_SIZE: usize = 0x78;
+    const MIN_DATA_SIZE: usize = 0x100;
     const MAX_DATA_SIZE: usize = 0x1B0000;
 
     let mut result = ExtractionResult {

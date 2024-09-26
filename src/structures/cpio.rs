@@ -45,7 +45,7 @@ pub fn parse_cpio_entry_header(
                         let file_name_end: usize =
                             file_name_start + file_name_size - NULL_BYTE_SIZE;
 
-                        if available_data > file_name_end {
+                        if file_name_end > file_name_start && available_data > file_name_start && available_data > file_name_end {
                             if let Ok(file_name) = String::from_utf8(
                                 cpio_data[file_name_start..file_name_end].to_vec(),
                             ) {

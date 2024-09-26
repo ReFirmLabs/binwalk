@@ -28,10 +28,15 @@ pub fn tarball_parser(
     let tarball_start_offset = offset - TARBALL_MAGIC_OFFSET;
 
     // Loop through available data, processing tarball entry headers
-    while (file_data.len() - (tarball_start_offset + tarball_total_size)) >= TARBALL_BLOCK_SIZE {
+    while file_data.len() > (tarball_start_offset + tarball_total_size + TARBALL_BLOCK_SIZE) {
         // Calculate the offset(s) of the next expected tarball entry header
         let next_header_start = tarball_start_offset + tarball_total_size;
         let next_header_end = next_header_start + TARBALL_BLOCK_SIZE;
+
+        // usize overflow
+        if next_header_end < next_header_start {
+            break;
+        }
 
         // Get the next header's block
         let tarball_header_block: &[u8] = &file_data[next_header_start..next_header_end];
