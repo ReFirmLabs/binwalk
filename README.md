@@ -210,7 +210,7 @@ All errors and debug information are printed to stderr.
 
 ## Limitations
 
-Binwalk is a command line utility only; there is no library, API, or plugins (yet).
+Currently binwalk is primarily a command line utility, but a Rust library is available.
 
 Binwalk can be very resource intensive. By default it will use all available CPU cores (this can be controlled with the `--threads` argument), and
 reads files into memory in their entirety. 
