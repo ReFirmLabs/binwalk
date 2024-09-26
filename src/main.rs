@@ -58,11 +58,17 @@ fn main() {
             panic!("No target file name specified! Try --help.");
         }
         Some(file_name) => {
+            let mut output_directory: Option<&String> = None;
+
+            // If extraction was requested, we need to initialize the output directory
+            if cliargs.extract == true {
+                output_directory = Some(&cliargs.directory);
+            }
+
             // Initialize binwalk
             match binwalk::init(
-                &file_name,
-                &cliargs.directory,
-                cliargs.extract,
+                Some(&file_name),
+                output_directory,
                 cliargs.include,
                 cliargs.exclude,
             ) {
