@@ -5,8 +5,6 @@ pub struct IFSHeader {
 }
 
 pub fn parse_ifs_header(ifs_data: &[u8]) -> Result<IFSHeader, structures::common::StructureError> {
-    const IFS_HEADER_SIZE: usize = 64;
-
     // https://github.com/askac/dumpifs/blob/master/sys/startup.h
     let ifs_structure = vec![
         ("magic", "u32"),
@@ -31,11 +29,8 @@ pub fn parse_ifs_header(ifs_data: &[u8]) -> Result<IFSHeader, structures::common
         ("zero_3", "u32"),
     ];
 
-    // Sanity check the size of available data
-    if ifs_data.len() >= IFS_HEADER_SIZE {
-        // Parse the IFS header
-        let ifs_header =
-            structures::common::parse(&ifs_data[0..IFS_HEADER_SIZE], &ifs_structure, "little");
+    // Parse the IFS header
+    if let Ok(ifs_header) = structures::common::parse(ifs_data, &ifs_structure, "little") {
 
         // The flags2 field is unused and should be 0
         if ifs_header["flags2"] == 0 {

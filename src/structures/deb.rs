@@ -16,14 +16,11 @@ pub fn parse_deb_header(deb_data: &[u8]) -> Result<DebHeader, structures::common
         ..Default::default()
     };
 
-    // Sanity check the size of available data
-    if deb_data.len() >= CONTROL_FILE_SIZE_END {
-        // Index into the header to get the raw bytes of the decimal ASCII string that contains the control file size
-        let control_file_size_data: Vec<u8> =
-            deb_data[CONTROL_FILE_SIZE_START..CONTROL_FILE_SIZE_END].to_vec();
+    // Index into the header to get the raw bytes of the decimal ASCII string that contains the control file size
+    if let Some(control_file_size_data) = deb_data.get(CONTROL_FILE_SIZE_START..CONTROL_FILE_SIZE_END) {
 
         // Convert the raw bytes into an ASCII string
-        if let Ok(control_file_size_str) = String::from_utf8(control_file_size_data) {
+        if let Ok(control_file_size_str) = String::from_utf8(control_file_size_data.to_vec()) {
             // Trim white space from the string and convert to an integer value
             if let Ok(control_file_size) = usize::from_str_radix(&control_file_size_str.trim(), 10)
             {
@@ -34,14 +31,11 @@ pub fn parse_deb_header(deb_data: &[u8]) -> Result<DebHeader, structures::common
                     + DATA_FILE_SIZE_OFFSET;
                 let data_file_size_end: usize = data_file_size_start + DATA_FILE_SIZE_LEN;
 
-                // Sanity check before indexing into deb_data
-                if deb_data.len() > data_file_size_end {
-                    // Index into the header to get the raw bytes of the deciaml ASCII string that contains the data file size
-                    let data_file_size_data: Vec<u8> =
-                        deb_data[data_file_size_start..data_file_size_end].to_vec();
+                // Index into the header to get the raw bytes of the deciaml ASCII string that contains the data file size
+                if let Some(data_file_size_data) = deb_data.get(data_file_size_start..data_file_size_end) {
 
                     // Convert the raw bytes to an ASCII string
-                    if let Ok(data_file_size_str) = String::from_utf8(data_file_size_data) {
+                    if let Ok(data_file_size_str) = String::from_utf8(data_file_size_data.to_vec()) {
                         // Trim whitespace from the string and convert to an integer value
                         if let Ok(data_file_size) =
                             usize::from_str_radix(&data_file_size_str.trim(), 10)

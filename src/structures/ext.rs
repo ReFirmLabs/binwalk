@@ -16,8 +16,6 @@ pub struct EXTHeader {
 }
 
 pub fn parse_ext_header(ext_data: &[u8]) -> Result<EXTHeader, structures::common::StructureError> {
-    const SUPERBLOCK_STRUCT_SIZE: usize = 84;
-
     const MAX_BLOCK_LOG: usize = 2;
 
     // Parital superblock structure, just enough for validation and size calculation
@@ -64,38 +62,36 @@ pub fn parse_ext_header(ext_data: &[u8]) -> Result<EXTHeader, structures::common
         ..Default::default()
     };
 
-    // Sanity check the reported offset of the magic bytes
+    // Sanity check the available data
     if ext_data.len() >= (SUPERBLOCK_OFFSET + SUPERBLOCK_SIZE) {
-        // Calculate the start and end offsets for parsing the partial ext_superblock_structure
-        let superblock_start: usize = SUPERBLOCK_OFFSET;
-        let superblock_end: usize = superblock_start + SUPERBLOCK_STRUCT_SIZE;
 
         // Parse the EXT superblock structure
-        let ext_superblock = structures::common::parse(
-            &ext_data[superblock_start..superblock_end],
+        if let Ok(ext_superblock) = structures::common::parse(
+            &ext_data[SUPERBLOCK_OFFSET..],
             &ext_superblock_structure,
             "little",
-        );
+        ) {
 
-        // Sanity check the reported OS this EXT image was created on
-        if supported_os.contains_key(&ext_superblock["creator_os"]) {
-            // Sanity check the s_rev_level field
-            if allowed_rev_levels.contains(&ext_superblock["s_rev_level"]) {
-                // Sanity check the first_data_block field, which must be either 0 or 1
-                if allowed_first_data_blocks.contains(&ext_superblock["first_data_block"]) {
-                    // Santiy check the log_block_size
-                    if ext_superblock["log_block_size"] <= MAX_BLOCK_LOG {
-                        // Update the reported image info
-                        ext_header.blocks_count = ext_superblock["blocks_count"];
-                        ext_header.inodes_count = ext_superblock["inodes_count"];
-                        ext_header.block_size = 1024 << ext_superblock["log_block_size"];
-                        ext_header.free_blocks_count = ext_superblock["free_blocks_count"];
-                        ext_header.os = supported_os[&ext_superblock["creator_os"]].to_string();
-                        ext_header.reserved_blocks_count = ext_superblock["reserved_blocks_count"];
-                        ext_header.image_size =
-                            ext_header.block_size * ext_superblock["blocks_count"];
+            // Sanity check the reported OS this EXT image was created on
+            if supported_os.contains_key(&ext_superblock["creator_os"]) {
+                // Sanity check the s_rev_level field
+                if allowed_rev_levels.contains(&ext_superblock["s_rev_level"]) {
+                    // Sanity check the first_data_block field, which must be either 0 or 1
+                    if allowed_first_data_blocks.contains(&ext_superblock["first_data_block"]) {
+                        // Santiy check the log_block_size
+                        if ext_superblock["log_block_size"] <= MAX_BLOCK_LOG {
+                            // Update the reported image info
+                            ext_header.blocks_count = ext_superblock["blocks_count"];
+                            ext_header.inodes_count = ext_superblock["inodes_count"];
+                            ext_header.block_size = 1024 << ext_superblock["log_block_size"];
+                            ext_header.free_blocks_count = ext_superblock["free_blocks_count"];
+                            ext_header.os = supported_os[&ext_superblock["creator_os"]].to_string();
+                            ext_header.reserved_blocks_count = ext_superblock["reserved_blocks_count"];
+                            ext_header.image_size =
+                                ext_header.block_size * ext_superblock["blocks_count"];
 
-                        return Ok(ext_header);
+                            return Ok(ext_header);
+                        }
                     }
                 }
             }

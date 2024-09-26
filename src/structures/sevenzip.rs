@@ -28,29 +28,21 @@ pub fn parse_7z_header(
         ("next_header_crc", "u32"),
     ];
 
-    // Sanity check on the available file data
-    if sevenzip_data.len() >= SEVENZIP_HEADER_SIZE {
-        // Calculate offsets of the header data used to calculate the header crc
-        let crc_start: usize = SEVENZIP_CRC_START;
-        let crc_end: usize = SEVENZIP_HEADER_SIZE;
-
-        // Parse the 7zip header
-        let sevenzip_header = structures::common::parse(
-            &sevenzip_data[0..SEVENZIP_HEADER_SIZE],
-            &sevenzip_structure,
-            "little",
-        );
-
+    // Parse the 7zip header
+    if let Ok(sevenzip_header) = structures::common::parse(sevenzip_data, &sevenzip_structure, "little") {
+        
         // Validate header CRC, which is calculated over the 'next_header_offset', 'next_header_size', and 'next_header_crc' values
-        if crc32(&sevenzip_data[crc_start..crc_end]) == (sevenzip_header["header_crc"] as u32) {
-            return Ok(SevenZipHeader {
-                header_size: SEVENZIP_HEADER_SIZE,
-                major_version: sevenzip_header["major_version"],
-                minor_version: sevenzip_header["minor_version"],
-                next_header_crc: sevenzip_header["next_header_crc"],
-                next_header_size: sevenzip_header["next_header_size"],
-                next_header_offset: sevenzip_header["next_header_offset"],
-            });
+        if let Some(crc_data) = sevenzip_data.get(SEVENZIP_CRC_START..SEVENZIP_HEADER_SIZE) {
+            if crc32(crc_data) == (sevenzip_header["header_crc"] as u32) {
+                return Ok(SevenZipHeader {
+                    header_size: SEVENZIP_HEADER_SIZE,
+                    major_version: sevenzip_header["major_version"],
+                    minor_version: sevenzip_header["minor_version"],
+                    next_header_crc: sevenzip_header["next_header_crc"],
+                    next_header_size: sevenzip_header["next_header_size"],
+                    next_header_offset: sevenzip_header["next_header_offset"],
+                });
+            }
         }
     }
 

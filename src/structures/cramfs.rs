@@ -11,7 +11,6 @@ pub struct CramFSHeader {
 pub fn parse_cramfs_header(
     cramfs_data: &[u8],
 ) -> Result<CramFSHeader, structures::common::StructureError> {
-    const HEADER_SIZE: usize = 48;
 
     const BIG_ENDIAN_MAGIC: usize = 0x453DCD28;
     const LITTLE_ENDIAN_MAGIC: usize = 0x28CD3D45;
@@ -38,25 +37,24 @@ pub fn parse_cramfs_header(
     // Default to little endian
     cramfs_info.endianness = "little".to_string();
 
-    // Sanity check the size available data
-    if cramfs_data.len() > HEADER_SIZE {
-        // Parse the CramFS header, try little endian first
-        let mut cramfs_header = structures::common::parse(
-            &cramfs_data[0..HEADER_SIZE],
-            &cramfs_header_structure,
-            &cramfs_info.endianness,
-        );
+    // Parse the CramFS header, try little endian first
+    if let Ok(mut cramfs_header) = structures::common::parse(&cramfs_data, &cramfs_header_structure, &cramfs_info.endianness) {
 
         // Do the magic bytes match?
         if allowed_magics.contains(&cramfs_header["magic"]) {
             // If the magic bytes endianness don't match what's expected for little endian, switch to big endian
             if cramfs_header["magic"] == BIG_ENDIAN_MAGIC {
                 cramfs_info.endianness = "big".to_string();
-                cramfs_header = structures::common::parse(
-                    &cramfs_data[0..HEADER_SIZE],
-                    &cramfs_header_structure,
-                    &cramfs_info.endianness,
-                );
+
+                // Parse the header again, this time as big endian
+                match structures::common::parse(&cramfs_data, &cramfs_header_structure, &cramfs_info.endianness) {
+                    Err(_) => {
+                        return Err(structures::common::StructureError);
+                    },
+                    Ok(cramfs_be_header) => {
+                        cramfs_header = cramfs_be_header.clone();
+                    },
+                }
             }
 
             // Populate info about the CramFS image

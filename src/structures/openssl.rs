@@ -9,9 +9,7 @@ pub fn parse_openssl_crypt_header(
 ) -> Result<OpenSSLCryptHeader, structures::common::StructureError> {
     let ssl_structure = vec![("magic", "u32"), ("salt", "u64")];
 
-    // Sanity check the size of available data
-    if ssl_data.len() >= structures::common::size(&ssl_structure) {
-        let ssl_header = structures::common::parse(&ssl_data, &ssl_structure, "big");
+    if let Ok(ssl_header) = structures::common::parse(&ssl_data, &ssl_structure, "big") {
 
         return Ok(OpenSSLCryptHeader {
             salt: ssl_header["salt"],

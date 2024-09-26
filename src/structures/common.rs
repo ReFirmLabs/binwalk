@@ -16,7 +16,7 @@ pub struct StructureError;
  *
  * Supported data types: u8, u16, u24, u32, u64.
  *
- * raw_data: The raw data to apply the structure over. It is up to the caller to ensure that enough data is provided to parse the entire structure.
+ * data: The raw data to apply the structure over. It is up to the caller to ensure that enough data is provided to parse the entire structure.
  * structure: A vector of tuples describing the data structure (see below for exmaple).
  * endianness: One of: "big", "little".
  *
@@ -35,10 +35,10 @@ pub struct StructureError;
  *
  */
 pub fn parse(
-    raw_data: &[u8],
+    data: &[u8],
     structure: &Vec<(&str, &str)>,
     endianness: &str,
-) -> HashMap<String, usize> {
+) -> Result<HashMap<String, usize>, StructureError> {
     const U24_SIZE: usize = 3;
 
     let mut value: usize;
@@ -46,73 +46,70 @@ pub fn parse(
     let mut offset: usize = 0;
     let mut parsed_structure = HashMap::new();
 
-    // Sanity check the provided data fits in the defined structure
+    // Get the size of the defined structure
     let structure_size = size(structure);
-    if structure_size > raw_data.len() {
-        panic!(
-            "Not enough data supplied to parse structure; need {} bytes, got {} bytes",
-            structure_size,
-            raw_data.len()
-        );
-    }
 
-    for (name, ctype) in structure {
-        let data_type: String = ctype.to_string();
+    if let Some(raw_data) = data.get(0..structure_size) {
+        for (name, ctype) in structure {
+            let data_type: String = ctype.to_string();
 
-        csize = type_to_size(&ctype);
+            csize = type_to_size(&ctype);
 
-        if csize == std::mem::size_of::<u8>() {
-            // u8, endianness doesn't matter
-            value =
-                u8::from_be_bytes(raw_data[offset..offset + csize].try_into().unwrap()) as usize;
-        } else if csize == std::mem::size_of::<u16>() {
-            if endianness == "big" {
-                value = u16::from_be_bytes(raw_data[offset..offset + csize].try_into().unwrap())
-                    as usize;
+            if csize == std::mem::size_of::<u8>() {
+                // u8, endianness doesn't matter
+                value =
+                    u8::from_be_bytes(raw_data[offset..offset + csize].try_into().unwrap()) as usize;
+            } else if csize == std::mem::size_of::<u16>() {
+                if endianness == "big" {
+                    value = u16::from_be_bytes(raw_data[offset..offset + csize].try_into().unwrap())
+                        as usize;
+                } else {
+                    value = u16::from_le_bytes(raw_data[offset..offset + csize].try_into().unwrap())
+                        as usize;
+                }
+
+            // Yes Virginia, u24's are real
+            } else if csize == U24_SIZE {
+                if endianness == "big" {
+                    value = ((raw_data[offset] as usize) << 16)
+                        + ((raw_data[offset + 1] as usize) << 8)
+                        + (raw_data[offset + 2] as usize);
+                } else {
+                    value = ((raw_data[offset + 2] as usize) << 16)
+                        + ((raw_data[offset + 1] as usize) << 8)
+                        + (raw_data[offset] as usize);
+                }
+            } else if csize == std::mem::size_of::<u32>() {
+                if endianness == "big" {
+                    value = u32::from_be_bytes(raw_data[offset..offset + csize].try_into().unwrap())
+                        as usize;
+                } else {
+                    value = u32::from_le_bytes(raw_data[offset..offset + csize].try_into().unwrap())
+                        as usize;
+                }
+            } else if csize == std::mem::size_of::<u64>() {
+                if endianness == "big" {
+                    value = u64::from_be_bytes(raw_data[offset..offset + csize].try_into().unwrap())
+                        as usize;
+                } else {
+                    value = u64::from_le_bytes(raw_data[offset..offset + csize].try_into().unwrap())
+                        as usize;
+                }
             } else {
-                value = u16::from_le_bytes(raw_data[offset..offset + csize].try_into().unwrap())
-                    as usize;
+                panic!(
+                    "Cannot parse structure element with unknown data type '{}'",
+                    data_type
+                );
             }
 
-        // Yes Virginia, u24's are real
-        } else if csize == U24_SIZE {
-            if endianness == "big" {
-                value = ((raw_data[offset] as usize) << 16)
-                    + ((raw_data[offset + 1] as usize) << 8)
-                    + (raw_data[offset + 2] as usize);
-            } else {
-                value = ((raw_data[offset + 2] as usize) << 16)
-                    + ((raw_data[offset + 1] as usize) << 8)
-                    + (raw_data[offset] as usize);
-            }
-        } else if csize == std::mem::size_of::<u32>() {
-            if endianness == "big" {
-                value = u32::from_be_bytes(raw_data[offset..offset + csize].try_into().unwrap())
-                    as usize;
-            } else {
-                value = u32::from_le_bytes(raw_data[offset..offset + csize].try_into().unwrap())
-                    as usize;
-            }
-        } else if csize == std::mem::size_of::<u64>() {
-            if endianness == "big" {
-                value = u64::from_be_bytes(raw_data[offset..offset + csize].try_into().unwrap())
-                    as usize;
-            } else {
-                value = u64::from_le_bytes(raw_data[offset..offset + csize].try_into().unwrap())
-                    as usize;
-            }
-        } else {
-            panic!(
-                "Cannot parse structure element with unknown data type '{}'",
-                data_type
-            );
+            offset += csize;
+            parsed_structure.insert(name.to_string(), value);
         }
 
-        offset += csize;
-        parsed_structure.insert(name.to_string(), value);
+        return Ok(parsed_structure);
     }
 
-    return parsed_structure;
+    return Err(StructureError);
 }
 
 /*

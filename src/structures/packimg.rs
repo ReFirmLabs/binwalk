@@ -18,14 +18,12 @@ pub fn parse_packimg_header(
         ("data_size", "u32"),
     ];
 
-    // Available data must be larger than the header size, else this is a false positive or a header for nothing
-    if packimg_data.len() > PACKIMG_HEADER_SIZE {
-        // Parse the packimg header
-        let packimg_header = structures::common::parse(
-            &packimg_data[0..PACKIMG_HEADER_SIZE],
+    // Parse the packimg header
+    if let Ok(packimg_header) = structures::common::parse(
+            &packimg_data,
             &packimg_structure,
             "little",
-        );
+    ) {
 
         return Ok(PackIMGHeader {
             header_size: PACKIMG_HEADER_SIZE,

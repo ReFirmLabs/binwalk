@@ -34,17 +34,15 @@ pub fn parse_android_sparse_header(
         ("checksum", "u32"),
     ];
 
-    let header_size = structures::common::size(&android_sparse_structure);
+    let expected_header_size = structures::common::size(&android_sparse_structure);
 
-    // Sanity check the size of available data
-    if sparse_data.len() > header_size {
-        // Parse the header
-        let header = structures::common::parse(&sparse_data, &android_sparse_structure, "little");
+    // Parse the header
+    if let Ok(header) = structures::common::parse(&sparse_data, &android_sparse_structure, "little") {
 
         // Sanity check header values
         if header["major_version"] == MAJOR_VERSION
             && header["minor_version"] == MINOR_VERSION
-            && header["header_size"] == header_size
+            && header["header_size"] == expected_header_size
             && header["chunk_header_size"] == CHUNK_HEADER_SIZE
             && (header["block_size"] % BLOCK_ALIGNMENT) == 0
         {
@@ -93,10 +91,8 @@ pub fn parse_android_sparse_chunk_header(
         ..Default::default()
     };
 
-    // Sanity check available data
-    if chunk_data.len() >= chonker.header_size {
-        // Parse the header
-        let chunk_header = structures::common::parse(chunk_data, &chunk_structure, "little");
+    // Parse the header
+    if let Ok(chunk_header) = structures::common::parse(chunk_data, &chunk_structure, "little") {
 
         // Make sure the reserved field is zero
         if chunk_header["reserved"] == 0 {

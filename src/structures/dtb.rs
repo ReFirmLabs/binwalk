@@ -33,10 +33,8 @@ pub fn parse_dtb_header(dtb_data: &[u8]) -> Result<DTBHeader, structures::common
 
     let dtb_structure_size = structures::common::size(&dtb_structure);
 
-    // Sanity check the size of available data
-    if dtb_data.len() >= dtb_structure_size {
-        // Parse the header
-        let dtb_header = structures::common::parse(&dtb_data, &dtb_structure, "big");
+    // Parse the header
+    if let Ok(dtb_header) = structures::common::parse(&dtb_data, &dtb_structure, "big") {
 
         // Check the reported versioning
         if dtb_header["version"] == EXPECTED_VERSION

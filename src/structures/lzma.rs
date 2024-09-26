@@ -21,17 +21,12 @@ pub fn parse_lzma_header(
         ("null_byte", "u8"),
     ];
 
-    let available_data = lzma_data.len();
     let mut lzma_hdr_info = LZMAHeader {
         ..Default::default()
     };
-    let lzma_header_size: usize = structures::common::size(&lzma_structure);
 
-    // Sanity check the size of available data
-    if available_data > lzma_header_size {
-        // Parse the lzma header
-        let lzma_header =
-            structures::common::parse(&lzma_data[0..lzma_header_size], &lzma_structure, "little");
+    // Parse the lzma header
+    if let Ok(lzma_header) = structures::common::parse(&lzma_data, &lzma_structure, "little") {
 
         // Sanity check expected values for LZMA header fields
         if lzma_header["null_byte"] == 0 {

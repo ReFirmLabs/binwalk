@@ -32,11 +32,8 @@ pub fn parse_lz4_file_header(
         ..Default::default()
     };
 
-    // Sanity check the size of available data
-    if lz4_data.len() >= LZ4_STRUCT_SIZE {
-        // Parse the header
-        let lz4_header =
-            structures::common::parse(&lz4_data[0..LZ4_STRUCT_SIZE], &lz4_structure, "little");
+    // Parse the header
+    if let Ok(lz4_header) = structures::common::parse(&lz4_data, &lz4_structure, "little") {
 
         // Make sure the reserved bits aren't set
         if (lz4_header["flags"] & FLAGS_RESERVED_MASK) == 0
@@ -60,26 +57,26 @@ pub fn parse_lz4_file_header(
                 crc_data_end += DICTIONARY_LEN;
             }
 
-            // Sanity check on crc_data_end offset
-            if crc_data_end < lz4_data.len() {
+            // Get the data over which the CRC is calculated
+            if let Some(crc_data) = lz4_data.get(crc_data_start..crc_data_end) {
                 // Grab the header CRC value stored in the file header
-                let actual_crc: u8 = lz4_data[crc_data_end];
+                if let Some(actual_crc) = lz4_data.get(crc_data_end) {
 
-                // Calculate the header CRC, which is the second byte of the xxh32 hash. It is calculated over the header, excluding the magic bytes.
-                let calculated_crc: u8 =
-                    ((xxhash_rust::xxh32::xxh32(&lz4_data[crc_data_start..crc_data_end], 0) >> 8)
-                        & 0xFF) as u8;
+                    // Calculate the header CRC, which is the second byte of the xxh32 hash. It is calculated over the header, excluding the magic bytes.
+                    let calculated_crc: u8 =
+                        ((xxhash_rust::xxh32::xxh32(&crc_data, 0) >> 8) & 0xFF) as u8;
 
-                // Make sure the CRC's match
-                if actual_crc == calculated_crc {
-                    // Data blocks start immediately after the header checksum byte
-                    lz4_hdr_info.header_size = crc_data_end + 1;
-                    lz4_hdr_info.block_checksum_present =
-                        (lz4_header["flags"] & FLAG_BLOCK_CHECKSUM_PRESENT) != 0;
-                    lz4_hdr_info.content_checksum_present =
-                        (lz4_header["flags"] & FLAG_CONTENT_CHECKSUM_PRESENT) != 0;
+                    // Make sure the CRC's match
+                    if *actual_crc == calculated_crc {
+                        // Data blocks start immediately after the header checksum byte
+                        lz4_hdr_info.header_size = crc_data_end + 1;
+                        lz4_hdr_info.block_checksum_present =
+                            (lz4_header["flags"] & FLAG_BLOCK_CHECKSUM_PRESENT) != 0;
+                        lz4_hdr_info.content_checksum_present =
+                            (lz4_header["flags"] & FLAG_CONTENT_CHECKSUM_PRESENT) != 0;
 
-                    return Ok(lz4_hdr_info);
+                        return Ok(lz4_hdr_info);
+                    }
                 }
             }
         }
@@ -113,14 +110,12 @@ pub fn parse_lz4_block_header(
         ..Default::default()
     };
 
-    // Sanity check on the available size of data
-    if lz4_block_data.len() >= BLOCK_STRUCT_SIZE {
-        // Parse the block header
-        let block_header = structures::common::parse(
-            &lz4_block_data[0..BLOCK_STRUCT_SIZE],
+    // Parse the block header
+    if let Ok(block_header) = structures::common::parse(
+            &lz4_block_data,
             &block_structure,
             "little",
-        );
+    ) {
 
         // Header size is always 4 bytes
         lz4_block.header_size = BLOCK_STRUCT_SIZE;

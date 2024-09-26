@@ -26,28 +26,32 @@ pub fn parse_jffs2_node_header(
     let mut node = JFFS2Node {
         ..Default::default()
     };
-    let node_header_size = JFFS2_NODE_STRUCT_SIZE;
 
     // Try little endian first
     node.endianness = "little".to_string();
 
-    // Sanity check size of available data
-    if node_data.len() >= node_header_size {
-        // Parse the node header
-        let mut node_header = structures::common::parse(
-            &node_data[0..node_header_size],
-            &jffs2_node_structure,
-            &node.endianness,
-        );
+    // Parse the node header
+    if let Ok(mut node_header) = structures::common::parse(
+        &node_data,
+        &jffs2_node_structure,
+        &node.endianness,
+    ) {
 
         // If the node header magic isn't correct, try parsing the header as big endian
         if node_header["magic"] != JFFS2_CORRECT_MAGIC {
             node.endianness = "big".to_string();
-            node_header = structures::common::parse(
-                &node_data[0..node_header_size],
+            match structures::common::parse(
+                &node_data,
                 &jffs2_node_structure,
                 &node.endianness,
-            );
+            ) {
+                Err(_) => {
+                    return Err(structures::common::StructureError);
+                },
+                Ok(node_header_be) => {
+                    node_header = node_header_be.clone();
+                },
+            }
         }
 
         // Node magic must be correct at this point, else this node is invalid

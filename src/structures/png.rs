@@ -18,10 +18,8 @@ pub fn parse_png_chunk_header(
 
     let chunk_structure_size: usize = structures::common::size(&png_chunk_structure);
 
-    // Sanity check the size of available data
-    if chunk_data.len() > chunk_structure_size {
-        // Parse the chunk header
-        let chunk_header = structures::common::parse(&chunk_data, &png_chunk_structure, "big");
+    // Parse the chunk header
+    if let Ok(chunk_header) = structures::common::parse(&chunk_data, &png_chunk_structure, "big") {
 
         return Ok(PNGChunkHeader {
             is_last_chunk: chunk_header["type"] == IEND_CHUNK_TYPE,

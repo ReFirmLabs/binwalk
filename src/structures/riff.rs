@@ -23,12 +23,8 @@ pub fn parse_riff_header(
         ("chunk_type", "u32"),
     ];
 
-    let riff_struct_size: usize = structures::common::size(&riff_structure);
-
-    // Sanity check the size of available data
-    if riff_data.len() >= riff_struct_size {
-        // Parse the riff header
-        let riff_header = structures::common::parse(&riff_data, &riff_structure, "little");
+    // Parse the riff header
+    if let Ok(riff_header) = structures::common::parse(&riff_data, &riff_structure, "little") {
 
         if riff_header["magic1"] == MAGIC1 && riff_header["magic2"] == MAGIC2 {
             if let Ok(type_string) =

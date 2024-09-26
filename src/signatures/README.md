@@ -115,22 +115,8 @@ pub fn foobar_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::c
                                             ..Default::default()
     };
 
-    // This will return the size, in bytes, of the header structure we defined above
-    let foobar_header_size: usize = structures::common::size(&foobar_header_structure);
-    
-    // Define the start and end offsets of the FooBar header inside the file data
-    let start_of_header: usize = offset;
-    let end_of_header: usize = start_of_header + foobar_header_size;
-
-    /*
-     * Before parsing the header, we *must* ensure that there is enough data to process all header fields.
-     * If this is a false positive, or if the file is corrupt, and there is *not* enough data available
-     * to parse the header structure, structures::common::parse will panic.
-     */
-    if file_data.len() >= end_of_header {
-
-        // Parse the header, interpreting structure fields as big endian values
-        let foobar_header = structures::common::parse(&file_data[start_of_header..end_of_header], &foobar_header_structure, "big");
+    // Parse the header, interpreting structure fields as big endian values
+    if let Ok(foobar_header) = structures::common::parse(&file_data[offset..], &foobar_header_structure, "big") {
 
         /*
          * Do some sanity checks on the header values.
@@ -145,24 +131,17 @@ pub fn foobar_parser(file_data: &Vec<u8>, offset: usize) -> Result<signatures::c
             // We know that the flags field should only be one of these values
             if allowed_flags.contains(&foobar_header["flags"]) {
         
-                /*
-                 * The reported image size should not extend past the end of the file.
-                 *
-                 * Note that this check is not strictly necessary; if we were to return
-                 * a SignatureResult with a size field that extended beyond the end of
-                 * the file, it would be automatically marked as invalid by binwalk::scan.
-                 */
-                if file_data.len() >= (start_of_header + foobar_header["image_size"]) {
+                // Include the size of the FooBar image in our SignatureResult structure
+                // Note that no sanity check is done on this field; if a signature returns
+                // a size that would extend beyond EOF, it is automatically marked as invalid
+                // by binwalk::scan.
+                result.size = foobar_header["image_size"];
 
-                    // Include the size of the FooBar image in our SignatureResult structure
-                    result.size = foobar_header["image_size"];
+                // This is not necessary, but it is nice to display some more detailed information about the signature to the user, if possible
+                result.description = format!("{}, total size: {} bytes", result.description, result.size);
 
-                    // This is not necessary, but it is nice to display some more detailed information about the signature to the user, if possible
-                    result.description = format!("{}, total size: {} bytes", result.description, result.size);
-
-                   // Everything looks ok!
-                   return Ok(result);
-                }
+                // Everything looks ok!
+                return Ok(result);
             }
         }
     }

@@ -18,16 +18,12 @@ pub fn parse_romfs_header(
     // Get the size of the defined header structure
     let header_size = structures::common::size(&header_structure);
 
-    // Sanity check that there's more than enough data to process the header
-    if romfs_data.len() >= header_size {
-        // Parse the header structure
-        let header =
-            structures::common::parse(&romfs_data[0..header_size], &header_structure, "big");
+    // Parse the header structure
+    if let Ok(header) = structures::common::parse(romfs_data, &header_structure, "big") {
 
-        // Sanity check the reported size of image
-        if header["image_size"] > header_size {
-            // The volume name is a NULL-terminated string that immediately follows the RomFS header
-            let volume_name = get_cstring(&romfs_data[header_size..]);
+        // The volume name is a NULL-terminated string that immediately follows the RomFS header
+        if let Some(volume_name_bytes) = romfs_data.get(header_size..) {
+            let volume_name = get_cstring(volume_name_bytes);
 
             let mut crc_data_len: usize = MAX_HEADER_CRC_DATA_LEN;
 
@@ -36,13 +32,15 @@ pub fn parse_romfs_header(
             }
 
             // Validate the header CRC
-            if romfs_crc_valid(&romfs_data[0..crc_data_len]) == true {
-                return Ok(RomFSHeader {
-                    image_size: header["image_size"],
-                    volume_name: volume_name.clone(),
-                    // Volume name has a NULL terminator and is padded to a 16 byte boundary alignment
-                    header_size: header_size + romfs_align(volume_name.len() + 1),
-                });
+            if let Some(crc_data) = romfs_data.get(0..crc_data_len) {
+                if romfs_crc_valid(crc_data) == true {
+                    return Ok(RomFSHeader {
+                        image_size: header["image_size"],
+                        volume_name: volume_name.clone(),
+                        // Volume name has a NULL terminator and is padded to a 16 byte boundary alignment
+                        header_size: header_size + romfs_align(volume_name.len() + 1),
+                    });
+                }
             }
         }
     }
@@ -97,53 +95,49 @@ pub fn parse_romfs_file_entry(
     // Size of the defined file header structure
     let file_header_size = structures::common::size(&file_header_structure);
 
-    // Sanity check available data
-    if romfs_data.len() >= file_header_size {
-        // Parse the file header
-        let file_entry_header = structures::common::parse(
-            &romfs_data[0..file_header_size],
-            &file_header_structure,
-            "big",
-        );
+    // Parse the file header
+    if let Ok(file_entry_header) = structures::common::parse(romfs_data, &file_header_structure, "big") {
 
         // Null terminated file name immediately follows the header
-        let file_name = get_cstring(&romfs_data[file_header_size..]);
+        if let Some(file_name_bytes) = romfs_data.get(file_header_size..) {
+            let file_name = get_cstring(file_name_bytes);
 
-        // A file should have a name
-        if file_name.len() > 0 {
-            // Instantiate a new RomFSEntry structure
-            let mut file_header = RomFSFileHeader {
-                ..Default::default()
-            };
+            // A file should have a name
+            if file_name.len() > 0 {
+                // Instantiate a new RomFSEntry structure
+                let mut file_header = RomFSFileHeader {
+                    ..Default::default()
+                };
 
-            // Populate basic info
-            file_header.size = file_entry_header["size"];
-            file_header.info = file_entry_header["info"];
-            file_header.checksum = file_entry_header["checksum"];
-            file_header.name = file_name.clone();
+                // Populate basic info
+                file_header.size = file_entry_header["size"];
+                file_header.info = file_entry_header["info"];
+                file_header.checksum = file_entry_header["checksum"];
+                file_header.name = file_name.clone();
 
-            // File data begins immediately after the file header, including the NULL-terminated, 16-byte alignment padded file name
-            file_header.data_offset = file_header_size + romfs_align(file_name.len() + 1);
+                // File data begins immediately after the file header, including the NULL-terminated, 16-byte alignment padded file name
+                file_header.data_offset = file_header_size + romfs_align(file_name.len() + 1);
 
-            // These values are encoded into the next header offset field
-            file_header.file_type = file_entry_header["next_header_offset"] & FILE_TYPE_MASK;
-            file_header.executable =
-                (file_entry_header["next_header_offset"] & FILE_EXEC_MASK) != 0;
+                // These values are encoded into the next header offset field
+                file_header.file_type = file_entry_header["next_header_offset"] & FILE_TYPE_MASK;
+                file_header.executable =
+                    (file_entry_header["next_header_offset"] & FILE_EXEC_MASK) != 0;
 
-            // Set the type of entry this is
-            file_header.fifo = file_header.file_type == ROMFS_FIFO;
-            file_header.socket = file_header.file_type == ROMFS_SOCKET;
-            file_header.symlink = file_header.file_type == ROMFS_SYMLINK;
-            file_header.regular = file_header.file_type == ROMFS_REGULAR_FILE;
-            file_header.directory = file_header.file_type == ROMFS_DIRECTORY;
-            file_header.block_device = file_header.file_type == ROMFS_BLOCK_DEVICE;
-            file_header.character_device = file_header.file_type == ROMFS_CHAR_DEVICE;
+                // Set the type of entry this is
+                file_header.fifo = file_header.file_type == ROMFS_FIFO;
+                file_header.socket = file_header.file_type == ROMFS_SOCKET;
+                file_header.symlink = file_header.file_type == ROMFS_SYMLINK;
+                file_header.regular = file_header.file_type == ROMFS_REGULAR_FILE;
+                file_header.directory = file_header.file_type == ROMFS_DIRECTORY;
+                file_header.block_device = file_header.file_type == ROMFS_BLOCK_DEVICE;
+                file_header.character_device = file_header.file_type == ROMFS_CHAR_DEVICE;
 
-            // The next file header offset is an offset from the beginning of the RomFS image
-            file_header.next_header_offset =
-                file_entry_header["next_header_offset"] & NEXT_OFFSET_MASK;
+                // The next file header offset is an offset from the beginning of the RomFS image
+                file_header.next_header_offset =
+                    file_entry_header["next_header_offset"] & NEXT_OFFSET_MASK;
 
-            return Ok(file_header);
+                return Ok(file_header);
+            }
         }
     }
 

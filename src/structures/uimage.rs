@@ -152,37 +152,32 @@ pub fn parse_uimage_header(
         (44, "StarFive SPL image"),
     ]);
 
-    // Sanity check available data length
-    if uimage_data.len() >= UIMAGE_HEADER_SIZE {
-        // Parse the first half of the header
-        let uimage_header = structures::common::parse(
-            &uimage_data[0..UIMAGE_HEADER_SIZE],
-            &uimage_structure,
-            "big",
-        );
+    // Parse the first half of the header
+    if let Ok(uimage_header) = structures::common::parse(uimage_data, &uimage_structure, "big") {
 
-        // Sanity check header fields, validate CRC
+        // Sanity check header fields
         if valid_os_types.contains_key(&uimage_header["os_type"]) {
             if valid_cpu_types.contains_key(&uimage_header["cpu_type"]) {
                 if valid_image_types.contains_key(&uimage_header["image_type"]) {
                     if valid_compression_types.contains_key(&uimage_header["compression_type"]) {
-                        if calculate_uimage_header_checksum(
-                            &uimage_data[0..UIMAGE_HEADER_SIZE].to_vec(),
-                        ) == uimage_header["header_crc"]
-                        {
-                            return Ok(UImageHeader {
-                                header_size: UIMAGE_HEADER_SIZE,
-                                name: get_cstring(&uimage_data[UIMAGE_NAME_OFFSET..]),
-                                data_size: uimage_header["data_size"],
-                                timestamp: uimage_header["creation_timestamp"],
-                                compression_type: valid_compression_types
-                                    [&uimage_header["compression_type"]]
-                                    .to_string(),
-                                cpu_type: valid_cpu_types[&uimage_header["cpu_type"]].to_string(),
-                                os_type: valid_os_types[&uimage_header["os_type"]].to_string(),
-                                image_type: valid_image_types[&uimage_header["image_type"]]
-                                    .to_string(),
-                            });
+
+                        // Finally, validate the header CRC
+                        if let Some(crc_data) = uimage_data.get(0..UIMAGE_HEADER_SIZE) {
+                            if calculate_uimage_header_checksum(crc_data) == uimage_header["header_crc"] {
+                                return Ok(UImageHeader {
+                                    header_size: UIMAGE_HEADER_SIZE,
+                                    name: get_cstring(&uimage_data[UIMAGE_NAME_OFFSET..]),
+                                    data_size: uimage_header["data_size"],
+                                    timestamp: uimage_header["creation_timestamp"],
+                                    compression_type: valid_compression_types
+                                        [&uimage_header["compression_type"]]
+                                        .to_string(),
+                                    cpu_type: valid_cpu_types[&uimage_header["cpu_type"]].to_string(),
+                                    os_type: valid_os_types[&uimage_header["os_type"]].to_string(),
+                                    image_type: valid_image_types[&uimage_header["image_type"]]
+                                        .to_string(),
+                                });
+                            }
                         }
                     }
                 }
@@ -193,12 +188,12 @@ pub fn parse_uimage_header(
     return Err(structures::common::StructureError);
 }
 
-fn calculate_uimage_header_checksum(hdr: &Vec<u8>) -> usize {
+fn calculate_uimage_header_checksum(hdr: &[u8]) -> usize {
     const HEADER_CRC_START: usize = 4;
     const HEADER_CRC_END: usize = 8;
 
-    // Clone the data, the header checksum has to be nulled out to calculate the CRC
-    let mut uimage_header: Vec<u8> = hdr.clone();
+    // Header checksum has to be nulled out to calculate the CRC
+    let mut uimage_header: Vec<u8> = hdr.to_vec();
 
     for i in HEADER_CRC_START..HEADER_CRC_END {
         uimage_header[i] = 0;

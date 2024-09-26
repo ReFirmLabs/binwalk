@@ -20,13 +20,10 @@ pub fn dlob_parser(
     };
 
     if let Ok(dlob_header) = parse_dlob_header(&file_data[offset..]) {
-        // Both parts should have the same magic bytes
-        if dlob_header.magic1 == dlob_header.magic2 {
-            result.size = dlob_header.size;
-            result.description =
-                format!("{}, header size: {} bytes", result.description, result.size);
-            return Ok(result);
-        }
+        result.size = dlob_header.size;
+        result.description =
+            format!("{}, header size: {} bytes", result.description, result.size);
+        return Ok(result);
     }
 
     return Err(signatures::common::SignatureError);

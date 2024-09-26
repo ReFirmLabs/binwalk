@@ -11,7 +11,6 @@ pub fn parse_yaffs_obj_header(
     endianness: &str,
 ) -> Result<YAFFSObject, structures::common::StructureError> {
     const UNUSED: usize = 0xFFFF;
-    const OBJ_STRUCT_SIZE: usize = 10;
 
     // First part of an object header
     let yaffs_object_structure = vec![
@@ -23,13 +22,8 @@ pub fn parse_yaffs_obj_header(
     // Allowed object types
     let allowed_types: Vec<usize> = vec![0, 1, 2, 3, 4, 5];
 
-    if header_data.len() >= OBJ_STRUCT_SIZE {
-        let obj_header = structures::common::parse(
-            &header_data[0..OBJ_STRUCT_SIZE],
-            &yaffs_object_structure,
-            endianness,
-        );
-
+    // Parse the object header
+    if let Ok(obj_header) = structures::common::parse(header_data, &yaffs_object_structure, endianness) {
         // Validate that the header looks sane
         if allowed_types.contains(&obj_header["type"])
             && (obj_header["parent_id"] > 0)
@@ -54,8 +48,6 @@ pub fn parse_yaffs_file_header(
     header_data: &[u8],
     endianness: &str,
 ) -> Result<YAFFSFileHeader, structures::common::StructureError> {
-    const INFO_STRUCT_SIZE: usize = 28;
-
     // Second part of an object header (after the name field)
     let yaffs_file_info = vec![
         ("mode", "u32"),
@@ -67,13 +59,7 @@ pub fn parse_yaffs_file_header(
         ("file_size", "u32"),
     ];
 
-    if header_data.len() >= INFO_STRUCT_SIZE {
-        let file_info = structures::common::parse(
-            &header_data[0..INFO_STRUCT_SIZE],
-            &yaffs_file_info,
-            endianness,
-        );
-
+    if let Ok(file_info) = structures::common::parse(header_data, &yaffs_file_info, endianness) {
         return Ok(YAFFSFileHeader {
             file_size: file_info["file_size"],
         });

@@ -31,10 +31,8 @@ pub fn parse_symtab_entry(
 
     let symtab_structure_size: usize = structures::common::size(&symtab_structure);
 
-    // Sanity check the size of available data
-    if symbol_data.len() >= symtab_structure_size {
-        // Parse the symbol table entry
-        let symbol_entry = structures::common::parse(&symbol_data, &symtab_structure, endianness);
+    // Parse the symbol table entry
+    if let Ok(symbol_entry) = structures::common::parse(&symbol_data, &symtab_structure, endianness) {
 
         // Sanity check expected values in the symbol table entry
         if allowed_symbol_types.contains_key(&symbol_entry["type"]) {
@@ -60,8 +58,8 @@ pub fn get_symtab_endianness(
     let mut endianness = "little";
 
     // The type field starts at offset 8 and is 0x00_00_05_00, so for big endian targets the 9th byte will be NULL
-    if symbol_data.len() > TYPE_FIELD_OFFSET {
-        if symbol_data[TYPE_FIELD_OFFSET] == 0 {
+    if let Some(offset_field) = symbol_data.get(TYPE_FIELD_OFFSET) {
+        if *offset_field == 0 {
             endianness = "big";
         }
 

@@ -21,19 +21,23 @@ pub fn parse_seama_header(
     let mut endianness: &str = "little";
     let header_size: usize = structures::common::size(&seama_structure);
 
-    // Sanity check the size of available data
-    if seama_data.len() > header_size {
-        // Parse the header; try little endian first
-        let mut seama_header = structures::common::parse(&seama_data, &seama_structure, endianness);
+    // Parse the header; try little endian first
+    if let Ok(mut seama_header) = structures::common::parse(&seama_data, &seama_structure, endianness) {
 
         // If the magic bytes don't match, switch to big endian
         if seama_header["magic"] != MAGIC {
             endianness = "big";
-            seama_header = structures::common::parse(&seama_data, &seama_structure, endianness);
+            match structures::common::parse(&seama_data, &seama_structure, endianness) {
+                Err(_) => {
+                    return Err(structures::common::StructureError);
+                },
+                Ok(seama_header_be) => {
+                    seama_header = seama_header_be.clone();
+                },
+            }
         }
 
-        // Sanity check the reported size of the firmware description string
-        if seama_data.len() >= (header_size + seama_header["description_size"]) {
+        if seama_header["magic"] == MAGIC {
             return Ok(SeamaHeader {
                 data_size: seama_header["data_size"],
                 header_size: header_size + seama_header["description_size"],

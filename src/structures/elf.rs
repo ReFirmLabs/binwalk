@@ -11,8 +11,6 @@ pub struct ELFHeader {
 }
 
 pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, structures::common::StructureError> {
-    // Smallest possible 32bit ELF (according to the internet)
-    const MIN_ELF_SIZE: usize = 45;
 
     const ELF_INFO_STRUCT_SIZE: usize = 8;
     const ELF_IDENT_STRUCT_SIZE: usize = 16;
@@ -141,14 +139,12 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, structures::common
         ..Default::default()
     };
 
-    // Sanity check the size of available data
-    if elf_data.len() >= MIN_ELF_SIZE {
-        // Endianness doesn't matter here, and we don't know what the ELF's endianness is yet
-        let e_ident = structures::common::parse(
-            &elf_data[0..ELF_IDENT_STRUCT_SIZE],
-            &elf_ident_structure,
-            "little",
-        );
+    // Endianness doesn't matter here, and we don't know what the ELF's endianness is yet
+    if let Ok(e_ident) = structures::common::parse(
+        &elf_data,
+        &elf_ident_structure,
+        "little",
+    ) {
 
         // Sanity check the e_ident fields
         if e_ident["padding_1"] == 0 && e_ident["padding_2"] == 0 {
@@ -166,24 +162,27 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, structures::common
                             let elf_info_start: usize = ELF_IDENT_STRUCT_SIZE;
                             let elf_info_end: usize = elf_info_start + ELF_INFO_STRUCT_SIZE;
 
-                            // Parse the remaining info from the ELF header
-                            let elf_info = structures::common::parse(
-                                &elf_data[elf_info_start..elf_info_end],
-                                &elf_info_structure,
-                                elf_endianness[&e_ident["endianness"]],
-                            );
+                            if let Some(elf_info_raw) = elf_data.get(elf_info_start..elf_info_end) {
+                                // Parse the remaining info from the ELF header
+                                if let Ok(elf_info) = structures::common::parse(
+                                    &elf_info_raw,
+                                    &elf_info_structure,
+                                    elf_endianness[&e_ident["endianness"]],
+                                ) {
 
-                            // Sanity check the remaining ELF header fields
-                            if elf_info["version"] == EXPECTED_VERSION {
-                                if elf_types.contains_key(&elf_info["type"]) {
-                                    if elf_machines.contains_key(&elf_info["machine"]) {
-                                        // Set the ELF info, erm, info
-                                        elf_hdr_info.exe_type =
-                                            elf_types[&elf_info["type"]].to_string();
-                                        elf_hdr_info.machine =
-                                            elf_machines[&elf_info["machine"]].to_string();
+                                    // Sanity check the remaining ELF header fields
+                                    if elf_info["version"] == EXPECTED_VERSION {
+                                        if elf_types.contains_key(&elf_info["type"]) {
+                                            if elf_machines.contains_key(&elf_info["machine"]) {
+                                                // Set the ELF info fields
+                                                elf_hdr_info.exe_type =
+                                                    elf_types[&elf_info["type"]].to_string();
+                                                elf_hdr_info.machine =
+                                                    elf_machines[&elf_info["machine"]].to_string();
 
-                                        return Ok(elf_hdr_info);
+                                                return Ok(elf_hdr_info);
+                                            }
+                                        }
                                     }
                                 }
                             }

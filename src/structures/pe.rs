@@ -84,22 +84,11 @@ pub fn parse_pe_header(pe_data: &[u8]) -> Result<PEHeader, structures::common::S
         (0x169, "MIPS WCEv2"),
     ]);
 
-    // Structure sizes
+    // Size of PE header structure
     let pe_header_size = structures::common::size(&pe_structure);
-    let dos_header_size = structures::common::size(&dos_structure);
 
-    // Start and end offsets of the DOS header
-    let dos_header_start: usize = 0;
-    let dos_header_end: usize = dos_header_start + dos_header_size;
-
-    // Sanity check the size of available data
-    if pe_data.len() > dos_header_end {
-        // Parse the DOS header
-        let dos_header = structures::common::parse(
-            &pe_data[dos_header_start..dos_header_end],
-            &dos_structure,
-            "little",
-        );
+    // Parse the DOS header
+    if let Ok(dos_header) = structures::common::parse(pe_data, &dos_structure, "little") {
 
         // Sanity check the reserved header fields; they should all be 0
         if dos_header["e_res_1"] == 0
@@ -122,21 +111,18 @@ pub fn parse_pe_header(pe_data: &[u8]) -> Result<PEHeader, structures::common::S
             let pe_header_end: usize = pe_header_start + pe_header_size;
 
             // Sanity check the PE header offsets
-            if pe_header_start > dos_header_end && pe_data.len() > pe_header_end {
-                // Parse the second part of the header
-                let pe_header = structures::common::parse(
-                    &pe_data[pe_header_start..pe_header_end],
-                    &pe_structure,
-                    "little",
-                );
+            if let Some(pe_header_data) = pe_data.get(pe_header_start..pe_header_end) {
+                // Parse the PE header
+                if let Ok(pe_header) = structures::common::parse(pe_header_data, &pe_structure, "little") {
 
-                // Check the PE magic bytes
-                if pe_header["magic"] == PE_MAGIC {
-                    // Check the reported machine type
-                    if known_machine_types.contains_key(&pe_header["machine"]) {
-                        return Ok(PEHeader {
-                            machine: known_machine_types[&pe_header["machine"]].to_string(),
-                        });
+                    // Check the PE magic bytes
+                    if pe_header["magic"] == PE_MAGIC {
+                        // Check the reported machine type
+                        if known_machine_types.contains_key(&pe_header["machine"]) {
+                            return Ok(PEHeader {
+                                machine: known_machine_types[&pe_header["machine"]].to_string(),
+                            });
+                        }
                     }
                 }
             }
