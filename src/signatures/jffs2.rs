@@ -44,7 +44,6 @@ pub fn jffs2_parser(
 
         // Make sure that jffs2_eof is sane
         if jffs2_eof < file_data.len() {
-
             // Start searching for subsequent JFFS2 nodes at the end of this node's data
             let grep_offset: usize = jffs2_eof;
 

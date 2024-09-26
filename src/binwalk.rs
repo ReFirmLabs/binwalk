@@ -40,7 +40,6 @@ pub fn init(
     include: Option<Vec<String>>,
     exclude: Option<Vec<String>>,
 ) -> Result<BinwalkConfig, std::io::Error> {
-
     // Set up a default BinwalkConfig structure
     let mut config: BinwalkConfig = BinwalkConfig {
         ..Default::default()
@@ -49,26 +48,29 @@ pub fn init(
     // Target file is optional, especially if being called via the library
     if let Some(target_file) = target_file_name {
         // Set the target file path, make it an absolute path
-        config.base_target_file = path::absolute(path::Path::new(target_file)).unwrap()
-                                                                              .to_str()
-                                                                              .unwrap()
-                                                                              .to_string();
+        config.base_target_file = path::absolute(path::Path::new(target_file))
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .to_string();
 
         // If an output extraction directory was specified, initialize it
         if let Some(extraction_directory) = output_directory {
-            config.base_output_directory = path::absolute(path::Path::new(extraction_directory)).unwrap()
-                                                                                                .to_str()
-                                                                                                .unwrap()
-                                                                                                .to_string();
+            config.base_output_directory = path::absolute(path::Path::new(extraction_directory))
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .to_string();
 
-            match init_extraction_directory(&config.base_target_file, &config.base_output_directory) {
+            match init_extraction_directory(&config.base_target_file, &config.base_output_directory)
+            {
                 Err(e) => {
                     return Err(e);
-                },
+                }
                 Ok(new_target_file_path) => {
                     // This is the new base target path (a symlink inside the extraction directory)
                     config.base_target_file = new_target_file_path.clone();
-                },
+                }
             }
         }
     }
@@ -84,8 +86,9 @@ pub fn init(
         config.signature_count += 1;
 
         // Create a lookup table which associates each signature to its respective extractor
-        config.extractor_lookup_table
-              .insert(signature.name.clone(), signature.extractor.clone());
+        config
+            .extractor_lookup_table
+            .insert(signature.name.clone(), signature.extractor.clone());
 
         // Each signature may have multiple magic bytes associated with it
         for pattern in signature.magic.clone() {
@@ -112,13 +115,15 @@ pub fn init(
 }
 
 // Initializes the extraction output directory
-fn init_extraction_directory(target_file: &String, extraction_directory: &String) -> Result<String, std::io::Error> {
-
+fn init_extraction_directory(
+    target_file: &String,
+    extraction_directory: &String,
+) -> Result<String, std::io::Error> {
     // Create the output directory, equivalent of mkdir -p
     match fs::create_dir_all(&extraction_directory) {
         Ok(_) => {
             debug!("Created base output directory: '{}'", extraction_directory);
-        },
+        }
         Err(e) => {
             error!(
                 "Failed to create base output directory '{}': {}",
@@ -138,7 +143,7 @@ fn init_extraction_directory(target_file: &String, extraction_directory: &String
         path::MAIN_SEPARATOR,
         target_path.file_name().unwrap().to_str().unwrap()
     );
-        
+
     // Create a path for the symlink target path
     let symlink_path = path::Path::new(&symlink_target_path_str);
 
@@ -147,12 +152,12 @@ fn init_extraction_directory(target_file: &String, extraction_directory: &String
         symlink_path.to_str().unwrap(),
         target_path.to_str().unwrap()
     );
-            
+
     // Create a symlink from inside the extraction directory to the specified target file
     match unix::fs::symlink(&target_path, &symlink_path) {
         Ok(_) => {
             return Ok(symlink_target_path_str);
-        },
+        }
         Err(e) => {
             error!(
                 "Failed to create symlink {} -> {}: {}",
@@ -161,7 +166,7 @@ fn init_extraction_directory(target_file: &String, extraction_directory: &String
                 e
             );
             return Err(e);
-        },
+        }
     }
 }
 
