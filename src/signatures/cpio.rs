@@ -27,29 +27,34 @@ pub fn cpio_parser(
         // Calculate the start and end offsets, enough to process a CPIO header with an EOF marker
         let header_data_start: usize = offset + result.size;
 
-        // Parse this CPIO entry's header
-        if let Ok(cpio_header) = cpio::parse_cpio_entry_header(&file_data[header_data_start..]) {
-            // Sanity check the magic bytes
-            if cpio_magic().contains(&cpio_header.magic) == false {
-                break;
-            }
-
-            // Keep a tally of how many CPIO headers have been processed
-            header_count += 1;
-
-            // Update the total size of the CPIO file to include this header and its data
-            result.size += cpio_header.header_size + cpio_header.data_size;
-
-            // If EOF marker has been found, we're done
-            if cpio_header.file_name == EOF_MARKER {
-                // We should have processed more than just an EOF entry!
-                if header_count > 1 {
-                    result.description =
-                        format!("{}, file count: {}", result.description, header_count - 1);
-                    return Ok(result);
-                } else {
+        // Get the CPIO entry's raw data
+        if let Some(cpio_entry_data) = file_data.get(header_data_start..) {
+            // Parse this CPIO entry's header
+            if let Ok(cpio_header) = cpio::parse_cpio_entry_header(cpio_entry_data) {
+                // Sanity check the magic bytes
+                if cpio_magic().contains(&cpio_header.magic) == false {
                     break;
                 }
+
+                // Keep a tally of how many CPIO headers have been processed
+                header_count += 1;
+
+                // Update the total size of the CPIO file to include this header and its data
+                result.size += cpio_header.header_size + cpio_header.data_size;
+
+                // If EOF marker has been found, we're done
+                if cpio_header.file_name == EOF_MARKER {
+                    // We should have processed more than just an EOF entry!
+                    if header_count > 1 {
+                        result.description =
+                            format!("{}, file count: {}", result.description, header_count - 1);
+                        return Ok(result);
+                    } else {
+                        break;
+                    }
+                }
+            } else {
+                break;
             }
         } else {
             break;
