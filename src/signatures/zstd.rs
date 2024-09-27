@@ -1,3 +1,4 @@
+use crate::common::is_offset_safe;
 use crate::signatures;
 use crate::structures::zstd::{parse_block_header, parse_zstd_header};
 
@@ -11,6 +12,7 @@ pub fn zstd_parser(
     file_data: &Vec<u8>,
     offset: usize,
 ) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+    // Size of checksum value at EOF
     const EOF_CHECKSUM_SIZE: usize = 4;
 
     // More or less arbitrarily chosen
@@ -23,13 +25,16 @@ pub fn zstd_parser(
         ..Default::default()
     };
 
-    // Parse the ZSTD header
+    let available_data = file_data.len();
+
+    // Parse the ZSTD header; this should be safe as the ZSTD magic bytes wouldn't have matched at this offset if nothing was there...
     if let Ok(zstd_header) = parse_zstd_header(&file_data[offset..]) {
         /*
          * The first block header starts immediately after the ZSTD header, BUT there may be optional header fields present.
          * Must parse the frame header descriptor bit fields to determine total size of the header.
          */
         let mut next_block_header_start = offset + zstd_header.fixed_header_size;
+        let mut previous_block_header_start = None;
 
         // If single segment flag is not set, then window descriptor byte is present in the header
         if zstd_header.single_segment_flag == false {
@@ -63,7 +68,7 @@ pub fn zstd_parser(
         let mut block_count: usize = 0;
 
         // We now know where the first block header starts, loop through all the blocks to determine where the ZSTD data ends
-        while file_data.len() > next_block_header_start {
+        while is_offset_safe(available_data, next_block_header_start, previous_block_header_start) {
             // Parse the block header
             match parse_block_header(&file_data[next_block_header_start..]) {
                 Err(_) => {
@@ -75,6 +80,7 @@ pub fn zstd_parser(
                     block_count += 1;
 
                     // The next block header should start at the end of this block; note that the reported block size does not include the size of the block header
+                    previous_block_header_start = Some(next_block_header_start);
                     next_block_header_start += block_header.header_size + block_header.block_size;
 
                     // Was this the last block?
