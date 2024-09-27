@@ -1,3 +1,4 @@
+use crate::common::is_offset_safe;
 use crate::extractors::common::{
     chrooted_path, create_block_device, create_character_device, create_directory, create_fifo,
     create_file, create_socket, create_symlink, make_executable, safe_path_join,
@@ -110,18 +111,22 @@ fn process_romfs_entries(
     romfs_data: &[u8],
     offset: usize,
 ) -> Result<Vec<RomFSEntry>, ExtractionError> {
+    let mut previous_file_offset = None;
     let mut file_entries: Vec<RomFSEntry> = vec![];
     let mut processed_entries: Vec<usize> = vec![];
     let ignore_file_names: Vec<String> = vec![".".to_string(), "..".to_string()];
 
-    // File data starts immediately after the image header
+    // Total available data
+    let available_data = romfs_data.len();
+
+    // File data starts immediately after the image header; the offset passed in should be the end of the header
     let mut file_offset: usize = offset;
 
     /*
      * Sanity check the available file data against the offset of the next file entry.
      * The file offset for the next file entry will be 0 when we've reached the end of the entry list.
      */
-    while file_offset != 0 && romfs_data.len() > file_offset {
+    while file_offset != 0 && is_offset_safe(available_data, file_offset, previous_file_offset) {
         // Sanity check, no two entries should exist at the same offset, if so, infinite recursion could ensue
         if processed_entries.contains(&file_offset) == true {
             break;
@@ -163,16 +168,18 @@ fn process_romfs_entries(
             if ignore_file_names.contains(&file_entry.name) == false {
                 // Symlinks need their target paths
                 if file_entry.symlink == true {
-                    match String::from_utf8(
-                        romfs_data[file_entry.offset..file_entry.offset + file_entry.size].to_vec(),
-                    ) {
-                        Err(e) => {
-                            warn!("Failed to convert symlink target path to string: {}", e);
-                            return Err(ExtractionError);
+                    if let Some(symlink_bytes) = romfs_data.get(file_entry.offset..file_entry.offset + file_entry.size) {
+                        match String::from_utf8(symlink_bytes.to_vec()) {
+                            Err(e) => {
+                                warn!("Failed to convert symlink target path to string: {}", e);
+                                return Err(ExtractionError);
+                            }
+                            Ok(path) => {
+                                file_entry.symlink_target = path.clone();
+                            },
                         }
-                        Ok(path) => {
-                            file_entry.symlink_target = path.clone();
-                        }
+                    } else {
+                        break;
                     }
                 // Device files have their major/minor numbers encoded into the info field
                 } else if file_entry.block_device || file_entry.character_device {
@@ -195,6 +202,7 @@ fn process_romfs_entries(
             }
 
             // The next file header offset is an offset from the beginning of the RomFS image
+            previous_file_offset = Some(file_offset);
             file_offset = file_header.next_header_offset;
         } else {
             // File entry header parsing failed, gtfo
