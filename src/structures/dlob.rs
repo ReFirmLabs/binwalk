@@ -23,7 +23,8 @@ pub fn parse_dlob_header(
 
         // Parse the second part of the header
         if let Some(header_p2_data) = dlob_data.get(dlob_header_p2_offset..) {
-            if let Ok(dlob_header_p2) = structures::common::parse(header_p2_data, &dlob_structure, "big")
+            if let Ok(dlob_header_p2) =
+                structures::common::parse(header_p2_data, &dlob_structure, "big")
             {
                 // Both parts should have the same magic bytes
                 if dlob_header_p1["magic"] == dlob_header_p2["magic"] {

@@ -168,7 +168,9 @@ fn process_romfs_entries(
             if ignore_file_names.contains(&file_entry.name) == false {
                 // Symlinks need their target paths
                 if file_entry.symlink == true {
-                    if let Some(symlink_bytes) = romfs_data.get(file_entry.offset..file_entry.offset + file_entry.size) {
+                    if let Some(symlink_bytes) =
+                        romfs_data.get(file_entry.offset..file_entry.offset + file_entry.size)
+                    {
                         match String::from_utf8(symlink_bytes.to_vec()) {
                             Err(e) => {
                                 warn!("Failed to convert symlink target path to string: {}", e);
@@ -176,7 +178,7 @@ fn process_romfs_entries(
                             }
                             Ok(path) => {
                                 file_entry.symlink_target = path.clone();
-                            },
+                            }
                         }
                     } else {
                         break;

@@ -90,7 +90,11 @@ pub fn get_cstring(raw_data: &[u8]) -> String {
  * next_offset    - The next data offset to be accessed
  * last_offset    - The previous data offset that was accessed
  */
-pub fn is_offset_safe(available_data: usize, next_offset: usize, last_offset: Option<usize>) -> bool {
+pub fn is_offset_safe(
+    available_data: usize,
+    next_offset: usize,
+    last_offset: Option<usize>,
+) -> bool {
     // If a previous file offset was specified, ensure that it is less than the next file offset
     if let Some(previous_offset) = last_offset {
         if previous_offset >= next_offset {
