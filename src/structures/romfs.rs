@@ -21,25 +21,29 @@ pub fn parse_romfs_header(
     // Parse the header structure
     if let Ok(header) = structures::common::parse(romfs_data, &header_structure, "big") {
 
-        // The volume name is a NULL-terminated string that immediately follows the RomFS header
-        if let Some(volume_name_bytes) = romfs_data.get(header_size..) {
-            let volume_name = get_cstring(volume_name_bytes);
+        // Sanity check the reported image size
+        if header["image_size"] > header_size {
 
-            let mut crc_data_len: usize = MAX_HEADER_CRC_DATA_LEN;
+            // The volume name is a NULL-terminated string that immediately follows the RomFS header
+            if let Some(volume_name_bytes) = romfs_data.get(header_size..) {
+                let volume_name = get_cstring(volume_name_bytes);
 
-            if header["image_size"] < crc_data_len {
-                crc_data_len = header["image_size"];
-            }
+                let mut crc_data_len: usize = MAX_HEADER_CRC_DATA_LEN;
 
-            // Validate the header CRC
-            if let Some(crc_data) = romfs_data.get(0..crc_data_len) {
-                if romfs_crc_valid(crc_data) == true {
-                    return Ok(RomFSHeader {
-                        image_size: header["image_size"],
-                        volume_name: volume_name.clone(),
-                        // Volume name has a NULL terminator and is padded to a 16 byte boundary alignment
-                        header_size: header_size + romfs_align(volume_name.len() + 1),
-                    });
+                if header["image_size"] < crc_data_len {
+                    crc_data_len = header["image_size"];
+                }
+
+                // Validate the header CRC
+                if let Some(crc_data) = romfs_data.get(0..crc_data_len) {
+                    if romfs_crc_valid(crc_data) == true {
+                        return Ok(RomFSHeader {
+                            image_size: header["image_size"],
+                            volume_name: volume_name.clone(),
+                            // Volume name has a NULL terminator and is padded to a 16 byte boundary alignment
+                            header_size: header_size + romfs_align(volume_name.len() + 1),
+                        });
+                    }
                 }
             }
         }

@@ -54,51 +54,50 @@ pub fn extract_romfs(
         Some(_) => do_extraction = true,
     }
 
-    // RomFS start is known, size is not...
-    let mut romfs_data: &[u8] = &file_data[offset..];
-
     // Parse the RomFS header
-    if let Ok(romfs_header) = parse_romfs_header(romfs_data) {
+    if let Ok(romfs_header) = parse_romfs_header(&file_data[offset..]) {
         // Calculate start and end offsets of RomFS image
         let romfs_data_start: usize = offset;
         let romfs_data_end: usize = romfs_data_start + romfs_header.image_size;
 
-        // Sanity check available file data
-        if file_data.len() >= romfs_data_end {
-            // Now that the size of the image is known, restrict romfs_data to that size
-            romfs_data = &file_data[romfs_data_start..romfs_data_end];
+        // Sanity check reported image size and get the romfs data
+        if let Some(romfs_data) = file_data.get(romfs_data_start..romfs_data_end) {
 
             // Process the RomFS file entries
             if let Ok(root_entries) = process_romfs_entries(romfs_data, romfs_header.header_size) {
-                // Everything looks good
-                result.success = true;
-                result.size = Some(romfs_header.image_size);
 
-                // Do extraction, if an output directory was provided
-                if do_extraction {
-                    let mut file_count: usize = 0;
-                    let root_parent = "".to_string();
-                    let extraction_directory = output_directory.unwrap();
+                // We expect at least one file entry in the root of the RomFS image
+                if root_entries.len() > 0 {
+                    // Everything looks good
+                    result.success = true;
+                    result.size = Some(romfs_header.image_size);
 
-                    // RomFS files will be extracted to a sub-directory under the specified
-                    // extraction directory whose name is the RomFS volume name.
-                    let romfs_chroot_dir =
-                        chrooted_path(&romfs_header.volume_name, &extraction_directory);
+                    // Do extraction, if an output directory was provided
+                    if do_extraction {
+                        let mut file_count: usize = 0;
+                        let root_parent = "".to_string();
+                        let extraction_directory = output_directory.unwrap();
 
-                    // Create the romfs output directory, ensuring that it is contained inside the specified extraction directory
-                    if create_directory(&romfs_chroot_dir, extraction_directory) == true {
-                        // Extract RomFS contents
-                        file_count = extract_romfs_entries(
-                            romfs_data,
-                            &root_entries,
-                            &root_parent,
-                            &romfs_chroot_dir,
-                        );
-                    }
+                        // RomFS files will be extracted to a sub-directory under the specified
+                        // extraction directory whose name is the RomFS volume name.
+                        let romfs_chroot_dir =
+                            chrooted_path(&romfs_header.volume_name, &extraction_directory);
 
-                    // If no files were extracted, extraction was a failure
-                    if file_count == 0 {
-                        result.success = false;
+                        // Create the romfs output directory, ensuring that it is contained inside the specified extraction directory
+                        if create_directory(&romfs_chroot_dir, extraction_directory) == true {
+                            // Extract RomFS contents
+                            file_count = extract_romfs_entries(
+                                romfs_data,
+                                &root_entries,
+                                &root_parent,
+                                &romfs_chroot_dir,
+                            );
+                        }
+
+                        // If no files were extracted, extraction was a failure
+                        if file_count == 0 {
+                            result.success = false;
+                        }
                     }
                 }
             }
