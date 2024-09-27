@@ -7,6 +7,7 @@ pub struct UImageHeader {
     pub header_size: usize,
     pub name: String,
     pub data_size: usize,
+    pub data_checksum: usize,
     pub timestamp: usize,
     pub compression_type: String,
     pub cpu_type: String,
@@ -168,6 +169,7 @@ pub fn parse_uimage_header(
                                     header_size: UIMAGE_HEADER_SIZE,
                                     name: get_cstring(&uimage_data[UIMAGE_NAME_OFFSET..]),
                                     data_size: uimage_header["data_size"],
+                                    data_checksum: uimage_header["data_crc"],
                                     timestamp: uimage_header["creation_timestamp"],
                                     compression_type: valid_compression_types
                                         [&uimage_header["compression_type"]]

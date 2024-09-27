@@ -125,7 +125,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         magic: signatures::uimage::uimage_magic(),
         parser: signatures::uimage::uimage_parser,
         description: signatures::uimage::DESCRIPTION.to_string(),
-        extractor: None,
+        extractor: Some(extractors::uimage::uimage_extractor()),
     });
 
     // packimg header

@@ -24,6 +24,7 @@ pub mod tarball;
 pub mod tsk;
 pub mod ubi;
 pub mod uefi;
+pub mod uimage;
 pub mod vxworks;
 pub mod zip;
 pub mod zlib;
