@@ -46,8 +46,6 @@ pub fn yaffs_parser(
         let page_size = get_page_size(&file_data[offset..]);
         let spare_size = get_spare_size(&file_data[offset..], page_size, endianness);
 
-        println!("page size: {}  spare size: {}", page_size, spare_size);
-
         if let Ok(image_size) =
             get_image_size(&file_data[offset..], page_size, spare_size, endianness)
         {
