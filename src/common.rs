@@ -82,3 +82,26 @@ pub fn get_cstring(raw_data: &[u8]) -> String {
 
     return string;
 }
+
+/*
+ * Validates file/data offsets to prevent out-of-bounds access and infinite loops.
+ *
+ * available_data - The maximum number of bytes available in the data being accessed
+ * next_offset    - The next data offset to be accessed
+ * last_offset    - The previous data offset that was accessed
+ */
+pub fn is_offset_safe(available_data: usize, next_offset: usize, last_offset: Option<usize>) -> bool {
+    // If a previous file offset was specified, ensure that it is less than the next file offset
+    if let Some(previous_offset) = last_offset {
+        if previous_offset >= next_offset {
+            return false;
+        }
+    }
+
+    // Ensure that the next file offset is within the bounds of available file data
+    if next_offset >= available_data {
+        return false;
+    }
+
+    return true;
+}

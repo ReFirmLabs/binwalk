@@ -1,3 +1,4 @@
+use crate::common::is_offset_safe;
 use crate::extractors::common::{append_to_file, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::androidsparse;
 
@@ -33,11 +34,12 @@ pub fn extract_android_sparse(
 
     // Parse the sparse file header
     if let Ok(sparse_header) = androidsparse::parse_android_sparse_header(&file_data[offset..]) {
+        let available_data: usize = file_data.len();
+        let mut last_chunk_offset: Option<usize> = None;
         let mut processed_chunk_count: usize = 0;
         let mut next_chunk_offset: usize = offset + sparse_header.header_size;
 
-        // Sanity check the size of available data before processing the next chunk
-        while next_chunk_offset < file_data.len() {
+        while is_offset_safe(available_data, next_chunk_offset, last_chunk_offset) {
             // Parse the next chunk's header
             match androidsparse::parse_android_sparse_chunk_header(&file_data[next_chunk_offset..])
             {
@@ -46,31 +48,29 @@ pub fn extract_android_sparse(
                 }
 
                 Ok(chunk_header) => {
-                    // Sanity check the reported size of the next chunk's data
-                    if file_data.len()
-                        < (next_chunk_offset + chunk_header.header_size + chunk_header.data_size)
-                    {
-                        break;
-                    }
-
                     // If not a dry run, extract the data from the next chunk
                     if dry_run == false {
                         let chunk_data_start: usize = next_chunk_offset + chunk_header.header_size;
                         let chunk_data_end: usize = chunk_data_start + chunk_header.data_size;
 
-                        if extract_chunk(
-                            &sparse_header,
-                            &chunk_header,
-                            &file_data[chunk_data_start..chunk_data_end],
-                            &OUTFILE_NAME.to_string(),
-                            output_directory.unwrap(),
-                        ) == false
-                        {
+                        if let Some(chunk_data) = file_data.get(chunk_data_start..chunk_data_end) {
+                            if extract_chunk(
+                                &sparse_header,
+                                &chunk_header,
+                                chunk_data,
+                                &OUTFILE_NAME.to_string(),
+                                output_directory.unwrap(),
+                            ) == false
+                            {
+                                break;
+                            }
+                        } else {
                             break;
                         }
                     }
 
                     processed_chunk_count += 1;
+                    last_chunk_offset = Some(next_chunk_offset);
                     next_chunk_offset += chunk_header.header_size + chunk_header.data_size;
                 }
             }

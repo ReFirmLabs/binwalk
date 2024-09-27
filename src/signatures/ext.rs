@@ -1,5 +1,5 @@
 use crate::signatures;
-use crate::structures::ext::{parse_ext_header, SUPERBLOCK_OFFSET, SUPERBLOCK_SIZE};
+use crate::structures::ext::parse_ext_header;
 
 pub const DESCRIPTION: &str = "EXT filesystem";
 
@@ -28,20 +28,14 @@ pub fn ext_parser(
 
     let mut result = signatures::common::SignatureResult {
         description: DESCRIPTION.to_string(),
-        offset: offset,
+        offset: offset - MAGIC_OFFSET,
         size: 0,
         confidence: signatures::common::CONFIDENCE_MEDIUM,
         ..Default::default()
     };
 
-    let available_data: usize = file_data.len() - offset;
-
-    // Sanity check the reported offset of the magic bytes
-    if available_data >= (SUPERBLOCK_OFFSET + SUPERBLOCK_SIZE) {
-        // Set the reported offset to the actual beginning of the EXT image
-        result.offset = offset - MAGIC_OFFSET;
-
-        if let Ok(ext_header) = parse_ext_header(&file_data[result.offset..]) {
+    if let Some(ext_data) = file_data.get(result.offset..) {
+        if let Ok(ext_header) = parse_ext_header(ext_data) {
             result.size = ext_header.image_size;
             result.description = format!("{} for {}, inodes: {}, block size: {}, block count: {}, free blocks: {}, reserved blocks: {}, total size: {} bytes", result.description,
                                                                                                                                                                ext_header.os,
