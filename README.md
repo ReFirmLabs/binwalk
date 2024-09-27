@@ -111,13 +111,13 @@ binwalk file_name.bin
 To exclude specific signatures from a scan:
 
 ```
-binwalk -x jpeg,png,pdf file_name.bin
+binwalk --exclude=jpeg,png,pdf file_name.bin
 ```
 
 To only serch for specific signatures during a scan:
 
 ```
-binwalk -y jpeg,png,pdf file_name.bin
+binwalk --include=jpeg,png,pdf file_name.bin
 ```
 
 To scan a file and extract its contents (default output directory is `extractions`):
@@ -141,7 +141,7 @@ binwalk -E file_name.bin
 To save signature or entropy analysis results to a JSON file:
 
 ```
-binwalk -l results.json file_name.bin
+binwalk --log=results.json file_name.bin
 ```
 
 ## Command Line Output
