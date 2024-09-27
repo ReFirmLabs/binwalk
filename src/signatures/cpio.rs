@@ -1,3 +1,4 @@
+use crate::common::is_offset_safe;
 use crate::signatures;
 use crate::structures::cpio;
 
@@ -22,42 +23,58 @@ pub fn cpio_parser(
         ..Default::default()
     };
 
-    // Loop while there is still the possibility of having a CPIO header
-    while file_data.len() >= (offset + result.size + cpio::CPIO_HEADER_SIZE) {
-        // Calculate the start and end offsets, enough to process a CPIO header with an EOF marker
-        let header_data_start: usize = offset + result.size;
+    let mut next_header_offset = offset;
+    let mut previous_header_offset = None;
+    let available_data = file_data.len();
 
+    // Loop over all the available data, or until CPIO EOF, or until error
+    while is_offset_safe(available_data, next_header_offset, previous_header_offset) {
         // Get the CPIO entry's raw data
-        if let Some(cpio_entry_data) = file_data.get(header_data_start..) {
-            // Parse this CPIO entry's header
-            if let Ok(cpio_header) = cpio::parse_cpio_entry_header(cpio_entry_data) {
-                // Sanity check the magic bytes
-                if cpio_magic().contains(&cpio_header.magic) == false {
-                    break;
-                }
-
-                // Keep a tally of how many CPIO headers have been processed
-                header_count += 1;
-
-                // Update the total size of the CPIO file to include this header and its data
-                result.size += cpio_header.header_size + cpio_header.data_size;
-
-                // If EOF marker has been found, we're done
-                if cpio_header.file_name == EOF_MARKER {
-                    // We should have processed more than just an EOF entry!
-                    if header_count > 1 {
-                        result.description =
-                            format!("{}, file count: {}", result.description, header_count - 1);
-                        return Ok(result);
-                    } else {
-                        break;
-                    }
-                }
-            } else {
+        match file_data.get(next_header_offset..) {
+            None => {
                 break;
             }
-        } else {
-            break;
+            Some(cpio_entry_data) => {
+                // Parse this CPIO entry's header
+                match cpio::parse_cpio_entry_header(cpio_entry_data) {
+                    Err(_) => {
+                        break;
+                    }
+                    Ok(cpio_header) => {
+                        // Sanity check the magic bytes
+                        if cpio_magic().contains(&cpio_header.magic) == false {
+                            break;
+                        }
+
+                        // Keep a tally of how many CPIO headers have been processed
+                        header_count += 1;
+
+                        // Update the total size of the CPIO file to include this header and its data
+                        result.size += cpio_header.header_size + cpio_header.data_size;
+
+                        // If EOF marker has been found, we're done
+                        if cpio_header.file_name == EOF_MARKER {
+                            // If one or fewer CPIO headers were found, consider it a false positive;
+                            // a CPIO archive should have at least one file/directory entry, and one EOF entry.
+                            if header_count > 1 {
+                                // Return the result; reported file count does not include the EOF entry
+                                result.description = format!(
+                                    "{}, file count: {}",
+                                    result.description,
+                                    header_count - 1
+                                );
+                                return Ok(result);
+                            }
+
+                            break;
+                        }
+
+                        // Update the previous and next header offset values for the next loop iteration
+                        previous_header_offset = Some(next_header_offset);
+                        next_header_offset = offset + result.size;
+                    }
+                }
+            }
         }
     }
 
