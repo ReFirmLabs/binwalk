@@ -1,3 +1,4 @@
+use crate::common::is_offset_safe;
 use crate::signatures;
 use aho_corasick::AhoCorasick;
 
@@ -28,6 +29,8 @@ pub fn srec_parser(
         ..Default::default()
     };
 
+    let available_data = file_data.len();
+
     // Srec lines, and hence the last line of an s-record, should end with a new line or line feed
     let terminating_characters = vec![WINDOWS_TERMINATING_CHARACTER, UNIX_TERMINATING_CHARACTER];
 
@@ -44,9 +47,10 @@ pub fn srec_parser(
 
         // Start searching for terminating EOF characters after this footer match (all footer signatures are the same size)
         let mut srec_eof: usize = offset + srec_footer_match.start() + srec_footers[0].len();
+        let mut last_srec_eof = None;
 
         // Found the start of a possible srec footer line, loop over remianing bytes looking for the line termination
-        while srec_eof < file_data.len() {
+        while is_offset_safe(available_data, srec_eof, last_srec_eof) {
             // All srec lines should end in \n or \r\n
             if terminating_characters.contains(&file_data[srec_eof]) {
                 // Windows systems use \r\n
@@ -57,7 +61,7 @@ pub fn srec_parser(
                 }
 
                 // Sanity check, don't want to index out of bounds
-                if srec_eof < file_data.len() {
+                if is_offset_safe(available_data, srec_eof, last_srec_eof) {
                     // Last byte should be a line feed (\n)
                     if file_data[srec_eof] == UNIX_TERMINATING_CHARACTER {
                         // Include the final line feed byte in the size of the s-record
@@ -78,6 +82,7 @@ pub fn srec_parser(
             }
 
             // Not a terminating character, go to the next byte in the file
+            last_srec_eof = Some(srec_eof);
             srec_eof += 1;
         }
     }

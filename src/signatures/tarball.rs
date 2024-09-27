@@ -1,3 +1,4 @@
+use crate::common::is_offset_safe;
 use crate::signatures;
 
 const TARBALL_BLOCK_SIZE: usize = 512;
@@ -27,38 +28,44 @@ pub fn tarball_parser(
     // Calculate the actual start of the tarball (header magic does not start at the beginning of a tar entry)
     let tarball_start_offset = offset - TARBALL_MAGIC_OFFSET;
 
+    // Tarball magic bytes do not start at the beginning of the tarball file
+    let mut next_header_start = tarball_start_offset;
+    let mut previous_header_start = None;
+    let available_data = file_data.len();
+
     // Loop through available data, processing tarball entry headers
-    while file_data.len() > (tarball_start_offset + tarball_total_size + TARBALL_BLOCK_SIZE) {
-        // Calculate the offset(s) of the next expected tarball entry header
-        let next_header_start = tarball_start_offset + tarball_total_size;
+    while is_offset_safe(available_data, next_header_start, previous_header_start) {
+        // Calculate the end of the next tarball entry data
         let next_header_end = next_header_start + TARBALL_BLOCK_SIZE;
 
-        // usize overflow
-        if next_header_end < next_header_start {
-            break;
-        }
-
-        // Get the next header's block
-        let tarball_header_block: &[u8] = &file_data[next_header_start..next_header_end];
-
-        // Bad checksum? Quit processing headers.
-        if header_checksum_is_valid(tarball_header_block) == false {
-            break;
-        }
-
-        // Get the reported size of the next entry header
-        match tarball_entry_size(tarball_header_block) {
-            Err(_e) => break,
-            Ok(entry_size) => {
-                // Sanity check: tarball should not extend beyond EOF
-                if (tarball_start_offset + tarball_total_size + entry_size) <= file_data.len() {
-                    // Append this entry's size to the running total
-                    tarball_total_size = tarball_total_size + entry_size;
-                    valid_header_count += 1;
-                } else {
+        // Get the next header's data; this will fail if not enough data is present, protecting
+        // other functions (header_checksum_is_valid, tarball_entry_size) from out-of-bounds access
+        match file_data.get(next_header_start..next_header_end) {
+            None => {
+                break;
+            },
+            Some(tarball_header_block) => {
+                // Bad checksum? Quit processing headers.
+                if header_checksum_is_valid(tarball_header_block) == false {
                     break;
                 }
-            }
+
+                // Increment the count of valid tarball headers found
+                valid_header_count += 1;
+
+                // Get the reported size of the next entry header
+                match tarball_entry_size(tarball_header_block) {
+                    Err(_) => {
+                        break;
+                    },
+                    Ok(entry_size) => {
+                        // Update total size count, and next/previous header offsets
+                        tarball_total_size += entry_size;
+                        previous_header_start = Some(next_header_start);
+                        next_header_start += entry_size;
+                    },
+                }
+            },
         }
     }
 

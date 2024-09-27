@@ -1,3 +1,4 @@
+use crate::common::is_offset_safe;
 use crate::signatures;
 use crate::structures::lz4::{parse_lz4_block_header, parse_lz4_file_header};
 
@@ -58,20 +59,30 @@ fn get_lz4_data_size(
     checksum_present: bool,
 ) -> Result<usize, signatures::common::SignatureError> {
     let mut lz4_data_size: usize = 0;
+    let mut last_lz4_data_size = None;
+    let available_data = lz4_data.len();
 
-    // Loop through data blocks while there is still data left to processes
-    while lz4_data.len() > lz4_data_size {
-        match parse_lz4_block_header(&lz4_data[lz4_data_size..], checksum_present) {
-            Err(_) => {
+    while is_offset_safe(available_data, lz4_data_size, last_lz4_data_size) {
+        match lz4_data.get(lz4_data_size..) {
+            None => {
                 break;
             }
+            Some(lz4_block_data) => {
+                match parse_lz4_block_header(lz4_block_data, checksum_present) {
+                    Err(_) => {
+                        break;
+                    }
 
-            Ok(block_header) => {
-                lz4_data_size +=
-                    block_header.header_size + block_header.data_size + block_header.checksum_size;
+                    Ok(block_header) => {
+                        last_lz4_data_size = Some(lz4_data_size);
+                        lz4_data_size += block_header.header_size
+                            + block_header.data_size
+                            + block_header.checksum_size;
 
-                if block_header.last_block == true {
-                    return Ok(lz4_data_size);
+                        if block_header.last_block == true {
+                            return Ok(lz4_data_size);
+                        }
+                    }
                 }
             }
         }
