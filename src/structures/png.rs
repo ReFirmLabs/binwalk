@@ -20,7 +20,6 @@ pub fn parse_png_chunk_header(
 
     // Parse the chunk header
     if let Ok(chunk_header) = structures::common::parse(&chunk_data, &png_chunk_structure, "big") {
-
         return Ok(PNGChunkHeader {
             is_last_chunk: chunk_header["type"] == IEND_CHUNK_TYPE,
             total_size: chunk_structure_size + chunk_header["length"] + CRC_SIZE,

@@ -89,7 +89,6 @@ pub fn parse_pe_header(pe_data: &[u8]) -> Result<PEHeader, structures::common::S
 
     // Parse the DOS header
     if let Ok(dos_header) = structures::common::parse(pe_data, &dos_structure, "little") {
-
         // Sanity check the reserved header fields; they should all be 0
         if dos_header["e_res_1"] == 0
             && dos_header["e_res_2"] == 0
@@ -113,8 +112,9 @@ pub fn parse_pe_header(pe_data: &[u8]) -> Result<PEHeader, structures::common::S
             // Sanity check the PE header offsets
             if let Some(pe_header_data) = pe_data.get(pe_header_start..pe_header_end) {
                 // Parse the PE header
-                if let Ok(pe_header) = structures::common::parse(pe_header_data, &pe_structure, "little") {
-
+                if let Ok(pe_header) =
+                    structures::common::parse(pe_header_data, &pe_structure, "little")
+                {
                     // Check the PE magic bytes
                     if pe_header["magic"] == PE_MAGIC {
                         // Check the reported machine type

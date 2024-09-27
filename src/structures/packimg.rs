@@ -19,12 +19,9 @@ pub fn parse_packimg_header(
     ];
 
     // Parse the packimg header
-    if let Ok(packimg_header) = structures::common::parse(
-            &packimg_data,
-            &packimg_structure,
-            "little",
-    ) {
-
+    if let Ok(packimg_header) =
+        structures::common::parse(&packimg_data, &packimg_structure, "little")
+    {
         return Ok(PackIMGHeader {
             header_size: PACKIMG_HEADER_SIZE,
             data_size: packimg_header["data_size"],

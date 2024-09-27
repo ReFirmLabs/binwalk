@@ -17,8 +17,9 @@ pub fn parse_deb_header(deb_data: &[u8]) -> Result<DebHeader, structures::common
     };
 
     // Index into the header to get the raw bytes of the decimal ASCII string that contains the control file size
-    if let Some(control_file_size_data) = deb_data.get(CONTROL_FILE_SIZE_START..CONTROL_FILE_SIZE_END) {
-
+    if let Some(control_file_size_data) =
+        deb_data.get(CONTROL_FILE_SIZE_START..CONTROL_FILE_SIZE_END)
+    {
         // Convert the raw bytes into an ASCII string
         if let Ok(control_file_size_str) = String::from_utf8(control_file_size_data.to_vec()) {
             // Trim white space from the string and convert to an integer value
@@ -32,10 +33,12 @@ pub fn parse_deb_header(deb_data: &[u8]) -> Result<DebHeader, structures::common
                 let data_file_size_end: usize = data_file_size_start + DATA_FILE_SIZE_LEN;
 
                 // Index into the header to get the raw bytes of the deciaml ASCII string that contains the data file size
-                if let Some(data_file_size_data) = deb_data.get(data_file_size_start..data_file_size_end) {
-
+                if let Some(data_file_size_data) =
+                    deb_data.get(data_file_size_start..data_file_size_end)
+                {
                     // Convert the raw bytes to an ASCII string
-                    if let Ok(data_file_size_str) = String::from_utf8(data_file_size_data.to_vec()) {
+                    if let Ok(data_file_size_str) = String::from_utf8(data_file_size_data.to_vec())
+                    {
                         // Trim whitespace from the string and convert to an integer value
                         if let Ok(data_file_size) =
                             usize::from_str_radix(&data_file_size_str.trim(), 10)

@@ -33,7 +33,6 @@ pub fn parse_chk_header(
 
     // Parse the CHK header
     if let Ok(chk_header) = structures::common::parse(&header_data, &chk_header_structure, "big") {
-
         // Validate the reported header size
         if chk_header["header_size"] > struct_size
             && chk_header["header_size"] <= MAX_EXPECTED_HEADER_SIZE
@@ -43,7 +42,6 @@ pub fn parse_chk_header(
             let board_id_end: usize = chk_header["header_size"];
 
             if let Some(board_id_raw_bytes) = header_data.get(board_id_start..board_id_end) {
-            
                 let board_id_string = get_cstring(&board_id_raw_bytes);
 
                 // We expect that there must be a valid board ID string

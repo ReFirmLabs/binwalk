@@ -14,7 +14,6 @@ pub fn parse_xz_header(xz_data: &[u8]) -> Result<usize, structures::common::Stru
     ];
 
     if let Ok(xz_header) = structures::common::parse(xz_data, &xz_structure, "little") {
-
         if let Some(crc_data) = xz_data.get(XZ_CRC_START..XZ_CRC_END) {
             if crc32(crc_data) == (xz_header["header_crc"] as u32) {
                 return Ok(XZ_HEADER_SIZE);
@@ -39,7 +38,6 @@ pub fn parse_xz_footer(xz_data: &[u8]) -> Result<usize, structures::common::Stru
 
     // Parse the stream footer
     if let Ok(xz_footer) = structures::common::parse(xz_data, &xz_footer_structure, "little") {
-
         // Calculate the start and end offsets of the CRC'd data
         let crc_start = CRC_START_INDEX;
         let crc_end = crc_start + CRC_DATA_SIZE;

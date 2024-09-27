@@ -28,8 +28,8 @@ pub fn parse_trx_header(
     let struct_size: usize = structures::common::size(&trx_header_structure);
 
     // Parse the header
-    if let Ok(trx_header) = structures::common::parse(header_data, &trx_header_structure, "little") {
-
+    if let Ok(trx_header) = structures::common::parse(header_data, &trx_header_structure, "little")
+    {
         // Sanity check partition offsets. Partition offsets may be 0.
         if trx_header["boot_partition_offset"] <= trx_header["total_size"]
             && trx_header["kernel_partition_offset"] <= trx_header["total_size"]

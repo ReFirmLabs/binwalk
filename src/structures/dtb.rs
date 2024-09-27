@@ -35,7 +35,6 @@ pub fn parse_dtb_header(dtb_data: &[u8]) -> Result<DTBHeader, structures::common
 
     // Parse the header
     if let Ok(dtb_header) = structures::common::parse(&dtb_data, &dtb_structure, "big") {
-
         // Check the reported versioning
         if dtb_header["version"] == EXPECTED_VERSION
             && dtb_header["min_compatible_version"] == EXPECTED_COMPAT_VERSION

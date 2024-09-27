@@ -25,7 +25,6 @@ pub fn parse_riff_header(
 
     // Parse the riff header
     if let Ok(riff_header) = structures::common::parse(&riff_data, &riff_structure, "little") {
-
         if riff_header["magic1"] == MAGIC1 && riff_header["magic2"] == MAGIC2 {
             if let Ok(type_string) =
                 String::from_utf8(riff_data[CHUNK_TYPE_START..CHUNK_TYPE_END].to_vec())

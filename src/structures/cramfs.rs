@@ -11,7 +11,6 @@ pub struct CramFSHeader {
 pub fn parse_cramfs_header(
     cramfs_data: &[u8],
 ) -> Result<CramFSHeader, structures::common::StructureError> {
-
     const BIG_ENDIAN_MAGIC: usize = 0x453DCD28;
     const LITTLE_ENDIAN_MAGIC: usize = 0x28CD3D45;
 
@@ -38,8 +37,11 @@ pub fn parse_cramfs_header(
     cramfs_info.endianness = "little".to_string();
 
     // Parse the CramFS header, try little endian first
-    if let Ok(mut cramfs_header) = structures::common::parse(&cramfs_data, &cramfs_header_structure, &cramfs_info.endianness) {
-
+    if let Ok(mut cramfs_header) = structures::common::parse(
+        &cramfs_data,
+        &cramfs_header_structure,
+        &cramfs_info.endianness,
+    ) {
         // Do the magic bytes match?
         if allowed_magics.contains(&cramfs_header["magic"]) {
             // If the magic bytes endianness don't match what's expected for little endian, switch to big endian
@@ -47,13 +49,17 @@ pub fn parse_cramfs_header(
                 cramfs_info.endianness = "big".to_string();
 
                 // Parse the header again, this time as big endian
-                match structures::common::parse(&cramfs_data, &cramfs_header_structure, &cramfs_info.endianness) {
+                match structures::common::parse(
+                    &cramfs_data,
+                    &cramfs_header_structure,
+                    &cramfs_info.endianness,
+                ) {
                     Err(_) => {
                         return Err(structures::common::StructureError);
-                    },
+                    }
                     Ok(cramfs_be_header) => {
                         cramfs_header = cramfs_be_header.clone();
-                    },
+                    }
                 }
             }
 

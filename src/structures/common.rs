@@ -57,8 +57,8 @@ pub fn parse(
 
             if csize == std::mem::size_of::<u8>() {
                 // u8, endianness doesn't matter
-                value =
-                    u8::from_be_bytes(raw_data[offset..offset + csize].try_into().unwrap()) as usize;
+                value = u8::from_be_bytes(raw_data[offset..offset + csize].try_into().unwrap())
+                    as usize;
             } else if csize == std::mem::size_of::<u16>() {
                 if endianness == "big" {
                     value = u16::from_be_bytes(raw_data[offset..offset + csize].try_into().unwrap())

@@ -34,7 +34,6 @@ pub fn parse_lz4_file_header(
 
     // Parse the header
     if let Ok(lz4_header) = structures::common::parse(&lz4_data, &lz4_structure, "little") {
-
         // Make sure the reserved bits aren't set
         if (lz4_header["flags"] & FLAGS_RESERVED_MASK) == 0
             && (lz4_header["bd"] & BD_RESERVED_MASK) == 0
@@ -61,7 +60,6 @@ pub fn parse_lz4_file_header(
             if let Some(crc_data) = lz4_data.get(crc_data_start..crc_data_end) {
                 // Grab the header CRC value stored in the file header
                 if let Some(actual_crc) = lz4_data.get(crc_data_end) {
-
                     // Calculate the header CRC, which is the second byte of the xxh32 hash. It is calculated over the header, excluding the magic bytes.
                     let calculated_crc: u8 =
                         ((xxhash_rust::xxh32::xxh32(&crc_data, 0) >> 8) & 0xFF) as u8;
@@ -111,12 +109,8 @@ pub fn parse_lz4_block_header(
     };
 
     // Parse the block header
-    if let Ok(block_header) = structures::common::parse(
-            &lz4_block_data,
-            &block_structure,
-            "little",
-    ) {
-
+    if let Ok(block_header) = structures::common::parse(&lz4_block_data, &block_structure, "little")
+    {
         // Header size is always 4 bytes
         lz4_block.header_size = BLOCK_STRUCT_SIZE;
 

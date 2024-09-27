@@ -37,8 +37,8 @@ pub fn parse_android_sparse_header(
     let expected_header_size = structures::common::size(&android_sparse_structure);
 
     // Parse the header
-    if let Ok(header) = structures::common::parse(&sparse_data, &android_sparse_structure, "little") {
-
+    if let Ok(header) = structures::common::parse(&sparse_data, &android_sparse_structure, "little")
+    {
         // Sanity check header values
         if header["major_version"] == MAJOR_VERSION
             && header["minor_version"] == MINOR_VERSION
@@ -93,7 +93,6 @@ pub fn parse_android_sparse_chunk_header(
 
     // Parse the header
     if let Ok(chunk_header) = structures::common::parse(chunk_data, &chunk_structure, "little") {
-
         // Make sure the reserved field is zero
         if chunk_header["reserved"] == 0 {
             // Populate the structure values

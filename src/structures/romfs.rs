@@ -20,10 +20,8 @@ pub fn parse_romfs_header(
 
     // Parse the header structure
     if let Ok(header) = structures::common::parse(romfs_data, &header_structure, "big") {
-
         // Sanity check the reported image size
         if header["image_size"] > header_size {
-
             // The volume name is a NULL-terminated string that immediately follows the RomFS header
             if let Some(volume_name_bytes) = romfs_data.get(header_size..) {
                 let volume_name = get_cstring(volume_name_bytes);
@@ -100,8 +98,9 @@ pub fn parse_romfs_file_entry(
     let file_header_size = structures::common::size(&file_header_structure);
 
     // Parse the file header
-    if let Ok(file_entry_header) = structures::common::parse(romfs_data, &file_header_structure, "big") {
-
+    if let Ok(file_entry_header) =
+        structures::common::parse(romfs_data, &file_header_structure, "big")
+    {
         // Null terminated file name immediately follows the header
         if let Some(file_name_bytes) = romfs_data.get(file_header_size..) {
             let file_name = get_cstring(file_name_bytes);

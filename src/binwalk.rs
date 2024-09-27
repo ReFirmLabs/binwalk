@@ -403,7 +403,8 @@ pub fn scan(
 
         // If we've made it this far, make sure this signature's data doesn't extend beyond EOF and that the file data doesn't wrap around
         if this_signature.size > remaining_available_size
-            || ((this_signature.offset + this_signature.size) as isize) < 0 {
+            || ((this_signature.offset + this_signature.size) as isize) < 0
+        {
             debug!(
                 "Signature {} at offset {:#X} claims its size extends beyond EOF; ignoring",
                 this_signature.name, this_signature.offset

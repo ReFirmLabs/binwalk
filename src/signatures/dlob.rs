@@ -21,8 +21,7 @@ pub fn dlob_parser(
 
     if let Ok(dlob_header) = parse_dlob_header(&file_data[offset..]) {
         result.size = dlob_header.size;
-        result.description =
-            format!("{}, header size: {} bytes", result.description, result.size);
+        result.description = format!("{}, header size: {} bytes", result.description, result.size);
         return Ok(result);
     }
 

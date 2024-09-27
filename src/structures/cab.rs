@@ -52,8 +52,8 @@ pub fn parse_cab_header(
     };
 
     // Parse the CAB header
-    if let Ok(cab_header) = structures::common::parse(&header_data, &cab_header_structure, "little") {
-
+    if let Ok(cab_header) = structures::common::parse(&header_data, &cab_header_structure, "little")
+    {
         // All reserved fields must be 0
         if cab_header["reserved1"] == 0
             && cab_header["reserved2"] == 0
@@ -82,10 +82,15 @@ pub fn parse_cab_header(
                         let extra_header_end: usize = extra_header_start + CAB_EXTRA_STRUCT_SIZE;
 
                         // Get the extra header raw data
-                        if let Some(extra_header_data) = header_data.get(extra_header_start..extra_header_end) {
+                        if let Some(extra_header_data) =
+                            header_data.get(extra_header_start..extra_header_end)
+                        {
                             // Parse the extra header
-                            if let Ok(extra_header) = structures::common::parse(&extra_header_data, &cab_extra_header_structure, "little") {
-
+                            if let Ok(extra_header) = structures::common::parse(
+                                &extra_header_data,
+                                &cab_extra_header_structure,
+                                "little",
+                            ) {
                                 // The extra data is expected to come immediately after the data specified in the main CAB header
                                 if extra_header["data_offset"] == cab_header["size"] {
                                     // Update the CAB file size to include the extra data

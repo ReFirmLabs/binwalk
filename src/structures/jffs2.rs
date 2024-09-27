@@ -31,26 +31,19 @@ pub fn parse_jffs2_node_header(
     node.endianness = "little".to_string();
 
     // Parse the node header
-    if let Ok(mut node_header) = structures::common::parse(
-        &node_data,
-        &jffs2_node_structure,
-        &node.endianness,
-    ) {
-
+    if let Ok(mut node_header) =
+        structures::common::parse(&node_data, &jffs2_node_structure, &node.endianness)
+    {
         // If the node header magic isn't correct, try parsing the header as big endian
         if node_header["magic"] != JFFS2_CORRECT_MAGIC {
             node.endianness = "big".to_string();
-            match structures::common::parse(
-                &node_data,
-                &jffs2_node_structure,
-                &node.endianness,
-            ) {
+            match structures::common::parse(&node_data, &jffs2_node_structure, &node.endianness) {
                 Err(_) => {
                     return Err(structures::common::StructureError);
-                },
+                }
                 Ok(node_header_be) => {
                     node_header = node_header_be.clone();
-                },
+                }
             }
         }
 

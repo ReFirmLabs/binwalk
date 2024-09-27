@@ -31,7 +31,6 @@ pub fn parse_ifs_header(ifs_data: &[u8]) -> Result<IFSHeader, structures::common
 
     // Parse the IFS header
     if let Ok(ifs_header) = structures::common::parse(ifs_data, &ifs_structure, "little") {
-
         // The flags2 field is unused and should be 0
         if ifs_header["flags2"] == 0 {
             // Verify that all the zero fields are, in fact, zero

@@ -64,14 +64,12 @@ pub fn parse_ext_header(ext_data: &[u8]) -> Result<EXTHeader, structures::common
 
     // Sanity check the available data
     if ext_data.len() >= (SUPERBLOCK_OFFSET + SUPERBLOCK_SIZE) {
-
         // Parse the EXT superblock structure
         if let Ok(ext_superblock) = structures::common::parse(
             &ext_data[SUPERBLOCK_OFFSET..],
             &ext_superblock_structure,
             "little",
         ) {
-
             // Sanity check the reported OS this EXT image was created on
             if supported_os.contains_key(&ext_superblock["creator_os"]) {
                 // Sanity check the s_rev_level field
@@ -86,7 +84,8 @@ pub fn parse_ext_header(ext_data: &[u8]) -> Result<EXTHeader, structures::common
                             ext_header.block_size = 1024 << ext_superblock["log_block_size"];
                             ext_header.free_blocks_count = ext_superblock["free_blocks_count"];
                             ext_header.os = supported_os[&ext_superblock["creator_os"]].to_string();
-                            ext_header.reserved_blocks_count = ext_superblock["reserved_blocks_count"];
+                            ext_header.reserved_blocks_count =
+                                ext_superblock["reserved_blocks_count"];
                             ext_header.image_size =
                                 ext_header.block_size * ext_superblock["blocks_count"];
 

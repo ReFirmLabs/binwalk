@@ -51,11 +51,11 @@ pub fn parse_ubi_superblock_header(
         ("ro_compat_version", "u32"),
     ];
 
-    let sb_struct_size: usize = structures::common::size(&ubi_sb_structure) + SUPERBLOCK_STRUCTURE_EXTRA_SIZE;
+    let sb_struct_size: usize =
+        structures::common::size(&ubi_sb_structure) + SUPERBLOCK_STRUCTURE_EXTRA_SIZE;
 
     // Parse the UBI superblock header
     if let Ok(sb_header) = structures::common::parse(ubi_data, &ubi_sb_structure, "little") {
-
         // Make sure the padding fields are NULL
         if sb_header["padding1"] == 0 && sb_header["padding2"] == 0 {
             // Make sure the node type is SUPERBLOCK
@@ -64,8 +64,7 @@ pub fn parse_ubi_superblock_header(
                 if sb_header["group_type"] <= MAX_GROUP_TYPE {
                     // Validate the header CRC, which is calculated over the entire header except for the magic bytes and CRC field
                     if let Some(crc_data) = ubi_data.get(CRC_START_OFFSET..sb_struct_size) {
-                        if ubi_crc(crc_data) == sb_header["header_crc"]
-                        {
+                        if ubi_crc(crc_data) == sb_header["header_crc"] {
                             return Ok(UbiSuperBlockHeader {
                                 leb_size: sb_header["leb_size"],
                                 leb_count: sb_header["leb_count"],
@@ -110,7 +109,6 @@ pub fn parse_ubi_ec_header(
 
     // Parse the first half of the header
     if let Ok(ubi_ec_header) = structures::common::parse(ubi_data, &ubi_ec_structure, "big") {
-
         // Padding fields must be NULL
         if ubi_ec_header["padding1"] == 0
             && ubi_ec_header["padding2"] == 0
@@ -171,7 +169,6 @@ pub fn parse_ubi_volume_header(
 
     // Parse the volume header
     if let Ok(ubi_vol_header) = structures::common::parse(&ubi_data, &ubi_vol_structure, "big") {
-
         // Sanity check padding fields, they should all be null
         if ubi_vol_header["padding1"] == 0
             && ubi_vol_header["padding2"] == 0

@@ -22,18 +22,19 @@ pub fn parse_seama_header(
     let header_size: usize = structures::common::size(&seama_structure);
 
     // Parse the header; try little endian first
-    if let Ok(mut seama_header) = structures::common::parse(&seama_data, &seama_structure, endianness) {
-
+    if let Ok(mut seama_header) =
+        structures::common::parse(&seama_data, &seama_structure, endianness)
+    {
         // If the magic bytes don't match, switch to big endian
         if seama_header["magic"] != MAGIC {
             endianness = "big";
             match structures::common::parse(&seama_data, &seama_structure, endianness) {
                 Err(_) => {
                     return Err(structures::common::StructureError);
-                },
+                }
                 Ok(seama_header_be) => {
                     seama_header = seama_header_be.clone();
-                },
+                }
             }
         }
 

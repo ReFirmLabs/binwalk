@@ -27,7 +27,6 @@ pub fn parse_lzma_header(
 
     // Parse the lzma header
     if let Ok(lzma_header) = structures::common::parse(&lzma_data, &lzma_structure, "little") {
-
         // Sanity check expected values for LZMA header fields
         if lzma_header["null_byte"] == 0 {
             if lzma_header["decompressed_size"] > MIN_SUPPORTED_DECOMPRESSED_SIZE {

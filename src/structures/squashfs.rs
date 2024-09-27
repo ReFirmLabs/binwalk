@@ -106,23 +106,31 @@ pub fn parse_squashfs_header(
             // Parse the SquashFS header, using the appropriate version header.
             if squashfs_version == 4 {
                 squashfs_header_size = structures::common::size(&squashfs_v4_structure);
-                match structures::common::parse(sqsh_data, &squashfs_v4_structure, &sqsh_header.endianness) {
+                match structures::common::parse(
+                    sqsh_data,
+                    &squashfs_v4_structure,
+                    &sqsh_header.endianness,
+                ) {
                     Err(e) => {
                         return Err(e);
-                    },
+                    }
                     Ok(squash4_header) => {
                         squashfs_header = squash4_header.clone();
-                    },
+                    }
                 }
             } else {
                 squashfs_header_size = structures::common::size(&squashfs_v3_structure);
-                match structures::common::parse(sqsh_data, &squashfs_v3_structure, &sqsh_header.endianness) {
+                match structures::common::parse(
+                    sqsh_data,
+                    &squashfs_v3_structure,
+                    &sqsh_header.endianness,
+                ) {
                     Err(e) => {
                         return Err(e);
-                    },
+                    }
                     Ok(squash3_header) => {
                         squashfs_header = squash3_header.clone();
-                    },
+                    }
                 }
             }
 
@@ -164,7 +172,6 @@ pub fn parse_squashfs_uid_entry(
     version: usize,
     endianness: &String,
 ) -> Result<usize, structures::common::StructureError> {
-
     let squashfs_v4_uid_table_structure = vec![("uid_block_ptr", "u64")];
     let squashfs_v3_uid_table_structure = vec![("uid_block_ptr", "u32")];
 
@@ -173,19 +180,19 @@ pub fn parse_squashfs_uid_entry(
         match structures::common::parse(uid_data, &squashfs_v4_uid_table_structure, endianness) {
             Err(e) => {
                 return Err(e);
-            },
+            }
             Ok(uidv4) => {
                 return Ok(uidv4["uid_block_ptr"]);
-            },
+            }
         }
     } else {
         match structures::common::parse(uid_data, &squashfs_v3_uid_table_structure, endianness) {
             Err(e) => {
                 return Err(e);
-            },
+            }
             Ok(uidv3) => {
                 return Ok(uidv3["uid_block_ptr"]);
-            },
+            }
         }
     }
 }

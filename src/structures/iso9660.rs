@@ -34,12 +34,9 @@ pub fn parse_iso_header(iso_data: &[u8]) -> Result<ISOHeader, structures::common
 
     if iso_data.len() > ISO_STRUCT_START {
         // Parse the ISO header
-        if let Ok(iso_header) = structures::common::parse(
-            &iso_data[ISO_STRUCT_START..],
-            &iso_structure,
-            "little",
-        ) {
-
+        if let Ok(iso_header) =
+            structures::common::parse(&iso_data[ISO_STRUCT_START..], &iso_structure, "little")
+        {
             // Make sure all the unused fields are, in fact, unused
             if iso_header["unused1"] == 0
                 && iso_header["unused2"] == 0
@@ -51,7 +48,8 @@ pub fn parse_iso_header(iso_data: &[u8]) -> Result<ISOHeader, structures::common
                  * Make sure all the identical, but byte-swapped, fields agree.
                  * NOTE: The to_be() conversions probably won't work on big-endian systems.
                  */
-                if iso_header["set_size_lsb"] == (iso_header["set_size_msb"] as u16).to_be() as usize
+                if iso_header["set_size_lsb"]
+                    == (iso_header["set_size_msb"] as u16).to_be() as usize
                     && iso_header["block_size_lsb"]
                         == (iso_header["block_size_msb"] as u16).to_be() as usize
                     && iso_header["volume_size_lsb"]
@@ -61,7 +59,8 @@ pub fn parse_iso_header(iso_data: &[u8]) -> Result<ISOHeader, structures::common
                     && iso_header["path_table_size_lsb"]
                         == (iso_header["path_table_size_msb"] as u32).to_be() as usize
                 {
-                    iso_info.image_size = iso_header["volume_size_lsb"] * iso_header["block_size_lsb"];
+                    iso_info.image_size =
+                        iso_header["volume_size_lsb"] * iso_header["block_size_lsb"];
                     return Ok(iso_info);
                 }
             }

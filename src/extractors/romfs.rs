@@ -62,10 +62,8 @@ pub fn extract_romfs(
 
         // Sanity check reported image size and get the romfs data
         if let Some(romfs_data) = file_data.get(romfs_data_start..romfs_data_end) {
-
             // Process the RomFS file entries
             if let Ok(root_entries) = process_romfs_entries(romfs_data, romfs_header.header_size) {
-
                 // We expect at least one file entry in the root of the RomFS image
                 if root_entries.len() > 0 {
                     // Everything looks good

@@ -50,7 +50,6 @@ pub fn parse_lzop_file_header(
 
     // Parse the first part of the header
     if let Ok(lzo_header_p1) = structures::common::parse(&lzop_data, &lzo_structure_p1, "big") {
-
         // Sanity check the methods field
         if allowed_methods.contains(&lzo_header_p1["method"]) {
             // Sanity check the header version numbers
@@ -70,12 +69,9 @@ pub fn parse_lzop_file_header(
 
                 if let Some(header_p2_data) = lzop_data.get(header_p2_start..header_p2_end) {
                     // Parse the second part of the header
-                    if let Ok(lzo_header_p2) = structures::common::parse(
-                        header_p2_data,
-                        &lzo_structure_p2,
-                        "big",
-                    ) {
-
+                    if let Ok(lzo_header_p2) =
+                        structures::common::parse(header_p2_data, &lzo_structure_p2, "big")
+                    {
                         // Calculate the total header size; compressed data blocks will immediately follow
                         lzop_info.header_size =
                             header_p2_end + lzo_header_p2["file_name_length"] + LZO_CHECKSUM_SIZE;
@@ -121,7 +117,6 @@ pub fn parse_lzop_block_header(
 
     // Parse the block header
     if let Ok(block_header) = structures::common::parse(&lzo_data, &block_structure, "big") {
-
         // Basic sanity check on the block header values
         if block_header["compressed_size"] != 0
             && block_header["uncompressed_size"] != 0
@@ -162,7 +157,6 @@ pub fn parse_lzop_eof_marker(eof_data: &[u8]) -> Result<usize, structures::commo
      * as other similar compression file formats use that. This assumption could be incorrect.
      */
     if let Ok(eof_marker) = structures::common::parse(&eof_data, &eof_structure, "big") {
-
         // Sanity check the EOF marker
         if eof_marker["marker"] == EOF_MARKER {
             // Return the size of the EOF marker

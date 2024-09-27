@@ -23,7 +23,9 @@ pub fn parse_yaffs_obj_header(
     let allowed_types: Vec<usize> = vec![0, 1, 2, 3, 4, 5];
 
     // Parse the object header
-    if let Ok(obj_header) = structures::common::parse(header_data, &yaffs_object_structure, endianness) {
+    if let Ok(obj_header) =
+        structures::common::parse(header_data, &yaffs_object_structure, endianness)
+    {
         // Validate that the header looks sane
         if allowed_types.contains(&obj_header["type"])
             && (obj_header["parent_id"] > 0)

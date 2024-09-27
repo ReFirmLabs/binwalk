@@ -30,14 +30,10 @@ pub fn parse_pchrom_header(
     let struct_end: usize = struct_start + HEADER_STRUCTURE_SIZE;
 
     if let Some(pch_structure_data) = pch_data.get(struct_start..struct_end) {
-
         // Parse the header structure
-        if let Ok(pch_header) = structures::common::parse(
-            pch_structure_data,
-            &pch_rom_header_structure,
-            "little",
-        ) {
-
+        if let Ok(pch_header) =
+            structures::common::parse(pch_structure_data, &pch_rom_header_structure, "little")
+        {
             // Sanity check the expected header values
             if pch_header["flmap0_fcba"] == EXPECTED_FCBA {
                 if pch_header["flmap0_frba_nr"] == EXPECTED_FRBA {
@@ -90,10 +86,12 @@ fn get_pch_regions_size(
         match pch_data.get(region_entry_start..region_entry_end) {
             None => {
                 return Err(structures::common::StructureError);
-            },
+            }
             Some(pch_region_data) => {
                 // Parse the 32-bit entry value for this region
-                if let Ok(region_entry) = structures::common::parse(pch_region_data, &region_entry_structure, "little") {
+                if let Ok(region_entry) =
+                    structures::common::parse(pch_region_data, &region_entry_structure, "little")
+                {
                     let region_value = region_entry["region_value"];
 
                     // The base (starting offset) and limit (ending offset) of the region is encoded into the 32-bit entry value

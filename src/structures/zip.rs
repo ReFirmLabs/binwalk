@@ -22,7 +22,9 @@ pub fn parse_zip_header(zip_data: &[u8]) -> Result<bool, structures::common::Str
         vec![0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 14, 18, 19, 98];
 
     // Parse the ZIP local file structure
-    if let Ok(zip_local_file_header) = structures::common::parse(zip_data, &zip_local_file_structure, "little") {
+    if let Ok(zip_local_file_header) =
+        structures::common::parse(zip_data, &zip_local_file_structure, "little")
+    {
         // Unused/reserved flag bits should be 0
         if (zip_local_file_header["flags"] & UNUSED_FLAGS_MASK) == 0 {
             // Specified compression method should be one of the defined ZIP compression methods
@@ -44,7 +46,6 @@ pub struct ZipEOCDHeader {
 pub fn parse_eocd_header(
     eocd_data: &[u8],
 ) -> Result<ZipEOCDHeader, structures::common::StructureError> {
-
     let zip_eocd_structure = vec![
         ("magic", "u32"),
         ("disk_number", "u16"),
@@ -57,15 +58,16 @@ pub fn parse_eocd_header(
     ];
 
     // Parse the EOCD header
-    if let Ok(zip_eocd_header) = structures::common::parse(eocd_data, &zip_eocd_structure, "little") {
-
+    if let Ok(zip_eocd_header) = structures::common::parse(eocd_data, &zip_eocd_structure, "little")
+    {
         // Assume there is only one "disk", so disk entries and total entries should be the same, and the ZIP archive should contain at least one file
         if zip_eocd_header["central_directory_disk_entries"]
             == zip_eocd_header["central_directory_total_entries"]
             && zip_eocd_header["central_directory_total_entries"] > 0
         {
             // An optional comment may follow the EOCD header; include the comment length in the offset of the ZIP EOF
-            let zip_eof: usize = structures::common::size(&zip_eocd_structure) + zip_eocd_header["comment_length"];
+            let zip_eof: usize =
+                structures::common::size(&zip_eocd_structure) + zip_eocd_header["comment_length"];
 
             return Ok(ZipEOCDHeader {
                 size: zip_eof,

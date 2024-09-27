@@ -62,8 +62,9 @@ pub fn parse_gzip_header(
     header_info.size = structures::common::size(&gzip_header_structure);
 
     // Parse the gzip header
-    if let Ok(gzip_header) = structures::common::parse(header_data, &gzip_header_structure, "little") {
-
+    if let Ok(gzip_header) =
+        structures::common::parse(header_data, &gzip_header_structure, "little")
+    {
         header_info.timestamp = gzip_header["timestamp"] as u32;
 
         // Sanity check; compression type should be deflate, reserved flag bits should not be set.
@@ -76,18 +77,22 @@ pub fn parse_gzip_header(
                     // Check if the optional "extra" data follows the header
                     if (gzip_header["flags"] & FLAG_EXTRA) != 0 {
                         // File offsets and sizes for parsing the extra header
-                        let extra_header_size = structures::common::size(&gzip_extra_header_structure);
+                        let extra_header_size =
+                            structures::common::size(&gzip_extra_header_structure);
                         let extra_header_start: usize = header_info.size;
                         let extra_header_end: usize = extra_header_start + extra_header_size;
 
-                        if let Some(extra_header_data) = header_data.get(extra_header_start..extra_header_end) {
+                        if let Some(extra_header_data) =
+                            header_data.get(extra_header_start..extra_header_end)
+                        {
                             // Parse the extra header and update the header_info.size to include this data
                             if let Ok(extra_header) = structures::common::parse(
                                 &extra_header_data,
                                 &gzip_extra_header_structure,
                                 "little",
                             ) {
-                                header_info.size += extra_header_size + extra_header["extra_data_len"];
+                                header_info.size +=
+                                    extra_header_size + extra_header["extra_data_len"];
                             } else {
                                 return Err(structures::common::StructureError);
                             }

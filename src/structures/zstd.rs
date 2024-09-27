@@ -27,8 +27,8 @@ pub fn parse_zstd_header(
     };
 
     // Parse the ZSTD header
-    if let Ok(zstd_header) = structures::common::parse(zstd_data, &zstd_header_structure, "little") {
-
+    if let Ok(zstd_header) = structures::common::parse(zstd_data, &zstd_header_structure, "little")
+    {
         // Unused bits should be unused
         if (zstd_header["frame_header_descriptor"] & FRAME_UNUSED_BITS_MASK) == 0 {
             // Indicates if a dictionary ID field is present, and if so, how big it is
@@ -83,8 +83,8 @@ pub fn parse_block_header(
 
     // Parse the block header
     if let Ok(block_header) =
-            structures::common::parse(block_data, &zstd_block_header_structure, "little") {
-
+        structures::common::parse(block_data, &zstd_block_header_structure, "little")
+    {
         // Interpret the bit fields of the block header, which indicate the type of block, the size of the block, and if this is the last block
         block_info.last_block = (block_header["info_bits"] & ZSTD_LAST_BLOCK_MASK) != 0;
         block_info.block_type =

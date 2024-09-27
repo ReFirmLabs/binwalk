@@ -11,7 +11,6 @@ pub struct ELFHeader {
 }
 
 pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, structures::common::StructureError> {
-
     const ELF_INFO_STRUCT_SIZE: usize = 8;
     const ELF_IDENT_STRUCT_SIZE: usize = 16;
 
@@ -140,12 +139,7 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, structures::common
     };
 
     // Endianness doesn't matter here, and we don't know what the ELF's endianness is yet
-    if let Ok(e_ident) = structures::common::parse(
-        &elf_data,
-        &elf_ident_structure,
-        "little",
-    ) {
-
+    if let Ok(e_ident) = structures::common::parse(&elf_data, &elf_ident_structure, "little") {
         // Sanity check the e_ident fields
         if e_ident["padding_1"] == 0 && e_ident["padding_2"] == 0 {
             if e_ident["version"] == EXPECTED_VERSION {
@@ -169,7 +163,6 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, structures::common
                                     &elf_info_structure,
                                     elf_endianness[&e_ident["endianness"]],
                                 ) {
-
                                     // Sanity check the remaining ELF header fields
                                     if elf_info["version"] == EXPECTED_VERSION {
                                         if elf_types.contains_key(&elf_info["type"]) {

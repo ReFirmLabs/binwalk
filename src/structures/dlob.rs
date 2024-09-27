@@ -17,18 +17,14 @@ pub fn parse_dlob_header(
     ];
 
     // Parse the first half of the header
-    if let Ok(dlob_header_p1) = structures::common::parse(&dlob_data, &dlob_structure, "big"){
-
+    if let Ok(dlob_header_p1) = structures::common::parse(&dlob_data, &dlob_structure, "big") {
         // Calculate the offset to the second part of the header
         let dlob_header_p2_offset: usize = dlob_header_p1["metadata_size"] + DLOB_METADATA_OFFSET;
 
         // Parse the second part of the header
-        if let Ok(dlob_header_p2) = structures::common::parse(
-            &dlob_data[dlob_header_p2_offset..],
-            &dlob_structure,
-            "big",
-        ) {
-
+        if let Ok(dlob_header_p2) =
+            structures::common::parse(&dlob_data[dlob_header_p2_offset..], &dlob_structure, "big")
+        {
             // Both parts should have the same magic bytes
             if dlob_header_p1["magic"] == dlob_header_p2["magic"] {
                 return Ok(DlobHeader {

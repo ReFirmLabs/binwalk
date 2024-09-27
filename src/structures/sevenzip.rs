@@ -29,8 +29,9 @@ pub fn parse_7z_header(
     ];
 
     // Parse the 7zip header
-    if let Ok(sevenzip_header) = structures::common::parse(sevenzip_data, &sevenzip_structure, "little") {
-        
+    if let Ok(sevenzip_header) =
+        structures::common::parse(sevenzip_data, &sevenzip_structure, "little")
+    {
         // Validate header CRC, which is calculated over the 'next_header_offset', 'next_header_size', and 'next_header_crc' values
         if let Some(crc_data) = sevenzip_data.get(SEVENZIP_CRC_START..SEVENZIP_HEADER_SIZE) {
             if crc32(crc_data) == (sevenzip_header["header_crc"] as u32) {
