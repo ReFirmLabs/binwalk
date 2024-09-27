@@ -177,8 +177,8 @@ pub fn create_file(
     let safe_file_path: String = chrooted_path(file_path, chroot);
 
     if path::Path::new(&safe_file_path).exists() == false {
-        if data.len() >= end {
-            match fs::write(safe_file_path.clone(), data[start..end].to_vec()) {
+        if let Some(file_data) = data.get(start..end) {
+            match fs::write(safe_file_path.clone(), file_data.to_vec()) {
                 Ok(_) => {
                     return true;
                 }
@@ -188,7 +188,7 @@ pub fn create_file(
             }
         } else {
             error!(
-                "Failed to create file {}: offset/size provided exceeds available data",
+                "Failed to create file {}: data offset/size are invalid",
                 safe_file_path
             );
         }
