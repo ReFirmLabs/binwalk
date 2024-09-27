@@ -1,3 +1,4 @@
+use crate::common::is_offset_safe;
 use crate::extractors::common::{create_file, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::vxworks::{
     get_symtab_endianness, parse_symtab_entry, VxWorksSymbolTableEntry,
@@ -25,6 +26,8 @@ pub fn extract_symbol_table(
         ..Default::default()
     };
 
+    let available_data = file_data.len();
+    let mut previous_entry_offset = None;
     let mut symtab_entry_offset: usize = offset;
     let mut symtab_entries: Vec<VxWorksSymbolTableEntry> = vec![];
 
@@ -41,7 +44,7 @@ pub fn extract_symbol_table(
     // Determine the symbol table endianness first
     if let Ok(endianness) = get_symtab_endianness(&file_data[symtab_entry_offset..]) {
         // Loop through all the symbol table entries, until we run out of data or hit an invalid entry
-        while symtab_entry_offset < file_data.len() {
+        while is_offset_safe(available_data, symtab_entry_offset, previous_entry_offset) {
             // Parse the symbol table entry
             match parse_symtab_entry(&file_data[symtab_entry_offset..], &endianness) {
                 // Break on an invalid entry
@@ -51,6 +54,7 @@ pub fn extract_symbol_table(
 
                 // Increment symtab_entry_offset to the offset of the next entry and keep a list of all processed entries
                 Ok(entry) => {
+                    previous_entry_offset = Some(symtab_entry_offset);
                     symtab_entry_offset += entry.size;
                     symtab_entries.push(entry);
                 }
