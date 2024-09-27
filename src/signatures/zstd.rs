@@ -68,7 +68,11 @@ pub fn zstd_parser(
         let mut block_count: usize = 0;
 
         // We now know where the first block header starts, loop through all the blocks to determine where the ZSTD data ends
-        while is_offset_safe(available_data, next_block_header_start, previous_block_header_start) {
+        while is_offset_safe(
+            available_data,
+            next_block_header_start,
+            previous_block_header_start,
+        ) {
             // Parse the block header
             match parse_block_header(&file_data[next_block_header_start..]) {
                 Err(_) => {

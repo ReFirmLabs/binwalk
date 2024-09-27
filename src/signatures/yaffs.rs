@@ -86,7 +86,8 @@ fn get_page_size(file_data: &[u8]) -> usize {
             let start_spare_offset: usize = *page_size;
             let end_spare_offset: usize = start_spare_offset + spare_magic.len();
 
-            if let Some(spare_magic_candidate) = file_data.get(start_spare_offset..end_spare_offset) {
+            if let Some(spare_magic_candidate) = file_data.get(start_spare_offset..end_spare_offset)
+            {
                 // If this spare data starts with the expected bytes, then we've guessed the page size correctly
                 if spare_magic_candidate == *spare_magic {
                     return *page_size;
@@ -136,7 +137,7 @@ fn get_image_size(
     let mut image_size: usize = 0;
     let mut next_obj_offset: usize = 0;
     let mut previous_obj_offset = None;
-    
+
     let available_data = file_data.len();
     let block_size: usize = page_size + spare_size;
 
@@ -145,14 +146,14 @@ fn get_image_size(
         match file_data.get(next_obj_offset..) {
             None => {
                 return Err(signatures::common::SignatureError);
-            },
+            }
             Some(obj_data) => {
                 // Parse and validate the object header
                 match parse_yaffs_obj_header(obj_data, endianness) {
                     Err(_) => {
                         // This is not necessarily an error; could just be that there is trailing data after the YAFFS image
                         break;
-                    },
+                    }
                     Ok(header) => {
                         // Each object header takes up at least one block of data
                         let mut data_blocks: usize = 1;
@@ -173,9 +174,9 @@ fn get_image_size(
                         previous_obj_offset = Some(next_obj_offset);
                         image_size += data_blocks * block_size;
                         next_obj_offset = image_size;
-                    },
+                    }
                 }
-            },
+            }
         }
     }
 

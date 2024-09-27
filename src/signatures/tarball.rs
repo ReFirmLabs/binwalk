@@ -43,7 +43,7 @@ pub fn tarball_parser(
         match file_data.get(next_header_start..next_header_end) {
             None => {
                 break;
-            },
+            }
             Some(tarball_header_block) => {
                 // Bad checksum? Quit processing headers.
                 if header_checksum_is_valid(tarball_header_block) == false {
@@ -57,15 +57,15 @@ pub fn tarball_parser(
                 match tarball_entry_size(tarball_header_block) {
                     Err(_) => {
                         break;
-                    },
+                    }
                     Ok(entry_size) => {
                         // Update total size count, and next/previous header offsets
                         tarball_total_size += entry_size;
                         previous_header_start = Some(next_header_start);
                         next_header_start += entry_size;
-                    },
+                    }
                 }
-            },
+            }
         }
     }
 
