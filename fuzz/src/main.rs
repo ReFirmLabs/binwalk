@@ -1,13 +1,12 @@
 use afl::fuzz;
-use binwalk::binwalk;
+use binwalk::Binwalk;
 
 fn main() {
     // AFL makes this real simple...
     fuzz!(|data: &[u8]| {
         // Initialize binwalk, no extraction
-        if let Ok(bwconfig) = binwalk::init(None, None, None, None) {
-            // Scan the data provided by AFL
-            binwalk::scan(&bwconfig, &data.to_vec());
-        }
+        let binwalker = Binwalk::default();
+        // Scan the data provided by AFL
+        binwalker.scan(&data.to_vec());
     });
 }
