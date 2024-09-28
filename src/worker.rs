@@ -41,8 +41,7 @@ pub fn analyze(
                 "Submitting {} signature results to extractor",
                 results.file_map.len()
             );
-            results.extractions =
-                binworker.extract(&file_data, &target_file, &results.file_map);
+            results.extractions = binworker.extract(&file_data, &target_file, &results.file_map);
         }
     }
 

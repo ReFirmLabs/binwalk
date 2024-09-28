@@ -32,9 +32,9 @@ pub struct Binwalk {
 }
 
 impl Binwalk {
-
     /// Create a new Binwalk instance with all default values.
     /// Equivalent to `Binwalk::new(None, None, None, None, None)`
+    #[allow(dead_code)]
     pub fn default() -> Binwalk {
         return Binwalk::new(None, None, None, None, None).unwrap();
     }
@@ -45,10 +45,11 @@ impl Binwalk {
         output_directory: Option<String>,
         include: Option<Vec<String>>,
         exclude: Option<Vec<String>>,
-        signatures: Option<Vec<signatures::common::Signature>>
+        signatures: Option<Vec<signatures::common::Signature>>,
     ) -> Result<Binwalk, BinwalkError> {
-
-        let mut new_instance = Binwalk { ..Default::default() };
+        let mut new_instance = Binwalk {
+            ..Default::default()
+        };
 
         // Target file is optional, especially if being called via the library
         if let Some(target_file) = target_file_name {
@@ -61,21 +62,24 @@ impl Binwalk {
 
             // If an output extraction directory was also specified, initialize it
             if let Some(extraction_directory) = output_directory {
-                new_instance.base_output_directory = path::absolute(path::Path::new(&extraction_directory))
-                    .unwrap()
-                    .to_str()
-                    .unwrap()
-                    .to_string();
+                new_instance.base_output_directory =
+                    path::absolute(path::Path::new(&extraction_directory))
+                        .unwrap()
+                        .to_str()
+                        .unwrap()
+                        .to_string();
 
-                match init_extraction_directory(&new_instance.base_target_file, &new_instance.base_output_directory)
-                {
+                match init_extraction_directory(
+                    &new_instance.base_target_file,
+                    &new_instance.base_output_directory,
+                ) {
                     Err(_) => {
                         return Err(BinwalkError);
-                    },
+                    }
                     Ok(new_target_file_path) => {
                         // This is the new base target path (a symlink inside the extraction directory)
                         new_instance.base_target_file = new_target_file_path.clone();
-                    },
+                    }
                 }
             }
         }
@@ -127,7 +131,6 @@ impl Binwalk {
         return Ok(new_instance);
     }
 
-
     /// Scan a file for magic signatures.
     /// Returns a list of validated magic signatures, representing the known contents of the file.
     pub fn scan(&self, file_data: &Vec<u8>) -> Vec<signatures::common::SignatureResult> {
@@ -158,7 +161,9 @@ impl Binwalk {
                             signature.description, magic_start
                         );
 
-                        if let Ok(mut signature_result) = (signature.parser)(&file_data, magic_start) {
+                        if let Ok(mut signature_result) =
+                            (signature.parser)(&file_data, magic_start)
+                        {
                             // Auto populate some signature result fields
                             signature_result_auto_populate(&mut signature_result, &signature);
 
@@ -381,7 +386,6 @@ impl Binwalk {
         return file_map;
     }
 
-
     /// Extract all extractable signatures found in a file.
     /// Returns a HashMap of <SignatureResult.id, ExtractionResult>.
     pub fn extract(
@@ -554,5 +558,3 @@ fn signature_result_auto_populate(
     signature_result.name = signature.name.clone();
     signature_result.always_display = signature.always_display;
 }
-
-

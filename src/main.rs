@@ -83,15 +83,21 @@ fn main() {
     }
 
     // Initialize binwalk
-    match binwalk::Binwalk::new(cliargs.file_name, output_directory, cliargs.include, cliargs.exclude, None) {
+    match binwalk::Binwalk::new(
+        cliargs.file_name,
+        output_directory,
+        cliargs.include,
+        cliargs.exclude,
+        None,
+    ) {
         Err(_) => {
             panic!("Binwalk initialization failed");
-        },
+        }
         Ok(bw) => {
             binwalker = bw;
-        },
+        }
     }
-            
+
     // If the user specified --threads, honor that request; else, auto-detect available parallelism
     match cliargs.threads {
         Some(threads) => {
@@ -120,7 +126,10 @@ fn main() {
     let (worker_tx, worker_rx) = mpsc::channel();
 
     // Queue the specified file for analysis
-    debug!("Queuing initial target file: {}", binwalker.base_target_file);
+    debug!(
+        "Queuing initial target file: {}",
+        binwalker.base_target_file
+    );
     target_files.insert(target_files.len(), binwalker.base_target_file.clone());
 
     /*
