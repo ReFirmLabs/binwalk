@@ -61,14 +61,14 @@ fn blocks(data: &[u8]) -> Vec<BlockEntropy> {
 /*
  * Generate a plot of a file's entropy.
  */
-pub fn plot(target_file: &String) -> Result<FileEntropy, EntropyError> {
+pub fn plot(target_file: String) -> Result<FileEntropy, EntropyError> {
     const FILE_EXTENSION: &str = "png";
     const SHANNON_MAX_VALUE: i32 = 8;
     const IMAGE_PIXEL_WIDTH: u32 = 2048;
     const IMAGE_PIXEL_HEIGHT: u32 = ((IMAGE_PIXEL_WIDTH as f64) * 0.6) as u32;
 
     // Get the base name of the target file
-    let target_file_name = path::Path::new(target_file)
+    let target_file_name = path::Path::new(&target_file)
         .file_name()
         .unwrap()
         .to_str()

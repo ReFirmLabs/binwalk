@@ -23,8 +23,8 @@ fn main() {
     // Only use one thread if unable to auto-detect available core info
     const DEFAULT_WORKER_COUNT: usize = 1;
 
-    // Binwalk configuration data structure
-    let bwconfig: binwalk::BinwalkConfig;
+    let binwalker: binwalk::Binwalk;
+    let mut output_directory: Option<String> = None;
 
     // Statistics variables; keeps track of analyzed file count and total analysis run time
     let mut file_count: usize = 0;
@@ -53,36 +53,15 @@ fn main() {
     }
 
     // If --list was not specified, a target file must be provided
-    match cliargs.file_name {
-        None => {
-            panic!("No target file name specified! Try --help.");
-        }
-        Some(file_name) => {
-            let mut output_directory: Option<&String> = None;
-
-            // If extraction was requested, we need to initialize the output directory
-            if cliargs.extract == true {
-                output_directory = Some(&cliargs.directory);
-            }
-
-            // Initialize binwalk
-            match binwalk::init(
-                Some(&file_name),
-                output_directory,
-                cliargs.include,
-                cliargs.exclude,
-            ) {
-                Err(_e) => panic!("Binwalk initialization failed"),
-                Ok(config) => bwconfig = config,
-            }
-        }
+    if cliargs.file_name.is_none() {
+        panic!("No target file name specified! Try --help.");
     }
 
     // If entropy analysis was requested, generate the entropy graph and return
     if cliargs.entropy == true {
         display::print_plain(cliargs.quiet, "Calculating file entropy...");
 
-        if let Ok(entropy_results) = entropy::plot(&bwconfig.base_target_file) {
+        if let Ok(entropy_results) = entropy::plot(cliargs.file_name.unwrap()) {
             // Log entropy results to JSON file, if requested
             json::log(
                 &cliargs.log,
@@ -98,6 +77,21 @@ fn main() {
         return;
     }
 
+    // If extraction was requested, we need to initialize the output directory
+    if cliargs.extract == true {
+        output_directory = Some(cliargs.directory);
+    }
+
+    // Initialize binwalk
+    match binwalk::Binwalk::new(cliargs.file_name, output_directory, cliargs.include, cliargs.exclude, None) {
+        Err(_) => {
+            panic!("Binwalk initialization failed");
+        },
+        Ok(bw) => {
+            binwalker = bw;
+        },
+    }
+            
     // If the user specified --threads, honor that request; else, auto-detect available parallelism
     match cliargs.threads {
         Some(threads) => {
@@ -126,13 +120,13 @@ fn main() {
     let (worker_tx, worker_rx) = mpsc::channel();
 
     // Queue the specified file for analysis
-    debug!("Queuing initial target file: {}", bwconfig.base_target_file);
-    target_files.insert(target_files.len(), bwconfig.base_target_file.clone());
+    debug!("Queuing initial target file: {}", binwalker.base_target_file);
+    target_files.insert(target_files.len(), binwalker.base_target_file.clone());
 
     /*
      * Set a custom panic handler.
-     * This ensures that when any thread panics, the default panic handler will be invoked,
-     * _and_ the process will exit with an error code.
+     * This ensures that when any thread panics, the default panic handler will be invoked
+     * _and_ the entire process will exit with an error code.
      */
     let default_panic_handler = panic::take_hook();
     panic::set_hook(Box::new(move |panic_info| {
@@ -156,12 +150,12 @@ fn main() {
             let worker_tx = worker_tx.clone();
 
             // Clone binwalk config data for worker thread
-            let binwalk_config = bwconfig.clone();
+            let binworker = binwalker.clone();
 
             /* Start of worker thread code */
             workers.execute(move || {
                 // Analyze target file, with extraction, if specified
-                let results = worker::analyze(&binwalk_config, &target_file, cliargs.extract);
+                let results = worker::analyze(&binworker, &target_file, cliargs.extract);
                 // Report file results back to main thread
                 if let Err(e) = worker_tx.send(results) {
                     panic!(
@@ -250,7 +244,7 @@ fn main() {
         cliargs.quiet,
         run_time,
         file_count,
-        bwconfig.signature_count,
-        bwconfig.patterns.len(),
+        binwalker.signature_count,
+        binwalker.patterns.len(),
     );
 }

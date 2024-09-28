@@ -18,7 +18,7 @@ pub struct AnalysisResults {
 }
 
 pub fn analyze(
-    bwconfig: &binwalk::BinwalkConfig,
+    binworker: &binwalk::Binwalk,
     target_file: &String,
     do_extraction: bool,
 ) -> AnalysisResults {
@@ -32,17 +32,17 @@ pub fn analyze(
     if let Ok(file_data) = read_file(target_file) {
         // Scan file data for signatures
         info!("Scanning {}", target_file);
-        results.file_map = binwalk::scan(&bwconfig, &file_data);
+        results.file_map = binworker.scan(&file_data);
 
         // Only extract if told to, and if there were some signatures found in this file
         if do_extraction == true && results.file_map.len() > 0 {
             // Extract everything we can
             debug!(
-                "Submitting {} results for extraction",
+                "Submitting {} signature results to extractor",
                 results.file_map.len()
             );
             results.extractions =
-                binwalk::extract(&bwconfig, &file_data, &target_file, &results.file_map);
+                binworker.extract(&file_data, &target_file, &results.file_map);
         }
     }
 
