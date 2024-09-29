@@ -1,4 +1,4 @@
-use crate::extractors::common::{create_file, ExtractionResult, Extractor, ExtractorType};
+use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::riff::parse_riff_header;
 
 pub fn riff_extractor() -> Extractor {
@@ -26,8 +26,9 @@ pub fn extract_riff_image(
         result.size = Some(riff_header.size);
         result.success = true;
 
-        if let Some(outdir) = output_directory {
+        if let Some(_) = output_directory {
             let file_path: String;
+            let chroot = Chroot::new(output_directory);
 
             if riff_header.chunk_type == WAV_TYPE {
                 file_path = WAV_OUTFILE_NAME.to_string();
@@ -36,7 +37,7 @@ pub fn extract_riff_image(
             }
 
             result.success =
-                create_file(&file_path, file_data, offset, result.size.unwrap(), outdir);
+                chroot.create_file(&file_path, file_data, offset, result.size.unwrap());
         }
     }
 

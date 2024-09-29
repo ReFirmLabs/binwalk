@@ -1,4 +1,4 @@
-use crate::extractors::common::{create_file, ExtractionResult};
+use crate::extractors::common::{Chroot, ExtractionResult};
 use miniz_oxide::inflate;
 
 /*
@@ -55,12 +55,12 @@ pub fn inflate_decompressor(
                 if dry_run == true {
                     result.success = true;
                 } else {
-                    result.success = create_file(
+                    let chroot = Chroot::new(output_directory);
+                    result.success = chroot.create_file(
                         &OUTPUT_FILE_NAME.to_string(),
                         &decompressed_data,
                         0,
                         decompressed_data.len(),
-                        &output_directory.unwrap(),
                     );
                 }
             }

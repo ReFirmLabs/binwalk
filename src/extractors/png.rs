@@ -1,5 +1,5 @@
 use crate::common::is_offset_safe;
-use crate::extractors::common::{create_file, ExtractionResult, Extractor, ExtractorType};
+use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::png::parse_png_chunk_header;
 
 // Defines the internal extractor function for carving out PNG images
@@ -30,13 +30,13 @@ pub fn extract_png_image(
             result.success = true;
 
             // If extraction was requested, extract the PNG
-            if let Some(outdir) = output_directory {
-                result.success = create_file(
+            if let Some(_) = output_directory {
+                let chroot = Chroot::new(output_directory);
+                result.success = chroot.create_file(
                     &OUTFILE_NAME.to_string(),
                     file_data,
                     offset,
                     result.size.unwrap(),
-                    outdir,
                 );
             }
         }

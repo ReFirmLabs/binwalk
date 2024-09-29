@@ -1,5 +1,5 @@
 use crate::common::is_offset_safe;
-use crate::extractors::common::{create_file, ExtractionResult, Extractor, ExtractorType};
+use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::vxworks::{
     get_symtab_endianness, parse_symtab_entry, VxWorksSymbolTableEntry,
 };
@@ -69,6 +69,8 @@ pub fn extract_symbol_table(
 
         // This is not a drill!
         if dry_run == false {
+            let chroot = Chroot::new(output_directory);
+
             // Convert symbol table entires to JSON
             match serde_json::to_string_pretty(&symtab_entries) {
                 // This should never happen...
@@ -78,12 +80,11 @@ pub fn extract_symbol_table(
 
                 // Write JSON to file
                 Ok(symtab_json) => {
-                    result.success = create_file(
+                    result.success = chroot.create_file(
                         &OUTFILE_NAME.to_string(),
                         &symtab_json.clone().into_bytes(),
                         0,
                         symtab_json.len(),
-                        output_directory.unwrap(),
                     );
                 }
             }

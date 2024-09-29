@@ -1,9 +1,5 @@
 use crate::common::is_offset_safe;
-use crate::extractors::common::{
-    chrooted_path, create_block_device, create_character_device, create_directory, create_fifo,
-    create_file, create_socket, create_symlink, make_executable, safe_path_join,
-};
-use crate::extractors::common::{ExtractionError, ExtractionResult, Extractor, ExtractorType};
+use crate::extractors::common::{Chroot, ExtractionError, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::romfs::{parse_romfs_file_entry, parse_romfs_header};
 use log::warn;
 
@@ -75,15 +71,14 @@ pub fn extract_romfs(
                     if do_extraction {
                         let mut file_count: usize = 0;
                         let root_parent = "".to_string();
-                        let extraction_directory = output_directory.unwrap();
 
                         // RomFS files will be extracted to a sub-directory under the specified
                         // extraction directory whose name is the RomFS volume name.
-                        let romfs_chroot_dir =
-                            chrooted_path(&romfs_header.volume_name, &extraction_directory);
+                        let chroot = Chroot::new(output_directory);
+                        let romfs_chroot_dir = chroot.chrooted_path(&romfs_header.volume_name);
 
                         // Create the romfs output directory, ensuring that it is contained inside the specified extraction directory
-                        if create_directory(&romfs_chroot_dir, extraction_directory) == true {
+                        if chroot.create_directory(&romfs_chroot_dir) == true {
                             // Extract RomFS contents
                             file_count = extract_romfs_entries(
                                 romfs_data,
@@ -224,40 +219,39 @@ fn extract_romfs_entries(
 ) -> usize {
     let mut file_count: usize = 0;
 
+    let chroot = Chroot::new(Some(chroot_directory));
+
     for file_entry in romfs_files {
         let extraction_success: bool;
-        let file_path = safe_path_join(parent_directory, &file_entry.name, chroot_directory);
+        let file_path = chroot.safe_path_join(parent_directory, &file_entry.name);
 
         if file_entry.directory {
-            extraction_success = create_directory(&file_path, chroot_directory);
+            extraction_success = chroot.create_directory(&file_path);
         } else if file_entry.regular {
-            extraction_success = create_file(
+            extraction_success = chroot.create_file(
                 &file_path,
                 romfs_data,
                 file_entry.offset,
                 file_entry.size,
-                chroot_directory,
             );
         } else if file_entry.symlink {
             extraction_success =
-                create_symlink(&file_path, &file_entry.symlink_target, chroot_directory);
+                chroot.create_symlink(&file_path, &file_entry.symlink_target);
         } else if file_entry.fifo {
-            extraction_success = create_fifo(&file_path, chroot_directory);
+            extraction_success = chroot.create_fifo(&file_path);
         } else if file_entry.socket {
-            extraction_success = create_socket(&file_path, chroot_directory);
+            extraction_success = chroot.create_socket(&file_path);
         } else if file_entry.block_device {
-            extraction_success = create_block_device(
+            extraction_success = chroot.create_block_device(
                 &file_path,
                 file_entry.device_major,
                 file_entry.device_minor,
-                chroot_directory,
             );
         } else if file_entry.character_device {
-            extraction_success = create_character_device(
+            extraction_success = chroot.create_character_device(
                 &file_path,
                 file_entry.device_major,
                 file_entry.device_minor,
-                chroot_directory,
             );
         } else {
             continue;
@@ -278,7 +272,7 @@ fn extract_romfs_entries(
 
             // Make executable files executable
             if file_entry.regular == true && file_entry.executable == true {
-                make_executable(&file_path, chroot_directory);
+                chroot.make_executable(&file_path);
             }
         } else {
             warn!("Failed to extract RomFS file {}", file_path);

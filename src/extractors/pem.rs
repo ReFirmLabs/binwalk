@@ -1,4 +1,4 @@
-use crate::extractors::common::{create_file, ExtractionResult, Extractor, ExtractorType};
+use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use aho_corasick::AhoCorasick;
 
 // Defines the internal extractor function for carving out PEM keys
@@ -58,12 +58,12 @@ pub fn pem_carver(
 
         if let Some(outfile) = fname {
             if let Some(_) = output_directory {
-                result.success = create_file(
+                let chroot = Chroot::new(output_directory);
+                result.success = chroot.create_file(
                     &outfile.to_string(),
                     file_data,
                     offset,
                     result.size.unwrap(),
-                    output_directory.unwrap(),
                 );
             }
         }

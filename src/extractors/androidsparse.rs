@@ -1,5 +1,5 @@
 use crate::common::is_offset_safe;
-use crate::extractors::common::{append_to_file, ExtractionResult, Extractor, ExtractorType};
+use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::androidsparse;
 
 // Defines the internal extractor function for decompressing zlib data
@@ -50,6 +50,7 @@ pub fn extract_android_sparse(
                 Ok(chunk_header) => {
                     // If not a dry run, extract the data from the next chunk
                     if dry_run == false {
+                        let chroot = Chroot::new(output_directory);
                         let chunk_data_start: usize = next_chunk_offset + chunk_header.header_size;
                         let chunk_data_end: usize = chunk_data_start + chunk_header.data_size;
 
@@ -59,7 +60,7 @@ pub fn extract_android_sparse(
                                 &chunk_header,
                                 chunk_data,
                                 &OUTFILE_NAME.to_string(),
-                                output_directory.unwrap(),
+                                &chroot,
                             ) == false
                             {
                                 break;
@@ -92,11 +93,11 @@ fn extract_chunk(
     chunk_header: &androidsparse::AndroidSparseChunkHeader,
     chunk_data: &[u8],
     outfile: &String,
-    chroot_dir: &String,
+    chroot: &Chroot,
 ) -> bool {
     if chunk_header.is_raw == true {
         // Raw chunks are just data chunks stored verbatim
-        if append_to_file(outfile, chunk_data, chroot_dir) == false {
+        if chroot.append_to_file(outfile, chunk_data) == false {
             return false;
         }
     } else if chunk_header.is_fill {
@@ -112,7 +113,7 @@ fn extract_chunk(
             }
 
             // Append fill block to file
-            if append_to_file(outfile, &fill_block, chroot_dir) == false {
+            if chroot.append_to_file(outfile, &fill_block) == false {
                 return false;
             }
         }
@@ -126,7 +127,7 @@ fn extract_chunk(
 
         // Write block_count NULL blocks to disk
         for _ in 0..chunk_header.block_count {
-            if append_to_file(outfile, &null_block, chroot_dir) == false {
+            if chroot.append_to_file(outfile, &null_block) == false {
                 return false;
             }
         }

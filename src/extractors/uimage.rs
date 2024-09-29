@@ -1,5 +1,5 @@
 use crate::common::crc32;
-use crate::extractors::common::{create_file, ExtractionResult, Extractor, ExtractorType};
+use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::uimage::parse_uimage_header;
 
 pub fn uimage_extractor() -> Extractor {
@@ -35,7 +35,8 @@ pub fn extract_uimage(
                     result.size = Some(uimage_header.header_size + uimage_header.data_size);
 
                     // If extraction was requested, carve the uImage data out to a file
-                    if let Some(chroot_dir) = output_directory {
+                    if let Some(_) = output_directory {
+                        let chroot = Chroot::new(output_directory);
                         let mut file_base_name: String = DEFAULT_OUTPUT_FILE_NAME.to_string();
 
                         // Use the name specified in the uImage header as the file name, if one was provided
@@ -46,7 +47,7 @@ pub fn extract_uimage(
                         let output_file = format!("{}.{}", file_base_name, OUTPUT_FILE_EXT);
 
                         result.success =
-                            create_file(&output_file, image_data, 0, image_data.len(), chroot_dir);
+                            chroot.create_file(&output_file, image_data, 0, image_data.len());
                     }
                 }
             }

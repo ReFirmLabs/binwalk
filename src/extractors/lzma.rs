@@ -1,4 +1,4 @@
-use crate::extractors::common::{create_file, ExtractionResult, Extractor, ExtractorType};
+use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use lzma;
 
 // Defines the internal extractor function for decompressing gzip data
@@ -41,12 +41,12 @@ pub fn lzma_decompress(
         match lzma::decompress(&file_data[offset..offset + lzma_data_size]) {
             Ok(decompressed_data) => {
                 if dry_run == false {
-                    result.success = create_file(
+                    let chroot = Chroot::new(output_directory);
+                    result.success = chroot.create_file(
                         &OUTPUT_FILE_NAME.to_string(),
                         &decompressed_data,
                         0,
                         decompressed_data.len(),
-                        output_directory.unwrap(),
                     );
                 } else {
                     result.success = true;

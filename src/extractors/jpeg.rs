@@ -1,4 +1,4 @@
-use crate::extractors::common::{create_file, ExtractionResult, Extractor, ExtractorType};
+use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use aho_corasick::AhoCorasick;
 
 // Defines the internal extractor function for carving out JPEG images
@@ -25,13 +25,13 @@ pub fn extract_jpeg_image(
         result.size = Some(jpeg_data_size);
         result.success = true;
 
-        if let Some(outdir) = output_directory {
-            result.success = create_file(
+        if let Some(_) = output_directory {
+            let chroot = Chroot::new(output_directory);
+            result.success = chroot.create_file(
                 &OUTFILE_NAME.to_string(),
                 file_data,
                 offset,
                 result.size.unwrap(),
-                outdir,
             );
         }
     }
