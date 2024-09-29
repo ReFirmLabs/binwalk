@@ -83,8 +83,6 @@ pub fn extract_symbol_table(
                     result.success = chroot.create_file(
                         &OUTFILE_NAME.to_string(),
                         &symtab_json.clone().into_bytes(),
-                        0,
-                        symtab_json.len(),
                     );
                 }
             }

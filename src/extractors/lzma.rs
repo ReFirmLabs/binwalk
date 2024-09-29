@@ -45,8 +45,6 @@ pub fn lzma_decompress(
                     result.success = chroot.create_file(
                         &OUTPUT_FILE_NAME.to_string(),
                         &decompressed_data,
-                        0,
-                        decompressed_data.len(),
                     );
                 } else {
                     result.success = true;

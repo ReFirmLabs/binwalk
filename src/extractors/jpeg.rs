@@ -27,7 +27,7 @@ pub fn extract_jpeg_image(
 
         if let Some(_) = output_directory {
             let chroot = Chroot::new(output_directory);
-            result.success = chroot.create_file(
+            result.success = chroot.carve_file(
                 &OUTFILE_NAME.to_string(),
                 file_data,
                 offset,

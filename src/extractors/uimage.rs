@@ -47,7 +47,7 @@ pub fn extract_uimage(
                         let output_file = format!("{}.{}", file_base_name, OUTPUT_FILE_EXT);
 
                         result.success =
-                            chroot.create_file(&output_file, image_data, 0, image_data.len());
+                            chroot.create_file(&output_file, image_data);
                     }
                 }
             }

@@ -228,7 +228,7 @@ fn extract_romfs_entries(
         if file_entry.directory {
             extraction_success = chroot.create_directory(&file_path);
         } else if file_entry.regular {
-            extraction_success = chroot.create_file(
+            extraction_success = chroot.carve_file(
                 &file_path,
                 romfs_data,
                 file_entry.offset,

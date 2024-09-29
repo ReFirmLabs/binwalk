@@ -163,28 +163,18 @@ impl Chroot {
     pub fn create_file(
         &self,
         file_path: &String,
-        data: &[u8],
-        start: usize,
-        size: usize,
+        file_data: &[u8],
     ) -> bool {
-        let end: usize = start + size;
         let safe_file_path: String = self.chrooted_path(file_path);
 
         if path::Path::new(&safe_file_path).exists() == false {
-            if let Some(file_data) = data.get(start..end) {
-                match fs::write(safe_file_path.clone(), file_data.to_vec()) {
-                    Ok(_) => {
-                        return true;
-                    }
-                    Err(e) => {
-                        error!("Failed to write data to {}: {}", safe_file_path, e);
-                    }
+            match fs::write(safe_file_path.clone(), file_data.to_vec()) {
+                Ok(_) => {
+                    return true;
                 }
-            } else {
-                error!(
-                    "Failed to create file {}: data offset/size are invalid",
-                    safe_file_path
-                );
+                Err(e) => {
+                    error!("Failed to write data to {}: {}", safe_file_path, e);
+                }
             }
         } else {
             error!(
@@ -194,6 +184,19 @@ impl Chroot {
         }
 
         return false;
+    }
+
+    /// Carve data and write it to a new file.
+    pub fn carve_file(&self, file_path: &String, data: &[u8], start: usize, size: usize) -> bool {
+        let mut retval: bool = false;
+
+        if let Some(file_data) = data.get(start..start + size) {
+            retval = self.create_file(file_path, file_data);
+        } else {
+            error!("Failed to create file {}: data offset/size are invalid", file_path);
+        }
+
+        return retval;
     }
 
     /// Creates a device file in the chroot directory.
@@ -208,8 +211,6 @@ impl Chroot {
         return self.create_file(
             file_path,
             &device_file_contents.clone().into_bytes(),
-            0,
-            device_file_contents.len(),
         );
     }
 
@@ -235,12 +236,12 @@ impl Chroot {
 
     /// Creates a fifo file in the chroot directory.
     pub fn create_fifo(&self, file_path: &String) -> bool {
-        return self.create_file(file_path, b"fifo", 0, 4);
+        return self.create_file(file_path, b"fifo");
     }
 
     /// Creates a socket file in the chroot directory.
     pub fn create_socket(&self, file_path: &String) -> bool {
-        return self.create_file(file_path, b"socket", 0, 6);
+        return self.create_file(file_path, b"socket");
     }
 
     /// Append the provided data to the specified file in the chroot directory.
@@ -629,7 +630,7 @@ fn spawn(
         }
     } else {
         // Copy file data to carved file path
-        if chroot.create_file(
+        if chroot.carve_file(
             &carved_file,
             file_data,
             signature.offset,

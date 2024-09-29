@@ -32,7 +32,7 @@ pub fn extract_png_image(
             // If extraction was requested, extract the PNG
             if let Some(_) = output_directory {
                 let chroot = Chroot::new(output_directory);
-                result.success = chroot.create_file(
+                result.success = chroot.carve_file(
                     &OUTFILE_NAME.to_string(),
                     file_data,
                     offset,

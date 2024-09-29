@@ -46,7 +46,7 @@ pub fn extract_trx_partitions(
                             }
 
                             let this_partition_file_name = format!("partition_{}.bin", i);
-                            result.success = chroot.create_file(&this_partition_file_name, file_data, this_partition_absolute_offset, this_partition_size);
+                            result.success = chroot.carve_file(&this_partition_file_name, file_data, this_partition_absolute_offset, this_partition_size);
 
                             if result.success == false {
                                 break;
