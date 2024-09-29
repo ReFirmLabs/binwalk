@@ -17,8 +17,11 @@ pub struct BinwalkError;
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct AnalysisResults {
+    // Path to the file that was analyzed
     pub file_path: String,
+    // File signature results, as returned by Binwalk::scan
     pub file_map: Vec<signatures::common::SignatureResult>,
+    // File extraction results, as returned by Binwalk::extract
     pub extractions: HashMap<String, extractors::common::ExtractionResult>,
 }
 
@@ -529,7 +532,18 @@ impl Binwalk {
         return extraction_results;
     }
 
-    /// Analyzer a file and optionally extract the file contents
+    /// Analyze a file and optionally extract the file contents.
+    ///
+    /// Example:
+    ///
+    /// ```
+    /// use binwalk::Binwalk;
+    ///
+    /// let binwalker = Binwalk::default();
+    /// let file_path = String::from_utf8("/tmp/foo.bin");
+    ///
+    /// binwalker.analyze(&file_path, false);
+    /// ```
     pub fn analyze(&self, target_file: &String, do_extraction: bool) -> AnalysisResults {
         // Return value
         let mut results: AnalysisResults = AnalysisResults {
