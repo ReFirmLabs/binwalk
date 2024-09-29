@@ -42,10 +42,8 @@ pub fn lzma_decompress(
             Ok(decompressed_data) => {
                 if dry_run == false {
                     let chroot = Chroot::new(output_directory);
-                    result.success = chroot.create_file(
-                        &OUTPUT_FILE_NAME.to_string(),
-                        &decompressed_data,
-                    );
+                    result.success =
+                        chroot.create_file(&OUTPUT_FILE_NAME.to_string(), &decompressed_data);
                 } else {
                     result.success = true;
                 }

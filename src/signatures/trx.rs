@@ -1,5 +1,5 @@
-use crate::signatures;
 use crate::extractors::trx::extract_trx_partitions;
+use crate::signatures;
 use crate::structures::trx::parse_trx_header;
 
 pub const DESCRIPTION: &str = "TRX firmware image";

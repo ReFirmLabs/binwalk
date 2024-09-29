@@ -38,15 +38,23 @@ pub fn extract_trx_partitions(
                         for i in 0..trx_header.partitions.len() {
                             let next_partition: usize = i + 1;
                             let this_partition_relative_offset: usize = trx_header.partitions[i];
-                            let this_partition_absolute_offset: usize = offset + this_partition_relative_offset;
-                            let mut this_partition_size: usize = trx_header.total_size - this_partition_relative_offset;
+                            let this_partition_absolute_offset: usize =
+                                offset + this_partition_relative_offset;
+                            let mut this_partition_size: usize =
+                                trx_header.total_size - this_partition_relative_offset;
 
                             if next_partition < trx_header.partitions.len() {
-                                this_partition_size = trx_header.partitions[next_partition] - this_partition_relative_offset;
+                                this_partition_size = trx_header.partitions[next_partition]
+                                    - this_partition_relative_offset;
                             }
 
                             let this_partition_file_name = format!("partition_{}.bin", i);
-                            result.success = chroot.carve_file(&this_partition_file_name, file_data, this_partition_absolute_offset, this_partition_size);
+                            result.success = chroot.carve_file(
+                                &this_partition_file_name,
+                                file_data,
+                                this_partition_absolute_offset,
+                                this_partition_size,
+                            );
 
                             if result.success == false {
                                 break;

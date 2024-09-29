@@ -1,5 +1,7 @@
 use crate::common::is_offset_safe;
-use crate::extractors::common::{Chroot, ExtractionError, ExtractionResult, Extractor, ExtractorType};
+use crate::extractors::common::{
+    Chroot, ExtractionError, ExtractionResult, Extractor, ExtractorType,
+};
 use crate::structures::romfs::{parse_romfs_file_entry, parse_romfs_header};
 use log::warn;
 
@@ -228,15 +230,10 @@ fn extract_romfs_entries(
         if file_entry.directory {
             extraction_success = chroot.create_directory(&file_path);
         } else if file_entry.regular {
-            extraction_success = chroot.carve_file(
-                &file_path,
-                romfs_data,
-                file_entry.offset,
-                file_entry.size,
-            );
-        } else if file_entry.symlink {
             extraction_success =
-                chroot.create_symlink(&file_path, &file_entry.symlink_target);
+                chroot.carve_file(&file_path, romfs_data, file_entry.offset, file_entry.size);
+        } else if file_entry.symlink {
+            extraction_success = chroot.create_symlink(&file_path, &file_entry.symlink_target);
         } else if file_entry.fifo {
             extraction_success = chroot.create_fifo(&file_path);
         } else if file_entry.socket {

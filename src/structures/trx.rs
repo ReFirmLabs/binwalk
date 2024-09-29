@@ -41,10 +41,8 @@ pub fn parse_trx_header(
         {
             // Sanity check the reported total size
             if trx_header["total_size"] > struct_size {
-
                 // Sanity check the reported version number
                 if allowed_versions.contains(&trx_header["version"]) {
-
                     let mut partitions: Vec<usize> = vec![];
 
                     if trx_header["partition1_offset"] != 0 {
@@ -60,7 +58,7 @@ pub fn parse_trx_header(
                     }
 
                     if trx_header["version"] == TRX_VERSION_2 {
-                        if trx_header["partition4_offset"] != 0  {
+                        if trx_header["partition4_offset"] != 0 {
                             partitions.push(trx_header["partition4_offset"]);
                         }
                     } else {

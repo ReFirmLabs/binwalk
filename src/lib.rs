@@ -6,5 +6,5 @@ mod signatures;
 mod structures;
 
 pub use binwalk::Binwalk;
-pub use extractors::common::{Chroot, Extractor, ExtractorType, ExtractionResult, ExtractionError};
-pub use signatures::common::{Signature, SignatureResult, SignatureParser, SignatureError};
+pub use extractors::common::{Chroot, ExtractionError, ExtractionResult, Extractor, ExtractorType};
+pub use signatures::common::{Signature, SignatureError, SignatureParser, SignatureResult};

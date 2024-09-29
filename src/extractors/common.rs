@@ -77,14 +77,12 @@ pub struct ProcInfo {
     pub carved_file: String,
 }
 
-
 #[derive(Debug, Default, Clone)]
 pub struct Chroot {
     pub chroot_directory: String,
 }
 
 impl Chroot {
-
     /// Create a new chrooted instance. All file paths will be effectively chrooted in the specified directory path.
     ///
     /// If no directory path is specified, the chroot directory will be `/`.
@@ -97,16 +95,18 @@ impl Chroot {
     /// let chroot_directory = String::from_utf8("/tmp");
     /// let chroot = Chroot(Some(&chroot_directory));
     /// ```
-    pub fn new(chroot_directory: Option<&String> ) -> Chroot {
-        let mut chroot_instance = Chroot { ..Default::default() };
+    pub fn new(chroot_directory: Option<&String>) -> Chroot {
+        let mut chroot_instance = Chroot {
+            ..Default::default()
+        };
 
         match chroot_directory {
             None => {
                 chroot_instance.chroot_directory = path::MAIN_SEPARATOR.to_string();
-            },
+            }
             Some(chroot_dir) => {
                 chroot_instance.chroot_directory = chroot_dir.clone();
-            },
+            }
         }
 
         return chroot_instance;
@@ -139,7 +139,12 @@ impl Chroot {
         // If the joined path does not start with the chroot directory,
         // prepend the chroot directory to the final joined path.
         if joined_path.starts_with(&self.chroot_directory) == false {
-            joined_path = format!("{}{}{}", self.chroot_directory, path::MAIN_SEPARATOR, joined_path);
+            joined_path = format!(
+                "{}{}{}",
+                self.chroot_directory,
+                path::MAIN_SEPARATOR,
+                joined_path
+            );
         }
 
         return self.strip_double_slash(&joined_path);
@@ -160,11 +165,7 @@ impl Chroot {
     }
 
     /// Creates a regular file in the chrooted directory and writes the provided data to it.
-    pub fn create_file(
-        &self,
-        file_path: &String,
-        file_data: &[u8],
-    ) -> bool {
+    pub fn create_file(&self, file_path: &String, file_data: &[u8]) -> bool {
         let safe_file_path: String = self.chrooted_path(file_path);
 
         if path::Path::new(&safe_file_path).exists() == false {
@@ -193,7 +194,10 @@ impl Chroot {
         if let Some(file_data) = data.get(start..start + size) {
             retval = self.create_file(file_path, file_data);
         } else {
-            error!("Failed to create file {}: data offset/size are invalid", file_path);
+            error!(
+                "Failed to create file {}: data offset/size are invalid",
+                file_path
+            );
         }
 
         return retval;
@@ -208,29 +212,16 @@ impl Chroot {
         minor: usize,
     ) -> bool {
         let device_file_contents: String = format!("{} {} {}", device_type, major, minor);
-        return self.create_file(
-            file_path,
-            &device_file_contents.clone().into_bytes(),
-        );
+        return self.create_file(file_path, &device_file_contents.clone().into_bytes());
     }
 
     /// Creates a character device file in the chroot directory.
-    pub fn create_character_device(
-        &self,
-        file_path: &String,
-        major: usize,
-        minor: usize,
-    ) -> bool {
+    pub fn create_character_device(&self, file_path: &String, major: usize, minor: usize) -> bool {
         return self.create_device(file_path, "c", major, minor);
     }
 
     /// Creates a block device file in the chroot directory.
-    pub fn create_block_device(
-        &self,
-        file_path: &String,
-        major: usize,
-        minor: usize,
-    ) -> bool {
+    pub fn create_block_device(&self, file_path: &String, major: usize, minor: usize) -> bool {
         return self.create_device(file_path, "b", major, minor);
     }
 
@@ -630,13 +621,7 @@ fn spawn(
         }
     } else {
         // Copy file data to carved file path
-        if chroot.carve_file(
-            &carved_file,
-            file_data,
-            signature.offset,
-            signature.size,
-        ) == false
-        {
+        if chroot.carve_file(&carved_file, file_data, signature.offset, signature.size) == false {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 "Failed to carve data to disk",
