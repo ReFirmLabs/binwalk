@@ -1,6 +1,6 @@
+use crate::binwalk::AnalysisResults;
 use crate::extractors;
 use crate::signatures;
-use crate::binwalk::AnalysisResults;
 use colored::ColoredString;
 use colored::Colorize;
 use std::collections::HashMap;

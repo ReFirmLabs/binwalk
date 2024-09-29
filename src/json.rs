@@ -6,8 +6,8 @@ use std::io;
 use std::io::Seek;
 use std::io::Write;
 
-use crate::entropy::FileEntropy;
 use crate::binwalk::AnalysisResults;
+use crate::entropy::FileEntropy;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum JSONType {

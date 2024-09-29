@@ -1,20 +1,19 @@
 use aho_corasick::AhoCorasick;
 use log::{debug, error, info, warn};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
 use std::os::unix;
 use std::path;
 use uuid::Uuid;
-use serde::{Deserialize, Serialize};
 
+use crate::common::read_file;
 use crate::extractors;
 use crate::magic;
 use crate::signatures;
-use crate::common::read_file;
 
 #[derive(Debug, Default, Clone)]
 pub struct BinwalkError;
-
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct AnalysisResults {
@@ -531,11 +530,7 @@ impl Binwalk {
     }
 
     /// Analyzer a file and optionally extract the file contents
-    pub fn analyze(
-        &self,
-        target_file: &String,
-        do_extraction: bool,
-    ) -> AnalysisResults {
+    pub fn analyze(&self, target_file: &String, do_extraction: bool) -> AnalysisResults {
         // Return value
         let mut results: AnalysisResults = AnalysisResults {
             file_path: target_file.clone(),

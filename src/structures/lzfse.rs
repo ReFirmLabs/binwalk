@@ -1,4 +1,4 @@
-use crate::structures::common::{ parse, StructureError };
+use crate::structures::common::{parse, StructureError};
 
 #[derive(Debug, Default, Clone)]
 pub struct LZFSEBlock {
@@ -7,7 +7,7 @@ pub struct LZFSEBlock {
     pub header_size: usize,
 }
 
-pub fn parse_lzfse_block_header (lzfse_data: &[u8]) -> Result<LZFSEBlock, StructureError> {
+pub fn parse_lzfse_block_header(lzfse_data: &[u8]) -> Result<LZFSEBlock, StructureError> {
     const ENDOFSTREAM: usize = 0x24787662;
     const UNCOMPRESSED: usize = 0x2d787662;
     const COMPRESSEDV1: usize = 0x31787662;
@@ -15,9 +15,7 @@ pub fn parse_lzfse_block_header (lzfse_data: &[u8]) -> Result<LZFSEBlock, Struct
     const COMPRESSEDLZVN: usize = 0x6e787662;
 
     // Each block starts with a 4-byte magic identifier
-    let block_type_structure = vec![
-        ("block_type", "u32"),
-    ];
+    let block_type_structure = vec![("block_type", "u32")];
 
     if let Ok(block_type_header) = parse(lzfse_data, &block_type_structure, "little") {
         let block_type = block_type_header["block_type"];
@@ -43,17 +41,14 @@ fn parse_endofstream_block_header(_lzfse_data: &[u8]) -> Result<LZFSEBlock, Stru
     return Ok(LZFSEBlock {
         eof: true,
         data_size: 0,
-        header_size: 4
+        header_size: 4,
     });
 }
 
 fn parse_uncompressed_block_header(lzfse_data: &[u8]) -> Result<LZFSEBlock, StructureError> {
     const HEADER_SIZE: usize = 8;
 
-    let block_structure = vec![
-        ("magic", "u32"),
-        ("n_raw_bytes", "u32"),
-    ];
+    let block_structure = vec![("magic", "u32"), ("n_raw_bytes", "u32")];
 
     if let Ok(header) = parse(lzfse_data, &block_structure, "little") {
         return Ok(LZFSEBlock {
@@ -113,8 +108,10 @@ fn parse_compressedv2_block_header(lzfse_data: &[u8]) -> Result<LZFSEBlock, Stru
     ];
 
     if let Ok(block_header) = parse(lzfse_data, &block_structure, "little") {
-        let n_lmd_payload_bytes = (block_header["packed_field_2"] >> LMD_PAYLOAD_SHIFT) & PAYLOAD_MASK;
-        let n_literal_payload_bytes = (block_header["packed_field_1"] >> N_PAYLOAD_SHIFT) & PAYLOAD_MASK;
+        let n_lmd_payload_bytes =
+            (block_header["packed_field_2"] >> LMD_PAYLOAD_SHIFT) & PAYLOAD_MASK;
+        let n_literal_payload_bytes =
+            (block_header["packed_field_1"] >> N_PAYLOAD_SHIFT) & PAYLOAD_MASK;
 
         return Ok(LZFSEBlock {
             eof: false,

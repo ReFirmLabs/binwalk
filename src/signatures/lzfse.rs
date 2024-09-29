@@ -1,6 +1,6 @@
 use crate::common::is_offset_safe;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 use crate::structures::lzfse::parse_lzfse_block_header;
-use crate::signatures::common::{ CONFIDENCE_HIGH, SignatureResult, SignatureError };
 
 pub const DESCRIPTION: &str = "LZFSE compressed data";
 
@@ -30,10 +30,11 @@ pub fn lzfse_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResul
         if let Ok(lzfse_block) = parse_lzfse_block_header(&file_data[next_block_offset..]) {
             previous_block_offset = Some(next_block_offset);
             next_block_offset += lzfse_block.header_size + lzfse_block.data_size;
-            
+
             if lzfse_block.eof == true {
                 result.size = next_block_offset - offset;
-                result.description = format!("{}, total size: {} bytes", result.description, result.size);
+                result.description =
+                    format!("{}, total size: {} bytes", result.description, result.size);
                 return Ok(result);
             }
         }
