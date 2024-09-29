@@ -30,3 +30,4 @@ pub mod vxworks;
 pub mod zip;
 pub mod zlib;
 pub mod zstd;
+pub mod trx;

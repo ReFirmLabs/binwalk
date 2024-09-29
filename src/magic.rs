@@ -500,7 +500,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         magic: signatures::trx::trx_magic(),
         parser: signatures::trx::trx_parser,
         description: signatures::trx::DESCRIPTION.to_string(),
-        extractor: None,
+        extractor: Some(extractors::trx::trx_extractor()),
     });
 
     // Motorola S-record
