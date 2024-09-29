@@ -85,6 +85,12 @@ sudo cp ./dumpifs /usr/local/bin/dumpifs
 ```
 
 ```
+git clone https://github.com/lzfse/lzfse.git
+cd lzfse
+sudo make install
+```
+
+```
 mkdir srec
 cd srec
 wget http://www.goffart.co.uk/s-record/download/srec_151_src.zip

@@ -743,5 +743,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         extractor: None,
     });
 
+    // lzfse
+    binary_signatures.push(signatures::common::Signature {
+        name: "lzfse".to_string(),
+        short: false,
+        magic_offset: 0,
+        always_display: false,
+        magic: signatures::lzfse::lzfse_magic(),
+        parser: signatures::lzfse::lzfse_parser,
+        description: signatures::lzfse::DESCRIPTION.to_string(),
+        extractor: Some(extractors::lzfse::lzfse_extractor()),
+    });
+
     return binary_signatures;
 }
