@@ -415,7 +415,8 @@ pub fn create_symlink(symlink: &String, target: &String, chroot: &String) -> boo
 /*
  * Recursively walks a given directory and returns a list of regular non-zero size files in the given directory path.
  */
-pub fn get_extracted_files(directory: &String) -> Vec<String> {
+#[allow(dead_code)]
+ pub fn get_extracted_files(directory: &String) -> Vec<String> {
     let mut regular_files: Vec<String> = vec![];
 
     for entry in WalkDir::new(directory).into_iter() {

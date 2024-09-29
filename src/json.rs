@@ -6,13 +6,13 @@ use std::io;
 use std::io::Seek;
 use std::io::Write;
 
-use crate::entropy;
-use crate::worker;
+use crate::entropy::FileEntropy;
+use crate::binwalk::AnalysisResults;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum JSONType {
-    Entropy(entropy::FileEntropy),
-    Analysis(worker::AnalysisResults),
+    Entropy(FileEntropy),
+    Analysis(AnalysisResults),
 }
 
 /*

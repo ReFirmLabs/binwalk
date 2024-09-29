@@ -1,6 +1,6 @@
 use crate::extractors;
 use crate::signatures;
-use crate::worker;
+use crate::binwalk::AnalysisResults;
 use colored::ColoredString;
 use colored::Colorize;
 use std::collections::HashMap;
@@ -189,7 +189,7 @@ fn print_extractions(
     }
 }
 
-pub fn print_analysis_results(quiet: bool, results: &worker::AnalysisResults) {
+pub fn print_analysis_results(quiet: bool, results: &AnalysisResults) {
     if quiet == true {
         return;
     }

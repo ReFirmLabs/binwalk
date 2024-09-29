@@ -17,7 +17,6 @@ mod json;
 mod magic;
 mod signatures;
 mod structures;
-mod worker;
 
 fn main() {
     // Only use one thread if unable to auto-detect available core info
@@ -164,7 +163,7 @@ fn main() {
             /* Start of worker thread code */
             workers.execute(move || {
                 // Analyze target file, with extraction, if specified
-                let results = worker::analyze(&binworker, &target_file, cliargs.extract);
+                let results = binworker.analyze(&target_file, cliargs.extract);
                 // Report file results back to main thread
                 if let Err(e) = worker_tx.send(results) {
                     panic!(
