@@ -1,3 +1,5 @@
+//! Rust library for analyzing and extracting files embedded inside other files.
+
 mod binwalk;
 mod common;
 mod extractors;

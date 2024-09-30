@@ -15,10 +15,8 @@ pub const SOURCE_FILE_PLACEHOLDER: &str = "%e";
 #[derive(Debug, Clone)]
 pub struct ExtractionError;
 
-/*
- * Built-in internal extractors must provide a function conforming to this definition.
- * Arguments: file_data, offset, output_directory.
- */
+/// Built-in internal extractors must provide a function conforming to this definition.
+/// Arguments: file_data, offset, output_directory.
 pub type InternalExtractor = fn(&Vec<u8>, usize, Option<&String>) -> ExtractionResult;
 
 #[derive(Debug, Default, Clone, Eq, PartialEq, Ord, PartialOrd)]
@@ -29,47 +27,41 @@ pub enum ExtractorType {
     None,
 }
 
-/*
- * Describes an extractor.
- */
+/// Describes an extractor.
 #[derive(Debug, Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Extractor {
-    // External command or internal function to execute
+    /// External command or internal function to execute
     pub utility: ExtractorType,
-    // File extension expected by an external command
+    /// File extension expected by an external command
     pub extension: String,
-    // Arguments to pass to the external command
+    /// Arguments to pass to the external command
     pub arguments: Vec<String>,
-    // A list of successful exit codes for the external command
+    /// A list of successful exit codes for the external command
     pub exit_codes: Vec<i32>,
-    // Set to true to disable recursion into this extractor's extracted files
+    /// Set to true to disable recursion into this extractor's extracted files
     pub do_not_recurse: bool,
 }
 
-/*
- * Stores information about a completed extraction.
- * When constructing this structure, only the `size` and `success` fields should be populated;
- * the others are automatically populated (see: execute(), below).
- */
+/// Stores information about a completed extraction.
+/// When constructing this structure, only the `size` and `success` fields should be populated;
+/// the others are automatically populated (see: extractors::common::execute).
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ExtractionResult {
-    // Size of the data consumed during extraction, if known
+    /// Size of the data consumed during extraction, if known
     pub size: Option<usize>,
-    // Extractor success status
+    /// Extractor success status
     pub success: bool,
-    // Extractor name, automatically populated by execute(), below
+    /// Extractor name, automatically populated by execute(), below
     pub extractor: String,
-    // Set to true if the corresponding Extractor definition has it set to true
-    // WARNING: this value must be defined in the extractor definition, as that
-    // will override this value (see execute(), below).
+    /// Set to true if the corresponding Extractor definition has it set to true
+    /// WARNING: this value must be defined in the extractor definition, as that
+    /// will override this value (see: extractors::common::execute).
     pub do_not_recurse: bool,
-    // The output directory where the extractor dropped its files, automatically populated by execute(), below
+    /// The output directory where the extractor dropped its files, automatically populated by execute(), below
     pub output_directory: String,
 }
 
-/*
- * Stores information about external extractor processes.
- */
+/// Stores information about external extractor processes.
 #[derive(Debug)]
 pub struct ProcInfo {
     pub child: process::Child,
@@ -77,6 +69,7 @@ pub struct ProcInfo {
     pub carved_file: String,
 }
 
+/// Used to pseudo-chroot file paths.
 #[derive(Debug, Default, Clone)]
 pub struct Chroot {
     pub chroot_directory: String,

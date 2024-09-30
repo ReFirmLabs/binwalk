@@ -15,31 +15,34 @@ use crate::signatures;
 #[derive(Debug, Default, Clone)]
 pub struct BinwalkError;
 
+/// Analysis results returned by Binwalk::analyze
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct AnalysisResults {
-    // Path to the file that was analyzed
+    /// Path to the file that was analyzed
     pub file_path: String,
-    // File signature results, as returned by Binwalk::scan
+    /// File signature results, as returned by Binwalk::scan
     pub file_map: Vec<signatures::common::SignatureResult>,
-    // File extraction results, as returned by Binwalk::extract
+    /// File extraction results, as returned by Binwalk::extract.
+    /// HashMap key is the corresponding SignatureResult.id value in `file_map`.
     pub extractions: HashMap<String, extractors::common::ExtractionResult>,
 }
 
+/// Analyze files / memory for file signatures
 #[derive(Debug, Default, Clone)]
 pub struct Binwalk {
-    // Count of all signatures (short and regular)
+    /// Count of all signatures (short and regular)
     pub signature_count: usize,
-    // The base file requested for analysis
+    /// The base file requested for analysis
     pub base_target_file: String,
-    // The base output directory for extracted files
+    /// The base output directory for extracted files
     pub base_output_directory: String,
-    // A list of signatures that must start at offset 0
+    /// A list of signatures that must start at offset 0
     pub short_signatures: Vec<signatures::common::Signature>,
-    // A list of magic bytes to search for throughout the entire file
+    /// A list of magic bytes to search for throughout the entire file
     pub patterns: Vec<Vec<u8>>,
-    // Maps patterns to their corresponding signature
+    /// Maps patterns to their corresponding signature
     pub pattern_signature_table: HashMap<usize, signatures::common::Signature>,
-    // Maps signatures to their corresponding extractors
+    /// Maps signatures to their corresponding extractors
     pub extractor_lookup_table: HashMap<String, Option<extractors::common::Extractor>>,
 }
 
