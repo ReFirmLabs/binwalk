@@ -60,7 +60,7 @@ pub fn pem_carver(
             if let Some(_) = output_directory {
                 let chroot = Chroot::new(output_directory);
                 result.success = chroot.carve_file(
-                    &outfile.to_string(),
+                    outfile,
                     file_data,
                     offset,
                     result.size.unwrap(),

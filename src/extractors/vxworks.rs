@@ -81,7 +81,7 @@ pub fn extract_symbol_table(
                 // Write JSON to file
                 Ok(symtab_json) => {
                     result.success = chroot
-                        .create_file(&OUTFILE_NAME.to_string(), &symtab_json.clone().into_bytes());
+                        .create_file(OUTFILE_NAME, &symtab_json.clone().into_bytes());
                 }
             }
         }

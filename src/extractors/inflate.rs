@@ -57,7 +57,7 @@ pub fn inflate_decompressor(
                 } else {
                     let chroot = Chroot::new(output_directory);
                     result.success =
-                        chroot.create_file(&OUTPUT_FILE_NAME.to_string(), &decompressed_data);
+                        chroot.create_file(OUTPUT_FILE_NAME, &decompressed_data);
                 }
             }
         }

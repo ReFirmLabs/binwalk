@@ -33,7 +33,7 @@ pub fn extract_png_image(
             if let Some(_) = output_directory {
                 let chroot = Chroot::new(output_directory);
                 result.success = chroot.carve_file(
-                    &OUTFILE_NAME.to_string(),
+                    OUTFILE_NAME,
                     file_data,
                     offset,
                     result.size.unwrap(),

@@ -36,7 +36,7 @@ pub fn extract_riff_image(
                 file_path = OUTFILE_NAME.to_string();
             }
 
-            result.success = chroot.carve_file(&file_path, file_data, offset, result.size.unwrap());
+            result.success = chroot.carve_file(file_path, file_data, offset, result.size.unwrap());
         }
     }
 
