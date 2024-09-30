@@ -47,7 +47,7 @@ impl Binwalk {
     /// Create a new Binwalk instance with all default values.
     /// Equivalent to `Binwalk::new(None, None, None, None, None)`.
     ///
-    /// Example:
+    /// ## Example
     ///
     /// ```
     /// use binwalk::Binwalk;
@@ -68,13 +68,13 @@ impl Binwalk {
     ///
     /// Additional user-defined signatures may be provided via the `signatures` argument.
     ///
-    /// Example:
+    /// ## Example
     ///
     /// ```
     /// use binwalk::Binwalk;
     ///
     /// // Don't scan for these file signatures
-    /// let exclude_filters: vec!["jpeg", "png"];
+    /// let exclude_filters: Vec<String> = vec!["jpeg".to_string(), "png".to_string()];
     ///
     /// let binwalker = Binwalk::new(None, None, None, Some(exclude_filters), None).unwrap();
     /// ```
@@ -172,19 +172,23 @@ impl Binwalk {
     /// Scan a file for magic signatures.
     /// Returns a list of validated magic signatures representing the known contents of the file.
     ///
-    /// Example:
+    /// ## Example
     ///
     /// ```
     /// use binwalk::Binwalk;
     ///
-    /// let target_file = "/tmp/foobar.bin";
-    /// let data_to_scan = fs::read(target_file).expect("Unable to read file");
+    /// let target_file = "/bin/ls";
+    /// let data_to_scan = std::fs::read(target_file).expect("Unable to read file");
     ///
     /// let binwalker = Binwalk::default();
     ///
-    /// for result in binwalker.scan(&data_to_scan) {
-    ///     println("{:#X}  {}", result.offset, result.description);
+    /// let signature_results = binwalker.scan(&data_to_scan);
+    ///
+    /// for result in &signature_results {
+    ///     println!("{:#X}  {}", result.offset, result.description);
     /// }
+    ///
+    /// assert!(signature_results.len() > 0);
     /// ```
     pub fn scan(&self, file_data: &Vec<u8>) -> Vec<signatures::common::SignatureResult> {
         const FILE_START_OFFSET: usize = 0;
@@ -441,26 +445,6 @@ impl Binwalk {
 
     /// Extract all extractable signatures found in a file.
     /// Returns a HashMap of <SignatureResult.id, ExtractionResult>.
-    /// Example:
-    ///
-    /// ```
-    /// use binwalk::Binwalk;
-    ///
-    /// let target_file = "/tmp/foobar.bin".to_string();
-    /// let output_directory = "/tmp/extracted".to_string();
-    ///
-    /// let data_to_scan = fs::read(&target_file).expect("Unable to read file");
-    ///
-    /// let binwalker = Binwalk::new(Some(target_file.clone()),
-    ///                              Some(output_directory.clone()),
-    ///                              None,
-    ///                              None,
-    ///                              None);
-    ///
-    /// let scan_results = binwalker.scan(&data_to_scan);
-    ///
-    /// binwalker.extract(&data_to_scan, &target_file, &scan_results);
-    /// ```
     pub fn extract(
         &self,
         file_data: &Vec<u8>,
@@ -534,15 +518,17 @@ impl Binwalk {
 
     /// Analyze a file and optionally extract the file contents.
     ///
-    /// Example:
+    /// ## Example
     ///
     /// ```
     /// use binwalk::Binwalk;
     ///
     /// let binwalker = Binwalk::default();
-    /// let file_path = String::from_utf8("/tmp/foo.bin");
+    /// let file_path = "/bin/ls".to_string();
     ///
-    /// binwalker.analyze(&file_path, false);
+    /// let analysis_results = binwalker.analyze(&file_path, false);
+    ///
+    /// assert!(analysis_results.file_map.len() > 0);
     /// ```
     pub fn analyze(&self, target_file: &String, do_extraction: bool) -> AnalysisResults {
         // Return value

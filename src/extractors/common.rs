@@ -84,16 +84,20 @@ pub struct Chroot {
 
 impl Chroot {
     /// Create a new chrooted instance. All file paths will be effectively chrooted in the specified directory path.
+    /// The chroot directory path will be created if it does not already exist.
     ///
     /// If no directory path is specified, the chroot directory will be `/`.
     ///
-    /// Example:
+    /// ## Example
     ///
     /// ```
     /// use binwalk::Chroot;
     ///
-    /// let chroot_directory = String::from_utf8("/tmp");
-    /// let chroot = Chroot(Some(&chroot_directory));
+    /// let chroot_directory = "/tmp/foobar".to_string();
+    /// let chroot = Chroot::new(Some(&chroot_directory));
+    ///
+    /// assert_eq!(chroot.chroot_directory, "/tmp/foobar");
+    /// assert_eq!(std::path::Path::new("/tmp/foobar").exists(), true);
     /// ```
     pub fn new(chroot_directory: Option<&String>) -> Chroot {
         let mut chroot_instance = Chroot {
@@ -109,21 +113,35 @@ impl Chroot {
             }
         }
 
+        // Create the chroot directory if it does not exist
+        if path::Path::new(&chroot_instance.chroot_directory).exists() == false {
+            match fs::create_dir_all(&chroot_instance.chroot_directory) {
+                Ok(_) => {
+                    debug!("Created new chroot directory {}", chroot_instance.chroot_directory);
+                }
+                Err(e) => {
+                    error!("Failed to create chroot directory {}: {}", chroot_instance.chroot_directory, e);
+                }
+            }
+        }
+
         return chroot_instance;
     }
 
     /// Joins two paths, ensuring that the final path does not traverse outside of the chroot directory.
     ///
-    /// Example:
+    /// ## Example
     ///
     /// ```
     /// use binwalk::Chroot;
     ///
-    /// let chroot = Chroot(Some(&"/tmp/foobar".to_string()));
+    /// let chroot_directory = "/tmp/foobar".to_string();
+    ///
+    /// let chroot = Chroot::new(Some(&chroot_directory));
     ///
     /// let path1 = chroot.safe_path_join("/etc", "passwd");
     /// let path2 = chroot.safe_path_join("/etc", "../../passwd");
-    /// let path3 = chroot.safe_path_join("../../../etc", "passwd");
+    /// let path3 = chroot.safe_path_join("../../../etc", "/passwd");
     /// let path4 = chroot.safe_path_join("/tmp/foobar/", "/etc/passwd");
     ///
     /// assert_eq!(path1, "/tmp/foobar/etc/passwd");
@@ -152,14 +170,14 @@ impl Chroot {
 
     /// Given a file path, returns a sanitized path that is chrooted inside the specified chroot directory.
     ///
-    /// Example:
+    /// ## Example
     ///
     /// ```
     /// use binwalk::Chroot;
     ///
-    /// let chroot_dir = String::from_utf8("/tmp/foobar");
+    /// let chroot_dir = "/tmp/foobar/".to_string();
     ///
-    /// let chroot = Chroot(Some(&chroot_dir));
+    /// let chroot = Chroot::new(Some(&chroot_dir));
     /// let path = chroot.chrooted_path("test.txt");
     ///
     /// assert_eq!(path, "/tmp/foobar/test.txt");
@@ -170,17 +188,18 @@ impl Chroot {
 
     /// Creates a regular file in the chrooted directory and writes the provided data to it.
     ///
-    /// Example:
+    /// ## Example
     ///
     /// ```
     /// use binwalk::Chroot;
     ///
-    /// let chroot_dir = String::from_utf8("/tmp/foobar");
+    /// let chroot_dir = "/tmp/foobar".to_string();
     /// let file_data: &[u8] = b"foobar";
     ///
-    /// let chroot = Chroot(Some(&chroot_dir));
+    /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
-    /// assert_eq!(chroot.create_file("foobar.txt", file_data), true);
+    /// assert_eq!(chroot.create_file("created_file.txt", file_data), true);
+    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/created_file.txt").unwrap(), "foobar");
     /// ```
     pub fn create_file(&self, file_path: impl Into<String>, file_data: &[u8]) -> bool {
         let safe_file_path: String = self.chrooted_path(file_path);
@@ -206,17 +225,18 @@ impl Chroot {
 
     /// Carve data and write it to a new file.
     ///
-    /// Example:
+    /// ## Example
     ///
     /// ```
     /// use binwalk::Chroot;
     ///
-    /// let chroot_dir = String::from_utf8("/tmp/foobar");
+    /// let chroot_dir = "/tmp/foobar".to_string();
     /// let file_data_with_trailing_junk: &[u8] = b"foobarJUNK";
     ///
-    /// let chroot = Chroot(Some(&chroot_dir));
+    /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
-    /// assert_eq!(chroot.carve_file("foobar.txt", file_data_with_trailing_junk, 0, 6), true);
+    /// assert_eq!(chroot.carve_file("carved_file.txt", file_data_with_trailing_junk, 0, 6), true);
+    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/carved_file.txt").unwrap(), "foobar");
     /// ```
     pub fn carve_file(&self, file_path: impl Into<String>, data: &[u8], start: usize, size: usize) -> bool {
         let mut retval: bool = false;
@@ -251,18 +271,19 @@ impl Chroot {
     ///
     /// Note that this does *not* create a real character device, just a regular file containing the text `c <major> <minor>`.
     ///
-    /// Example:
+    /// ## Example
     ///
     /// ```
     /// use binwalk::Chroot;
     ///
-    /// let chroot_dir = String::from_utf8("/tmp/foobar");
+    /// let chroot_dir = "/tmp/foobar".to_string();
     /// let dev_major: usize = 1;
     /// let dev_minor: usize = 2;
     ///
-    /// let chroot = Chroot(Some(&chroot_dir));
+    /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
-    /// assert_eq!(chroot.create_character_device("/dev/char_device", dev_major, dev_minor), true);
+    /// assert_eq!(chroot.create_character_device("char_device", dev_major, dev_minor), true);
+    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/char_device").unwrap(), "c 1 2");
     /// ```
     pub fn create_character_device(&self, file_path: impl Into<String>, major: usize, minor: usize) -> bool {
         return self.create_device(file_path, "c", major, minor);
@@ -272,18 +293,19 @@ impl Chroot {
     ///
     /// Note that this does *not* create a real block device, just a regular file containing the text `b <major> <minor>`.
     ///
-    /// Example:
+    /// ## Example
     ///
     /// ```
     /// use binwalk::Chroot;
     ///
-    /// let chroot_dir = String::from_utf8("/tmp/foobar");
+    /// let chroot_dir = "/tmp/foobar".to_string();
     /// let dev_major: usize = 1;
     /// let dev_minor: usize = 2;
     ///
-    /// let chroot = Chroot(Some(&chroot_dir));
+    /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
-    /// assert_eq!(chroot.create_block_device("/dev/block_device", dev_major, dev_minor), true);
+    /// assert_eq!(chroot.create_block_device("block_device", dev_major, dev_minor), true);
+    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/block_device").unwrap(), "b 1 2");
     /// ```
     pub fn create_block_device(&self, file_path: impl Into<String>, major: usize, minor: usize) -> bool {
         return self.create_device(file_path, "b", major, minor);
@@ -293,16 +315,17 @@ impl Chroot {
     ///
     /// Note that this does *not* create a real fifo, just a regular file containing the text `fifo`.
     ///
-    /// Example:
+    /// ## Example
     ///
     /// ```
     /// use binwalk::Chroot;
     ///
-    /// let chroot_dir = String::from_utf8("/tmp/foobar");
+    /// let chroot_dir = "/tmp/foobar".to_string();
     ///
-    /// let chroot = Chroot(Some(&chroot_dir));
+    /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
-    /// assert_eq!(chroot.create_fifo("/dev/fifo"), true);
+    /// assert_eq!(chroot.create_fifo("fifo_file"), true);
+    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/fifo_file").unwrap(), "fifo");
     /// ```
     pub fn create_fifo(&self, file_path: impl Into<String>) -> bool {
         return self.create_file(file_path, b"fifo");
@@ -312,16 +335,17 @@ impl Chroot {
     ///
     /// Note that this does *not* create a real socket, just a regular file containing the text `socket`.
     ///
-    /// Example:
+    /// ## Example
     ///
     /// ```
     /// use binwalk::Chroot;
     ///
-    /// let chroot_dir = String::from_utf8("/tmp/foobar");
+    /// let chroot_dir = "/tmp/foobar".to_string();
     ///
-    /// let chroot = Chroot(Some(&chroot_dir));
+    /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
-    /// assert_eq!(chroot.create_socket("/dev/socket"), true);
+    /// assert_eq!(chroot.create_socket("socket_file"), true);
+    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/socket_file").unwrap(), "socket");
     /// ```
     pub fn create_socket(&self, file_path: impl Into<String>) -> bool {
         return self.create_file(file_path, b"socket");
@@ -331,17 +355,18 @@ impl Chroot {
     ///
     /// If the specified file does not exist, it will be created.
     ///
-    /// Example:
+    /// ## Example
     ///
     /// ```
     /// use binwalk::Chroot;
     ///
-    /// let chroot_dir = String::from_utf8("/tmp/foobar");
+    /// let chroot_dir = "/tmp/foobar".to_string();
     /// let my_file_data: &[u8] = b"foobar";
     ///
-    /// let chroot = Chroot(Some(&chroot_dir));
+    /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
-    /// assert_eq!(chroot.append_to_file("my_file.txt", my_file_data), true);
+    /// assert_eq!(chroot.append_to_file("append.txt", my_file_data), true);
+    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/append.txt").unwrap(), "foobar");
     /// ```
     pub fn append_to_file(&self, file_path: impl Into<String>, data: &[u8]) -> bool {
         let safe_file_path: String = self.chrooted_path(file_path);
@@ -378,16 +403,17 @@ impl Chroot {
     ///
     /// Equivalent to mkdir -p.
     ///
-    /// Example:
+    /// ## Example
     ///
     /// ```
     /// use binwalk::Chroot;
     ///
-    /// let chroot_dir = String::from_utf8("/tmp/foobar");
+    /// let chroot_dir = "/tmp/foobar".to_string();
     ///
-    /// let chroot = Chroot(Some(&chroot_dir));
+    /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
-    /// assert_eq!(chroot.create_directory("/usr/bin/foobar"), true);
+    /// assert_eq!(chroot.create_directory("/usr/bin/"), true);
+    /// assert_eq!(std::path::Path::new("/tmp/foobar/usr/bin").exists(), true);
     /// ```
     pub fn create_directory(&self, dir_path: impl Into<String>) -> bool {
         let safe_dir_path: String = self.chrooted_path(dir_path);
@@ -406,16 +432,17 @@ impl Chroot {
 
     /// Set executable permissions on an existing file in the chroot directory.
     ///
-    /// Example:
+    /// ## Example
     ///
     /// ```
     /// use binwalk::Chroot;
     ///
-    /// let chroot_dir = String::from_utf8("/tmp/foobar");
+    /// let chroot_dir = "/tmp/foobar".to_string();
     ///
-    /// let chroot = Chroot(Some(&chroot_dir));
+    /// let chroot = Chroot::new(Some(&chroot_dir));
+    /// chroot.create_file("runme.exe", b"AAAA");
     ///
-    /// assert_eq!(chroot.make_executable("/bin/busybox"), true);
+    /// assert_eq!(chroot.make_executable("runme.exe"), true);
     /// ```
     pub fn make_executable(&self, file_path: impl Into<String>) -> bool {
         // Make the file globally executable
@@ -457,16 +484,17 @@ impl Chroot {
     /// Both the symlink and target paths will be *absolute*, meaning that symlinks will break if the
     /// symlink is later moved to a different absolute directory.
     ///
-    /// Example:
+    /// ## Example
     ///
     /// ```
     /// use binwalk::Chroot;
     ///
-    /// let chroot_dir = String::from_utf8("/tmp/foobar");
+    /// let chroot_dir = "/tmp/foobar".to_string();
     ///
-    /// let chroot = Chroot(Some(&chroot_dir));
+    /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
-    /// assert_eq!(chroot.create_symlink("/bin/grep", "./busybox"), true);
+    /// assert_eq!(chroot.create_symlink("symlink", "/"), true);
+    /// assert_eq!(std::fs::canonicalize("/tmp/foobar/symlink").unwrap().to_str(), Some("/tmp/foobar"));
     /// ```
     pub fn create_symlink(&self, symlink_path: impl Into<String>, target_path: impl Into<String>) -> bool {
         let safe_target: String;
@@ -530,10 +558,15 @@ impl Chroot {
 
     /// Replace `//` with `/`. This is for asthetics only.
     fn strip_double_slash(&self, path: &String) -> String {
-        return path.replace(
-            &format!("{}{}", path::MAIN_SEPARATOR, path::MAIN_SEPARATOR),
-            &path::MAIN_SEPARATOR.to_string(),
-        );
+        let mut stripped_path = path.clone();
+        let single_slash = path::MAIN_SEPARATOR.to_string();
+        let double_slash = format!("{}{}", single_slash, single_slash);
+
+        while stripped_path.contains(&double_slash) {
+            stripped_path = stripped_path.replace(&double_slash, &single_slash);
+        }
+
+        return stripped_path;
     }
 
     /// Interprets a given path containing '..' directories.
