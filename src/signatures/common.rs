@@ -7,46 +7,64 @@ pub const CONFIDENCE_MEDIUM: u8 = 128;
 pub const CONFIDENCE_HIGH: u8 = 250;
 pub const CONFIDENCE_HIGHER_THAN_SNOOP_DOG: u8 = 255;
 
+/// Return value of SignatureParser upon error
 #[derive(Debug, Clone)]
 pub struct SignatureError;
 
-/// All signature parsers take a vector of u8 bytes, and an offset into that vector where the signature's magic bytes were found.
-/// They return either a SignatureResult struct, or, if the signature is not valid, a SignatureError.
+/// Type definition for signature parser functions
+///
+/// ## Arguments
+///
+/// All signature parsers are passed two arguments: a vector of u8 bytes, and an offset into that vector where the signature's magic bytes were found.
+///
+/// ## Return values
+///
+/// Each signature parser is responsible for parsing and validating signature candidates.
+///
+/// They must return either a SignatureResult struct if validation succeeds, or a SignatureError if validation fails.
 pub type SignatureParser = fn(&Vec<u8>, usize) -> Result<SignatureResult, SignatureError>;
 
-/// This struct is returned by all signature parser functions (see: SignatureParser).
-/// The id and name fields are automatically populated, and need not be set by parser functions.
-/// At the very least, parser functions should define the `offset` and `description` fields.
-/// Note that if a SignatureResult contains a `size` of 0, it is assumed to extend to the beginning of the next signature, or EOF, whichever comes first (see: binwalk.rs).
-/// Sortable by offset.
+/// Describes a valid identified file signature
+///
+/// ## Construction
+///
+/// The SignatureResult struct is returned by all SignatureParser functions upon success.
+///
+/// The `id`, `name`, and `always_display` fields are automatically populated after being returned by a SignatureParser function, and need not be set by the SignatureParser function.
+///
+/// At the very least, SignatureParser functions should define the `offset` and `description` fields.
+///
+/// ## Additional Notes
+///
+/// If a SignatureResult contains a `size` of `0` (the default value), it is assumed to extend to the beginning of the next signature, or EOF, whichever comes first.
+///
+/// SignatureResult structs are sortable by `offset`.
+///
+/// SignatureResult structs can be JSON serialized/deserialized with [serde](https://crates.io/crates/serde).
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct SignatureResult {
-    /// File offset where this signature starts
+    /// File/data offset where this signature starts
     pub offset: usize,
-    /// Automatically populated; see: binwalk::signature_result_auto_populate
+    /// A UUID uniquely identifying this signature result; auto-populated
     pub id: String,
     /// Size of the signature data, 0 if unknown
     pub size: usize,
-    /// Automatically populated; see: binwalk::signature_result_auto_populate
+    /// A unique name for this signature type, auto-populated from the signature definition in Signature.name
     pub name: String,
     /// One of CONFIDENCE_LOW, CONFIDENCE_MEDIUM, CONFIDENCE_HIGH; default is CONFIDENCE_LOW
     pub confidence: u8,
     /// Human readable description of this signature
     pub description: String,
-    /// Automatically populated; see: binwalk::signature_result_auto_populate
+    /// If true, always display this signature result; auto-populated from the signature definition in Signature.always_display
     pub always_display: bool,
     /// Set to true to disable extraction for this particular signature result (default: false)
     pub extraction_declined: bool,
-    /// Signatures may specify a preferred extractor, which overrides the default extractor specified in magic.rs
+    /// Signatures may specify a preferred extractor, which overrides the default extractor specified in the Signature.extractor definition
     #[serde(skip_deserializing, skip_serializing)]
     pub preferred_extractor: Option<extractors::common::Extractor>,
 }
 
-/// There must be a signature struct defined for each signature (see: signatures::magic::patterns).
-/// Signature.magic is an array of "magic" byte patterns that are associated with the signature.
-/// Signature.parser is a function of type SignatureParser, responsible for parsing and validating hits on those "magic" byte patterns.
-/// If always_display is true, then this signature will always be displayed (during recursive extraction files with no extractable signatures
-/// are not displayed by default; see main.rs).
+/// Defines a file signature to search for, and how to extract that file type
 #[derive(Debug, Clone)]
 pub struct Signature {
     /// Unique name for the signature (no whitespace)

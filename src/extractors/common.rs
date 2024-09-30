@@ -9,9 +9,10 @@ use std::path;
 use std::process;
 use walkdir::WalkDir;
 
-/* This contstant in command line arguments will be replaced with the path to the input file */
+/// This contstant in command line arguments will be replaced with the path to the input file
 pub const SOURCE_FILE_PLACEHOLDER: &str = "%e";
 
+/// Return value of InternalExtractor upon error
 #[derive(Debug, Clone)]
 pub struct ExtractionError;
 
@@ -28,7 +29,7 @@ pub enum ExtractorType {
     None,
 }
 
-/// Describes an extractor.
+/// Describes extractors, both external and internal
 #[derive(Debug, Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Extractor {
     /// External command or internal function to execute
@@ -43,7 +44,7 @@ pub struct Extractor {
     pub do_not_recurse: bool,
 }
 
-/// Stores information about a completed extraction.
+/// Stores information about a completed extraction
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ExtractionResult {
     /// Size of the data consumed during extraction, if known; should be populated by the constructor
@@ -67,8 +68,7 @@ pub struct ProcInfo {
     pub carved_file: String,
 }
 
-/// Used to pseudo-chroot file paths.
-/// All Chroot methods ensure that file paths do not traverse outside of the specified "chroot" directory.
+/// Provides chroot-like functionality for internal extractors
 #[derive(Debug, Default, Clone)]
 pub struct Chroot {
     /// The chroot directory passed to Chroot::new
@@ -86,11 +86,13 @@ impl Chroot {
     /// ```
     /// use binwalk::Chroot;
     ///
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// let chroot_directory = "/tmp/foobar".to_string();
     /// let chroot = Chroot::new(Some(&chroot_directory));
     ///
     /// assert_eq!(chroot.chroot_directory, "/tmp/foobar");
     /// assert_eq!(std::path::Path::new("/tmp/foobar").exists(), true);
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// ```
     pub fn new(chroot_directory: Option<&String>) -> Chroot {
         let mut chroot_instance = Chroot {
@@ -139,6 +141,7 @@ impl Chroot {
     ///
     /// let chroot_directory = "/tmp/foobar".to_string();
     ///
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// let chroot = Chroot::new(Some(&chroot_directory));
     ///
     /// let path1 = chroot.safe_path_join("/etc", "passwd");
@@ -150,6 +153,7 @@ impl Chroot {
     /// assert_eq!(path2, "/tmp/foobar/passwd");
     /// assert_eq!(path3, "/tmp/foobar/etc/passwd");
     /// assert_eq!(path4, "/tmp/foobar/etc/passwd");
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// ```
     pub fn safe_path_join(&self, path1: impl Into<String>, path2: impl Into<String>) -> String {
         // Join and sanitize both paths; retain the leading '/' (if there is one)
@@ -198,10 +202,12 @@ impl Chroot {
     /// let chroot_dir = "/tmp/foobar".to_string();
     /// let file_data: &[u8] = b"foobar";
     ///
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
     /// assert_eq!(chroot.create_file("created_file.txt", file_data), true);
     /// assert_eq!(std::fs::read_to_string("/tmp/foobar/created_file.txt").unwrap(), "foobar");
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// ```
     pub fn create_file(&self, file_path: impl Into<String>, file_data: &[u8]) -> bool {
         let safe_file_path: String = self.chrooted_path(file_path);
@@ -235,10 +241,12 @@ impl Chroot {
     /// let chroot_dir = "/tmp/foobar".to_string();
     /// let file_data_with_trailing_junk: &[u8] = b"foobarJUNK";
     ///
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
     /// assert_eq!(chroot.carve_file("carved_file.txt", file_data_with_trailing_junk, 0, 6), true);
     /// assert_eq!(std::fs::read_to_string("/tmp/foobar/carved_file.txt").unwrap(), "foobar");
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// ```
     pub fn carve_file(&self, file_path: impl Into<String>, data: &[u8], start: usize, size: usize) -> bool {
         let mut retval: bool = false;
@@ -282,10 +290,12 @@ impl Chroot {
     /// let dev_major: usize = 1;
     /// let dev_minor: usize = 2;
     ///
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
     /// assert_eq!(chroot.create_character_device("char_device", dev_major, dev_minor), true);
     /// assert_eq!(std::fs::read_to_string("/tmp/foobar/char_device").unwrap(), "c 1 2");
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// ```
     pub fn create_character_device(&self, file_path: impl Into<String>, major: usize, minor: usize) -> bool {
         return self.create_device(file_path, "c", major, minor);
@@ -304,10 +314,12 @@ impl Chroot {
     /// let dev_major: usize = 1;
     /// let dev_minor: usize = 2;
     ///
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
     /// assert_eq!(chroot.create_block_device("block_device", dev_major, dev_minor), true);
     /// assert_eq!(std::fs::read_to_string("/tmp/foobar/block_device").unwrap(), "b 1 2");
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// ```
     pub fn create_block_device(&self, file_path: impl Into<String>, major: usize, minor: usize) -> bool {
         return self.create_device(file_path, "b", major, minor);
@@ -324,10 +336,12 @@ impl Chroot {
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
     ///
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
     /// assert_eq!(chroot.create_fifo("fifo_file"), true);
     /// assert_eq!(std::fs::read_to_string("/tmp/foobar/fifo_file").unwrap(), "fifo");
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// ```
     pub fn create_fifo(&self, file_path: impl Into<String>) -> bool {
         return self.create_file(file_path, b"fifo");
@@ -344,10 +358,12 @@ impl Chroot {
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
     ///
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
     /// assert_eq!(chroot.create_socket("socket_file"), true);
     /// assert_eq!(std::fs::read_to_string("/tmp/foobar/socket_file").unwrap(), "socket");
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// ```
     pub fn create_socket(&self, file_path: impl Into<String>) -> bool {
         return self.create_file(file_path, b"socket");
@@ -365,10 +381,12 @@ impl Chroot {
     /// let chroot_dir = "/tmp/foobar".to_string();
     /// let my_file_data: &[u8] = b"foobar";
     ///
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
     /// assert_eq!(chroot.append_to_file("append.txt", my_file_data), true);
     /// assert_eq!(std::fs::read_to_string("/tmp/foobar/append.txt").unwrap(), "foobar");
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// ```
     pub fn append_to_file(&self, file_path: impl Into<String>, data: &[u8]) -> bool {
         let safe_file_path: String = self.chrooted_path(file_path);
@@ -412,10 +430,12 @@ impl Chroot {
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
     ///
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
     /// assert_eq!(chroot.create_directory("/usr/bin/"), true);
     /// assert_eq!(std::path::Path::new("/tmp/foobar/usr/bin").exists(), true);
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// ```
     pub fn create_directory(&self, dir_path: impl Into<String>) -> bool {
         let safe_dir_path: String = self.chrooted_path(dir_path);
@@ -441,10 +461,12 @@ impl Chroot {
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
     ///
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// let chroot = Chroot::new(Some(&chroot_dir));
     /// chroot.create_file("runme.exe", b"AAAA");
     ///
     /// assert_eq!(chroot.make_executable("runme.exe"), true);
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// ```
     pub fn make_executable(&self, file_path: impl Into<String>) -> bool {
         // Make the file globally executable
@@ -493,10 +515,12 @@ impl Chroot {
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
     ///
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
     /// assert_eq!(chroot.create_symlink("symlink", "/"), true);
     /// assert_eq!(std::fs::canonicalize("/tmp/foobar/symlink").unwrap().to_str(), Some("/tmp/foobar"));
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// ```
     pub fn create_symlink(&self, symlink_path: impl Into<String>, target_path: impl Into<String>) -> bool {
         let safe_target: String;
@@ -620,9 +644,7 @@ impl Chroot {
     }
 }
 
-/*
- * Recursively walks a given directory and returns a list of regular non-zero size files in the given directory path.
- */
+/// Recursively walks a given directory and returns a list of regular non-zero size files in the given directory path.
 #[allow(dead_code)]
 pub fn get_extracted_files(directory: &String) -> Vec<String> {
     let mut regular_files: Vec<String> = vec![];
@@ -649,9 +671,7 @@ pub fn get_extracted_files(directory: &String) -> Vec<String> {
     return regular_files;
 }
 
-/*
- * Executes an extractor for the provided SignatureResult.
- */
+/// Executes an extractor for the provided SignatureResult.
 pub fn execute(
     file_data: &Vec<u8>,
     file_path: &String,
@@ -757,9 +777,7 @@ pub fn execute(
     return result;
 }
 
-/*
- * Spawn an external extractor process.
- */
+/// Spawn an external extractor process.
 fn spawn(
     file_data: &Vec<u8>,
     file_path: &String,
@@ -850,10 +868,8 @@ fn spawn(
     }
 }
 
-/*
- * Waits for an extraction process to complete.
- * Returns ExtractionError if the extractor was prematurely terminated, else returns an ExtractionResult.
- */
+/// Waits for an extraction process to complete.
+/// Returns ExtractionError if the extractor was prematurely terminated, else returns an ExtractionResult.
 fn proc_wait(mut worker_info: ProcInfo) -> Result<ExtractionResult, ExtractionError> {
     // The standard exit success value is 0
     const EXIT_SUCCESS: i32 = 0;
@@ -928,10 +944,8 @@ fn create_output_directory(file_path: &String, offset: usize) -> Result<String, 
     return Ok(output_directory);
 }
 
-/*
- * Returns true if the size of the provided extractor output directory is greater than zero.
- * Note that any intermediate/carved files must be deleted *before* calling this function.
- */
+/// Returns true if the size of the provided extractor output directory is greater than zero.
+/// Note that any intermediate/carved files must be deleted *before* calling this function.
 fn was_something_extracted(output_directory: &String) -> bool {
     let output_directory_path = path::Path::new(output_directory);
     debug!("Checking output directory {} for results", output_directory);

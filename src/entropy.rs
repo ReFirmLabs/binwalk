@@ -21,9 +21,7 @@ pub struct FileEntropy {
     pub blocks: Vec<BlockEntropy>,
 }
 
-/*
- * Splits the supplied data up into blocks and calculates the entropy of each block.
- */
+/// Splits the supplied data up into blocks and calculates the entropy of each block.
 fn blocks(data: &[u8]) -> Vec<BlockEntropy> {
     const MIN_BLOCK_SIZE: usize = 1024;
     const NUM_DATA_POINTS: usize = 4096 * 10;
@@ -58,14 +56,15 @@ fn blocks(data: &[u8]) -> Vec<BlockEntropy> {
     return entropy_blocks;
 }
 
-/*
- * Generate a plot of a file's entropy.
- */
-pub fn plot(target_file: String) -> Result<FileEntropy, EntropyError> {
+/// Generate a plot of a file's entropy.
+/// Will output a file to the current working directory with the name `<file_name>.png`.
+pub fn plot(file_path: impl Into<String>) -> Result<FileEntropy, EntropyError> {
     const FILE_EXTENSION: &str = "png";
     const SHANNON_MAX_VALUE: i32 = 8;
     const IMAGE_PIXEL_WIDTH: u32 = 2048;
     const IMAGE_PIXEL_HEIGHT: u32 = ((IMAGE_PIXEL_WIDTH as f64) * 0.6) as u32;
+
+    let target_file: String = file_path.into();
 
     // Get the base name of the target file
     let target_file_name = path::Path::new(&target_file)

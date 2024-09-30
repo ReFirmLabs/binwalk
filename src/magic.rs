@@ -1,9 +1,7 @@
 use crate::extractors;
 use crate::signatures;
 
-/*
- * Returns a list of all supported signatures, including their "magic" byte patterns and parser functions.
- */
+/// Returns a list of all supported signatures, including their "magic" byte patterns, parser functions, and any associated extractor.
 pub fn patterns() -> Vec<signatures::common::Signature> {
     let mut binary_signatures: Vec<signatures::common::Signature> = vec![];
 

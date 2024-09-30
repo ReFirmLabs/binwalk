@@ -8,32 +8,46 @@ use std::collections::HashMap;
 #[cfg(not(target_pointer_width = "64"))]
 compile_error!("compilation is only allowed for 64-bit targets");
 
+/// Error return value of structure parsers
 #[derive(Debug, Clone)]
 pub struct StructureError;
 
-/*
- * Function to parse basic data structures.
- *
- * Supported data types: u8, u16, u24, u32, u64.
- *
- * data: The raw data to apply the structure over. It is up to the caller to ensure that enough data is provided to parse the entire structure.
- * structure: A vector of tuples describing the data structure (see below for exmaple).
- * endianness: One of: "big", "little".
- *
- * Example:
- *
- *  let my_structure = vec![
- *      ("magic", "u32"),
- *      ("size", "u64"),
- *      ("flags", "u8"),
- *      ("checksum", "u32"),
- *  ];
- *
- *  let some_data = b"AAAA\x01\x00\x00\x00\x00\x00\x00\x00\x08\x01\x02\x03\x04";
- *  let header = structure::parse(some_data, &my_structure, "little");
- *  println!("Reported size is: {}", header["size"]);
- *
- */
+/// Function to parse basic C-style data structures.
+///
+/// ## Supported Data Types
+///
+/// The following data types are supported:
+/// - u8
+/// - u16
+/// - u24
+/// - u32
+/// - u64
+///
+/// ## Arguments
+///
+/// - `data`: The raw data to apply the structure over
+/// - `structure`: A vector of tuples describing the data structure
+/// - `endianness`: One of: "big", "little"
+///
+/// ## Example:
+///
+/// ```
+/// use binwalk::structures;
+///
+/// let my_structure = vec![
+///     ("magic", "u32"),
+///     ("size", "u64"),
+///     ("flags", "u8"),
+///     ("packed_bytes", "u24"),
+///     ("checksum", "u16"),
+/// ];
+///
+/// let some_data = b"AAAA\x01\x00\x00\x00\x00\x00\x00\x00\x08\x0A\x0B\x0C\x01\x02";
+/// let header = structures::common::parse(some_data, &my_structure, "little").unwrap();
+///
+/// assert_eq!(header["magic"], 0x41414141);
+/// assert_eq!(header["checksum"], 0x0201);
+/// ```
 pub fn parse(
     data: &[u8],
     structure: &Vec<(&str, &str)>,
@@ -112,9 +126,24 @@ pub fn parse(
     return Err(StructureError);
 }
 
-/*
- * Returns the size of a given structure definition.
- */
+/// Returns the size of a given structure definition.
+///
+/// ## Example:
+///
+/// ```
+/// use binwalk::structures;
+///
+/// let my_structure = vec![
+///     ("magic", "u32"),
+///     ("size", "u64"),
+///     ("flags", "u8"),
+///     ("checksum", "u32"),
+/// ];
+///
+/// let struct_size = structures::common::size(&my_structure);
+///
+/// assert_eq!(struct_size, 17);
+/// ```
 pub fn size(structure: &Vec<(&str, &str)>) -> usize {
     let mut struct_size: usize = 0;
 
@@ -125,6 +154,7 @@ pub fn size(structure: &Vec<(&str, &str)>) -> usize {
     return struct_size;
 }
 
+/// Returns the size of a give type string
 fn type_to_size(ctype: &str) -> usize {
     // This table must be updated when new data types are added
     let size_lookup_table: HashMap<&str, usize> =

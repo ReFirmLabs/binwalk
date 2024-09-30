@@ -1,3 +1,5 @@
+//! Primary Binwalk interface.
+
 use aho_corasick::AhoCorasick;
 use log::{debug, error, info, warn};
 use serde::{Deserialize, Serialize};

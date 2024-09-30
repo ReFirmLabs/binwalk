@@ -15,10 +15,8 @@ pub enum JSONType {
     Analysis(AnalysisResults),
 }
 
-/*
- * If file does not exist, write [\n<data>,\n]
- * Else, seek to EOF -1 , write ",\n<data>,\n]"
- */
+/// If file does not exist, write "[\n<json_data>\n]".
+/// Else, seek to EOF -1 and write ",\n<json_data>\n]".
 pub fn log(json_file: &Option<String>, results: JSONType) {
     const JSON_LIST_START: &str = "[\n";
     const JSON_LIST_END: &str = "\n]";
