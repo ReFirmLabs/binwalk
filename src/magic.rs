@@ -186,16 +186,16 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         extractor: Some(extractors::tsk::tsk_extractor()),
     });
 
-    // linux kernel version
+    // linux kernel
     binary_signatures.push(signatures::common::Signature {
-        name: "linux_kernel_version".to_string(),
+        name: "linux_kernel".to_string(),
         short: false,
         magic_offset: 0,
         always_display: true,
         magic: signatures::linux::linux_kernel_version_magic(),
         parser: signatures::linux::linux_kernel_version_parser,
         description: signatures::linux::LINUX_KERNEL_VERSION_DESCRIPTION.to_string(),
-        extractor: None,
+        extractor: Some(extractors::linux::linux_kernel_extractor()),
     });
 
     // linux boot image

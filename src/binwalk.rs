@@ -302,7 +302,11 @@ impl Binwalk {
 
                 // Add this signature to the file map
                 file_map.push(signature_result.clone());
-                next_valid_offset = signature_result.offset + signature_result.size;
+
+                // Only update the next_valid_offset if confidence is at least medium
+                if signature_result.confidence >= signatures::common::CONFIDENCE_MEDIUM {
+                    next_valid_offset = signature_result.offset + signature_result.size;
+                }
 
                 info!(
                     "Found valid {} signature at offset {:#X}",
@@ -402,8 +406,10 @@ impl Binwalk {
                 continue;
             }
 
-            // This signature looks OK, update the next_valid_offset to be the end of this signature's data
-            next_valid_offset = this_signature.offset + this_signature.size;
+            // This signature looks OK, update the next_valid_offset to be the end of this signature's data, only if we're fairly confident in the signature
+            if this_signature.confidence >= signatures::common::CONFIDENCE_MEDIUM {
+                next_valid_offset = this_signature.offset + this_signature.size;
+            }
         }
 
         /*
@@ -578,7 +584,7 @@ impl Binwalk {
     }
 }
 
-// Initializes the extraction output directory
+/// Initializes the extraction output directory
 fn init_extraction_directory(
     target_file: &String,
     extraction_directory: &String,
@@ -634,9 +640,7 @@ fn init_extraction_directory(
     }
 }
 
-/*
- * Returns true if the signature should be included for file analysis, else returns false.
- */
+/// Returns true if the signature should be included for file analysis, else returns false.
 fn include_signature(
     signature: &signatures::common::Signature,
     include: &Option<Vec<String>>,
@@ -665,9 +669,7 @@ fn include_signature(
     return true;
 }
 
-/*
- * Some SignatureResult fields need to be auto-populated.
- */
+/// Some SignatureResult fields need to be auto-populated.
 fn signature_result_auto_populate(
     signature_result: &mut signatures::common::SignatureResult,
     signature: &signatures::common::Signature,

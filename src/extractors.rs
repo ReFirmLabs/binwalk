@@ -9,6 +9,7 @@ pub mod gzip;
 pub mod inflate;
 pub mod jffs2;
 pub mod jpeg;
+pub mod linux;
 pub mod lz4;
 pub mod lzfse;
 pub mod lzma;
