@@ -48,23 +48,25 @@ pub struct Binwalk {
 
 impl Binwalk {
     /// Create a new Binwalk instance with all default values.
-    /// Equivalent to `Binwalk::new(None, None, None, None, None)`.
+    /// Equivalent to `Binwalk::configure(None, None, None, None, None)`.
     ///
     /// ## Example
     ///
     /// ```
     /// use binwalk::Binwalk;
     ///
-    /// let binwalker = Binwalk::default();
+    /// let binwalker = Binwalk::new();
     /// ```
     #[allow(dead_code)]
-    pub fn default() -> Binwalk {
-        return Binwalk::new(None, None, None, None, None).unwrap();
+    pub fn new() -> Binwalk {
+        return Binwalk::configure(None, None, None, None, None).unwrap();
     }
 
     /// Create a new Binwalk instance.
     ///
-    /// The arguments `target_file_name` and `output_directory` are only required if extraction is being performed.
+    /// If `target_file_name` and `output_directory` are specified, the `output_directory` will be created if it does not
+    /// already exist, and a symlink to `target_file_name` will be placed inside the `output_directory`. The path to this
+    /// symlink is placed in `Binwalk.base_target_file`.
     ///
     /// The `include` and `exclude` arguments specify include and exclude signature filters. The String values contained
     /// in these arguments must match the `Signature.name` values defined in magic.rs.
@@ -79,9 +81,9 @@ impl Binwalk {
     /// // Don't scan for these file signatures
     /// let exclude_filters: Vec<String> = vec!["jpeg".to_string(), "png".to_string()];
     ///
-    /// let binwalker = Binwalk::new(None, None, None, Some(exclude_filters), None).unwrap();
+    /// let binwalker = Binwalk::configure(None, None, None, Some(exclude_filters), None).unwrap();
     /// ```
-    pub fn new(
+    pub fn configure(
         target_file_name: Option<String>,
         output_directory: Option<String>,
         include: Option<Vec<String>>,
@@ -95,21 +97,30 @@ impl Binwalk {
         // Target file is optional, especially if being called via the library
         if let Some(target_file) = target_file_name {
             // Set the target file path, make it an absolute path
-            new_instance.base_target_file = path::absolute(path::Path::new(&target_file))
-                .unwrap()
-                .to_str()
-                .unwrap()
-                .to_string();
+            match path::absolute(&target_file) {
+                Err(_) => {
+                    return Err(BinwalkError);
+                },
+                Ok(abspath) => {
+                    new_instance.base_target_file = abspath.display().to_string();
+                },
+            }
 
             // If an output extraction directory was also specified, initialize it
             if let Some(extraction_directory) = output_directory {
-                new_instance.base_output_directory =
-                    path::absolute(path::Path::new(&extraction_directory))
-                        .unwrap()
-                        .to_str()
-                        .unwrap()
-                        .to_string();
+                // Make the extraction directory an absolute path
+                match path::absolute(&extraction_directory) {
+                    Err(_) => {
+                        return Err(BinwalkError);
+                    },
+                    Ok(abspath) => {
+                        new_instance.base_output_directory = abspath.display().to_string();
+                    },
+                }
 
+                // Initialize the extraction directory. This will create the directory if it
+                // does not exist, and create a symlink inside the directory that points to
+                // the specified target file.
                 match init_extraction_directory(
                     &new_instance.base_target_file,
                     &new_instance.base_output_directory,
@@ -183,7 +194,7 @@ impl Binwalk {
     /// let target_file = "/bin/ls";
     /// let data_to_scan = std::fs::read(target_file).expect("Unable to read file");
     ///
-    /// let binwalker = Binwalk::default();
+    /// let binwalker = Binwalk::new();
     ///
     /// let signature_results = binwalker.scan(&data_to_scan);
     ///
@@ -529,7 +540,7 @@ impl Binwalk {
     /// let target_path = "/usr/share/man/man2/accept.2.gz".to_string();
     /// let extraction_directory = "/tmp/foobar/extractions".to_string();
     ///
-    /// let binwalker = Binwalk::new(Some(target_path), Some(extraction_directory), None, None, None).unwrap();
+    /// let binwalker = Binwalk::configure(Some(target_path), Some(extraction_directory), None, None, None).unwrap();
     ///
     /// let analysis_results = binwalker.analyze(&binwalker.base_target_file, true);
     ///

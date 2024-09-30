@@ -82,7 +82,7 @@ fn main() {
     }
 
     // Initialize binwalk
-    match binwalk::Binwalk::new(
+    match binwalk::Binwalk::configure(
         cliargs.file_name,
         output_directory,
         cliargs.include,

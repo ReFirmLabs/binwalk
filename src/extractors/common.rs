@@ -19,6 +19,7 @@ pub struct ExtractionError;
 /// Arguments: file_data, offset, output_directory.
 pub type InternalExtractor = fn(&Vec<u8>, usize, Option<&String>) -> ExtractionResult;
 
+/// Enum to define either an Internal or External extractor type
 #[derive(Debug, Default, Clone, Eq, PartialEq, Ord, PartialOrd)]
 pub enum ExtractorType {
     External(String),
@@ -43,25 +44,22 @@ pub struct Extractor {
 }
 
 /// Stores information about a completed extraction.
-/// When constructing this structure, only the `size` and `success` fields should be populated;
-/// the others are automatically populated (see: extractors::common::execute).
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ExtractionResult {
-    /// Size of the data consumed during extraction, if known
+    /// Size of the data consumed during extraction, if known; should be populated by the constructor
     pub size: Option<usize>,
-    /// Extractor success status
+    /// Extractor success status; should be populated by the constructor
     pub success: bool,
-    /// Extractor name, automatically populated by execute(), below
+    /// Extractor name, automatically populated by extractors::common::execute
     pub extractor: String,
-    /// Set to true if the corresponding Extractor definition has it set to true
-    /// WARNING: this value must be defined in the extractor definition, as that
-    /// will override this value (see: extractors::common::execute).
+    /// Set to true to disable recursion into this extractor's extracted files.
+    /// Automatically populated with the corresponding Extractor.do_not_recurse field by extractors::common::execute.
     pub do_not_recurse: bool,
-    /// The output directory where the extractor dropped its files, automatically populated by execute(), below
+    /// The output directory where the extractor dropped its files, automatically populated by extractors::common::execute
     pub output_directory: String,
 }
 
-/// Stores information about external extractor processes.
+/// Stores information about external extractor processes. For internal use only.
 #[derive(Debug)]
 pub struct ProcInfo {
     pub child: process::Child,
@@ -70,8 +68,10 @@ pub struct ProcInfo {
 }
 
 /// Used to pseudo-chroot file paths.
+/// All Chroot methods ensure that file paths do not traverse outside of the specified "chroot" directory.
 #[derive(Debug, Default, Clone)]
 pub struct Chroot {
+    /// The chroot directory passed to Chroot::new
     pub chroot_directory: String,
 }
 
@@ -99,10 +99,19 @@ impl Chroot {
 
         match chroot_directory {
             None => {
+                // Default path is '/'
                 chroot_instance.chroot_directory = path::MAIN_SEPARATOR.to_string();
             }
             Some(chroot_dir) => {
-                chroot_instance.chroot_directory = chroot_dir.clone();
+                // Attempt to ensure that the specified path is absolute. If this fails, just use the path as given.
+                match path::absolute(chroot_dir) {
+                    Ok(pathbuf) => {
+                        chroot_instance.chroot_directory = pathbuf.display().to_string();
+                    },
+                    Err(_) => {
+                        chroot_instance.chroot_directory = chroot_dir.clone();
+                    },
+                }
             }
         }
 
