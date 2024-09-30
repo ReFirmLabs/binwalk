@@ -67,47 +67,50 @@ pub fn squashfs_parser(
             // Get the offset of the UID table, an array of pointers to metadata blocks containing lists of user IDs
             let uid_table_start: usize = offset + squashfs_header.uid_table_start;
 
-            // Validate that the UID table pointer points to a location after the end of the SquashFS header
+            // Validate that the UID table pointer points to a location after the end of the SquashFS header (it's usually at the end of the image)
             if uid_table_start > squashfs_header.header_size {
-                // Parse one entry from the UID table
-                if let Ok(uid_entry) = parse_squashfs_uid_entry(
-                    &file_data[uid_table_start..],
-                    squashfs_header.major_version,
-                    &squashfs_header.endianness,
-                ) {
-                    // Make sure the first UID table entry is either 0, or falls within the bounds of the SquashFS image data
-                    if (uid_entry == 0)
-                        || (uid_entry > squashfs_header.header_size
-                            && uid_entry <= squashfs_header.image_size)
-                    {
-                        // Format the modified time into something human readable
-                        let create_date = epoch_to_string(squashfs_header.timestamp as u32);
+                // Get the UID table data
+                if let Some(uid_entry_data) = file_data.get(uid_table_start..) {
+                    // Parse one entry from the UID table
+                    if let Ok(uid_entry) = parse_squashfs_uid_entry(
+                        uid_entry_data,
+                        squashfs_header.major_version,
+                        &squashfs_header.endianness,
+                    ) {
+                        // Make sure the first UID table entry is either 0, or falls within the bounds of the SquashFS image data
+                        if (uid_entry == 0)
+                            || (uid_entry > squashfs_header.header_size
+                                && uid_entry <= squashfs_header.image_size)
+                        {
+                            // Format the modified time into something human readable
+                            let create_date = epoch_to_string(squashfs_header.timestamp as u32);
 
-                        // Make sure the compression type is supported
-                        if squashfs_compression_types.contains_key(&squashfs_header.compression) {
-                            let compression_type_str = squashfs_compression_types
-                                [&squashfs_header.compression]
-                                .to_string();
+                            // Make sure the compression type is supported
+                            if squashfs_compression_types.contains_key(&squashfs_header.compression) {
+                                let compression_type_str = squashfs_compression_types
+                                    [&squashfs_header.compression]
+                                    .to_string();
 
-                            // Standard SquashFSv4 is little endian only; devices that implement a custom big endian version must use a custom extractor
-                            if squashfs_header.major_version == SQUASHFSV4
-                                && squashfs_header.endianness == "big"
-                            {
-                                result.preferred_extractor = Some(squashfs_v4_be_extractor());
+                                // Standard SquashFSv4 is little endian only; devices that implement a custom big endian version must use a custom extractor
+                                if squashfs_header.major_version == SQUASHFSV4
+                                    && squashfs_header.endianness == "big"
+                                {
+                                    result.preferred_extractor = Some(squashfs_v4_be_extractor());
+                                }
+
+                                result.size = squashfs_header.image_size;
+                                result.description = format!("{}, {} endian, version: {}.{}, compression: {}, inode count: {}, block size: {}, image size: {} bytes, created: {}", result.description,
+                                                                                                                                                                                   squashfs_header.endianness,
+                                                                                                                                                                                   squashfs_header.major_version,
+                                                                                                                                                                                   squashfs_header.minor_version,
+                                                                                                                                                                                   compression_type_str,
+                                                                                                                                                                                   squashfs_header.inode_count,
+                                                                                                                                                                                   squashfs_header.block_size,
+                                                                                                                                                                                   squashfs_header.image_size,
+                                                                                                                                                                                   create_date);
+
+                                return Ok(result);
                             }
-
-                            result.size = squashfs_header.image_size;
-                            result.description = format!("{}, {} endian, version: {}.{}, compression: {}, inode count: {}, block size: {}, image size: {} bytes, created: {}", result.description,
-                                                                                                                                                                               squashfs_header.endianness,
-                                                                                                                                                                               squashfs_header.major_version,
-                                                                                                                                                                               squashfs_header.minor_version,
-                                                                                                                                                                               compression_type_str,
-                                                                                                                                                                               squashfs_header.inode_count,
-                                                                                                                                                                               squashfs_header.block_size,
-                                                                                                                                                                               squashfs_header.image_size,
-                                                                                                                                                                               create_date);
-
-                            return Ok(result);
                         }
                     }
                 }
