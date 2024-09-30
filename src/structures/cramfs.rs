@@ -33,6 +33,8 @@ pub fn parse_cramfs_header(
         ..Default::default()
     };
 
+    let cramfs_structure_size = structures::common::size(&cramfs_header_structure);
+
     // Default to little endian
     cramfs_info.endianness = "little".to_string();
 
@@ -63,12 +65,15 @@ pub fn parse_cramfs_header(
                 }
             }
 
-            // Populate info about the CramFS image
-            cramfs_info.size = cramfs_header["size"];
-            cramfs_info.checksum = cramfs_header["checksum"] as u32;
-            cramfs_info.file_count = cramfs_header["file_count"];
+            // Reported image size must be larger than the header structure
+            if cramfs_header["size"] > cramfs_structure_size {
+                // Populate info about the CramFS image
+                cramfs_info.size = cramfs_header["size"];
+                cramfs_info.checksum = cramfs_header["checksum"] as u32;
+                cramfs_info.file_count = cramfs_header["file_count"];
 
-            return Ok(cramfs_info);
+                return Ok(cramfs_info);
+            }
         }
     }
 

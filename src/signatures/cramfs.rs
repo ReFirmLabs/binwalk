@@ -1,30 +1,36 @@
 use crate::common;
-use crate::signatures;
+use crate::signatures::common::{
+    SignatureError, SignatureResult, CONFIDENCE_HIGH, CONFIDENCE_MEDIUM,
+};
 use crate::structures::cramfs::parse_cramfs_header;
 
+/// Human readable description
 pub const DESCRIPTION: &str = "CramFS filesystem";
 
+/// This is technically the CramFS "signature", not the magic bytes, but it's endian-agnostic
 pub fn cramfs_magic() -> Vec<Vec<u8>> {
     return vec![b"Compressed ROMFS".to_vec()];
 }
 
+/// Parse and validate the CramFS header
 pub fn cramfs_parser(
     file_data: &Vec<u8>,
     offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+) -> Result<SignatureResult, SignatureError> {
+    // Some constant relative offsets
     const SIGNATURE_OFFSET: usize = 16;
     const CRC_START_OFFSET: usize = 32;
     const CRC_END_OFFSET: usize = 36;
 
-    let mut result = signatures::common::SignatureResult {
+    let mut result = SignatureResult {
         offset: offset - SIGNATURE_OFFSET,
         description: DESCRIPTION.to_string(),
-        confidence: signatures::common::CONFIDENCE_HIGH,
+        confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };
 
     if let Some(cramfs_header_data) = file_data.get(result.offset..) {
-        // Parse the CramFS header
+        // Parse the CramFS header; also validates that the reported size is greater than the header size
         if let Ok(cramfs_header) = parse_cramfs_header(cramfs_header_data) {
             // Update the reported size
             result.size = cramfs_header.size;
@@ -47,9 +53,10 @@ pub fn cramfs_parser(
                 let mut error_message: &str = "";
 
                 // On CRC error, lower confidence and report the checksum error
+                // (have seen partially corrupted images that still extract Ok)
                 if common::crc32(&cramfs_image) != cramfs_header.checksum {
                     error_message = " (checksum error)";
-                    result.confidence = signatures::common::CONFIDENCE_MEDIUM;
+                    result.confidence = CONFIDENCE_MEDIUM;
                 }
 
                 result.description = format!(
@@ -65,5 +72,5 @@ pub fn cramfs_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

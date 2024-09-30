@@ -1,19 +1,23 @@
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
 
+/// Human readable description
 pub const DESCRIPTION: &str = "compress'd data";
 
+/// Compress'd files always start with these bytes
 pub fn compressd_magic() -> Vec<Vec<u8>> {
     return vec![b"\x1F\x9D\x90".to_vec()];
 }
 
+/// "Validate" the compress'd header
 pub fn compressd_parser(
     _file_data: &Vec<u8>,
     offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-    let result = signatures::common::SignatureResult {
+) -> Result<SignatureResult, SignatureError> {
+    // Successful return value; confidence is medium since this only matches magic bytes at the beginning of a file
+    let result = SignatureResult {
         offset: offset,
         description: DESCRIPTION.to_string(),
-        confidence: signatures::common::CONFIDENCE_MEDIUM,
+        confidence: CONFIDENCE_MEDIUM,
         ..Default::default()
     };
 
@@ -22,5 +26,5 @@ pub fn compressd_parser(
         return Ok(result);
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

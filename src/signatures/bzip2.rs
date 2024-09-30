@@ -1,7 +1,9 @@
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
 
+/// Human readable description
 pub const DESCRIPTION: &str = "bzip2 compressed data";
 
+/// Bzip2 magic bytes; includes the magic bytes, version number, block size, and compressed magic signature
 pub fn bzip2_magic() -> Vec<Vec<u8>> {
     return vec![
         b"BZh91AY&SY".to_vec(),
@@ -16,15 +18,16 @@ pub fn bzip2_magic() -> Vec<Vec<u8>> {
     ];
 }
 
+/// Bzip2 header parser
 pub fn bzip2_parser(
     _file_data: &Vec<u8>,
     offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-    let result = signatures::common::SignatureResult {
+) -> Result<SignatureResult, SignatureError> {
+    // Return value
+    let result = SignatureResult {
         description: DESCRIPTION.to_string(),
         offset: offset,
-        confidence: signatures::common::CONFIDENCE_MEDIUM,
-        size: 0,
+        confidence: CONFIDENCE_MEDIUM,
         ..Default::default()
     };
 

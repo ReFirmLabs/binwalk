@@ -1,25 +1,25 @@
 use crate::common::is_offset_safe;
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 use crate::structures::cpio;
 
+/// Human readable description
 pub const DESCRIPTION: &str = "CPIO ASCII archive";
 
+/// Magic bytes for CPIO archives with and without CRC's
 pub fn cpio_magic() -> Vec<Vec<u8>> {
     return vec![b"070701".to_vec(), b"070702".to_vec()];
 }
 
-pub fn cpio_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+/// Parse and validate CPIO archives
+pub fn cpio_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+    // The last CPIO entry will have this file name
     const EOF_MARKER: &str = "TRAILER!!!";
 
     let mut header_count: usize = 0;
-    let mut result = signatures::common::SignatureResult {
+    let mut result = SignatureResult {
         description: DESCRIPTION.to_string(),
         offset: offset,
-        size: 0,
-        confidence: signatures::common::CONFIDENCE_HIGH,
+        confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };
 
@@ -79,5 +79,5 @@ pub fn cpio_parser(
     }
 
     // No EOF marker was found, or an error occurred in processing the CPIO headers
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

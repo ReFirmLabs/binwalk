@@ -1,7 +1,7 @@
 use crate::extractors;
 use serde::{Deserialize, Serialize};
 
-// Some pre-defined confidence levels for SignatureResult structures
+/// Some pre-defined confidence levels for SignatureResult structures
 pub const CONFIDENCE_LOW: u8 = 0;
 pub const CONFIDENCE_MEDIUM: u8 = 128;
 pub const CONFIDENCE_HIGH: u8 = 250;
