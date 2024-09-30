@@ -1,8 +1,9 @@
 use crate::common::get_cstring;
 use crate::signatures;
+use aho_corasick::AhoCorasick;
 
 pub const LINUX_BOOT_IMAGE_DESCRIPTION: &str = "Linux kernel boot image";
-pub const LINUX_KERNEL_VERSION_DESCRIPTION: &str = "Linux kernel";
+pub const LINUX_KERNEL_VERSION_DESCRIPTION: &str = "Linux kernel version";
 
 pub fn linux_boot_image_magic() -> Vec<Vec<u8>> {
     return vec![b"\xb8\xc0\x07\x8e\xd8\xb8\x00\x90\x8e\xc0\xb9\x00\x01\x29\xf6\x29".to_vec()];
@@ -60,11 +61,8 @@ pub fn linux_kernel_version_parser(
     const MIN_VERSION_STRING_LENGTH: usize = 75;
     const GCC_VERSION_STRING: &str = "(gcc version ";
 
-    // If a valid kernel version string is found, it is assumed that the *entire* file is a Linux kernel.
-    // This is necessary to run the vmlinux-to-elf extractor.
     let mut result = signatures::common::SignatureResult {
-        offset: 0,
-        size: file_data.len(),
+        offset: offset,
         confidence: signatures::common::CONFIDENCE_LOW,
         ..Default::default()
     };
@@ -88,7 +86,25 @@ pub fn linux_kernel_version_parser(
                         if kernel_version_string.as_bytes()[PERIOD_OFFSET_1] == PERIOD
                             && kernel_version_string.as_bytes()[PERIOD_OFFSET_2] == PERIOD
                         {
-                            result.description = kernel_version_string.clone();
+                            // Try to locate a Linux kernel symbol table
+                            let symtab_present = has_linux_symbol_table(file_data);
+
+                            // If a symbol table is present, assume the entire file is a raw Linux kernel.
+                            // This is necessary for vmlinux-to-elf extraction.
+                            // Otherwise just report the kernel version string and decline extraction.
+                            if symtab_present {
+                                result.offset = 0;
+                                result.size = file_data.len();
+                            } else {
+                                result.size = kernel_version_string.len();
+                                result.extraction_declined = true;
+                            }
+
+                            result.description = format!(
+                                "{}, has symbol table: {}",
+                                kernel_version_string.trim(),
+                                symtab_present
+                            );
                             return Ok(result);
                         }
                     }
@@ -98,4 +114,19 @@ pub fn linux_kernel_version_parser(
     }
 
     return Err(signatures::common::SignatureError);
+}
+
+fn has_linux_symbol_table(file_data: &[u8]) -> bool {
+    let mut match_count: usize = 0;
+    let symtab_magic = vec![b"\x000\x001\x002\x003\x004\x005\x006\x007\x008\x009\x00"];
+
+    let grep = AhoCorasick::new(symtab_magic).unwrap();
+
+    // Grep for matches on the Linux symbol table magic bytes
+    for _ in grep.find_overlapping_iter(file_data) {
+        match_count += 1;
+    }
+
+    // There should be only one match
+    return match_count == 1;
 }
