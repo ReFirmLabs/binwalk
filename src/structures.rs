@@ -1,3 +1,6 @@
+//! This module contains functions responsible for parsing various file structures.
+//!
+//! See `structures::common` for helper functions useful when writing new structure parsers.
 pub mod androidsparse;
 pub mod cab;
 pub mod chk;
