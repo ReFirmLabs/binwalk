@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 pub const CONFIDENCE_LOW: u8 = 0;
 pub const CONFIDENCE_MEDIUM: u8 = 128;
 pub const CONFIDENCE_HIGH: u8 = 250;
-pub const CONFIDENCE_HIGHER_THAN_SNOOP_DOG: u8 = 255;
 
 /// Return value of SignatureParser upon error
 #[derive(Debug, Clone)]
