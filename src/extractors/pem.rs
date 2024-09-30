@@ -59,12 +59,8 @@ pub fn pem_carver(
         if let Some(outfile) = fname {
             if let Some(_) = output_directory {
                 let chroot = Chroot::new(output_directory);
-                result.success = chroot.carve_file(
-                    outfile,
-                    file_data,
-                    offset,
-                    result.size.unwrap(),
-                );
+                result.success =
+                    chroot.carve_file(outfile, file_data, offset, result.size.unwrap());
             }
         }
     }

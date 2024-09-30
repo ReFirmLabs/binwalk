@@ -32,12 +32,8 @@ pub fn extract_png_image(
             // If extraction was requested, extract the PNG
             if let Some(_) = output_directory {
                 let chroot = Chroot::new(output_directory);
-                result.success = chroot.carve_file(
-                    OUTFILE_NAME,
-                    file_data,
-                    offset,
-                    result.size.unwrap(),
-                );
+                result.success =
+                    chroot.carve_file(OUTFILE_NAME, file_data, offset, result.size.unwrap());
             }
         }
     }

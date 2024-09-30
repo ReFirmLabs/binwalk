@@ -102,10 +102,10 @@ impl Binwalk {
             match path::absolute(&target_file) {
                 Err(_) => {
                     return Err(BinwalkError);
-                },
+                }
                 Ok(abspath) => {
                     new_instance.base_target_file = abspath.display().to_string();
-                },
+                }
             }
 
             // If an output extraction directory was also specified, initialize it
@@ -114,10 +114,10 @@ impl Binwalk {
                 match path::absolute(&extraction_directory) {
                     Err(_) => {
                         return Err(BinwalkError);
-                    },
+                    }
                     Ok(abspath) => {
                         new_instance.base_output_directory = abspath.display().to_string();
-                    },
+                    }
                 }
 
                 // Initialize the extraction directory. This will create the directory if it

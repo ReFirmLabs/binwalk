@@ -109,10 +109,10 @@ impl Chroot {
                 match path::absolute(chroot_dir) {
                     Ok(pathbuf) => {
                         chroot_instance.chroot_directory = pathbuf.display().to_string();
-                    },
+                    }
                     Err(_) => {
                         chroot_instance.chroot_directory = chroot_dir.clone();
-                    },
+                    }
                 }
             }
         }
@@ -121,10 +121,16 @@ impl Chroot {
         if path::Path::new(&chroot_instance.chroot_directory).exists() == false {
             match fs::create_dir_all(&chroot_instance.chroot_directory) {
                 Ok(_) => {
-                    debug!("Created new chroot directory {}", chroot_instance.chroot_directory);
+                    debug!(
+                        "Created new chroot directory {}",
+                        chroot_instance.chroot_directory
+                    );
                 }
                 Err(e) => {
-                    error!("Failed to create chroot directory {}: {}", chroot_instance.chroot_directory, e);
+                    error!(
+                        "Failed to create chroot directory {}: {}",
+                        chroot_instance.chroot_directory, e
+                    );
                 }
             }
         }
@@ -157,8 +163,10 @@ impl Chroot {
     /// ```
     pub fn safe_path_join(&self, path1: impl Into<String>, path2: impl Into<String>) -> String {
         // Join and sanitize both paths; retain the leading '/' (if there is one)
-        let mut joined_path: String =
-            self.sanitize_path(&format!("{}{}{}", path1.into(), path::MAIN_SEPARATOR, path2.into()), true);
+        let mut joined_path: String = self.sanitize_path(
+            &format!("{}{}{}", path1.into(), path::MAIN_SEPARATOR, path2.into()),
+            true,
+        );
 
         // If the joined path does not start with the chroot directory,
         // prepend the chroot directory to the final joined path.
@@ -248,7 +256,13 @@ impl Chroot {
     /// assert_eq!(std::fs::read_to_string("/tmp/foobar/carved_file.txt").unwrap(), "foobar");
     /// # std::fs::remove_dir_all("/tmp/foobar");
     /// ```
-    pub fn carve_file(&self, file_path: impl Into<String>, data: &[u8], start: usize, size: usize) -> bool {
+    pub fn carve_file(
+        &self,
+        file_path: impl Into<String>,
+        data: &[u8],
+        start: usize,
+        size: usize,
+    ) -> bool {
         let mut retval: bool = false;
 
         if let Some(file_data) = data.get(start..start + size) {
@@ -297,7 +311,12 @@ impl Chroot {
     /// assert_eq!(std::fs::read_to_string("/tmp/foobar/char_device").unwrap(), "c 1 2");
     /// # std::fs::remove_dir_all("/tmp/foobar");
     /// ```
-    pub fn create_character_device(&self, file_path: impl Into<String>, major: usize, minor: usize) -> bool {
+    pub fn create_character_device(
+        &self,
+        file_path: impl Into<String>,
+        major: usize,
+        minor: usize,
+    ) -> bool {
         return self.create_device(file_path, "c", major, minor);
     }
 
@@ -321,7 +340,12 @@ impl Chroot {
     /// assert_eq!(std::fs::read_to_string("/tmp/foobar/block_device").unwrap(), "b 1 2");
     /// # std::fs::remove_dir_all("/tmp/foobar");
     /// ```
-    pub fn create_block_device(&self, file_path: impl Into<String>, major: usize, minor: usize) -> bool {
+    pub fn create_block_device(
+        &self,
+        file_path: impl Into<String>,
+        major: usize,
+        minor: usize,
+    ) -> bool {
         return self.create_device(file_path, "b", major, minor);
     }
 
@@ -522,7 +546,11 @@ impl Chroot {
     /// assert_eq!(std::fs::canonicalize("/tmp/foobar/symlink").unwrap().to_str(), Some("/tmp/foobar"));
     /// # std::fs::remove_dir_all("/tmp/foobar");
     /// ```
-    pub fn create_symlink(&self, symlink_path: impl Into<String>, target_path: impl Into<String>) -> bool {
+    pub fn create_symlink(
+        &self,
+        symlink_path: impl Into<String>,
+        target_path: impl Into<String>,
+    ) -> bool {
         let safe_target: String;
         let safe_target_path: &path::Path;
 

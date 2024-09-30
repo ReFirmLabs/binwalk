@@ -27,12 +27,8 @@ pub fn extract_jpeg_image(
 
         if let Some(_) = output_directory {
             let chroot = Chroot::new(output_directory);
-            result.success = chroot.carve_file(
-                OUTFILE_NAME,
-                file_data,
-                offset,
-                result.size.unwrap(),
-            );
+            result.success =
+                chroot.carve_file(OUTFILE_NAME, file_data, offset, result.size.unwrap());
         }
     }
 

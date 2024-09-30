@@ -6,7 +6,9 @@ mod magic;
 mod signatures;
 
 pub mod structures;
-pub use common::{crc32, is_offset_safe, read_file, get_cstring, epoch_to_string};
 pub use binwalk::{AnalysisResults, Binwalk};
-pub use extractors::common::{SOURCE_FILE_PLACEHOLDER, Chroot, ExtractionError, ExtractionResult, Extractor, ExtractorType};
+pub use common::{crc32, epoch_to_string, get_cstring, is_offset_safe, read_file};
+pub use extractors::common::{
+    Chroot, ExtractionError, ExtractionResult, Extractor, ExtractorType, SOURCE_FILE_PLACEHOLDER,
+};
 pub use signatures::common::{Signature, SignatureError, SignatureParser, SignatureResult};

@@ -86,7 +86,8 @@ pub fn squashfs_parser(
                             let create_date = epoch_to_string(squashfs_header.timestamp as u32);
 
                             // Make sure the compression type is supported
-                            if squashfs_compression_types.contains_key(&squashfs_header.compression) {
+                            if squashfs_compression_types.contains_key(&squashfs_header.compression)
+                            {
                                 let compression_type_str = squashfs_compression_types
                                     [&squashfs_header.compression]
                                     .to_string();
