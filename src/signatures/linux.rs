@@ -2,7 +2,7 @@ use crate::common::get_cstring;
 use crate::signatures;
 
 pub const LINUX_BOOT_IMAGE_DESCRIPTION: &str = "Linux kernel boot image";
-pub const LINUX_KERNEL_VERSION_DESCRIPTION: &str = "Linux kernel version";
+pub const LINUX_KERNEL_VERSION_DESCRIPTION: &str = "Linux kernel";
 
 pub fn linux_boot_image_magic() -> Vec<Vec<u8>> {
     return vec![b"\xb8\xc0\x07\x8e\xd8\xb8\x00\x90\x8e\xc0\xb9\x00\x01\x29\xf6\x29".to_vec()];
