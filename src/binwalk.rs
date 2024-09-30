@@ -526,12 +526,16 @@ impl Binwalk {
     /// ```
     /// use binwalk::Binwalk;
     ///
-    /// let binwalker = Binwalk::default();
-    /// let file_path = "/bin/ls".to_string();
+    /// let target_path = "/usr/share/man/man2/accept.2.gz".to_string();
+    /// let extraction_directory = "/tmp/foobar/extractions".to_string();
     ///
-    /// let analysis_results = binwalker.analyze(&file_path, false);
+    /// let binwalker = Binwalk::new(Some(target_path), Some(extraction_directory), None, None, None).unwrap();
     ///
-    /// assert!(analysis_results.file_map.len() > 0);
+    /// let analysis_results = binwalker.analyze(&binwalker.base_target_file, true);
+    ///
+    /// assert_eq!(analysis_results.file_map.len(), 1);
+    /// assert_eq!(analysis_results.extractions.len(),  1);
+    /// assert_eq!(std::path::Path::new("/tmp/foobar/extractions/accept.2.gz.extracted/0/decompressed.bin").exists(), true);
     /// ```
     pub fn analyze(&self, target_file: &String, do_extraction: bool) -> AnalysisResults {
         // Return value
