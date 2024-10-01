@@ -38,9 +38,9 @@
 //!
 //! To write a parser for a fictional, simple, data structure:
 //!
-//! ```ignore
-//! use crate::common::crc32;
-//! use crate::structures::common::{self, StructureError};
+//! ```no_run
+//! use binwalk::crc32;
+//! use binwalk::structures::common::{self, StructureError};
 //!
 //! /// This function parses the file structure as defined in my_struct.
 //! /// It returns the size reported in the data structure on success.
@@ -72,16 +72,6 @@
 //!     return Err(StructureError);
 //! }
 //! ```
-//!
-//! By convention, the above code would be placed in a new file, `structures/mystruct.rs`.
-//!
-//! To import this new code into the Rust project, append the following line to `structures.rs`:
-//!
-//! ```ignore
-//! pub mod mystruct;
-//! ```
-//!
-//! The parser function can then be accessed by any other code in the project via `structures::mystruct::parse_my_structure`.
 
 pub mod androidsparse;
 pub mod cab;

@@ -77,11 +77,9 @@ pub fn epoch_to_string(epoch_timestamp: u32) -> String {
     }
 }
 
-/*
- * Get a C-style NULL-terminated string from the provided list of u8 bytes.
- * Return value does not include the terminating NULL byte.
- */
-pub fn get_cstring_bytes(raw_data: &[u8]) -> Vec<u8> {
+/// Get a C-style NULL-terminated string from the provided list of u8 bytes.
+/// Return value does not include the terminating NULL byte.
+fn get_cstring_bytes(raw_data: &[u8]) -> Vec<u8> {
     let mut cstring: Vec<u8> = vec![];
 
     for raw_byte in raw_data {
