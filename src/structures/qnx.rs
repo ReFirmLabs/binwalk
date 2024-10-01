@@ -1,10 +1,12 @@
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 
+/// Stores info on a QNX IFS header
 pub struct IFSHeader {
     pub total_size: usize,
 }
 
-pub fn parse_ifs_header(ifs_data: &[u8]) -> Result<IFSHeader, structures::common::StructureError> {
+/// Parse a QNX IFS header
+pub fn parse_ifs_header(ifs_data: &[u8]) -> Result<IFSHeader, StructureError> {
     // https://github.com/askac/dumpifs/blob/master/sys/startup.h
     let ifs_structure = vec![
         ("magic", "u32"),
@@ -30,7 +32,7 @@ pub fn parse_ifs_header(ifs_data: &[u8]) -> Result<IFSHeader, structures::common
     ];
 
     // Parse the IFS header
-    if let Ok(ifs_header) = structures::common::parse(ifs_data, &ifs_structure, "little") {
+    if let Ok(ifs_header) = common::parse(ifs_data, &ifs_structure, "little") {
         // The flags2 field is unused and should be 0
         if ifs_header["flags2"] == 0 {
             // Verify that all the zero fields are, in fact, zero
@@ -46,5 +48,5 @@ pub fn parse_ifs_header(ifs_data: &[u8]) -> Result<IFSHeader, structures::common
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

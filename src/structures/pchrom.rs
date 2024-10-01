@@ -1,14 +1,15 @@
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 
+/// Struct to store PCHROM image info
 #[derive(Debug, Default, Clone)]
 pub struct PCHRomHeader {
     pub data_size: usize,
     pub header_size: usize,
 }
 
-pub fn parse_pchrom_header(
-    pch_data: &[u8],
-) -> Result<PCHRomHeader, structures::common::StructureError> {
+/// Parse a PCHROM header
+pub fn parse_pchrom_header(pch_data: &[u8]) -> Result<PCHRomHeader, StructureError> {
+    // Structure is a fixed size, at a fixed offset from the beginning of the PCHROM image
     const HEADER_STRUCTURE_SIZE: usize = 8;
     const HEADER_STRUCTURE_OFFSET: usize = 16;
 
@@ -32,7 +33,7 @@ pub fn parse_pchrom_header(
     if let Some(pch_structure_data) = pch_data.get(struct_start..struct_end) {
         // Parse the header structure
         if let Ok(pch_header) =
-            structures::common::parse(pch_structure_data, &pch_rom_header_structure, "little")
+            common::parse(pch_structure_data, &pch_rom_header_structure, "little")
         {
             // Sanity check the expected header values
             if pch_header["flmap0_fcba"] == EXPECTED_FCBA {
@@ -42,7 +43,6 @@ pub fn parse_pchrom_header(
                         if let Ok(pch_regions_size) =
                             get_pch_regions_size(&pch_data, 0, pch_header["flmap0_fcba"])
                         {
-                            // Update the reported size
                             return Ok(PCHRomHeader {
                                 header_size: HEADER_STRUCTURE_OFFSET,
                                 data_size: pch_regions_size,
@@ -54,14 +54,15 @@ pub fn parse_pchrom_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }
 
+/// Determine the total size of PCHROM regions
 fn get_pch_regions_size(
     pch_data: &[u8],
     offset: usize,
     fcba: usize,
-) -> Result<usize, structures::common::StructureError> {
+) -> Result<usize, StructureError> {
     // There are 5 defined flash regions: Descriptor, BIOS, ME, GBE, PDATA
     const FLASH_REGION_COUNT: usize = 5;
 
@@ -85,12 +86,12 @@ fn get_pch_regions_size(
         // Get the next region's 32-bit value, in raw bytes
         match pch_data.get(region_entry_start..region_entry_end) {
             None => {
-                return Err(structures::common::StructureError);
+                return Err(StructureError);
             }
             Some(pch_region_data) => {
                 // Parse the 32-bit entry value for this region
                 if let Ok(region_entry) =
-                    structures::common::parse(pch_region_data, &region_entry_structure, "little")
+                    common::parse(pch_region_data, &region_entry_structure, "little")
                 {
                     let region_value = region_entry["region_value"];
 
@@ -113,6 +114,6 @@ fn get_pch_regions_size(
     if image_size > 0 {
         return Ok(image_size);
     } else {
-        return Err(structures::common::StructureError);
+        return Err(StructureError);
     }
 }

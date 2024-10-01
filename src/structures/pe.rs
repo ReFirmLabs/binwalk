@@ -1,11 +1,13 @@
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 use std::collections::HashMap;
 
+/// Stores info about the PE file
 pub struct PEHeader {
     pub machine: String,
 }
 
-pub fn parse_pe_header(pe_data: &[u8]) -> Result<PEHeader, structures::common::StructureError> {
+/// Partially parse a PE header
+pub fn parse_pe_header(pe_data: &[u8]) -> Result<PEHeader, StructureError> {
     const PE_MAGIC: usize = 0x00004550;
 
     let dos_structure = vec![
@@ -85,10 +87,10 @@ pub fn parse_pe_header(pe_data: &[u8]) -> Result<PEHeader, structures::common::S
     ]);
 
     // Size of PE header structure
-    let pe_header_size = structures::common::size(&pe_structure);
+    let pe_header_size = common::size(&pe_structure);
 
     // Parse the DOS header
-    if let Ok(dos_header) = structures::common::parse(pe_data, &dos_structure, "little") {
+    if let Ok(dos_header) = common::parse(pe_data, &dos_structure, "little") {
         // Sanity check the reserved header fields; they should all be 0
         if dos_header["e_res_1"] == 0
             && dos_header["e_res_2"] == 0
@@ -112,9 +114,7 @@ pub fn parse_pe_header(pe_data: &[u8]) -> Result<PEHeader, structures::common::S
             // Sanity check the PE header offsets
             if let Some(pe_header_data) = pe_data.get(pe_header_start..pe_header_end) {
                 // Parse the PE header
-                if let Ok(pe_header) =
-                    structures::common::parse(pe_header_data, &pe_structure, "little")
-                {
+                if let Ok(pe_header) = common::parse(pe_header_data, &pe_structure, "little") {
                     // Check the PE magic bytes
                     if pe_header["magic"] == PE_MAGIC {
                         // Check the reported machine type
@@ -129,5 +129,5 @@ pub fn parse_pe_header(pe_data: &[u8]) -> Result<PEHeader, structures::common::S
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

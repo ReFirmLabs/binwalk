@@ -1,6 +1,7 @@
 use crate::common::get_cstring;
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 
+/// Storage struct for CHK header info
 #[derive(Debug, Clone, Default)]
 pub struct CHKHeader {
     pub header_size: usize,
@@ -9,9 +10,8 @@ pub struct CHKHeader {
     pub board_id: String,
 }
 
-pub fn parse_chk_header(
-    header_data: &[u8],
-) -> Result<CHKHeader, structures::common::StructureError> {
+/// Parse a CHK firmware header
+pub fn parse_chk_header(header_data: &[u8]) -> Result<CHKHeader, StructureError> {
     // Somewhat arbitrarily chosen
     const MAX_EXPECTED_HEADER_SIZE: usize = 100;
 
@@ -29,10 +29,10 @@ pub fn parse_chk_header(
     ];
 
     // Size of the fixed-length portion of the header structure
-    let struct_size: usize = structures::common::size(&chk_header_structure);
+    let struct_size: usize = common::size(&chk_header_structure);
 
     // Parse the CHK header
-    if let Ok(chk_header) = structures::common::parse(&header_data, &chk_header_structure, "big") {
+    if let Ok(chk_header) = common::parse(&header_data, &chk_header_structure, "big") {
         // Validate the reported header size
         if chk_header["header_size"] > struct_size
             && chk_header["header_size"] <= MAX_EXPECTED_HEADER_SIZE
@@ -57,5 +57,5 @@ pub fn parse_chk_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

@@ -1,16 +1,18 @@
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 
+/// LZO checksums are 4-bytes long
 const LZO_CHECKSUM_SIZE: usize = 4;
 
+/// Struct to store LZOP file header info
 #[derive(Debug, Default, Clone)]
 pub struct LZOPFileHeader {
     pub header_size: usize,
     pub block_checksum_present: bool,
 }
 
-pub fn parse_lzop_file_header(
-    lzop_data: &[u8],
-) -> Result<LZOPFileHeader, structures::common::StructureError> {
+/// Parse an LZOP file header
+pub fn parse_lzop_file_header(lzop_data: &[u8]) -> Result<LZOPFileHeader, StructureError> {
+    // Max supported LZO version
     const LZO_MAX_VERSION: usize = 0x1040;
 
     const LZO_HEADER_SIZE_P1: usize = 21;
@@ -49,7 +51,7 @@ pub fn parse_lzop_file_header(
     };
 
     // Parse the first part of the header
-    if let Ok(lzo_header_p1) = structures::common::parse(&lzop_data, &lzo_structure_p1, "big") {
+    if let Ok(lzo_header_p1) = common::parse(&lzop_data, &lzo_structure_p1, "big") {
         // Sanity check the methods field
         if allowed_methods.contains(&lzo_header_p1["method"]) {
             // Sanity check the header version numbers
@@ -70,7 +72,7 @@ pub fn parse_lzop_file_header(
                 if let Some(header_p2_data) = lzop_data.get(header_p2_start..header_p2_end) {
                     // Parse the second part of the header
                     if let Ok(lzo_header_p2) =
-                        structures::common::parse(header_p2_data, &lzo_structure_p2, "big")
+                        common::parse(header_p2_data, &lzo_structure_p2, "big")
                     {
                         // Calculate the total header size; compressed data blocks will immediately follow
                         lzop_info.header_size =
@@ -90,9 +92,10 @@ pub fn parse_lzop_file_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }
 
+/// Struct to store info on LZOP block headers
 #[derive(Debug, Default, Clone)]
 pub struct LZOPBlockHeader {
     pub header_size: usize,
@@ -101,11 +104,12 @@ pub struct LZOPBlockHeader {
     pub checksum_size: usize,
 }
 
-// Parse the LZO blocks to determine the size of the compressed data
+/// Parse an LZO block header
 pub fn parse_lzop_block_header(
     lzo_data: &[u8],
     compressed_checksum_present: bool,
-) -> Result<LZOPBlockHeader, structures::common::StructureError> {
+) -> Result<LZOPBlockHeader, StructureError> {
+    // Size constants
     const BLOCK_HEADER_SIZE: usize = 12;
     const MAX_UNCOMPRESSED_BLOCK_SIZE: usize = 64 * 1024 * 1024;
 
@@ -116,7 +120,7 @@ pub fn parse_lzop_block_header(
     ];
 
     // Parse the block header
-    if let Ok(block_header) = structures::common::parse(&lzo_data, &block_structure, "big") {
+    if let Ok(block_header) = common::parse(&lzo_data, &block_structure, "big") {
         // Basic sanity check on the block header values
         if block_header["compressed_size"] != 0
             && block_header["uncompressed_size"] != 0
@@ -131,6 +135,7 @@ pub fn parse_lzop_block_header(
             block_hdr_info.compressed_size = block_header["compressed_size"];
             block_hdr_info.uncompressed_size = block_header["uncompressed_size"];
 
+            // Checksum field is optional
             if compressed_checksum_present {
                 block_hdr_info.checksum_size = LZO_CHECKSUM_SIZE;
             }
@@ -139,14 +144,11 @@ pub fn parse_lzop_block_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }
 
-/*
- * Parsers and validates the LZOP EOF marker.
- * Returns the size of the EOF marker upon success.
- */
-pub fn parse_lzop_eof_marker(eof_data: &[u8]) -> Result<usize, structures::common::StructureError> {
+/// Parse an LZOP EOF marker, returns the size of the EOF marker (always 4 bytes)
+pub fn parse_lzop_eof_marker(eof_data: &[u8]) -> Result<usize, StructureError> {
     const EOF_MARKER: usize = 0;
     const EOF_MARKER_SIZE: usize = 4;
 
@@ -156,7 +158,7 @@ pub fn parse_lzop_eof_marker(eof_data: &[u8]) -> Result<usize, structures::commo
      * It is unclear, but observed, that LZOP files end with 0x00000000; this is assumed to be an EOF marker,
      * as other similar compression file formats use that. This assumption could be incorrect.
      */
-    if let Ok(eof_marker) = structures::common::parse(&eof_data, &eof_structure, "big") {
+    if let Ok(eof_marker) = common::parse(&eof_data, &eof_structure, "big") {
         // Sanity check the EOF marker
         if eof_marker["marker"] == EOF_MARKER {
             // Return the size of the EOF marker
@@ -164,5 +166,5 @@ pub fn parse_lzop_eof_marker(eof_data: &[u8]) -> Result<usize, structures::commo
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

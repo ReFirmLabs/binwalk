@@ -1,5 +1,6 @@
 use crate::structures::common::{parse, StructureError};
 
+/// Struct to store LZFSE block info
 #[derive(Debug, Default, Clone)]
 pub struct LZFSEBlock {
     pub eof: bool,
@@ -7,7 +8,9 @@ pub struct LZFSEBlock {
     pub header_size: usize,
 }
 
+/// Parse an LZFSE block header
 pub fn parse_lzfse_block_header(lzfse_data: &[u8]) -> Result<LZFSEBlock, StructureError> {
+    // LZFSE block types
     const ENDOFSTREAM: usize = 0x24787662;
     const UNCOMPRESSED: usize = 0x2d787662;
     const COMPRESSEDV1: usize = 0x31787662;
@@ -17,9 +20,11 @@ pub fn parse_lzfse_block_header(lzfse_data: &[u8]) -> Result<LZFSEBlock, Structu
     // Each block starts with a 4-byte magic identifier
     let block_type_structure = vec![("block_type", "u32")];
 
+    // Parse the block header
     if let Ok(block_type_header) = parse(lzfse_data, &block_type_structure, "little") {
         let block_type = block_type_header["block_type"];
 
+        // Block headers are different for different block types; process this block header accordingly
         if block_type == ENDOFSTREAM {
             return parse_endofstream_block_header(lzfse_data);
         } else if block_type == UNCOMPRESSED {
@@ -36,6 +41,7 @@ pub fn parse_lzfse_block_header(lzfse_data: &[u8]) -> Result<LZFSEBlock, Structu
     return Err(StructureError);
 }
 
+/// Parse an end-of-stream LZFSE block header
 fn parse_endofstream_block_header(_lzfse_data: &[u8]) -> Result<LZFSEBlock, StructureError> {
     // This is easy; it's just the 4-byte magic bytes marking the end-of-stream
     return Ok(LZFSEBlock {
@@ -45,6 +51,7 @@ fn parse_endofstream_block_header(_lzfse_data: &[u8]) -> Result<LZFSEBlock, Stru
     });
 }
 
+/// Parse an uncompressed LZFSE block header
 fn parse_uncompressed_block_header(lzfse_data: &[u8]) -> Result<LZFSEBlock, StructureError> {
     const HEADER_SIZE: usize = 8;
 
@@ -61,6 +68,7 @@ fn parse_uncompressed_block_header(lzfse_data: &[u8]) -> Result<LZFSEBlock, Stru
     return Err(StructureError);
 }
 
+/// Parse a compressed (version 1) LZFSE block header
 fn parse_compressedv1_block_header(lzfse_data: &[u8]) -> Result<LZFSEBlock, StructureError> {
     const HEADER_SIZE: usize = 770;
 
@@ -92,6 +100,7 @@ fn parse_compressedv1_block_header(lzfse_data: &[u8]) -> Result<LZFSEBlock, Stru
     return Err(StructureError);
 }
 
+/// Parse a compressed (version 2) LZFSE block header
 fn parse_compressedv2_block_header(lzfse_data: &[u8]) -> Result<LZFSEBlock, StructureError> {
     const N_PAYLOAD_SHIFT: usize = 20;
     const LMD_PAYLOAD_SHIFT: usize = 40;
@@ -123,6 +132,7 @@ fn parse_compressedv2_block_header(lzfse_data: &[u8]) -> Result<LZFSEBlock, Stru
     return Err(StructureError);
 }
 
+/// Parse a LZVN compressed LZFSE block header
 fn parse_compressedlzvn_block_header(lzfse_data: &[u8]) -> Result<LZFSEBlock, StructureError> {
     const HEADER_SIZE: usize = 12;
 

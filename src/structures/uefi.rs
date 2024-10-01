@@ -1,5 +1,6 @@
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 
+/// Stores info about a UEFI volume header
 #[derive(Debug, Default, Clone)]
 pub struct UEFIVolumeHeader {
     pub header_crc: usize,
@@ -7,9 +8,8 @@ pub struct UEFIVolumeHeader {
     pub volume_size: usize,
 }
 
-pub fn parse_uefi_volume_header(
-    uefi_data: &[u8],
-) -> Result<UEFIVolumeHeader, structures::common::StructureError> {
+/// Parse a UEFI volume header
+pub fn parse_uefi_volume_header(uefi_data: &[u8]) -> Result<UEFIVolumeHeader, StructureError> {
     // The revision field must be 2
     const EXPECTED_REVISION: usize = 2;
 
@@ -25,9 +25,7 @@ pub fn parse_uefi_volume_header(
     ];
 
     // Parse the volume header
-    if let Ok(uefi_volume_header) =
-        structures::common::parse(uefi_data, &uefi_pi_header_structure, "little")
-    {
+    if let Ok(uefi_volume_header) = common::parse(uefi_data, &uefi_pi_header_structure, "little") {
         // Make sure the header size is sane (must be smaller than the total volume size)
         if uefi_volume_header["header_size"] < uefi_volume_header["volume_size"] {
             // The reserved field *must* be 0
@@ -45,18 +43,18 @@ pub fn parse_uefi_volume_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }
 
+/// Stores info about a UEFI capsule header
 #[derive(Debug, Default, Clone)]
 pub struct UEFICapsuleHeader {
     pub total_size: usize,
     pub header_size: usize,
 }
 
-pub fn parse_uefi_capsule_header(
-    uefi_data: &[u8],
-) -> Result<UEFICapsuleHeader, structures::common::StructureError> {
+/// Parse  UEFI capsule header
+pub fn parse_uefi_capsule_header(uefi_data: &[u8]) -> Result<UEFICapsuleHeader, StructureError> {
     let uefi_capsule_structure = vec![
         ("guid_p1", "u64"),
         ("guid_p2", "u64"),
@@ -66,9 +64,7 @@ pub fn parse_uefi_capsule_header(
     ];
 
     // Parse the capsule header
-    if let Ok(capsule_header) =
-        structures::common::parse(uefi_data, &uefi_capsule_structure, "little")
-    {
+    if let Ok(capsule_header) = common::parse(uefi_data, &uefi_capsule_structure, "little") {
         // Sanity check on header and total size fields
         if capsule_header["header_size"] < capsule_header["total_size"] {
             return Ok(UEFICapsuleHeader {
@@ -78,5 +74,5 @@ pub fn parse_uefi_capsule_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

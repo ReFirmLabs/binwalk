@@ -1,13 +1,14 @@
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 
+/// Struct to store PackIMG header info
 pub struct PackIMGHeader {
     pub header_size: usize,
     pub data_size: usize,
 }
 
-pub fn parse_packimg_header(
-    packimg_data: &[u8],
-) -> Result<PackIMGHeader, structures::common::StructureError> {
+/// Parse a PackIMG header
+pub fn parse_packimg_header(packimg_data: &[u8]) -> Result<PackIMGHeader, StructureError> {
+    // Fixed size header
     const PACKIMG_HEADER_SIZE: usize = 32;
 
     let packimg_structure = vec![
@@ -19,14 +20,12 @@ pub fn parse_packimg_header(
     ];
 
     // Parse the packimg header
-    if let Ok(packimg_header) =
-        structures::common::parse(&packimg_data, &packimg_structure, "little")
-    {
+    if let Ok(packimg_header) = common::parse(&packimg_data, &packimg_structure, "little") {
         return Ok(PackIMGHeader {
             header_size: PACKIMG_HEADER_SIZE,
             data_size: packimg_header["data_size"],
         });
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

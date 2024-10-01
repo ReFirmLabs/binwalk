@@ -1,6 +1,7 @@
 use crate::common::get_cstring;
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 
+/// Stores RomFS header info
 #[derive(Default, Debug, Clone)]
 pub struct RomFSHeader {
     pub image_size: usize,
@@ -8,18 +9,18 @@ pub struct RomFSHeader {
     pub volume_name: String,
 }
 
-pub fn parse_romfs_header(
-    romfs_data: &[u8],
-) -> Result<RomFSHeader, structures::common::StructureError> {
+/// Parse a RomFS header
+pub fn parse_romfs_header(romfs_data: &[u8]) -> Result<RomFSHeader, StructureError> {
+    // Maximum amount of data that the RomFS CRC is calculated over
     const MAX_HEADER_CRC_DATA_LEN: usize = 512;
 
     let header_structure = vec![("magic", "u64"), ("image_size", "u32"), ("checksum", "u32")];
 
     // Get the size of the defined header structure
-    let header_size = structures::common::size(&header_structure);
+    let header_size = common::size(&header_structure);
 
     // Parse the header structure
-    if let Ok(header) = structures::common::parse(romfs_data, &header_structure, "big") {
+    if let Ok(header) = common::parse(romfs_data, &header_structure, "big") {
         // Sanity check the reported image size
         if header["image_size"] > header_size {
             // The volume name is a NULL-terminated string that immediately follows the RomFS header
@@ -47,16 +48,17 @@ pub fn parse_romfs_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }
 
+/// Struct to store info on a RomFS file entry
 #[derive(Debug, Default, Clone)]
 pub struct RomFSFileHeader {
     pub info: usize,
     pub size: usize,
     pub name: String,
     pub checksum: usize,
-    // Offset to the start of the file data, *relative to the beginning of this header*
+    /// Offset to the start of the file data, *relative to the beginning of this header*
     pub data_offset: usize,
     pub file_type: usize,
     pub executable: bool,
@@ -67,13 +69,13 @@ pub struct RomFSFileHeader {
     pub character_device: bool,
     pub fifo: bool,
     pub socket: bool,
-    // Offset to the next file header, *relative to the beginning of the RomFS image*
+    /// Offset to the next file header, *relative to the beginning of the RomFS image*
     pub next_header_offset: usize,
 }
 
-pub fn parse_romfs_file_entry(
-    romfs_data: &[u8],
-) -> Result<RomFSFileHeader, structures::common::StructureError> {
+/// Parse a RomFS file entry
+pub fn parse_romfs_file_entry(romfs_data: &[u8]) -> Result<RomFSFileHeader, StructureError> {
+    // Bit masks
     const FILE_TYPE_MASK: usize = 0b0111;
     const FILE_EXEC_MASK: usize = 0b1000;
     const NEXT_OFFSET_MASK: usize = 0b11111111_11111111_11111111_11110000;
@@ -95,12 +97,10 @@ pub fn parse_romfs_file_entry(
     ];
 
     // Size of the defined file header structure
-    let file_header_size = structures::common::size(&file_header_structure);
+    let file_header_size = common::size(&file_header_structure);
 
     // Parse the file header
-    if let Ok(file_entry_header) =
-        structures::common::parse(romfs_data, &file_header_structure, "big")
-    {
+    if let Ok(file_entry_header) = common::parse(romfs_data, &file_header_structure, "big") {
         // Null terminated file name immediately follows the header
         if let Some(file_name_bytes) = romfs_data.get(file_header_size..) {
             let file_name = get_cstring(file_name_bytes);
@@ -126,7 +126,7 @@ pub fn parse_romfs_file_entry(
                 file_header.executable =
                     (file_entry_header["next_header_offset"] & FILE_EXEC_MASK) != 0;
 
-                // Set the type of entry this is
+                // Set the type of entry that this is
                 file_header.fifo = file_header.file_type == ROMFS_FIFO;
                 file_header.socket = file_header.file_type == ROMFS_SOCKET;
                 file_header.symlink = file_header.file_type == ROMFS_SYMLINK;
@@ -144,10 +144,10 @@ pub fn parse_romfs_file_entry(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }
 
-// RomFS aligns things to a 16-byte boundary
+/// RomFS aligns things to a 16-byte boundary
 fn romfs_align(x: usize) -> usize {
     const ALIGNMENT: usize = 16;
 
@@ -161,7 +161,7 @@ fn romfs_align(x: usize) -> usize {
     return x + padding;
 }
 
-// Pretty simple checksum used by RomFS
+/// Pretty simple checksum used by RomFS
 fn romfs_crc_valid(crc_data: &[u8]) -> bool {
     let word_size: usize = std::mem::size_of::<u32>();
 

@@ -11,23 +11,28 @@ pub fn cab_magic() -> Vec<Vec<u8>> {
 
 /// Parses and cabinet file signature
 pub fn cab_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
-    // Parse the CAB header; if this succeeds, assume it is a valid header
+    // Parse the CAB header
     if let Ok(cab_header) = parse_cab_header(&file_data[offset..]) {
-        // Return success
-        return Ok(SignatureResult {
-            description: format!(
-                "{}, file count: {}, folder count: {}, header size: {}, total size: {} bytes",
-                DESCRIPTION,
-                cab_header.file_count,
-                cab_header.folder_count,
-                cab_header.header_size,
-                cab_header.total_size
-            ),
-            offset: offset,
-            size: cab_header.total_size,
-            confidence: CONFIDENCE_MEDIUM,
-            ..Default::default()
-        });
+        let available_data = file_data.len() - offset;
+
+        // Sanity check the reported CAB file size
+        if cab_header.total_size <= available_data {
+            // Return success
+            return Ok(SignatureResult {
+                description: format!(
+                    "{}, file count: {}, folder count: {}, header size: {}, total size: {} bytes",
+                    DESCRIPTION,
+                    cab_header.file_count,
+                    cab_header.folder_count,
+                    cab_header.header_size,
+                    cab_header.total_size
+                ),
+                offset: offset,
+                size: cab_header.total_size,
+                confidence: CONFIDENCE_MEDIUM,
+                ..Default::default()
+            });
+        }
     }
 
     return Err(SignatureError);

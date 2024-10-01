@@ -1,5 +1,6 @@
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 
+/// Struct to store useful LZMA header data
 #[derive(Debug, Default, Clone)]
 pub struct LZMAHeader {
     pub properties: usize,
@@ -7,10 +8,12 @@ pub struct LZMAHeader {
     pub decompressed_size: usize,
 }
 
-pub fn parse_lzma_header(
-    lzma_data: &[u8],
-) -> Result<LZMAHeader, structures::common::StructureError> {
+/// Parse an LZMA header
+pub fn parse_lzma_header(lzma_data: &[u8]) -> Result<LZMAHeader, StructureError> {
+    // Streamed data has a reported size of -1
     const LZMA_STREAM_SIZE: usize = 0xFFFFFFFFFFFFFFFF;
+
+    // Some sane min and max values on the reported decompressed data size
     const MIN_SUPPORTED_DECOMPRESSED_SIZE: usize = 256;
     const MAX_SUPPORTED_DECOMPRESSED_SIZE: usize = 0xFFFFFFFF;
 
@@ -26,12 +29,12 @@ pub fn parse_lzma_header(
     };
 
     // Parse the lzma header
-    if let Ok(lzma_header) = structures::common::parse(&lzma_data, &lzma_structure, "little") {
+    if let Ok(lzma_header) = common::parse(&lzma_data, &lzma_structure, "little") {
         // Sanity check expected values for LZMA header fields
         if lzma_header["null_byte"] == 0 {
-            if lzma_header["decompressed_size"] > MIN_SUPPORTED_DECOMPRESSED_SIZE {
+            if lzma_header["decompressed_size"] >= MIN_SUPPORTED_DECOMPRESSED_SIZE {
                 if lzma_header["decompressed_size"] == LZMA_STREAM_SIZE
-                    || lzma_header["decompressed_size"] < MAX_SUPPORTED_DECOMPRESSED_SIZE
+                    || lzma_header["decompressed_size"] <= MAX_SUPPORTED_DECOMPRESSED_SIZE
                 {
                     lzma_hdr_info.properties = lzma_header["properties"];
                     lzma_hdr_info.dictionary_size = lzma_header["dictionary_size"];
@@ -43,5 +46,5 @@ pub fn parse_lzma_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

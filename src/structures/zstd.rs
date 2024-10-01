@@ -1,5 +1,6 @@
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 
+/// Stores info about a ZSTD file header
 #[derive(Debug, Default, Clone)]
 pub struct ZSTDHeader {
     pub fixed_header_size: usize,
@@ -9,9 +10,9 @@ pub struct ZSTDHeader {
     pub frame_content_flag: usize,
 }
 
-pub fn parse_zstd_header(
-    zstd_data: &[u8],
-) -> Result<ZSTDHeader, structures::common::StructureError> {
+/// Parse a ZSTD file header
+pub fn parse_zstd_header(zstd_data: &[u8]) -> Result<ZSTDHeader, StructureError> {
+    // Mask and shift bits
     const FRAME_UNUSED_BITS_MASK: usize = 0b00011000;
     const DICTIONARY_ID_MASK: usize = 0b11;
     const CONTENT_CHECKSUM_MASK: usize = 0b100;
@@ -22,13 +23,12 @@ pub fn parse_zstd_header(
     let zstd_header_structure = vec![("magic", "u32"), ("frame_header_descriptor", "u8")];
 
     let mut zstd_info = ZSTDHeader {
-        fixed_header_size: structures::common::size(&zstd_header_structure),
+        fixed_header_size: common::size(&zstd_header_structure),
         ..Default::default()
     };
 
     // Parse the ZSTD header
-    if let Ok(zstd_header) = structures::common::parse(zstd_data, &zstd_header_structure, "little")
-    {
+    if let Ok(zstd_header) = common::parse(zstd_data, &zstd_header_structure, "little") {
         // Unused bits should be unused
         if (zstd_header["frame_header_descriptor"] & FRAME_UNUSED_BITS_MASK) == 0 {
             // Indicates if a dictionary ID field is present, and if so, how big it is
@@ -52,9 +52,10 @@ pub fn parse_zstd_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }
 
+/// Stores info about a ZSTD block header
 #[derive(Debug, Default, Clone)]
 pub struct ZSTDBlockHeader {
     pub header_size: usize,
@@ -63,9 +64,9 @@ pub struct ZSTDBlockHeader {
     pub last_block: bool,
 }
 
-pub fn parse_block_header(
-    block_data: &[u8],
-) -> Result<ZSTDBlockHeader, structures::common::StructureError> {
+/// Parse a ZSTD block header
+pub fn parse_block_header(block_data: &[u8]) -> Result<ZSTDBlockHeader, StructureError> {
+    // Bit mask constants
     const ZSTD_BLOCK_TYPE_MASK: usize = 0b110;
     const ZSTD_BLOCK_TYPE_SHIFT: usize = 1;
     const ZSTD_RLE_BLOCK_TYPE: usize = 1;
@@ -77,14 +78,12 @@ pub fn parse_block_header(
     let zstd_block_header_structure = vec![("info_bits", "u24")];
 
     let mut block_info = ZSTDBlockHeader {
-        header_size: structures::common::size(&zstd_block_header_structure),
+        header_size: common::size(&zstd_block_header_structure),
         ..Default::default()
     };
 
     // Parse the block header
-    if let Ok(block_header) =
-        structures::common::parse(block_data, &zstd_block_header_structure, "little")
-    {
+    if let Ok(block_header) = common::parse(block_data, &zstd_block_header_structure, "little") {
         // Interpret the bit fields of the block header, which indicate the type of block, the size of the block, and if this is the last block
         block_info.last_block = (block_header["info_bits"] & ZSTD_LAST_BLOCK_MASK) != 0;
         block_info.block_type =
@@ -108,5 +107,5 @@ pub fn parse_block_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

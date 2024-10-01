@@ -1,7 +1,8 @@
-use crate::common;
-use crate::structures;
+use crate::common::get_cstring;
+use crate::structures::common::{self, StructureError};
 use std::collections::HashMap;
 
+/// Struct to store useful Gzip header info
 #[derive(Debug, Clone, Default)]
 pub struct GzipHeader {
     pub os: String,
@@ -11,9 +12,9 @@ pub struct GzipHeader {
     pub original_name: String,
 }
 
-pub fn parse_gzip_header(
-    header_data: &[u8],
-) -> Result<GzipHeader, structures::common::StructureError> {
+/// Parses a Gzip file header
+pub fn parse_gzip_header(header_data: &[u8]) -> Result<GzipHeader, StructureError> {
+    // Some expected constant values
     const CRC_SIZE: usize = 2;
     const NULL_BYTE_SIZE: usize = 1;
     const DEFLATE_COMPRESSION: usize = 8;
@@ -53,78 +54,81 @@ pub fn parse_gzip_header(
         (255, "unknown"),
     ]);
 
-    // Default: valid = false
     let mut header_info = GzipHeader {
         ..Default::default()
     };
 
     // End of the fixed-size portion of the gzip header
-    header_info.size = structures::common::size(&gzip_header_structure);
+    header_info.size = common::size(&gzip_header_structure);
 
     // Parse the gzip header
-    if let Ok(gzip_header) =
-        structures::common::parse(header_data, &gzip_header_structure, "little")
-    {
+    if let Ok(gzip_header) = common::parse(header_data, &gzip_header_structure, "little") {
+        // Report the timestamp
         header_info.timestamp = gzip_header["timestamp"] as u32;
 
-        // Sanity check; compression type should be deflate, reserved flag bits should not be set.
+        // Sanity check; compression type should be deflate, reserved flag bits should not be set, OS ID should be a known value
         if (gzip_header["flags"] & FLAG_RESERVED) == 0 {
             if gzip_header["compression_method"] == DEFLATE_COMPRESSION {
                 if known_os_ids.contains_key(&gzip_header["osid"]) {
                     // Set the operating system string
                     header_info.os = known_os_ids[&gzip_header["osid"]].to_string();
 
-                    // Check if the optional "extra" data follows the header
+                    // Check if the optional "extra" data follows the standard Gzip header
                     if (gzip_header["flags"] & FLAG_EXTRA) != 0 {
                         // File offsets and sizes for parsing the extra header
-                        let extra_header_size =
-                            structures::common::size(&gzip_extra_header_structure);
+                        let extra_header_size = common::size(&gzip_extra_header_structure);
                         let extra_header_start: usize = header_info.size;
                         let extra_header_end: usize = extra_header_start + extra_header_size;
 
-                        if let Some(extra_header_data) =
-                            header_data.get(extra_header_start..extra_header_end)
-                        {
-                            // Parse the extra header and update the header_info.size to include this data
-                            if let Ok(extra_header) = structures::common::parse(
-                                &extra_header_data,
-                                &gzip_extra_header_structure,
-                                "little",
-                            ) {
-                                header_info.size +=
-                                    extra_header_size + extra_header["extra_data_len"];
-                            } else {
-                                return Err(structures::common::StructureError);
+                        match header_data.get(extra_header_start..extra_header_end) {
+                            None => {
+                                return Err(StructureError);
                             }
-                        } else {
-                            // Failure.
-                            return Err(structures::common::StructureError);
+                            Some(extra_header_data) => {
+                                // Parse the extra header and update the header_info.size to include this data
+                                match common::parse(
+                                    &extra_header_data,
+                                    &gzip_extra_header_structure,
+                                    "little",
+                                ) {
+                                    Err(e) => {
+                                        return Err(e);
+                                    }
+                                    Ok(extra_header) => {
+                                        header_info.size +=
+                                            extra_header_size + extra_header["extra_data_len"];
+                                    }
+                                }
+                            }
                         }
                     }
 
                     // If the NULL-terminated original file name is included, it will be next
                     if (gzip_header["flags"] & FLAG_NAME) != 0 {
-                        if header_data.len() > header_info.size {
-                            header_info.original_name =
-                                common::get_cstring(&header_data[header_info.size..]);
-                            // The value returned by get_cstring does not include the terminating NULL byte
-                            header_info.size += header_info.original_name.len() + NULL_BYTE_SIZE;
-                        } else {
-                            // Failure.
-                            return Err(structures::common::StructureError);
+                        match header_data.get(header_info.size..) {
+                            None => {
+                                return Err(StructureError);
+                            }
+                            Some(file_name_bytes) => {
+                                header_info.original_name = get_cstring(file_name_bytes);
+                                // The value returned by get_cstring does not include the terminating NULL byte
+                                header_info.size +=
+                                    header_info.original_name.len() + NULL_BYTE_SIZE;
+                            }
                         }
                     }
 
                     // If a NULL-terminated comment is included, it will be next
                     if (gzip_header["flags"] & FLAG_COMMENT) != 0 {
-                        if header_data.len() > header_info.size {
-                            header_info.comment =
-                                common::get_cstring(&header_data[header_info.size..]);
-                            // The value returned by get_cstring does not include the terminating NULL byte
-                            header_info.size += header_info.comment.len() + NULL_BYTE_SIZE;
-                        } else {
-                            // Failure.
-                            return Err(structures::common::StructureError);
+                        match header_data.get(header_info.size..) {
+                            None => {
+                                return Err(StructureError);
+                            }
+                            Some(comment_bytes) => {
+                                header_info.comment = get_cstring(comment_bytes);
+                                // The value returned by get_cstring does not include the terminating NULL byte
+                                header_info.size += header_info.comment.len() + NULL_BYTE_SIZE;
+                            }
                         }
                     }
 
@@ -134,7 +138,7 @@ pub fn parse_gzip_header(
                     }
 
                     // Deflate data should start at header_info.size; make sure this offset is sane
-                    if header_data.len() > header_info.size {
+                    if header_data.len() >= header_info.size {
                         return Ok(header_info);
                     }
                 }
@@ -142,5 +146,5 @@ pub fn parse_gzip_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

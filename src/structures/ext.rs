@@ -1,9 +1,13 @@
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 use std::collections::HashMap;
 
+/// Expected size of an EXT superblock
 pub const SUPERBLOCK_SIZE: usize = 1024;
+
+/// Expected file offset of an EXT superblock
 pub const SUPERBLOCK_OFFSET: usize = 1024;
 
+/// Struct to store some useful EXT info
 #[derive(Debug, Default, Clone)]
 pub struct EXTHeader {
     pub os: String,
@@ -15,7 +19,9 @@ pub struct EXTHeader {
     pub reserved_blocks_count: usize,
 }
 
-pub fn parse_ext_header(ext_data: &[u8]) -> Result<EXTHeader, structures::common::StructureError> {
+/// Partially parses an EXT superblock structure
+pub fn parse_ext_header(ext_data: &[u8]) -> Result<EXTHeader, StructureError> {
+    // Max value of the EXT log block size
     const MAX_BLOCK_LOG: usize = 2;
 
     // Parital superblock structure, just enough for validation and size calculation
@@ -65,7 +71,7 @@ pub fn parse_ext_header(ext_data: &[u8]) -> Result<EXTHeader, structures::common
     // Sanity check the available data
     if ext_data.len() >= (SUPERBLOCK_OFFSET + SUPERBLOCK_SIZE) {
         // Parse the EXT superblock structure
-        if let Ok(ext_superblock) = structures::common::parse(
+        if let Ok(ext_superblock) = common::parse(
             &ext_data[SUPERBLOCK_OFFSET..],
             &ext_superblock_structure,
             "little",
@@ -97,5 +103,5 @@ pub fn parse_ext_header(ext_data: &[u8]) -> Result<EXTHeader, structures::common
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

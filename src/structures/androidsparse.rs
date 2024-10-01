@@ -1,5 +1,6 @@
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 
+/// Storage struct for AndroidSparse file header info
 #[derive(Debug, Default, Clone)]
 pub struct AndroidSparseHeader {
     pub major_version: usize,
@@ -9,9 +10,10 @@ pub struct AndroidSparseHeader {
     pub chunk_count: usize,
 }
 
+/// Parse Android Sparse header structures
 pub fn parse_android_sparse_header(
     sparse_data: &[u8],
-) -> Result<AndroidSparseHeader, structures::common::StructureError> {
+) -> Result<AndroidSparseHeader, StructureError> {
     // Version must be 1.0
     const MAJOR_VERSION: usize = 1;
     const MINOR_VERSION: usize = 0;
@@ -22,6 +24,7 @@ pub fn parse_android_sparse_header(
     // Expected value for the reported chunk header size
     const CHUNK_HEADER_SIZE: usize = 12;
 
+    // Header structure
     let android_sparse_structure = vec![
         ("magic", "u32"),
         ("major_version", "u16"),
@@ -34,11 +37,10 @@ pub fn parse_android_sparse_header(
         ("checksum", "u32"),
     ];
 
-    let expected_header_size = structures::common::size(&android_sparse_structure);
+    let expected_header_size = common::size(&android_sparse_structure);
 
     // Parse the header
-    if let Ok(header) = structures::common::parse(&sparse_data, &android_sparse_structure, "little")
-    {
+    if let Ok(header) = common::parse(&sparse_data, &android_sparse_structure, "little") {
         // Sanity check header values
         if header["major_version"] == MAJOR_VERSION
             && header["minor_version"] == MINOR_VERSION
@@ -56,9 +58,10 @@ pub fn parse_android_sparse_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }
 
+/// Storage structure for Android Sparse chunk headers
 #[derive(Debug, Default, Clone)]
 pub struct AndroidSparseChunkHeader {
     pub header_size: usize,
@@ -70,9 +73,10 @@ pub struct AndroidSparseChunkHeader {
     pub is_dont_care: bool,
 }
 
+/// Parse the header for an Android Sparse chunk
 pub fn parse_android_sparse_chunk_header(
     chunk_data: &[u8],
-) -> Result<AndroidSparseChunkHeader, structures::common::StructureError> {
+) -> Result<AndroidSparseChunkHeader, StructureError> {
     // Known chunk types
     const CHUNK_TYPE_RAW: usize = 0xCAC1;
     const CHUNK_TYPE_FILL: usize = 0xCAC2;
@@ -87,12 +91,12 @@ pub fn parse_android_sparse_chunk_header(
     ];
 
     let mut chonker = AndroidSparseChunkHeader {
-        header_size: structures::common::size(&chunk_structure),
+        header_size: common::size(&chunk_structure),
         ..Default::default()
     };
 
     // Parse the header
-    if let Ok(chunk_header) = structures::common::parse(chunk_data, &chunk_structure, "little") {
+    if let Ok(chunk_header) = common::parse(chunk_data, &chunk_structure, "little") {
         // Make sure the reserved field is zero
         if chunk_header["reserved"] == 0 {
             // Populate the structure values
@@ -114,5 +118,5 @@ pub fn parse_android_sparse_chunk_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

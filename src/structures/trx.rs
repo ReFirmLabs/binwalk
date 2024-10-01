@@ -1,5 +1,6 @@
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 
+/// Stores TRX firmware header info
 #[derive(Debug, Clone, Default)]
 pub struct TRXHeader {
     pub version: usize,
@@ -9,9 +10,9 @@ pub struct TRXHeader {
     pub partitions: Vec<usize>,
 }
 
-pub fn parse_trx_header(
-    header_data: &[u8],
-) -> Result<TRXHeader, structures::common::StructureError> {
+/// Parse a TRX firmware header
+pub fn parse_trx_header(header_data: &[u8]) -> Result<TRXHeader, StructureError> {
+    // TRX comes in two flavors: v1 and v2
     const TRX_VERSION_2: usize = 2;
 
     let trx_header_structure = vec![
@@ -29,11 +30,10 @@ pub fn parse_trx_header(
     let allowed_versions: Vec<usize> = vec![1, 2];
 
     // Size of the fixed-length portion of the header structure
-    let mut struct_size: usize = structures::common::size(&trx_header_structure);
+    let mut struct_size: usize = common::size(&trx_header_structure);
 
     // Parse the header
-    if let Ok(trx_header) = structures::common::parse(header_data, &trx_header_structure, "little")
-    {
+    if let Ok(trx_header) = common::parse(header_data, &trx_header_structure, "little") {
         // Sanity check partition offsets. Partition offsets may be 0.
         if trx_header["partition1_offset"] <= trx_header["total_size"]
             && trx_header["partition2_offset"] <= trx_header["total_size"]
@@ -57,11 +57,13 @@ pub fn parse_trx_header(
                         partitions.push(trx_header["partition3_offset"]);
                     }
 
+                    // Only TRXv2 has a fourth partition entry
                     if trx_header["version"] == TRX_VERSION_2 {
                         if trx_header["partition4_offset"] != 0 {
                             partitions.push(trx_header["partition4_offset"]);
                         }
                     } else {
+                        // For TRXv1, this means the real structure size is 4 bytes shorter
                         struct_size -= std::mem::size_of::<u32>();
                     }
 
@@ -77,5 +79,5 @@ pub fn parse_trx_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

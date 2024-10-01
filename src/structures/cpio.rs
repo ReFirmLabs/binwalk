@@ -1,7 +1,9 @@
-use crate::structures;
+use crate::structures::common::StructureError;
 
+/// Expected minimum size of a CPIO entry header
 pub const CPIO_HEADER_SIZE: usize = 110;
 
+/// Storage struct for CPIO entry header info
 #[derive(Debug, Clone, Default)]
 pub struct CPIOEntryHeader {
     pub magic: Vec<u8>,
@@ -10,10 +12,9 @@ pub struct CPIOEntryHeader {
     pub header_size: usize,
 }
 
-// TODO: If file mode parsing is added, internal extractor would be pretty easy to implement...
-pub fn parse_cpio_entry_header(
-    cpio_data: &[u8],
-) -> Result<CPIOEntryHeader, structures::common::StructureError> {
+/// Parses a CPIO entry header
+pub fn parse_cpio_entry_header(cpio_data: &[u8]) -> Result<CPIOEntryHeader, StructureError> {
+    // Some expected constants
     const NULL_BYTE_SIZE: usize = 1;
     const CPIO_MAGIC_START: usize = 0;
     const CPIO_MAGIC_END: usize = 6;
@@ -24,6 +25,7 @@ pub fn parse_cpio_entry_header(
 
     let available_data: usize = cpio_data.len();
 
+    // TODO: If file mode parsing is added, internal extractor would be pretty easy to implement...
     if available_data > CPIO_HEADER_SIZE {
         // Grab the CPIO header magic bytes
         let header_magic = cpio_data[CPIO_MAGIC_START..CPIO_MAGIC_END].to_vec();
@@ -45,6 +47,7 @@ pub fn parse_cpio_entry_header(
                         let file_name_end: usize =
                             file_name_start + file_name_size - NULL_BYTE_SIZE;
 
+                        // Get the file name
                         if let Some(file_name_raw_bytes) =
                             cpio_data.get(file_name_start..file_name_end)
                         {
@@ -66,10 +69,10 @@ pub fn parse_cpio_entry_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }
 
-// File data and CPIO headers are padded to 4-byte boundaries
+/// File data and CPIO headers are padded to 4-byte boundaries
 fn byte_padding(n: usize) -> usize {
     let modulus: usize = n % 4;
     if modulus == 0 {

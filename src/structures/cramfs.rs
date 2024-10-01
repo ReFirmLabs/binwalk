@@ -1,5 +1,6 @@
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 
+/// Struct to store info about a CramFS header
 #[derive(Default, Debug, Clone)]
 pub struct CramFSHeader {
     pub size: usize,
@@ -8,9 +9,9 @@ pub struct CramFSHeader {
     pub endianness: String,
 }
 
-pub fn parse_cramfs_header(
-    cramfs_data: &[u8],
-) -> Result<CramFSHeader, structures::common::StructureError> {
+/// Parses a CramFS header
+pub fn parse_cramfs_header(cramfs_data: &[u8]) -> Result<CramFSHeader, StructureError> {
+    // Endian specific magic bytes
     const BIG_ENDIAN_MAGIC: usize = 0x453DCD28;
     const LITTLE_ENDIAN_MAGIC: usize = 0x28CD3D45;
 
@@ -33,13 +34,13 @@ pub fn parse_cramfs_header(
         ..Default::default()
     };
 
-    let cramfs_structure_size = structures::common::size(&cramfs_header_structure);
+    let cramfs_structure_size = common::size(&cramfs_header_structure);
 
     // Default to little endian
     cramfs_info.endianness = "little".to_string();
 
     // Parse the CramFS header, try little endian first
-    if let Ok(mut cramfs_header) = structures::common::parse(
+    if let Ok(mut cramfs_header) = common::parse(
         &cramfs_data,
         &cramfs_header_structure,
         &cramfs_info.endianness,
@@ -51,13 +52,13 @@ pub fn parse_cramfs_header(
                 cramfs_info.endianness = "big".to_string();
 
                 // Parse the header again, this time as big endian
-                match structures::common::parse(
+                match common::parse(
                     &cramfs_data,
                     &cramfs_header_structure,
                     &cramfs_info.endianness,
                 ) {
                     Err(_) => {
-                        return Err(structures::common::StructureError);
+                        return Err(StructureError);
                     }
                     Ok(cramfs_be_header) => {
                         cramfs_header = cramfs_be_header.clone();
@@ -77,5 +78,5 @@ pub fn parse_cramfs_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

@@ -1,13 +1,14 @@
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 
+/// Struct to store SEAMA firmware header data
 pub struct SeamaHeader {
     pub data_size: usize,
     pub header_size: usize,
 }
 
-pub fn parse_seama_header(
-    seama_data: &[u8],
-) -> Result<SeamaHeader, structures::common::StructureError> {
+/// Parse a SEAMA firmware header
+pub fn parse_seama_header(seama_data: &[u8]) -> Result<SeamaHeader, StructureError> {
+    // SEAMA magic
     const MAGIC: usize = 0x5EA3A417;
 
     let seama_structure = vec![
@@ -19,18 +20,17 @@ pub fn parse_seama_header(
     ];
 
     let mut endianness: &str = "little";
-    let header_size: usize = structures::common::size(&seama_structure);
+    let available_data = seama_data.len();
+    let header_size: usize = common::size(&seama_structure);
 
     // Parse the header; try little endian first
-    if let Ok(mut seama_header) =
-        structures::common::parse(&seama_data, &seama_structure, endianness)
-    {
+    if let Ok(mut seama_header) = common::parse(&seama_data, &seama_structure, endianness) {
         // If the magic bytes don't match, switch to big endian
         if seama_header["magic"] != MAGIC {
             endianness = "big";
-            match structures::common::parse(&seama_data, &seama_structure, endianness) {
+            match common::parse(&seama_data, &seama_structure, endianness) {
                 Err(_) => {
-                    return Err(structures::common::StructureError);
+                    return Err(StructureError);
                 }
                 Ok(seama_header_be) => {
                     seama_header = seama_header_be.clone();
@@ -38,13 +38,21 @@ pub fn parse_seama_header(
             }
         }
 
+        // Sanity check on magic bytes
         if seama_header["magic"] == MAGIC {
-            return Ok(SeamaHeader {
-                data_size: seama_header["data_size"],
-                header_size: header_size + seama_header["description_size"],
-            });
+            let total_header_size = header_size + seama_header["description_size"];
+
+            // Sanity check on total header size
+            if total_header_size >= header_size {
+                if available_data >= total_header_size {
+                    return Ok(SeamaHeader {
+                        data_size: seama_header["data_size"],
+                        header_size: total_header_size,
+                    });
+                }
+            }
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

@@ -1,6 +1,7 @@
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 use xxhash_rust;
 
+/// Struct to store LZ4 file header info
 #[derive(Debug, Default, Clone)]
 pub struct LZ4FileHeader {
     pub header_size: usize,
@@ -8,9 +9,9 @@ pub struct LZ4FileHeader {
     pub content_checksum_present: bool,
 }
 
-pub fn parse_lz4_file_header(
-    lz4_data: &[u8],
-) -> Result<LZ4FileHeader, structures::common::StructureError> {
+/// Parse an LZ4 file header
+pub fn parse_lz4_file_header(lz4_data: &[u8]) -> Result<LZ4FileHeader, StructureError> {
+    // Fixed size constants
     const MAGIC_SIZE: usize = 4;
     const LZ4_STRUCT_SIZE: usize = 6;
 
@@ -33,7 +34,7 @@ pub fn parse_lz4_file_header(
     };
 
     // Parse the header
-    if let Ok(lz4_header) = structures::common::parse(&lz4_data, &lz4_structure, "little") {
+    if let Ok(lz4_header) = common::parse(&lz4_data, &lz4_structure, "little") {
         // Make sure the reserved bits aren't set
         if (lz4_header["flags"] & FLAGS_RESERVED_MASK) == 0
             && (lz4_header["bd"] & BD_RESERVED_MASK) == 0
@@ -58,7 +59,7 @@ pub fn parse_lz4_file_header(
 
             // Get the data over which the CRC is calculated
             if let Some(crc_data) = lz4_data.get(crc_data_start..crc_data_end) {
-                // Grab the header CRC value stored in the file header
+                // Grab the header CRC value stored in the file header (one byte only)
                 if let Some(actual_crc) = lz4_data.get(crc_data_end) {
                     // Calculate the header CRC, which is the second byte of the xxh32 hash. It is calculated over the header, excluding the magic bytes.
                     let calculated_crc: u8 =
@@ -80,9 +81,10 @@ pub fn parse_lz4_file_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }
 
+/// Struct to store LZ4 block header info
 #[derive(Debug, Default, Clone)]
 pub struct LZ4BlockHeader {
     pub data_size: usize,
@@ -91,11 +93,12 @@ pub struct LZ4BlockHeader {
     pub last_block: bool,
 }
 
-// Processes the LZ4 data blocks and returns the size of the raw LZ4 data
+/// Parse an LZ4 block header
 pub fn parse_lz4_block_header(
     lz4_block_data: &[u8],
     checksum_present: bool,
-) -> Result<LZ4BlockHeader, structures::common::StructureError> {
+) -> Result<LZ4BlockHeader, StructureError> {
+    // Useful constants
     const SIZE_MASK: u32 = 0x7FFFFFFF;
     const END_MARKER: usize = 0;
     const CHECKSUM_SIZE: usize = 4;
@@ -109,8 +112,7 @@ pub fn parse_lz4_block_header(
     };
 
     // Parse the block header
-    if let Ok(block_header) = structures::common::parse(&lz4_block_data, &block_structure, "little")
-    {
+    if let Ok(block_header) = common::parse(&lz4_block_data, &block_structure, "little") {
         // Header size is always 4 bytes
         lz4_block.header_size = BLOCK_STRUCT_SIZE;
 
@@ -128,5 +130,5 @@ pub fn parse_lz4_block_header(
         return Ok(lz4_block);
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

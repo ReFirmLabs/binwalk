@@ -1,5 +1,6 @@
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 
+/// Struct to store DMG footer info
 #[derive(Debug, Default, Clone)]
 pub struct DMGFooter {
     pub footer_size: usize,
@@ -7,7 +8,8 @@ pub struct DMGFooter {
     pub xml_length: usize,
 }
 
-pub fn parse_dmg_footer(dmg_data: &[u8]) -> Result<DMGFooter, structures::common::StructureError> {
+/// Parses a DMG footer structure
+pub fn parse_dmg_footer(dmg_data: &[u8]) -> Result<DMGFooter, StructureError> {
     // https://newosxbook.com/DMG.html
     let dmg_footer_structure = vec![
         ("magic", "u32"),
@@ -115,10 +117,10 @@ pub fn parse_dmg_footer(dmg_data: &[u8]) -> Result<DMGFooter, structures::common
         ("reserved_18", "u32"),
     ];
 
-    let structure_size: usize = structures::common::size(&dmg_footer_structure);
+    let structure_size: usize = common::size(&dmg_footer_structure);
 
     // Parse the DMG footer
-    if let Ok(dmg_footer) = structures::common::parse(&dmg_data, &dmg_footer_structure, "big") {
+    if let Ok(dmg_footer) = common::parse(&dmg_data, &dmg_footer_structure, "big") {
         // Sanity check, make sure the reported header size is the size of this structure
         if dmg_footer["header_size"] == structure_size {
             return Ok(DMGFooter {
@@ -129,5 +131,5 @@ pub fn parse_dmg_footer(dmg_data: &[u8]) -> Result<DMGFooter, structures::common
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

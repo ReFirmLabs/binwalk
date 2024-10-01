@@ -1,11 +1,13 @@
-use crate::structures;
+use crate::structures::common::StructureError;
 
+/// Struct to store DEB file info
 #[derive(Debug, Clone, Default)]
 pub struct DebHeader {
     pub file_size: usize,
 }
 
-pub fn parse_deb_header(deb_data: &[u8]) -> Result<DebHeader, structures::common::StructureError> {
+/// Parse a DEB file
+pub fn parse_deb_header(deb_data: &[u8]) -> Result<DebHeader, StructureError> {
     const END_MARKER_SIZE: usize = 2;
     const DATA_FILE_SIZE_LEN: usize = 10;
     const DATA_FILE_SIZE_OFFSET: usize = 48;
@@ -55,5 +57,5 @@ pub fn parse_deb_header(deb_data: &[u8]) -> Result<DebHeader, structures::common
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

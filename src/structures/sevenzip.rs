@@ -1,6 +1,7 @@
 use crate::common::crc32;
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 
+/// Struct to store 7zip header info
 #[derive(Debug, Default, Clone)]
 pub struct SevenZipHeader {
     pub header_size: usize,
@@ -11,9 +12,9 @@ pub struct SevenZipHeader {
     pub next_header_offset: usize,
 }
 
-pub fn parse_7z_header(
-    sevenzip_data: &[u8],
-) -> Result<SevenZipHeader, structures::common::StructureError> {
+/// Parse a 7zip header
+pub fn parse_7z_header(sevenzip_data: &[u8]) -> Result<SevenZipHeader, StructureError> {
+    // Offset & size constants
     const SEVENZIP_CRC_START: usize = 12;
     const SEVENZIP_HEADER_SIZE: usize = 32;
 
@@ -29,9 +30,7 @@ pub fn parse_7z_header(
     ];
 
     // Parse the 7zip header
-    if let Ok(sevenzip_header) =
-        structures::common::parse(sevenzip_data, &sevenzip_structure, "little")
-    {
+    if let Ok(sevenzip_header) = common::parse(sevenzip_data, &sevenzip_structure, "little") {
         // Validate header CRC, which is calculated over the 'next_header_offset', 'next_header_size', and 'next_header_crc' values
         if let Some(crc_data) = sevenzip_data.get(SEVENZIP_CRC_START..SEVENZIP_HEADER_SIZE) {
             if crc32(crc_data) == (sevenzip_header["header_crc"] as u32) {
@@ -47,5 +46,5 @@ pub fn parse_7z_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

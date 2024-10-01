@@ -1,6 +1,88 @@
-//! This module contains functions responsible for parsing various file structures.
+//! # Data Structure Parsing
 //!
-//! See `structures::common` for helper functions useful when writing new structure parsers.
+//! Both signatures and internal extractors may need to parse data structures used by various file formats.
+//! Structure parsing code is placed in the `structures` module.
+//!
+//! ## Helper Functions
+//!
+//! There are some definitions and helper functions in `structures::common` that are generally helpful for processing data structures.
+//!
+//! The `structures::common::parse` function provides a way to parse basic data structures by defining the data structure format,
+//! the endianness to use, and the data to cast the structure over. It is heavily used by most structure parsers.
+//! It supports the following data types:
+//!
+//! - u8
+//! - u16
+//! - u24
+//! - u32
+//! - u64
+//!
+//! Regardless of the data type specified, all values are returned as `usize` types.
+//! If an error occurs (typically due to not enough data available to process the specified data structure), `Err(structures::common::StructureError)` is returned.
+//!
+//! The `structures::common::size` function is a convenience function that returns the number of bytes required to parse a defined data structure.
+//!
+//! The `structures::common::StructureError` struct is typically used by structure parsers to return an error.
+//!
+//! ## Writing a Structure Parser
+//!
+//! Structure parsers may be defined however they need to be; there are no strict rules here.
+//! Generally, however, they should:
+//!
+//! - Accept some data to parse
+//! - Parse the data structure
+//! - Validate the structure fields for correctness
+//! - Return an error or success status
+//!
+//! ### Example
+//!
+//! To write a parser for a fictional, simple, data structure:
+//!
+//! ```ignore
+//! use crate::common::crc32;
+//! use crate::structures::common::{self, StructureError};
+//!
+//! /// This function parses the file structure as defined in my_struct.
+//! /// It returns the size reported in the data structure on success.
+//! /// It returns structures::common::StructureError on failure.
+//! fn parse_my_structure(data: &[u8]) -> Result<usize, StructureError> {
+//!     // The header CRC is calculated over the first 15 bytes of the header (everything except the header_crc field)
+//!     const CRC_CALC_LEN: usize = 15;
+//!
+//!     // Define a data structure; structure members must be in the order in which they appear in the data
+//!     let my_struct = vec![
+//!         ("magic", "u32"),
+//!         ("flags", "u8"),
+//!         ("size", "u64"),
+//!         ("volume_id", "u16"),
+//!         ("header_crc", "u32"),
+//!     ];
+//!
+//!     // Parse the provided data in accordance with the layout defined in my_struct, interpret fields as little endian
+//!     if let Ok(parsed_structure) = common::parse(data, &my_struct, "little") {
+//!         
+//!         // Validate the header CRC
+//!         if let Some(crc_data) = data.get(0..CRC_CALC_LEN) {
+//!             if parsed_structure["header_crc"] == (crc32(crc_data) as usize) {
+//!                 return Ok(parsed_structure["size"]);
+//!             }
+//!         }
+//!     }
+//!
+//!     return Err(StructureError);
+//! }
+//! ```
+//!
+//! By convention, the above code would be placed in a new file, `structures/mystruct.rs`.
+//!
+//! To import this new code into the Rust project, append the following line to `structures.rs`:
+//!
+//! ```ignore
+//! pub mod mystruct;
+//! ```
+//!
+//! The parser function can then be accessed by any other code in the project via `structures::mystruct::parse_my_structure`.
+
 pub mod androidsparse;
 pub mod cab;
 pub mod chk;

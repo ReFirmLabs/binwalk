@@ -1,7 +1,8 @@
 use crate::common::{crc32, get_cstring};
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 use std::collections::HashMap;
 
+/// Stores info about a uImage header
 #[derive(Debug, Default, Clone)]
 pub struct UImageHeader {
     pub header_size: usize,
@@ -15,9 +16,8 @@ pub struct UImageHeader {
     pub image_type: String,
 }
 
-pub fn parse_uimage_header(
-    uimage_data: &[u8],
-) -> Result<UImageHeader, structures::common::StructureError> {
+/// Pase a uImage header
+pub fn parse_uimage_header(uimage_data: &[u8]) -> Result<UImageHeader, StructureError> {
     const UIMAGE_HEADER_SIZE: usize = 64;
     const UIMAGE_NAME_OFFSET: usize = 32;
 
@@ -154,7 +154,7 @@ pub fn parse_uimage_header(
     ]);
 
     // Parse the first half of the header
-    if let Ok(uimage_header) = structures::common::parse(uimage_data, &uimage_structure, "big") {
+    if let Ok(uimage_header) = common::parse(uimage_data, &uimage_structure, "big") {
         // Sanity check header fields
         if valid_os_types.contains_key(&uimage_header["os_type"]) {
             if valid_cpu_types.contains_key(&uimage_header["cpu_type"]) {
@@ -188,9 +188,10 @@ pub fn parse_uimage_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }
 
+/// uImage checksum calculator
 fn calculate_uimage_header_checksum(hdr: &[u8]) -> usize {
     const HEADER_CRC_START: usize = 4;
     const HEADER_CRC_END: usize = 8;

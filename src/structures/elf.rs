@@ -1,6 +1,7 @@
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 use std::collections::HashMap;
 
+/// Struct to store some useful ELF info
 #[derive(Debug, Default, Clone)]
 pub struct ELFHeader {
     pub class: String,
@@ -10,7 +11,8 @@ pub struct ELFHeader {
     pub endianness: String,
 }
 
-pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, structures::common::StructureError> {
+/// Partially parses an ELF header
+pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, StructureError> {
     const ELF_INFO_STRUCT_SIZE: usize = 8;
     const ELF_IDENT_STRUCT_SIZE: usize = 16;
 
@@ -27,7 +29,7 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, structures::common
         ("padding_2", "u24"),
     ];
 
-    // Just enough of the ELF structure to grab some system info
+    // Just enough of the ELF structure to grab some useful info
     let elf_info_structure = vec![("type", "u16"), ("machine", "u16"), ("version", "u32")];
 
     let elf_classes = HashMap::from([(1, 32), (2, 64)]);
@@ -139,7 +141,7 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, structures::common
     };
 
     // Endianness doesn't matter here, and we don't know what the ELF's endianness is yet
-    if let Ok(e_ident) = structures::common::parse(&elf_data, &elf_ident_structure, "little") {
+    if let Ok(e_ident) = common::parse(&elf_data, &elf_ident_structure, "little") {
         // Sanity check the e_ident fields
         if e_ident["padding_1"] == 0 && e_ident["padding_2"] == 0 {
             if e_ident["version"] == EXPECTED_VERSION {
@@ -158,7 +160,7 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, structures::common
 
                             if let Some(elf_info_raw) = elf_data.get(elf_info_start..elf_info_end) {
                                 // Parse the remaining info from the ELF header
-                                if let Ok(elf_info) = structures::common::parse(
+                                if let Ok(elf_info) = common::parse(
                                     &elf_info_raw,
                                     &elf_info_structure,
                                     elf_endianness[&e_ident["endianness"]],
@@ -186,5 +188,5 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, structures::common
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

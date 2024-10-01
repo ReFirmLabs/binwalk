@@ -1,15 +1,16 @@
 use crate::common::crc32;
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 
+/// Stores UBI superblock header info
 #[derive(Debug, Default, Clone)]
 pub struct UbiSuperBlockHeader {
     pub leb_size: usize,
     pub leb_count: usize,
 }
 
-pub fn parse_ubi_superblock_header(
-    ubi_data: &[u8],
-) -> Result<UbiSuperBlockHeader, structures::common::StructureError> {
+/// Partially parse a UBI superblock header
+pub fn parse_ubi_superblock_header(ubi_data: &[u8]) -> Result<UbiSuperBlockHeader, StructureError> {
+    // Type & offset constants
     const MAX_GROUP_TYPE: usize = 2;
     const CRC_START_OFFSET: usize = 8;
     const SUPERBLOCK_NODE_TYPE: usize = 6;
@@ -51,11 +52,10 @@ pub fn parse_ubi_superblock_header(
         ("ro_compat_version", "u32"),
     ];
 
-    let sb_struct_size: usize =
-        structures::common::size(&ubi_sb_structure) + SUPERBLOCK_STRUCTURE_EXTRA_SIZE;
+    let sb_struct_size: usize = common::size(&ubi_sb_structure) + SUPERBLOCK_STRUCTURE_EXTRA_SIZE;
 
     // Parse the UBI superblock header
-    if let Ok(sb_header) = structures::common::parse(ubi_data, &ubi_sb_structure, "little") {
+    if let Ok(sb_header) = common::parse(ubi_data, &ubi_sb_structure, "little") {
         // Make sure the padding fields are NULL
         if sb_header["padding1"] == 0 && sb_header["padding2"] == 0 {
             // Make sure the node type is SUPERBLOCK
@@ -76,9 +76,10 @@ pub fn parse_ubi_superblock_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }
 
+/// Stores info about a UBI erase count header
 #[derive(Debug, Default, Clone)]
 pub struct UbiECHeader {
     pub version: usize,
@@ -86,9 +87,8 @@ pub struct UbiECHeader {
     pub volume_id_offset: usize,
 }
 
-pub fn parse_ubi_ec_header(
-    ubi_data: &[u8],
-) -> Result<UbiECHeader, structures::common::StructureError> {
+/// Parse a UBI erase count header
+pub fn parse_ubi_ec_header(ubi_data: &[u8]) -> Result<UbiECHeader, StructureError> {
     let ubi_ec_structure = vec![
         ("magic", "u32"),
         ("version", "u8"),
@@ -104,11 +104,11 @@ pub fn parse_ubi_ec_header(
         ("header_crc", "u32"),
     ];
 
-    let ec_header_size: usize = structures::common::size(&ubi_ec_structure);
+    let ec_header_size: usize = common::size(&ubi_ec_structure);
     let crc_data_size: usize = ec_header_size - std::mem::size_of::<u32>();
 
     // Parse the first half of the header
-    if let Ok(ubi_ec_header) = structures::common::parse(ubi_data, &ubi_ec_structure, "big") {
+    if let Ok(ubi_ec_header) = common::parse(ubi_data, &ubi_ec_structure, "big") {
         // Padding fields must be NULL
         if ubi_ec_header["padding1"] == 0
             && ubi_ec_header["padding2"] == 0
@@ -134,16 +134,15 @@ pub fn parse_ubi_ec_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }
 
-// Don't actually use any of the volume header fields, just need to verify the volume header contents
+/// Dummy structure indicating a UBI volume header was parsed successfully
 #[derive(Debug, Default, Clone)]
 pub struct UbiVolumeHeader;
 
-pub fn parse_ubi_volume_header(
-    ubi_data: &[u8],
-) -> Result<UbiVolumeHeader, structures::common::StructureError> {
+/// Parse a UBI volume header
+pub fn parse_ubi_volume_header(ubi_data: &[u8]) -> Result<UbiVolumeHeader, StructureError> {
     let ubi_vol_structure = vec![
         ("magic", "u32"),
         ("version", "u8"),
@@ -164,11 +163,11 @@ pub fn parse_ubi_volume_header(
         ("header_crc", "u32"),
     ];
 
-    let vol_header_size: usize = structures::common::size(&ubi_vol_structure);
+    let vol_header_size: usize = common::size(&ubi_vol_structure);
     let crc_data_size: usize = vol_header_size - std::mem::size_of::<u32>();
 
     // Parse the volume header
-    if let Ok(ubi_vol_header) = structures::common::parse(&ubi_data, &ubi_vol_structure, "big") {
+    if let Ok(ubi_vol_header) = common::parse(&ubi_data, &ubi_vol_structure, "big") {
         // Sanity check padding fields, they should all be null
         if ubi_vol_header["padding1"] == 0
             && ubi_vol_header["padding2"] == 0
@@ -184,9 +183,10 @@ pub fn parse_ubi_volume_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }
 
+/// Calculate a UBI checksum
 fn ubi_crc(data: &[u8]) -> usize {
     const UBI_CRC_INIT: u32 = 0xFFFFFFFF;
     return ((!crc32(data)) & UBI_CRC_INIT) as usize;

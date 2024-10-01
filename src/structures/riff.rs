@@ -1,13 +1,13 @@
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 
+/// Struct to store info from a RIFF header
 pub struct RIFFHeader {
     pub size: usize,
     pub chunk_type: String,
 }
 
-pub fn parse_riff_header(
-    riff_data: &[u8],
-) -> Result<RIFFHeader, structures::common::StructureError> {
+/// Parse a RIFF image header
+pub fn parse_riff_header(riff_data: &[u8]) -> Result<RIFFHeader, StructureError> {
     const MAGIC1: usize = 0x46464952;
     const MAGIC2: usize = 0x50424557;
 
@@ -24,8 +24,10 @@ pub fn parse_riff_header(
     ];
 
     // Parse the riff header
-    if let Ok(riff_header) = structures::common::parse(&riff_data, &riff_structure, "little") {
+    if let Ok(riff_header) = common::parse(&riff_data, &riff_structure, "little") {
+        // Sanity check expected magic bytes
         if riff_header["magic1"] == MAGIC1 && riff_header["magic2"] == MAGIC2 {
+            // Get the RIFF type string (e.g., "WAV")
             if let Ok(type_string) =
                 String::from_utf8(riff_data[CHUNK_TYPE_START..CHUNK_TYPE_END].to_vec())
             {
@@ -37,5 +39,5 @@ pub fn parse_riff_header(
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

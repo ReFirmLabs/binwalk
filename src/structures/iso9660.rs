@@ -1,11 +1,13 @@
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 
+/// Struct to store useful ISO info
 #[derive(Debug, Default, Clone)]
 pub struct ISOHeader {
     pub image_size: usize,
 }
 
-pub fn parse_iso_header(iso_data: &[u8]) -> Result<ISOHeader, structures::common::StructureError> {
+/// Partially parses an ISO header
+pub fn parse_iso_header(iso_data: &[u8]) -> Result<ISOHeader, StructureError> {
     // Offset from the beginning of the ISO image to the start of iso_structure
     const ISO_STRUCT_START: usize = 32840;
 
@@ -32,11 +34,9 @@ pub fn parse_iso_header(iso_data: &[u8]) -> Result<ISOHeader, structures::common
         ..Default::default()
     };
 
-    if iso_data.len() > ISO_STRUCT_START {
+    if let Some(iso_header_data) = iso_data.get(ISO_STRUCT_START..) {
         // Parse the ISO header
-        if let Ok(iso_header) =
-            structures::common::parse(&iso_data[ISO_STRUCT_START..], &iso_structure, "little")
-        {
+        if let Ok(iso_header) = common::parse(iso_header_data, &iso_structure, "little") {
             // Make sure all the unused fields are, in fact, unused
             if iso_header["unused1"] == 0
                 && iso_header["unused2"] == 0
@@ -46,7 +46,7 @@ pub fn parse_iso_header(iso_data: &[u8]) -> Result<ISOHeader, structures::common
             {
                 /*
                  * Make sure all the identical, but byte-swapped, fields agree.
-                 * NOTE: The to_be() conversions probably won't work on big-endian systems.
+                 * NOTE: The to_be() conversions probably won't work on big-endian hosts.
                  */
                 if iso_header["set_size_lsb"]
                     == (iso_header["set_size_msb"] as u16).to_be() as usize
@@ -67,5 +67,5 @@ pub fn parse_iso_header(iso_data: &[u8]) -> Result<ISOHeader, structures::common
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }

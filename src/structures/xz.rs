@@ -1,7 +1,8 @@
 use crate::common::crc32;
-use crate::structures;
+use crate::structures::common::{self, StructureError};
 
-pub fn parse_xz_header(xz_data: &[u8]) -> Result<usize, structures::common::StructureError> {
+/// Parse and validate an XZ header, returns the header size
+pub fn parse_xz_header(xz_data: &[u8]) -> Result<usize, StructureError> {
     const XZ_CRC_END: usize = 8;
     const XZ_CRC_START: usize = 6;
     const XZ_HEADER_SIZE: usize = 12;
@@ -13,7 +14,7 @@ pub fn parse_xz_header(xz_data: &[u8]) -> Result<usize, structures::common::Stru
         ("header_crc", "u32"),
     ];
 
-    if let Ok(xz_header) = structures::common::parse(xz_data, &xz_structure, "little") {
+    if let Ok(xz_header) = common::parse(xz_data, &xz_structure, "little") {
         if let Some(crc_data) = xz_data.get(XZ_CRC_START..XZ_CRC_END) {
             if crc32(crc_data) == (xz_header["header_crc"] as u32) {
                 return Ok(XZ_HEADER_SIZE);
@@ -21,10 +22,11 @@ pub fn parse_xz_header(xz_data: &[u8]) -> Result<usize, structures::common::Stru
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }
 
-pub fn parse_xz_footer(xz_data: &[u8]) -> Result<usize, structures::common::StructureError> {
+/// Parse and validate an XZ footer, returns the footer size
+pub fn parse_xz_footer(xz_data: &[u8]) -> Result<usize, StructureError> {
     const FOOTER_SIZE: usize = 12;
     const CRC_DATA_SIZE: usize = 6;
     const CRC_START_INDEX: usize = 4;
@@ -37,7 +39,7 @@ pub fn parse_xz_footer(xz_data: &[u8]) -> Result<usize, structures::common::Stru
     ];
 
     // Parse the stream footer
-    if let Ok(xz_footer) = structures::common::parse(xz_data, &xz_footer_structure, "little") {
+    if let Ok(xz_footer) = common::parse(xz_data, &xz_footer_structure, "little") {
         // Calculate the start and end offsets of the CRC'd data
         let crc_start = CRC_START_INDEX;
         let crc_end = crc_start + CRC_DATA_SIZE;
@@ -50,5 +52,5 @@ pub fn parse_xz_footer(xz_data: &[u8]) -> Result<usize, structures::common::Stru
         }
     }
 
-    return Err(structures::common::StructureError);
+    return Err(StructureError);
 }
