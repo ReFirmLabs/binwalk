@@ -1,8 +1,10 @@
 use crate::extractors::png::extract_png_image;
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 
+/// Human readable description
 pub const DESCRIPTION: &str = "PNG image";
 
+/// PNG magic bytes
 pub fn png_magic() -> Vec<Vec<u8>> {
     /*
      * PNG magic, followed by chunk size and IHDR chunk type.
@@ -11,14 +13,13 @@ pub fn png_magic() -> Vec<Vec<u8>> {
     return vec![b"\x89PNG\x0D\x0A\x1A\x0A\x00\x00\x00\x0DIHDR".to_vec()];
 }
 
-pub fn png_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-    let mut result = signatures::common::SignatureResult {
+/// Validate a PNG signature
+pub fn png_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+    // Success return value
+    let mut result = SignatureResult {
         offset: offset,
         description: DESCRIPTION.to_string(),
-        confidence: signatures::common::CONFIDENCE_HIGH,
+        confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };
 
@@ -42,5 +43,5 @@ pub fn png_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

@@ -1,23 +1,27 @@
 use crate::common::epoch_to_string;
 use crate::extractors::uimage::extract_uimage;
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 use crate::structures::uimage::parse_uimage_header;
 
+/// Human readable description
 pub const DESCRIPTION: &str = "uImage firmware image";
 
+/// uImage magic bytes
 pub fn uimage_magic() -> Vec<Vec<u8>> {
     return vec![b"\x27\x05\x19\x56".to_vec()];
 }
 
+/// Validates uImage signatures
 pub fn uimage_parser(
     file_data: &Vec<u8>,
     offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-    let mut result = signatures::common::SignatureResult {
+) -> Result<SignatureResult, SignatureError> {
+    // Success return value
+    let mut result = SignatureResult {
         size: 0,
         offset: offset,
         description: DESCRIPTION.to_string(),
-        confidence: signatures::common::CONFIDENCE_HIGH,
+        confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };
 
@@ -47,5 +51,5 @@ pub fn uimage_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

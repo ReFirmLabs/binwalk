@@ -1,8 +1,10 @@
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult};
 use crate::structures::qnx::parse_ifs_header;
 
+/// Human readable description
 pub const IFS_DESCRIPTION: &str = "QNX IFS image";
 
+/// QNX IFS magic bytes
 pub fn qnx_ifs_magic() -> Vec<Vec<u8>> {
     /*
      * Assumes little endian.
@@ -11,12 +13,13 @@ pub fn qnx_ifs_magic() -> Vec<Vec<u8>> {
     return vec![b"\xEB\x7E\xFF\x00\x01\x00".to_vec()];
 }
 
+/// Validate a QNX IFS signature
 pub fn qnx_ifs_parser(
     file_data: &Vec<u8>,
     offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-    let mut result = signatures::common::SignatureResult {
-        size: 0,
+) -> Result<SignatureResult, SignatureError> {
+    // Success return value
+    let mut result = SignatureResult {
         offset: offset,
         description: IFS_DESCRIPTION.to_string(),
         ..Default::default()
@@ -36,5 +39,5 @@ pub fn qnx_ifs_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

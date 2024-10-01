@@ -1,31 +1,31 @@
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 use crate::structures::ubi::{
     parse_ubi_ec_header, parse_ubi_superblock_header, parse_ubi_volume_header,
 };
 use aho_corasick::AhoCorasick;
 use std::collections::HashMap;
 
+/// Human readable desciptions
 pub const UBI_FS_DESCRIPTION: &str = "UBIFS image";
 pub const UBI_IMAGE_DESCRIPTION: &str = "UBI image";
 
+/// Erase block magic bytes; header version is assumed to be 1
 pub fn ubi_magic() -> Vec<Vec<u8>> {
-    // Erase block magic bytes; header version is assumed to be 1
     return vec![b"UBI#\x01\x00\x00\x00".to_vec()];
 }
 
+/// UBI node magic; this matches *any* UBI node, but ubifs_parser ensures that only superblock nodes are reported
 pub fn ubifs_magic() -> Vec<Vec<u8>> {
-    // UBI node magic; this matches *any* UBI node, but ubifs_parser ensures that only superblock nodes are reported
     return vec![b"\x31\x18\x10\x06".to_vec()];
 }
 
-pub fn ubifs_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-    let mut result = signatures::common::SignatureResult {
+/// Validates a UBIFS signature
+pub fn ubifs_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+    // Success return value
+    let mut result = SignatureResult {
         offset: offset,
         description: UBI_FS_DESCRIPTION.to_string(),
-        confidence: signatures::common::CONFIDENCE_HIGH,
+        confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };
 
@@ -37,17 +37,16 @@ pub fn ubifs_parser(
         return Ok(result);
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }
 
-pub fn ubi_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-    let mut result = signatures::common::SignatureResult {
+/// Validates a UBI signature
+pub fn ubi_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+    // Success return value
+    let mut result = SignatureResult {
         offset: offset,
         description: UBI_IMAGE_DESCRIPTION.to_string(),
-        confidence: signatures::common::CONFIDENCE_HIGH,
+        confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };
 
@@ -56,7 +55,9 @@ pub fn ubi_parser(
         let data_offset: usize = offset + ubi_header.data_offset;
         let volume_offset: usize = offset + ubi_header.volume_id_offset;
 
+        // Sanity check the reported volume and data offsets
         if file_data.len() > data_offset && file_data.len() > volume_offset {
+            // Get the size of the UBI image
             if let Ok(image_size) = get_ubi_image_size(&file_data[offset..]) {
                 result.size = image_size;
                 result.description = format!(
@@ -68,10 +69,11 @@ pub fn ubi_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }
 
-fn get_ubi_image_size(ubi_data: &[u8]) -> Result<usize, signatures::common::SignatureError> {
+/// Determines the LEB size and returns the size of the UBI image
+fn get_ubi_image_size(ubi_data: &[u8]) -> Result<usize, SignatureError> {
     let mut leb_size: usize = 0;
     let mut block_count: usize = 0;
     let mut best_leb_match_count: usize = 0;
@@ -123,5 +125,5 @@ fn get_ubi_image_size(ubi_data: &[u8]) -> Result<usize, signatures::common::Sign
         return Ok(block_count * leb_size);
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

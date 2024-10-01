@@ -1,12 +1,13 @@
 use crate::common::epoch_to_string;
 use crate::extractors::squashfs::squashfs_v4_be_extractor;
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 use crate::structures::squashfs::{parse_squashfs_header, parse_squashfs_uid_entry};
 use std::collections::HashMap;
 
-pub const DESCRIPTION: &str = "SquashFS filesystem";
+/// Human readable description
+pub const DESCRIPTION: &str = "SquashFS file system";
 
-/* Returns all of the known magic bytes that could indicate the beginning of a SquashFS image */
+/// All of the known magic bytes that could indicate the beginning of a SquashFS image
 pub fn squashfs_magic() -> Vec<Vec<u8>> {
     return vec![
         b"sqsh".to_vec(),
@@ -19,11 +20,11 @@ pub fn squashfs_magic() -> Vec<Vec<u8>> {
     ];
 }
 
-/* Responsible for parsing and validating a suspected SquashFS image header */
+/// Responsible for parsing and validating a suspected SquashFS image header
 pub fn squashfs_parser(
     file_data: &Vec<u8>,
     offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+) -> Result<SignatureResult, SignatureError> {
     const SQUASHFSV4: usize = 4;
 
     let squashfs_compression_types = HashMap::from([
@@ -36,11 +37,11 @@ pub fn squashfs_parser(
         (6, "zstd"),
     ]);
 
-    let mut result = signatures::common::SignatureResult {
+    let mut result = SignatureResult {
         size: 0,
         offset: offset,
         description: DESCRIPTION.to_string(),
-        confidence: signatures::common::CONFIDENCE_HIGH,
+        confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };
 
@@ -119,5 +120,5 @@ pub fn squashfs_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

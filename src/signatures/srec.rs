@@ -1,31 +1,31 @@
 use crate::common::is_offset_safe;
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 use aho_corasick::AhoCorasick;
 
+/// Human readable descriptions
 pub const SREC_DESCRIPTION: &str = "Motorola S-record";
 pub const SREC_SHORT_DESCRIPTION: &str = "Motorola S-record (generic)";
 
+/// Generic, short signature for s-records, should only be matched at the beginning of a file
 pub fn srec_short_magic() -> Vec<Vec<u8>> {
-    // Generic, short signature for s-records, should only be matched at the beginning of a file
     return vec![b"S0".to_vec()];
 }
 
+/// This assumes a srec header with the hex encoded string of "HDR"
 pub fn srec_magic() -> Vec<Vec<u8>> {
-    // This assumes a srec header with the hex encoded string of "HDR"
     return vec![b"S00600004844521B".to_vec()];
 }
 
-pub fn srec_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+/// Validates a SREC signature
+pub fn srec_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+    // \r and \n
     const UNIX_TERMINATING_CHARACTER: u8 = 0x0A;
     const WINDOWS_TERMINATING_CHARACTER: u8 = 0x0D;
 
-    let mut result = signatures::common::SignatureResult {
+    let mut result = SignatureResult {
         offset: offset,
         description: SREC_DESCRIPTION.to_string(),
-        confidence: signatures::common::CONFIDENCE_HIGH,
+        confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };
 
@@ -61,9 +61,9 @@ pub fn srec_parser(
                 }
 
                 // Sanity check, don't want to index out of bounds
-                if is_offset_safe(available_data, srec_eof, last_srec_eof) {
+                if let Some(srec_last_byte) = file_data.get(srec_eof) {
                     // Last byte should be a line feed (\n)
-                    if file_data[srec_eof] == UNIX_TERMINATING_CHARACTER {
+                    if *srec_last_byte == UNIX_TERMINATING_CHARACTER {
                         // Include the final line feed byte in the size of the s-record
                         srec_eof += 1;
 
@@ -78,7 +78,7 @@ pub fn srec_parser(
                 }
 
                 // Invalid srec termination, stop searching
-                return Err(signatures::common::SignatureError);
+                return Err(SignatureError);
             }
 
             // Not a terminating character, go to the next byte in the file
@@ -88,5 +88,5 @@ pub fn srec_parser(
     }
 
     // No valid srec footers found
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

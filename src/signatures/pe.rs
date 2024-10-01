@@ -1,8 +1,10 @@
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
 use crate::structures::pe::parse_pe_header;
 
+/// Human readable description
 pub const DESCRIPTION: &str = "Windows PE binary";
 
+/// Common PE file magics
 pub fn pe_magic() -> Vec<Vec<u8>> {
     /*
      * This matches the first 16 bytes of a DOS header, from e_magic through e_ss.
@@ -14,18 +16,17 @@ pub fn pe_magic() -> Vec<Vec<u8>> {
     ];
 }
 
-pub fn pe_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-    let mut result = signatures::common::SignatureResult {
-        size: 0,
+/// Validate a PE header
+pub fn pe_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+    // Successful return value
+    let mut result = SignatureResult {
         offset: offset,
         description: DESCRIPTION.to_string(),
-        confidence: signatures::common::CONFIDENCE_MEDIUM,
+        confidence: CONFIDENCE_MEDIUM,
         ..Default::default()
     };
 
+    // Parse the PE header
     if let Ok(pe_header) = parse_pe_header(&file_data[offset..]) {
         result.description = format!(
             "{}, machine type: {}",
@@ -34,5 +35,5 @@ pub fn pe_parser(
         return Ok(result);
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

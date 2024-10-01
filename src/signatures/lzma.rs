@@ -1,9 +1,11 @@
 use crate::extractors::lzma;
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 use crate::structures::lzma::parse_lzma_header;
 
+/// Human readable description
 pub const DESCRIPTION: &str = "LZMA compressed data";
 
+/// Builds a list of common LZMA magic bytes (properties + dictionary sizes)
 pub fn lzma_magic() -> Vec<Vec<u8>> {
     let mut magic_signatures: Vec<Vec<u8>> = vec![];
 
@@ -42,17 +44,17 @@ pub fn lzma_magic() -> Vec<Vec<u8>> {
     return magic_signatures;
 }
 
-pub fn lzma_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-    let mut result = signatures::common::SignatureResult {
+/// Validate LZMA signatures
+pub fn lzma_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+    // Success return value
+    let mut result = SignatureResult {
         offset: offset,
         description: DESCRIPTION.to_string(),
-        confidence: signatures::common::CONFIDENCE_HIGH,
+        confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };
 
+    // Parse the LZMA header
     if let Ok(lzma_header) = parse_lzma_header(&file_data[offset..]) {
         /*
          * LZMA signatures are very prone to false positives, so do a dry-run extraction.
@@ -60,6 +62,8 @@ pub fn lzma_parser(
          * Else, assume this is a false positive.
          */
         let dry_run = lzma::lzma_decompress(file_data, offset, None);
+
+        // Return success if dry run succeeded
         if dry_run.success == true {
             result.description = format!(
                 "{}, properties: {:#04X}, dictionary size: {} bytes, uncompressed size: {} bytes",
@@ -72,5 +76,5 @@ pub fn lzma_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

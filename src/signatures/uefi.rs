@@ -1,13 +1,16 @@
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
 use crate::structures::uefi::{parse_uefi_capsule_header, parse_uefi_volume_header};
 
+/// Human readable descriptions
 pub const VOLUME_DESCRIPTION: &str = "UEFI PI firmware volume";
 pub const CAPSULE_DESCRIPTION: &str = "UEFI capsule image";
 
+/// UEFI volume magic bytes
 pub fn uefi_volume_magic() -> Vec<Vec<u8>> {
     return vec![b"_FVH".to_vec()];
 }
 
+/// UEFI capsule GUIDs
 pub fn uefi_capsule_magic() -> Vec<Vec<u8>> {
     return vec![
         b"\xBD\x86\x66\x3B\x76\x0D\x30\x40\xB7\x0E\xB5\x51\x9E\x2F\xC5\xA0".to_vec(), // EFI capsule GUID
@@ -16,18 +19,19 @@ pub fn uefi_capsule_magic() -> Vec<Vec<u8>> {
     ];
 }
 
+/// Validates UEFI volume signatures
 pub fn uefi_volume_parser(
     file_data: &Vec<u8>,
     offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+) -> Result<SignatureResult, SignatureError> {
     // The magic signature begins this many bytes from the start of the UEFI volume
     const UEFI_MAGIC_OFFSET: usize = 40;
 
-    let mut result = signatures::common::SignatureResult {
+    let mut result = SignatureResult {
         size: 0,
         offset: 0,
         description: VOLUME_DESCRIPTION.to_string(),
-        confidence: signatures::common::CONFIDENCE_MEDIUM,
+        confidence: CONFIDENCE_MEDIUM,
         ..Default::default()
     };
 
@@ -53,18 +57,20 @@ pub fn uefi_volume_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }
 
+/// Validates UEFI capsule signatures
 pub fn uefi_capsule_parser(
     file_data: &Vec<u8>,
     offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-    let mut result = signatures::common::SignatureResult {
+) -> Result<SignatureResult, SignatureError> {
+    // Success return value
+    let mut result = SignatureResult {
         description: CAPSULE_DESCRIPTION.to_string(),
         offset: offset,
         size: 0,
-        confidence: signatures::common::CONFIDENCE_MEDIUM,
+        confidence: CONFIDENCE_MEDIUM,
         ..Default::default()
     };
 
@@ -82,5 +88,5 @@ pub fn uefi_capsule_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

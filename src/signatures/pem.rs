@@ -3,14 +3,17 @@ use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
 
+/// Human readable descriptions
 pub const PEM_PUBLIC_KEY_DESCRIPTION: &str = "PEM public key";
 pub const PEM_PRIVATE_KEY_DESCRIPTION: &str = "PEM private key";
 pub const PEM_CERTIFICATE_DESCRIPTION: &str = "PEM certificate";
 
+/// Public key magic
 pub fn pem_public_key_magic() -> Vec<Vec<u8>> {
     return vec![b"-----BEGIN PUBLIC KEY-----".to_vec()];
 }
 
+/// Private key magics
 pub fn pem_private_key_magic() -> Vec<Vec<u8>> {
     return vec![
         b"-----BEGIN PRIVATE KEY-----".to_vec(),
@@ -21,12 +24,14 @@ pub fn pem_private_key_magic() -> Vec<Vec<u8>> {
     ];
 }
 
+/// Certificate magic
 pub fn pem_certificate_magic() -> Vec<Vec<u8>> {
     return vec![b"-----BEGIN CERTIFICATE-----".to_vec()];
 }
 
-// Validates both PEM certificates and keys
+/// Validates both PEM certificate and key signatures
 pub fn pem_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+    // Enough bytes to uniquely differentiate certs from keys
     const MIN_PEM_LEN: usize = 26;
 
     let mut result = SignatureResult {
@@ -58,16 +63,13 @@ pub fn pem_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
     }
 
     // Sanity check available data
-    if file_data.len() > (offset + MIN_PEM_LEN) {
-        // Grab the magic bytes for this PEM candidate
-        let pem_magic = &file_data[offset..offset + MIN_PEM_LEN].to_vec();
-
+    if let Some(pem_magic) = file_data.get(offset..offset + MIN_PEM_LEN) {
         // Check if this magic is for a PEM cert or a PEM key
-        if public_magics.contains(pem_magic) == true {
+        if public_magics.contains(&pem_magic.to_vec()) == true {
             result.description = PEM_PUBLIC_KEY_DESCRIPTION.to_string();
-        } else if private_magics.contains(pem_magic) == true {
+        } else if private_magics.contains(&pem_magic.to_vec()) == true {
             result.description = PEM_PRIVATE_KEY_DESCRIPTION.to_string();
-        } else if certificate_magics.contains(pem_magic) == true {
+        } else if certificate_magics.contains(&pem_magic.to_vec()) == true {
             result.description = PEM_CERTIFICATE_DESCRIPTION.to_string();
         } else {
             // This function will only be called if one of the magics was found, so this should never happen
@@ -95,6 +97,7 @@ pub fn pem_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
     return Err(SignatureError);
 }
 
+/// Base64 decode PEM file contents
 fn decode_pem_data(pem_file_data: &[u8]) -> Result<usize, SignatureError> {
     const DELIM: &str = "--";
 
@@ -108,12 +111,13 @@ fn decode_pem_data(pem_file_data: &[u8]) -> Result<usize, SignatureError> {
             // PEM begin and end delimiter strings both start with hyphens
             if line.starts_with(DELIM) {
                 delim_count += 1;
-                continue;
-            }
 
-            // Expect two delimiters: the start, and the end. If we've found both, break.
-            if delim_count == 2 {
-                break;
+                // Expect two delimiters: the start, and the end. If we've found both, break.
+                if delim_count == 2 {
+                    break;
+                } else {
+                    continue;
+                }
             }
 
             // This is not a delimiter string, append the line to the base64 string to be decoded

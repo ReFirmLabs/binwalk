@@ -1,6 +1,9 @@
 use crate::common::is_offset_safe;
-use crate::signatures;
+use crate::signatures::common::{
+    SignatureError, SignatureResult, CONFIDENCE_HIGH, CONFIDENCE_MEDIUM,
+};
 
+/// Some tarball constants
 const TARBALL_BLOCK_SIZE: usize = 512;
 const TARBALL_MAGIC_OFFSET: usize = 257;
 const TARBALL_MAGIC_SIZE: usize = 5;
@@ -9,16 +12,19 @@ const TARBALL_SIZE_LEN: usize = 11;
 const TARBALL_UNIVERSAL_MAGIC: &[u8; 5] = b"ustar";
 const TARBALL_MIN_EXPECTED_HEADERS: usize = 10;
 
+/// Human readable description
 pub const DESCRIPTION: &str = "POSIX tar archive";
 
+/// Magic bytes for tarball and GNU tarball file types
 pub fn tarball_magic() -> Vec<Vec<u8>> {
     return vec![b"ustar\x00".to_vec(), b"ustar\x20\x20\x00".to_vec()];
 }
 
+/// Validate tarball signatures
 pub fn tarball_parser(
     file_data: &Vec<u8>,
     offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+) -> Result<SignatureResult, SignatureError> {
     // Stores the running total size of the tarball
     let mut tarball_total_size: usize = 0;
 
@@ -72,14 +78,14 @@ pub fn tarball_parser(
     // We expect that a tarball should be, at a minimum, one block in size
     if tarball_total_size >= TARBALL_BLOCK_SIZE {
         // Default confidence is medium
-        let mut confidence = signatures::common::CONFIDENCE_MEDIUM;
+        let mut confidence = CONFIDENCE_MEDIUM;
 
         // If more than just a few tarball headers were found and processed successfully, we have pretty high confidence that this isn't a false positive
         if valid_header_count >= TARBALL_MIN_EXPECTED_HEADERS {
-            confidence = signatures::common::CONFIDENCE_HIGH;
+            confidence = CONFIDENCE_HIGH;
         }
 
-        return Ok(signatures::common::SignatureResult {
+        return Ok(SignatureResult {
             description: format!("{}, file count: {}", DESCRIPTION, valid_header_count),
             offset: tarball_start_offset,
             size: tarball_total_size,
@@ -88,9 +94,10 @@ pub fn tarball_parser(
         });
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }
 
+/// Validate a tarball entry checksum
 fn header_checksum_is_valid(header_block: &[u8]) -> bool {
     const TARBALL_CHECKSUM_START: usize = 148;
     const TARBALL_CHECKSUM_END: usize = 156;
@@ -110,9 +117,8 @@ fn header_checksum_is_valid(header_block: &[u8]) -> bool {
     return sum == reported_checksum;
 }
 
-fn tarball_entry_size(
-    tarball_entry_data: &[u8],
-) -> Result<usize, signatures::common::SignatureError> {
+/// Returns the size of a tarball entry, including header and data
+fn tarball_entry_size(tarball_entry_data: &[u8]) -> Result<usize, SignatureError> {
     // Get the tarball entry's magic bytes
     let entry_magic: &[u8] =
         &tarball_entry_data[TARBALL_MAGIC_OFFSET..TARBALL_MAGIC_OFFSET + TARBALL_MAGIC_SIZE];
@@ -134,10 +140,10 @@ fn tarball_entry_size(
         return Ok(block_count * TARBALL_BLOCK_SIZE);
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }
 
-// Convert octal string to a number
+/// Convert octal string to a number
 fn tarball_octal(octal_string: &[u8]) -> usize {
     let mut num: usize = 0;
 

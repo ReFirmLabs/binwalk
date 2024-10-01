@@ -1,27 +1,27 @@
 use crate::common::is_offset_safe;
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 use crate::structures::zstd::{parse_block_header, parse_zstd_header};
 
+/// Human readable description
 pub const DESCRIPTION: &str = "ZSTD compressed data";
 
+/// ZSTD magic bytes
 pub fn zstd_magic() -> Vec<Vec<u8>> {
     return vec![b"\x28\xb5\x2f\xfd".to_vec()];
 }
 
-pub fn zstd_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+/// Validate a ZSTD signature
+pub fn zstd_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
     // Size of checksum value at EOF
     const EOF_CHECKSUM_SIZE: usize = 4;
 
     // More or less arbitrarily chosen
     const MIN_BLOCK_COUNT: usize = 2;
 
-    let mut result = signatures::common::SignatureResult {
+    let mut result = SignatureResult {
         offset: offset,
         description: DESCRIPTION.to_string(),
-        confidence: signatures::common::CONFIDENCE_HIGH,
+        confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };
 
@@ -113,5 +113,5 @@ pub fn zstd_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

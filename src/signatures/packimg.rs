@@ -1,18 +1,20 @@
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult};
 use crate::structures::packimg::parse_packimg_header;
 
+/// Human readable description
 pub const DESCRIPTION: &str = "PackImg firmware header";
 
+/// PackIMG magic bytes
 pub fn packimg_magic() -> Vec<Vec<u8>> {
     return vec![b"--PaCkImGs--".to_vec()];
 }
 
+/// Parse a PackIMG signature
 pub fn packimg_parser(
     file_data: &Vec<u8>,
     offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-    let mut result = signatures::common::SignatureResult {
-        size: 0,
+) -> Result<SignatureResult, SignatureError> {
+    let mut result = SignatureResult {
         offset: offset,
         description: DESCRIPTION.to_string(),
         ..Default::default()
@@ -20,6 +22,7 @@ pub fn packimg_parser(
 
     let available_data: usize = file_data.len() - offset;
 
+    // Parse the header
     if let Ok(packimg_header) = parse_packimg_header(&file_data[offset..]) {
         // Sanity check the reported data size
         if available_data >= (packimg_header.header_size + packimg_header.data_size) {
@@ -32,5 +35,5 @@ pub fn packimg_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

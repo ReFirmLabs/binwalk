@@ -1,15 +1,18 @@
 use crate::common::get_cstring;
 use crate::extractors::vxworks::extract_symbol_table;
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH, CONFIDENCE_LOW};
 
+/// Human readable descriptions
 pub const SYMTAB_DESCRIPTION: &str = "VxWorks symbol table";
 pub const WIND_KERNEL_DESCRIPTION: &str = "VxWorks WIND kernel version";
 
+/// WIND kernel version magic
 pub fn wind_kernel_magic() -> Vec<Vec<u8>> {
     // Magic version string for WIND kernels
     return vec![b"WIND version ".to_vec()];
 }
 
+/// VxWorks symbol table magic bytes
 pub fn symbol_table_magic() -> Vec<Vec<u8>> {
     // These magic bytes match the type and group fields in the VxWorks symbol table, for both big and little endian targets
     return vec![
@@ -22,24 +25,27 @@ pub fn symbol_table_magic() -> Vec<Vec<u8>> {
     ];
 }
 
+/// Validates WIND kernel version signatures
 pub fn wind_kernel_parser(
     file_data: &Vec<u8>,
     offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+) -> Result<SignatureResult, SignatureError> {
+    // Length of the magic signatures bytes
     const MAGIC_SIZE: usize = 13;
 
-    let mut result = signatures::common::SignatureResult {
+    let mut result = SignatureResult {
         offset: offset,
         description: WIND_KERNEL_DESCRIPTION.to_string(),
-        confidence: signatures::common::CONFIDENCE_LOW,
+        confidence: CONFIDENCE_LOW,
         ..Default::default()
     };
 
+    // Want the string that proceeds the magic bytes
     let version_offset: usize = offset + MAGIC_SIZE;
 
-    if file_data.len() > version_offset {
+    if let Some(version_bytes) = file_data.get(version_offset..) {
         // The wind kernel magic bytes should be followed by a string containing the wind kernel version
-        let version_string = get_cstring(&file_data[version_offset..]);
+        let version_string = get_cstring(version_bytes);
 
         // Make sure we got a string
         if version_string.len() > 0 {
@@ -49,18 +55,20 @@ pub fn wind_kernel_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }
 
+/// Validates VxWorks symbol table signatures
 pub fn symbol_table_parser(
     file_data: &Vec<u8>,
     offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+) -> Result<SignatureResult, SignatureError> {
+    // The magic bytes start at this offset from the beginning of the symbol table
     const MAGIC_OFFSET: usize = 8;
 
-    let mut result = signatures::common::SignatureResult {
+    let mut result = SignatureResult {
         description: SYMTAB_DESCRIPTION.to_string(),
-        confidence: signatures::common::CONFIDENCE_HIGH,
+        confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };
 
@@ -86,5 +94,5 @@ pub fn symbol_table_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

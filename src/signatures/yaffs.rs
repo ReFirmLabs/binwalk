@@ -1,13 +1,15 @@
 use crate::common::is_offset_safe;
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
 use crate::structures::yaffs::{parse_yaffs_file_header, parse_yaffs_obj_header};
 
+/// Minimum number of expected YAFFS objects in a YAFFS image
 const MIN_NUMBER_OF_OBJS: usize = 2;
 
+/// Human readable description
 pub const DESCRIPTION: &str = "YAFFS filesystem";
 
+/// Expect the first YAFFS entry to be either a directory (0x00000003) or file (0x00000001), big or little endian
 pub fn yaffs_magic() -> Vec<Vec<u8>> {
-    // Expect the first YAFFS entry to be either a directory (0x00000003) or file (0x00000001), big or little endian
     return vec![
         b"\x03\x00\x00\x00\x01\x00\x00\x00\xFF\xFF".to_vec(),
         b"\x00\x00\x00\x03\x00\x00\x00\x01\xFF\xFF".to_vec(),
@@ -16,19 +18,17 @@ pub fn yaffs_magic() -> Vec<Vec<u8>> {
     ];
 }
 
-pub fn yaffs_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+/// Validate a YAFFS signature
+pub fn yaffs_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
     // Max page size + max spare size
     const MAX_OBJ_SIZE: usize = 16896;
     const BIG_ENDIAN_FIRST_BYTE: u8 = 0;
 
-    let mut result = signatures::common::SignatureResult {
+    let mut result = SignatureResult {
         description: DESCRIPTION.to_string(),
         offset: offset,
         size: 0,
-        confidence: signatures::common::CONFIDENCE_HIGH,
+        confidence: CONFIDENCE_MEDIUM,
         ..Default::default()
     };
 
@@ -43,9 +43,11 @@ pub fn yaffs_parser(
             endianness = "big";
         }
 
+        // Determine the page and spare data sizes
         let page_size = get_page_size(&file_data[offset..]);
         let spare_size = get_spare_size(&file_data[offset..], page_size, endianness);
 
+        // Get the total image size
         if let Ok(image_size) =
             get_image_size(&file_data[offset..], page_size, spare_size, endianness)
         {
@@ -58,10 +60,10 @@ pub fn yaffs_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }
 
-// Returns the detected page size used by the YAFFS image
+/// Returns the detected page size used by the YAFFS image
 fn get_page_size(file_data: &[u8]) -> usize {
     // Index in page_sizes of the YAFFS1 page size
     const YAFFS1_PAGE_SIZE_INDEX: usize = 0;
@@ -98,7 +100,7 @@ fn get_page_size(file_data: &[u8]) -> usize {
     return page_sizes[YAFFS1_PAGE_SIZE_INDEX];
 }
 
-// Returns the detected spare size of the YAFFS image
+/// Returns the detected spare size of the YAFFS image
 fn get_spare_size(file_data: &[u8], page_size: usize, endianness: &str) -> usize {
     // Index in spare_sizes of the YAFFS1 spare size
     const YAFFS1_SPARE_SIZE_INDEX: usize = 0;
@@ -123,13 +125,14 @@ fn get_spare_size(file_data: &[u8], page_size: usize, endianness: &str) -> usize
     return spare_sizes[YAFFS1_SPARE_SIZE_INDEX];
 }
 
-// Returns the total size of the image, in bytes
+/// Returns the total size of the image, in bytes
 fn get_image_size(
     file_data: &[u8],
     page_size: usize,
     spare_size: usize,
     endianness: &str,
-) -> Result<usize, signatures::common::SignatureError> {
+) -> Result<usize, SignatureError> {
+    // Object type for files
     const FILE_TYPE: usize = 1;
 
     let mut image_size: usize = 0;
@@ -143,7 +146,7 @@ fn get_image_size(
     while is_offset_safe(available_data, next_obj_offset, previous_obj_offset) {
         match file_data.get(next_obj_offset..) {
             None => {
-                return Err(signatures::common::SignatureError);
+                return Err(SignatureError);
             }
             Some(obj_data) => {
                 // Parse and validate the object header
@@ -183,15 +186,15 @@ fn get_image_size(
         return Ok(image_size);
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }
 
-// Returns the number of data blocks used to store file data; this size is only valid for file type objects
+/// Returns the number of data blocks used to store file data; this size is only valid for file type objects
 fn get_file_block_count(
     obj_data: &[u8],
     page_size: usize,
     endianness: &str,
-) -> Result<usize, signatures::common::SignatureError> {
+) -> Result<usize, SignatureError> {
     // parse_yaffs_file_header only parses a portion of the header that we need; the partial structure starts this many bytes into the object data
     const INFO_STRUCT_START: usize = 268;
 
@@ -205,5 +208,5 @@ fn get_file_block_count(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

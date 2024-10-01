@@ -1,24 +1,26 @@
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 use crate::structures::zip::{parse_eocd_header, parse_zip_header};
 use aho_corasick::AhoCorasick;
 
+/// Human readable description
 pub const DESCRIPTION: &str = "ZIP archive";
 
+/// ZIP file entry magic bytes
 pub fn zip_magic() -> Vec<Vec<u8>> {
     return vec![b"PK\x03\x04".to_vec()];
 }
 
-pub fn zip_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-    let mut result = signatures::common::SignatureResult {
+/// Validates a ZIP file entry signature
+pub fn zip_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+    // Success return value
+    let mut result = SignatureResult {
         offset: offset,
         description: DESCRIPTION.to_string(),
-        confidence: signatures::common::CONFIDENCE_HIGH,
+        confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };
 
+    // Parse the ZIP file header
     if let Ok(_) = parse_zip_header(&file_data[offset..]) {
         // Locate the end-of-central-directory header, which must come after the zip local file entries
         if let Ok(zip_info) = find_zip_eof(&file_data, offset) {
@@ -31,7 +33,7 @@ pub fn zip_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }
 
 struct ZipEOCDInfo {
@@ -39,14 +41,9 @@ struct ZipEOCDInfo {
     file_count: usize,
 }
 
-/*
- * Need to grep the rest of the file data to locate the end-of-central-directory header, which tells us where the ZIP file ends.
- */
-fn find_zip_eof(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<ZipEOCDInfo, signatures::common::SignatureError> {
-    // This magic string assumes that the disk_number and central_directory_disk_number are 0 (see: zip_eocd_structure)
+/// Need to grep the rest of the file data to locate the end-of-central-directory header, which tells us where the ZIP file ends.
+fn find_zip_eof(file_data: &Vec<u8>, offset: usize) -> Result<ZipEOCDInfo, SignatureError> {
+    // This magic string assumes that the disk_number and central_directory_disk_number are 0
     const ZIP_EOCD_MAGIC: &[u8; 8] = b"PK\x05\x06\x00\x00\x00\x00";
 
     // Instatiate AhoCorasick search with the ZIP EOCD magic bytes
@@ -57,14 +54,17 @@ fn find_zip_eof(
         // Calculate the start and end of the fixed-size portion of the ZIP EOCD header in the file data
         let eocd_start: usize = eocd_match.start() + offset;
 
-        if let Ok(eocd_header) = parse_eocd_header(&file_data[eocd_start..]) {
-            return Ok(ZipEOCDInfo {
-                eof: eocd_start + eocd_header.size,
-                file_count: eocd_header.file_count,
-            });
+        // Parse the end-of-central-directory header
+        if let Some(eocd_data) = file_data.get(eocd_start..) {
+            if let Ok(eocd_header) = parse_eocd_header(eocd_data) {
+                return Ok(ZipEOCDInfo {
+                    eof: eocd_start + eocd_header.size,
+                    file_count: eocd_header.file_count,
+                });
+            }
         }
     }
 
     // No valid EOCD record found :(
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

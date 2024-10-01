@@ -1,8 +1,10 @@
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
 use crate::structures::ext::parse_ext_header;
 
+/// Human readable description
 pub const DESCRIPTION: &str = "EXT filesystem";
 
+/// EXT magic bytes
 pub fn ext_magic() -> Vec<Vec<u8>> {
     /*
      * The magic bytes for EXT are only a u16, resulting in many false positives.
@@ -20,17 +22,16 @@ pub fn ext_magic() -> Vec<Vec<u8>> {
     ];
 }
 
-pub fn ext_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+/// Parse the EXT signature
+pub fn ext_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+    // Offset inside the EXT image where the magic bytes reside
     const MAGIC_OFFSET: usize = 1080;
 
-    let mut result = signatures::common::SignatureResult {
+    let mut result = SignatureResult {
         description: DESCRIPTION.to_string(),
         offset: offset - MAGIC_OFFSET,
         size: 0,
-        confidence: signatures::common::CONFIDENCE_MEDIUM,
+        confidence: CONFIDENCE_MEDIUM,
         ..Default::default()
     };
 
@@ -49,5 +50,5 @@ pub fn ext_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

@@ -1,16 +1,16 @@
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult};
 
+/// Human readable description
 pub const DESCRIPTION: &str = "PDF document";
 
+/// PDF magic bytes
 pub fn pdf_magic() -> Vec<Vec<u8>> {
     // This assumes a major version of 1
     return vec![b"%PDF-1.".to_vec()];
 }
 
-pub fn pdf_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+/// Validate a PDF signature
+pub fn pdf_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
     // More than enough data for our needs
     const MIN_PDF_SIZE: usize = 16;
 
@@ -24,7 +24,7 @@ pub fn pdf_parser(
     const ASCII_PERCENT: u8 = 0x25;
     const ASCII_CARRIGE_RETURN: u8 = 0x0D;
 
-    let mut result = signatures::common::SignatureResult {
+    let mut result = SignatureResult {
         description: DESCRIPTION.to_string(),
         offset: offset,
         size: 0,
@@ -71,5 +71,5 @@ pub fn pdf_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

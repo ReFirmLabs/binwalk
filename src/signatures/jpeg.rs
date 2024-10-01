@@ -1,8 +1,10 @@
 use crate::extractors::jpeg::extract_jpeg_image;
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
 
+/// Human readable description
 pub const DESCRIPTION: &str = "JPEG image";
 
+/// JPEG magic bytes
 pub fn jpeg_magic() -> Vec<Vec<u8>> {
     return vec![
         /*
@@ -13,14 +15,13 @@ pub fn jpeg_magic() -> Vec<Vec<u8>> {
     ];
 }
 
-pub fn jpeg_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-    let mut result = signatures::common::SignatureResult {
+/// Parse a JPEG image
+pub fn jpeg_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+    // Successful return value
+    let mut result = SignatureResult {
         offset: offset,
         description: DESCRIPTION.to_string(),
-        confidence: signatures::common::CONFIDENCE_MEDIUM,
+        confidence: CONFIDENCE_MEDIUM,
         ..Default::default()
     };
 
@@ -44,5 +45,5 @@ pub fn jpeg_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

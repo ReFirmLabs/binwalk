@@ -1,41 +1,44 @@
 use crate::common::get_cstring;
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_LOW};
 use aho_corasick::AhoCorasick;
 
+/// Human readable descriptions
 pub const LINUX_BOOT_IMAGE_DESCRIPTION: &str = "Linux kernel boot image";
 pub const LINUX_KERNEL_VERSION_DESCRIPTION: &str = "Linux kernel version";
 
+/// Magic bytes for a linux boot image
 pub fn linux_boot_image_magic() -> Vec<Vec<u8>> {
     return vec![b"\xb8\xc0\x07\x8e\xd8\xb8\x00\x90\x8e\xc0\xb9\x00\x01\x29\xf6\x29".to_vec()];
 }
 
+/// Kernel version string magic
 pub fn linux_kernel_version_magic() -> Vec<Vec<u8>> {
     return vec![b"Linux\x20version\x20".to_vec()];
 }
 
+/// Validate a linux boot image signature
 pub fn linux_boot_image_parser(
     file_data: &Vec<u8>,
     offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+) -> Result<SignatureResult, SignatureError> {
     // There should be the string "!HdrS" 514 bytes from the start of the magic signature
     const HDRS_OFFSET: usize = 514;
     const HDRS_EXPECTED_VALUE: &str = "!HdrS";
 
-    let result = signatures::common::SignatureResult {
+    let result = SignatureResult {
         description: LINUX_BOOT_IMAGE_DESCRIPTION.to_string(),
         offset: offset,
         size: 0,
         ..Default::default()
     };
 
-    // Sanity check the size of available data
-    if file_data.len() >= (offset + HDRS_OFFSET + HDRS_EXPECTED_VALUE.len()) {
-        // Calculate start and end offset of the expected !HdrS string
-        let hdrs_start: usize = offset + HDRS_OFFSET;
-        let hdrs_end: usize = hdrs_start + HDRS_EXPECTED_VALUE.len();
+    // Calculate start and end offset of the expected !HdrS string
+    let hdrs_start: usize = offset + HDRS_OFFSET;
+    let hdrs_end: usize = hdrs_start + HDRS_EXPECTED_VALUE.len();
 
+    if let Some(hdrs_bytes) = file_data.get(hdrs_start..hdrs_end) {
         // Get the string that should equal HDRS_EXPECTED_VALUE
-        if let Ok(actual_hdrs_value) = String::from_utf8(file_data[hdrs_start..hdrs_end].to_vec()) {
+        if let Ok(actual_hdrs_value) = String::from_utf8(hdrs_bytes.to_vec()) {
             // Validate that the hdrs string matches
             if actual_hdrs_value == HDRS_EXPECTED_VALUE {
                 return Ok(result);
@@ -43,13 +46,14 @@ pub fn linux_boot_image_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }
 
+/// Validate a linux kernel version signature and detect if a symbol table is present
 pub fn linux_kernel_version_parser(
     file_data: &Vec<u8>,
     offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+) -> Result<SignatureResult, SignatureError> {
     // Kernel version string format is expected to be something like:
     // "Linux version 4.9.241 (root@server2) (gcc version 10.0.1 (OpenWrt GCC 10.0.1 r12423-0493d57e04) ) #755 SMP Wed Nov 4 03:59:02 +03 2020\n"
     const PERIOD: u8 = 0x2E;
@@ -61,9 +65,9 @@ pub fn linux_kernel_version_parser(
     const MIN_VERSION_STRING_LENGTH: usize = 75;
     const GCC_VERSION_STRING: &str = "(gcc version ";
 
-    let mut result = signatures::common::SignatureResult {
+    let mut result = SignatureResult {
         offset: offset,
-        confidence: signatures::common::CONFIDENCE_LOW,
+        confidence: CONFIDENCE_LOW,
         ..Default::default()
     };
 
@@ -100,6 +104,7 @@ pub fn linux_kernel_version_parser(
                                 result.extraction_declined = true;
                             }
 
+                            // Report the result
                             result.description = format!(
                                 "{}, has symbol table: {}",
                                 kernel_version_string.trim(),
@@ -113,11 +118,14 @@ pub fn linux_kernel_version_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }
 
+/// Searches the file data for a linux symbol table
 fn has_linux_symbol_table(file_data: &[u8]) -> bool {
     let mut match_count: usize = 0;
+
+    // Same magic bytes that vmlinux-to-elf searches for
     let symtab_magic = vec![b"\x000\x001\x002\x003\x004\x005\x006\x007\x008\x009\x00"];
 
     let grep = AhoCorasick::new(symtab_magic).unwrap();

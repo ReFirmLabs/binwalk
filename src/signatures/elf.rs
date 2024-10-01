@@ -1,25 +1,26 @@
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
 use crate::structures::elf::parse_elf_header;
 
+/// Human readable description
 pub const DESCRIPTION: &str = "ELF binary";
 
+/// ELF files start with these bytes
 pub fn elf_magic() -> Vec<Vec<u8>> {
     return vec![b"\x7FELF".to_vec()];
 }
 
-pub fn elf_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
-    let mut result = signatures::common::SignatureResult {
-        size: 0,
+/// Parse and validate the ELF header
+pub fn elf_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+    // Successful result
+    let mut result = SignatureResult {
         offset: offset,
         name: "elf".to_string(),
         description: DESCRIPTION.to_string(),
-        confidence: signatures::common::CONFIDENCE_MEDIUM,
+        confidence: CONFIDENCE_MEDIUM,
         ..Default::default()
     };
 
+    // If the header is parsed successfully, consider it valid
     if let Ok(elf_header) = parse_elf_header(&file_data[offset..]) {
         result.description = format!(
             "{}, {}-bit {}, {} for {}, {} endian",
@@ -33,5 +34,5 @@ pub fn elf_parser(
         return Ok(result);
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

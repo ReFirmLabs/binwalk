@@ -1,8 +1,10 @@
 use crate::extractors::zlib::zlib_decompress;
 use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 
+/// Human readable description
 pub const DESCRIPTION: &str = "Zlib compressed file";
 
+/// Zlib magic bytes
 pub fn zlib_magic() -> Vec<Vec<u8>> {
     return vec![
         b"\x78\x9c".to_vec(),
@@ -11,10 +13,7 @@ pub fn zlib_magic() -> Vec<Vec<u8>> {
     ];
 }
 
-/*
- * NOTE: The provided offset will always be 0; this is enforced by the 'short: true' specification
- *       in the magic.rs zlib signature definition.
- */
+/// Validate a zlib signature
 pub fn zlib_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
     let result = SignatureResult {
         offset: offset,
@@ -23,12 +22,15 @@ pub fn zlib_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
         ..Default::default()
     };
 
-    // Decompress the zlib; no output directory specified, dry run only.
-    let decompression_dry_run = zlib_decompress(&file_data, offset, None);
+    // This is enforced in magic.rs, so this check is supurfulous
+    if offset == 0 {
+        // Decompress the zlib; no output directory specified, dry run only.
+        let decompression_dry_run = zlib_decompress(&file_data, offset, None);
 
-    // If the decompression dry run was a success, this signature is almost certianly valid
-    if decompression_dry_run.success == true {
-        return Ok(result);
+        // If the decompression dry run was a success, this signature is almost certianly valid
+        if decompression_dry_run.success == true {
+            return Ok(result);
+        }
     }
 
     return Err(SignatureError);

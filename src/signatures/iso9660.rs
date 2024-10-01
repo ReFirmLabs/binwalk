@@ -1,22 +1,22 @@
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 use crate::structures::iso9660::parse_iso_header;
 
+/// Human readable description
 pub const DESCRIPTION: &str = "ISO9660 primary volume";
 
+/// ISOs start with these magic bytes
 pub fn iso_magic() -> Vec<Vec<u8>> {
     return vec![b"\x01CD001\x01\x00".to_vec()];
 }
 
-pub fn iso_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+/// Validate ISO signatures
+pub fn iso_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
     // Offset from the beginning of the ISO image to the magic bytes
     const ISO_MAGIC_OFFSET: usize = 32768;
 
-    let mut result = signatures::common::SignatureResult {
+    let mut result = SignatureResult {
         description: DESCRIPTION.to_string(),
-        confidence: signatures::common::CONFIDENCE_HIGH,
+        confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };
 
@@ -25,6 +25,7 @@ pub fn iso_parser(
         // Calculate the actual starting offset of the ISO
         result.offset = offset - ISO_MAGIC_OFFSET;
 
+        // Parse the header, if parsing succeeds assume it's valid
         if let Ok(iso_header) = parse_iso_header(&file_data[result.offset..]) {
             result.size = iso_header.image_size;
             result.description =
@@ -33,5 +34,5 @@ pub fn iso_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }

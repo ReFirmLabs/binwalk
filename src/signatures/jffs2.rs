@@ -1,9 +1,11 @@
-use crate::signatures;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 use crate::structures::jffs2::{parse_jffs2_node_header, JFFS2_NODE_STRUCT_SIZE};
 use aho_corasick::AhoCorasick;
 
+/// Human readable description
 pub const DESCRIPTION: &str = "JFFS2 filesystem";
 
+/// JFFS2 magic bytes
 pub fn jffs2_magic() -> Vec<Vec<u8>> {
     /*
      * Big and little endian patterns to search for.
@@ -20,20 +22,19 @@ pub fn jffs2_magic() -> Vec<Vec<u8>> {
     ];
 }
 
-pub fn jffs2_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<signatures::common::SignatureResult, signatures::common::SignatureError> {
+/// Parse and validate a JFFS2 image
+pub fn jffs2_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+    // Useful contstants
     const MAX_PAGE_SIZE: usize = 0x10000;
     const MIN_VALID_NODE_COUNT: usize = 2;
     const JFFS2_BIG_ENDIAN_MAGIC: &[u8; 2] = b"\x19\x85";
     const JFFS2_LITTLE_ENDIAN_MAGIC: &[u8; 2] = b"\x85\x19";
 
-    let mut result = signatures::common::SignatureResult {
+    let mut result = SignatureResult {
         size: 0,
         offset: offset,
         description: DESCRIPTION.to_string(),
-        confidence: signatures::common::CONFIDENCE_HIGH,
+        confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };
 
@@ -75,17 +76,18 @@ pub fn jffs2_parser(
                     break;
                 }
 
-                // If we've run out of data, quit
-                if file_data.len() < header_end {
-                    break;
-                }
-
-                // Parse this node's header
-                if let Ok(this_node_header) =
-                    parse_jffs2_node_header(&file_data[header_start..header_end])
-                {
-                    node_count += 1;
-                    jffs2_eof = header_start + roundup(this_node_header.size);
+                // Get the node header's raw bytes
+                match file_data.get(header_start..header_end) {
+                    None => {
+                        break;
+                    }
+                    Some(node_header_data) => {
+                        // Parse this node's header
+                        if let Ok(this_node_header) = parse_jffs2_node_header(node_header_data) {
+                            node_count += 1;
+                            jffs2_eof = header_start + roundup(this_node_header.size);
+                        }
+                    }
                 }
             }
 
@@ -101,10 +103,10 @@ pub fn jffs2_parser(
         }
     }
 
-    return Err(signatures::common::SignatureError);
+    return Err(SignatureError);
 }
 
-// JFFS2 nodes are padded to a 4 byte boundary
+/// JFFS2 nodes are padded to a 4 byte boundary
 fn roundup(num: usize) -> usize {
     let base: f64 = 4.0;
     let number: f64 = num as f64;
