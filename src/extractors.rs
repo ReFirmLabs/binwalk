@@ -14,6 +14,7 @@ pub mod lz4;
 pub mod lzfse;
 pub mod lzma;
 pub mod lzop;
+pub mod mbr;
 pub mod pem;
 pub mod png;
 pub mod rar;

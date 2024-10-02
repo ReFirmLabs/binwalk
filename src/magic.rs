@@ -762,7 +762,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         magic: signatures::mbr::mbr_magic(),
         parser: signatures::mbr::mbr_parser,
         description: signatures::mbr::DESCRIPTION.to_string(),
-        extractor: None,
+        extractor: Some(extractors::mbr::mbr_extractor()),
     });
 
     return binary_signatures;
