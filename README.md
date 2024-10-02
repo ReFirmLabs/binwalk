@@ -59,7 +59,7 @@ Binwalk relies on several external command-line utilities to perform extraction.
 To install all required extraction utilities:
 
 ```
-sudo apt install p7zip-full zstd unzip tar sleuthkit cabextract lz4 lzop device-tree-compiler unrar
+sudo apt install p7zip-full zstd unzip tar sleuthkit cabextract lz4 lzop device-tree-compiler unrar unyaffs
 ```
 
 ```

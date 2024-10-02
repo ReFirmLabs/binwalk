@@ -376,7 +376,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         magic: signatures::yaffs::yaffs_magic(),
         parser: signatures::yaffs::yaffs_parser,
         description: signatures::yaffs::DESCRIPTION.to_string(),
-        extractor: Some(extractors::tsk::tsk_extractor()),
+        extractor: Some(extractors::yaffs2::yaffs2_extractor()),
     });
 
     // lz4

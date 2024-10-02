@@ -6,7 +6,7 @@ use crate::structures::yaffs::{parse_yaffs_file_header, parse_yaffs_obj_header};
 const MIN_NUMBER_OF_OBJS: usize = 2;
 
 /// Human readable description
-pub const DESCRIPTION: &str = "YAFFS filesystem";
+pub const DESCRIPTION: &str = "YAFFSv2 filesystem";
 
 /// Expect the first YAFFS entry to be either a directory (0x00000003) or file (0x00000001), big or little endian
 pub fn yaffs_magic() -> Vec<Vec<u8>> {
@@ -43,20 +43,22 @@ pub fn yaffs_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResul
             endianness = "big";
         }
 
-        // Determine the page and spare data sizes
-        let page_size = get_page_size(&file_data[offset..]);
-        let spare_size = get_spare_size(&file_data[offset..], page_size, endianness);
-
-        // Get the total image size
-        if let Ok(image_size) =
-            get_image_size(&file_data[offset..], page_size, spare_size, endianness)
-        {
-            result.size = image_size;
-            result.description = format!(
-                "{}, {} endian, page size: {}, spare size: {}, image size: {} bytes",
-                result.description, endianness, page_size, spare_size, image_size
-            );
-            return Ok(result);
+        // Determine the page
+        if let Ok(page_size) = get_page_size(&file_data[offset..]) {
+            // Deterine the chunk size
+            if let Ok(spare_size) = get_spare_size(&file_data[offset..], page_size, endianness) {
+                // Get the total image size
+                if let Ok(image_size) =
+                    get_image_size(&file_data[offset..], page_size, spare_size, endianness)
+                {
+                    result.size = image_size;
+                    result.description = format!(
+                        "{}, {} endian, page size: {}, spare size: {}, image size: {} bytes",
+                        result.description, endianness, page_size, spare_size, image_size
+                    );
+                    return Ok(result);
+                }
+            }
         }
     }
 
@@ -64,10 +66,7 @@ pub fn yaffs_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResul
 }
 
 /// Returns the detected page size used by the YAFFS image
-fn get_page_size(file_data: &[u8]) -> usize {
-    // Index in page_sizes of the YAFFS1 page size
-    const YAFFS1_PAGE_SIZE_INDEX: usize = 0;
-
+fn get_page_size(file_data: &[u8]) -> Result<usize, SignatureError> {
     // Spare area is expected to start with these bytes, depending on endianess and ECC settings (YAFFS2 only)
     let spare_magics: Vec<Vec<u8>> = vec![
         b"\x00\x00\x10\x00".to_vec(),
@@ -80,7 +79,7 @@ fn get_page_size(file_data: &[u8]) -> usize {
     let page_sizes: Vec<usize> = vec![512, 1024, 2048, 4096, 8192, 16384];
 
     // Loop through each page size looking for one that is immediately followed by a valid spare data entry.
-    // This is only for YAFFS2! It will fail for YAFFS1 images, but YAFFS1 uses a fixed page size anyway.
+    // This is only for YAFFS2! It will fail for YAFFS1 images.
     for page_size in &page_sizes {
         for spare_magic in &spare_magics {
             let start_spare_offset: usize = *page_size;
@@ -90,25 +89,27 @@ fn get_page_size(file_data: &[u8]) -> usize {
             {
                 // If this spare data starts with the expected bytes, then we've guessed the page size correctly
                 if spare_magic_candidate == *spare_magic {
-                    return *page_size;
+                    return Ok(*page_size);
                 }
             }
         }
     }
 
-    // Nothing found, try the YAFFS1 page size
-    return page_sizes[YAFFS1_PAGE_SIZE_INDEX];
+    // Nothing valid found
+    return Err(SignatureError);
 }
 
 /// Returns the detected spare size of the YAFFS image
-fn get_spare_size(file_data: &[u8], page_size: usize, endianness: &str) -> usize {
-    // Index in spare_sizes of the YAFFS1 spare size
-    const YAFFS1_SPARE_SIZE_INDEX: usize = 0;
-
+fn get_spare_size(
+    file_data: &[u8],
+    page_size: usize,
+    endianness: &str,
+) -> Result<usize, SignatureError> {
+    // Valid spare sizes
     let spare_sizes: Vec<usize> = vec![16, 32, 64, 128, 256, 512];
 
     // Loop through all spare sizes until a valid object header is found
-    // This is only for YAFFS2! It will fail for YAFFS1 images, but YAFFS1 uses a fixed spare size anyway.
+    // This is only for YAFFS2! It will fail for YAFFS1 images.
     for spare_size in &spare_sizes {
         // If this spare size is correct, this should be the location of the next object header
         let next_obj_offset: usize = (page_size + *spare_size) * MIN_NUMBER_OF_OBJS;
@@ -116,13 +117,13 @@ fn get_spare_size(file_data: &[u8], page_size: usize, endianness: &str) -> usize
         if let Some(obj_header_data) = file_data.get(next_obj_offset..) {
             // Attempt to parse this data as a YAFFS object header
             if let Ok(_) = parse_yaffs_obj_header(obj_header_data, endianness) {
-                return *spare_size;
+                return Ok(*spare_size);
             }
         }
     }
 
-    // Nothing found, try the YAFFS1 page size
-    return spare_sizes[YAFFS1_SPARE_SIZE_INDEX];
+    // Nothing valid found
+    return Err(SignatureError);
 }
 
 /// Returns the total size of the image, in bytes
