@@ -42,6 +42,13 @@ pub fn pdf_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
 
         // Sanity check the minor version number
         if version_minor <= ASCII_NINE && version_minor >= ASCII_ZERO {
+            // Update the result description to include the version number
+            result.description = format!(
+                "{}, version 1.{}",
+                result.description,
+                version_minor - ASCII_ZERO
+            );
+
             // Search the remaining bytes for new line characters followed by a percent character
             for byte in pdf_header[NEWLINE_OFFSET..].to_vec() {
                 // Any new line or carrige return byte is OK, just keep going
@@ -49,12 +56,6 @@ pub fn pdf_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
                     continue;
                 // There should be a percent character
                 } else if byte == ASCII_PERCENT {
-                    result.description = format!(
-                        "{}, version 1.{}",
-                        result.description,
-                        version_minor - ASCII_ZERO,
-                    );
-
                     return Ok(result);
                 // Anything else is invalid
                 } else {
