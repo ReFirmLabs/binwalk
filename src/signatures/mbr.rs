@@ -34,14 +34,16 @@ pub fn mbr_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
                 if mbr_header.partitions.len() > 0 {
                     // Update the reported size
                     result.size = mbr_header.image_size;
-                    
+
                     // Add partition info to the description
                     for partition in &mbr_header.partitions {
-                        result.description = format!("{}, {} partition", result.description, partition.name);
+                        result.description =
+                            format!("{}, {} partition", result.description, partition.name);
                     }
 
                     // Add total size to the description
-                    result.description = format!("{}, image size: {} bytes", result.description, result.size);
+                    result.description =
+                        format!("{}, image size: {} bytes", result.description, result.size);
 
                     // Everything looks ok
                     return Ok(result);
