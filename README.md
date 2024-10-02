@@ -31,10 +31,10 @@ sudo apt install curl
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-Additionally, entropy graphing requires the `fontconfig` library to be installed:
+Additionally, some system libraries are also required:
 
 ```
-sudo apt install libfontconfig1-dev
+sudo apt install libfontconfig1-dev liblzma-dev
 ```
 
 ### Compiling From Source
