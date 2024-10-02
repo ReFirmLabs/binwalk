@@ -15,7 +15,6 @@ pub fn pdf_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
     const MIN_PDF_SIZE: usize = 16;
 
     const NEWLINE_OFFSET: usize = 8;
-    const PERCENT_OFFSET: usize = 9;
     const MINOR_NUMBER_OFFSET: usize = 7;
 
     const ASCII_ZERO: u8 = 0x30;
@@ -31,41 +30,35 @@ pub fn pdf_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         ..Default::default()
     };
 
-    // Sanity check the size of available data
-    if file_data.len() >= (offset + MIN_PDF_SIZE) {
-        let mut win_shift = 0;
+    let newline_characters: Vec<u8> = vec![ASCII_NEWLINE, ASCII_CARRIGE_RETURN];
 
-        // PDF header is expected to start with something like: %PDF-1.7\n%
-        let newline: u8 = file_data[offset + NEWLINE_OFFSET];
+    let pdf_header_start = offset;
+    let pdf_header_end = pdf_header_start + MIN_PDF_SIZE;
 
-        // Windows does \r\n, not just \n
-        if newline == ASCII_CARRIGE_RETURN {
-            win_shift = 1;
-        }
+    // PDF header is expected to start with something like: %PDF-1.7\n%
+    if let Some(pdf_header) = file_data.get(pdf_header_start..pdf_header_end) {
+        // Get the minor version number at the expected offset
+        let version_minor: u8 = pdf_header[MINOR_NUMBER_OFFSET];
 
-        let percent: u8 = file_data[offset + PERCENT_OFFSET + win_shift];
-        let version_minor: u8 = file_data[offset + MINOR_NUMBER_OFFSET];
-
-        // Very basic validation
+        // Sanity check the minor version number
         if version_minor <= ASCII_NINE && version_minor >= ASCII_ZERO {
-            if percent == ASCII_PERCENT {
-                if newline == ASCII_NEWLINE || newline == ASCII_CARRIGE_RETURN {
-                    let os_string: String;
-
-                    if win_shift == 1 {
-                        os_string = "Windows".to_string();
-                    } else {
-                        os_string = "Unix".to_string();
-                    }
-
+            // Search the remaining bytes for new line characters followed by a percent character
+            for byte in pdf_header[NEWLINE_OFFSET..].to_vec() {
+                // Any new line or carrige return byte is OK, just keep going
+                if newline_characters.contains(&byte) {
+                    continue;
+                // There should be a percent character
+                } else if byte == ASCII_PERCENT {
                     result.description = format!(
-                        "{}, version 1.{}, created on a {} system",
+                        "{}, version 1.{}",
                         result.description,
                         version_minor - ASCII_ZERO,
-                        os_string
                     );
 
                     return Ok(result);
+                // Anything else is invalid
+                } else {
+                    break;
                 }
             }
         }
