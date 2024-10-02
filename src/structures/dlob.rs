@@ -5,7 +5,7 @@ pub struct DlobHeader {
     pub size: usize,
 }
 
-/// Parses a DLOG header
+/// Parses a DLOB header
 pub fn parse_dlob_header(dlob_data: &[u8]) -> Result<DlobHeader, StructureError> {
     // Expected file offsets & sizes
     const DLOB_HEADER_SIZE: usize = 108;

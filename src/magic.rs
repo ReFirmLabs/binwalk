@@ -753,5 +753,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         extractor: Some(extractors::lzfse::lzfse_extractor()),
     });
 
+    // MBR
+    binary_signatures.push(signatures::common::Signature {
+        name: "mbr".to_string(),
+        short: true,
+        magic_offset: signatures::mbr::MAGIC_OFFSET,
+        always_display: false,
+        magic: signatures::mbr::mbr_magic(),
+        parser: signatures::mbr::mbr_parser,
+        description: signatures::mbr::DESCRIPTION.to_string(),
+        extractor: None,
+    });
+
     return binary_signatures;
 }

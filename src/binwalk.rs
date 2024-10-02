@@ -216,11 +216,11 @@ impl Binwalk {
         let mut file_map: Vec<signatures::common::SignatureResult> = vec![];
 
         /*
-         * Check beginning of file for shot signatures.
+         * Check beginning of file for short signatures.
          * These signatures are only valid if they occur at the very beginning of a file.
-         * This is typically because the signatures are very short and they are unlikely
+         * This is typically because the signatures are very short and they are likely
          * to occur randomly throughout the file, so this prevents having to validate many
-         * false positve matches throughout the file.
+         * false positve matches.
          */
         for signature in &self.short_signatures {
             for magic in signature.magic.clone() {
