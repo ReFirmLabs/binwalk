@@ -666,7 +666,7 @@ fn include_signature(
         return false;
     }
 
-    if let Some(exclude_signatures) = exclude {
+    if let Some(exclude_signatures) = exclude_opcode_signatures(exclude) {
         for exclude_str in exclude_signatures {
             if signature.name.to_lowercase() == exclude_str.to_lowercase() {
                 return false;
@@ -677,6 +677,23 @@ fn include_signature(
     }
 
     return true;
+}
+
+/// Opcode signatures are excluded by default
+fn exclude_opcode_signatures(exclude_list: &Option<Vec<String>>) -> Option<Vec<String>> {
+    let mut exclude_sigs: Vec<String>;
+
+    match exclude_list {
+        None => {
+            exclude_sigs = vec![magic::OPCODES.to_string()];
+        }
+        Some(user_exclude_list) => {
+            exclude_sigs = user_exclude_list.clone();
+            exclude_sigs.push(magic::OPCODES.to_string());
+        }
+    }
+
+    return Some(exclude_sigs);
 }
 
 /// Some SignatureResult fields need to be auto-populated.

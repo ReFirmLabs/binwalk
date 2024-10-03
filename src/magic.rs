@@ -1,6 +1,9 @@
 use crate::extractors;
 use crate::signatures;
 
+/// All opcode signatures must define this as their Signature name
+pub const OPCODES: &str = "opcodes";
+
 /// Returns a list of all supported signatures, including their "magic" byte patterns, parser functions, and any associated extractor.
 pub fn patterns() -> Vec<signatures::common::Signature> {
     let mut binary_signatures: Vec<signatures::common::Signature> = vec![];
@@ -786,6 +789,18 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         magic: signatures::pjl::pjl_magic(),
         parser: signatures::pjl::pjl_parser,
         description: signatures::pjl::DESCRIPTION.to_string(),
+        extractor: None,
+    });
+
+    // CPU opcodes (excluded by default, see: binwalk::exclude_opcode_signatures)
+    binary_signatures.push(signatures::common::Signature {
+        name: OPCODES.to_string(),
+        short: false,
+        magic_offset: 0,
+        always_display: true,
+        magic: signatures::opcodes::opcode_magic(),
+        parser: signatures::opcodes::opcode_parser,
+        description: signatures::opcodes::DESCRIPTION.to_string(),
         extractor: None,
     });
 
