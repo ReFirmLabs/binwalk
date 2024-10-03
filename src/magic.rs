@@ -765,5 +765,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         extractor: Some(extractors::mbr::mbr_extractor()),
     });
 
+    // tp-link
+    binary_signatures.push(signatures::common::Signature {
+        name: "tplink".to_string(),
+        short: false,
+        magic_offset: 0,
+        always_display: false,
+        magic: signatures::tplink::tplink_magic(),
+        parser: signatures::tplink::tplink_parser,
+        description: signatures::tplink::DESCRIPTION.to_string(),
+        extractor: None,
+    });
+
     return binary_signatures;
 }

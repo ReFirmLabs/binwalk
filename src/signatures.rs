@@ -44,6 +44,7 @@ pub mod sevenzip;
 pub mod squashfs;
 pub mod srec;
 pub mod tarball;
+pub mod tplink;
 pub mod trx;
 pub mod ubi;
 pub mod uefi;

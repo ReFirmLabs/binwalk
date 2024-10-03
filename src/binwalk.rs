@@ -212,6 +212,8 @@ impl Binwalk {
         let mut index_adjustment: usize = 0;
         let mut next_valid_offset: usize = 0;
 
+        let available_data = file_data.len();
+
         // A list of identified signatures, representing a "map" of the file data
         let mut file_map: Vec<signatures::common::SignatureResult> = vec![];
 
@@ -297,6 +299,14 @@ impl Binwalk {
              * An error indicates a false positive match for the signature type.
              */
             if let Ok(mut signature_result) = (signature.parser)(&file_data, magic_offset) {
+                let signature_end_offset = signature_result.offset + signature_result.size;
+
+                // Sanity check the reported offset and size vs file size
+                if signature_end_offset > available_data {
+                    info!("Signature {} extends beyond EOF; ignoring", signature.name);
+                    continue;
+                }
+
                 // Auto populate some signature result fields
                 signature_result_auto_populate(&mut signature_result, &signature);
 
