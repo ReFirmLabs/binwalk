@@ -34,6 +34,7 @@ pub mod pchrom;
 pub mod pdf;
 pub mod pe;
 pub mod pem;
+pub mod pjl;
 pub mod png;
 pub mod qnx;
 pub mod rar;

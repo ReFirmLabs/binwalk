@@ -104,7 +104,6 @@ pub fn parse_mbr_image(mbr_data: &[u8]) -> Result<MBRHeader, StructureError> {
                             // Some valid MBRs have partitions that start/end out of bounds WRT the disk image.
                             // Not sure why? At any rate, don't include them in the reported partitions.
                             if this_partition_end_offset <= mbr_data.len() {
-
                                 // Don't report the partition where the MBR header resides
                                 if this_partition.start != 0 {
                                     // Add it to the list of partitions

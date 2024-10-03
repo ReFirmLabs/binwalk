@@ -777,5 +777,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         extractor: None,
     });
 
+    // HP PJL
+    binary_signatures.push(signatures::common::Signature {
+        name: "pjl".to_string(),
+        short: false,
+        magic_offset: 0,
+        always_display: false,
+        magic: signatures::pjl::pjl_magic(),
+        parser: signatures::pjl::pjl_parser,
+        description: signatures::pjl::DESCRIPTION.to_string(),
+        extractor: None,
+    });
+
     return binary_signatures;
 }
