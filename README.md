@@ -26,7 +26,7 @@ than previous Binwalk releases.
 
 ### JSON Output
 
-Analysis and extraction results can be saved in [JSON format](#json-output), making Binwalk results easily ingestible by other tools.
+Analysis and extraction results can be saved in [JSON format](#json-logging), making Binwalk results easily ingestible by other tools.
 
 ## Supported Platforms
 
