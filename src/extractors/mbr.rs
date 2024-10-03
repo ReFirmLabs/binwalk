@@ -1,5 +1,5 @@
 use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
-use crate::structures::mbr::parse_mbr_header;
+use crate::structures::mbr::parse_mbr_image;
 
 /// Defines the internal extractor function for MBR partitions
 pub fn mbr_extractor() -> Extractor {
@@ -23,7 +23,7 @@ pub fn extract_mbr_partitions(
     let available_data = file_data.len() - offset;
 
     // Parse the MBR header
-    if let Ok(mbr_header) = parse_mbr_header(&file_data[offset..]) {
+    if let Ok(mbr_header) = parse_mbr_image(&file_data[offset..]) {
         // Make sure there is at least one valid partition
         if mbr_header.partitions.len() > 0 {
             // Make sure the reported size of the MBR does not extend beyond EOF

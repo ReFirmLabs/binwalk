@@ -758,7 +758,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         name: "mbr".to_string(),
         short: true,
         magic_offset: signatures::mbr::MAGIC_OFFSET,
-        always_display: false,
+        always_display: true,
         magic: signatures::mbr::mbr_magic(),
         parser: signatures::mbr::mbr_parser,
         description: signatures::mbr::DESCRIPTION.to_string(),

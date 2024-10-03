@@ -11,7 +11,8 @@ pub fn zip_extractor() -> extractors::common::Extractor {
             "''".to_string(), // Just use a blank password
             extractors::common::SOURCE_FILE_PLACEHOLDER.to_string(),
         ],
-        exit_codes: vec![0],
+        // Exit code 2 occurs when a CRC fails; files are still extracted though
+        exit_codes: vec![0, 2],
         ..Default::default()
     };
 }

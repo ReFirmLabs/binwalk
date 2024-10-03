@@ -16,8 +16,8 @@ pub struct MBRHeader {
     pub partitions: Vec<MBRPartition>,
 }
 
-/// Parse a MBR header
-pub fn parse_mbr_header(mbr_data: &[u8]) -> Result<MBRHeader, StructureError> {
+/// Parse a Master Boot Record image
+pub fn parse_mbr_image(mbr_data: &[u8]) -> Result<MBRHeader, StructureError> {
     const BLOCK_SIZE: usize = 512;
     const MIN_IMAGE_SIZE: usize = BLOCK_SIZE * 2;
 
@@ -39,6 +39,7 @@ pub fn parse_mbr_header(mbr_data: &[u8]) -> Result<MBRHeader, StructureError> {
         (0x43, "Linux"),
         (0x4D, "QNX Primary Volume"),
         (0x4E, "QNX Secondary Volume"),
+        (0x81, "Minix"),
         (0x83, "Linux"),
         (0x8E, "Linux LVM"),
         (0x96, "ISO-9660"),
@@ -96,16 +97,24 @@ pub fn parse_mbr_header(mbr_data: &[u8]) -> Result<MBRHeader, StructureError> {
                                 name: this_partition_name.to_string(),
                             };
 
-                            // Add it to the list of partitions
-                            mbr_header.partitions.push(this_partition.clone());
-
                             // Calculate where this partition ends
                             let this_partition_end_offset =
                                 this_partition.start + this_partition.size;
 
-                            // Image size is the end of the farthest away partition
-                            if this_partition_end_offset > mbr_header.image_size {
-                                mbr_header.image_size = this_partition_end_offset;
+                            // Some valid MBRs have partitions that start/end out of bounds WRT the disk image.
+                            // Not sure why? At any rate, don't include them in the reported partitions.
+                            if this_partition_end_offset <= mbr_data.len() {
+
+                                // Don't report the partition where the MBR header resides
+                                if this_partition.start != 0 {
+                                    // Add it to the list of partitions
+                                    mbr_header.partitions.push(this_partition.clone());
+                                }
+
+                                // Image size is the end of the farthest away partition
+                                if this_partition_end_offset > mbr_header.image_size {
+                                    mbr_header.image_size = this_partition_end_offset;
+                                }
                             }
                         }
                     }

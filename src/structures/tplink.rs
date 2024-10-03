@@ -16,6 +16,7 @@ pub fn parse_tplink_header(tplink_data: &[u8]) -> Result<TPLinkFirmwareHeader, S
     // Total size of the firmware header
     const HEADER_SIZE: usize = 0x200;
 
+    // https://github.com/jtreml/firmware-mod-kit/blob/master/src/tpl-tool/doc/Image_layout
     let tplink_structure = vec![
         ("product_id", "u32"),
         ("product_version", "u32"),

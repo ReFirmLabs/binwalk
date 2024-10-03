@@ -1,6 +1,6 @@
 use crate::extractors::mbr::extract_mbr_partitions;
 use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
-use crate::structures::mbr::parse_mbr_header;
+use crate::structures::mbr::parse_mbr_image;
 
 /// Human readable description
 pub const DESCRIPTION: &str = "DOS Master Boot Record";
@@ -37,11 +37,17 @@ pub fn mbr_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
                 result.size = mbr_total_size;
 
                 // Parse the MBR header
-                if let Ok(mbr_header) = parse_mbr_header(&file_data[result.offset..]) {
-                    // Add partition info to the description
+                if let Ok(mbr_header) = parse_mbr_image(&file_data[result.offset..]) {
+                    // Examine all reported partitions
                     for partition in &mbr_header.partitions {
+                        // Carving out partitions starting at offset 0 would result in infinite recurstion during recursive extraction!
+                        if partition.start == result.offset {
+                            result.extraction_declined = true;
+                        }
+
+                        // Add partition info to the description
                         result.description =
-                            format!("{}, {} partition", result.description, partition.name);
+                            format!("{}, partition: {}", result.description, partition.name);
                     }
 
                     // Add total size to the description
