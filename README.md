@@ -13,7 +13,7 @@ While the usage and output is similar to that of previous Binwalk releases, this
 While Binwalk still fundamentally relies on identifying files and data based on their [magic signatures](https://en.wikipedia.org/wiki/Magic_number_(programming)#In_files),
 each signature has an associated file parser which is repsonsible for parsing the expected file format and validating the data for correctness.
 
-Signatures that are deemed to be valid have an associated [confidence level](#command_line_output), indicating how confident the file parser is in the accuracy of the reported result.
+Signatures that are deemed to be valid have an associated [confidence level](#command-line-output), indicating how confident the file parser is in the accuracy of the reported result.
 
 This results in fewer false positives, more reliable file extraction, and more detailed analysis results.
 
@@ -26,7 +26,7 @@ than previous Binwalk releases.
 
 ### JSON Output
 
-Analysis and extraction results can be saved in [JSON format](#json_output), making Binwalk results easily ingestible by other tools.
+Analysis and extraction results can be saved in [JSON format](#json-output), making Binwalk results easily ingestible by other tools.
 
 ## Supported Platforms
 
