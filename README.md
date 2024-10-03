@@ -207,7 +207,7 @@ level of randomness displayed on the y axis and the file offset displayed on the
 Randomness is calculated on a unit-less scale of `0` (not random at all) to `8` (very random). Since compressed and encrypted data is, by nature, very random,
 this is useful for identifying sections of a file that have been compressed or encrypted.
 
-## JSON Output
+## JSON Logging
 
 The JSON logs (`--log`) include more detailed signature and extraction information than is reported on the command line.
 
