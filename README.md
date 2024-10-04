@@ -44,7 +44,7 @@ sudo apt install curl
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-Additionally, some system libraries are also required:
+Some system libraries are also required:
 
 ```
 sudo apt install libfontconfig1-dev liblzma-dev
