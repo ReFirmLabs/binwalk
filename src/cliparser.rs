@@ -27,6 +27,10 @@ pub struct CliArgs {
     #[arg(short = 'E', long, conflicts_with = "extract")]
     pub entropy: bool,
 
+    /// Scan file for executable opcode signatures
+    #[arg(short = 'A', long)]
+    pub opcodes: bool,
+
     /// Log JSON results to a file
     #[arg(short, long)]
     pub log: Option<String>,

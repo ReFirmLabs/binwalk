@@ -126,34 +126,40 @@ To list all supported file types and required extraction utilities:
 binwalk --list
 ```
 
-To scan a file's contents:
+Scan a file's contents:
 
 ```
 binwalk file_name.bin
 ```
 
-To exclude specific signatures from a scan:
+Exclude specific signatures from a scan:
 
 ```
 binwalk --exclude=jpeg,png,pdf file_name.bin
 ```
 
-To only serch for specific signatures during a scan:
+Only serch for specific signatures during a scan:
 
 ```
 binwalk --include=jpeg,png,pdf file_name.bin
 ```
 
-To scan a file and extract its contents (default output directory is `extractions`):
+Scan a file and extract its contents (default output directory is `extractions`):
 
 ```
 binwalk -e file_name.bin
 ```
 
-To recursively scan and extract a file's contents:
+Recursively scan and extract a file's contents:
 
 ```
 binwalk -Me file_name.bin
+```
+
+Scan a file for raw CPU opcodes:
+
+```
+binwalk -A file_name.bin
 ```
 
 Generate an entropy graph of the specified file (a PNG image will be saved to the current working directory):
@@ -162,7 +168,7 @@ Generate an entropy graph of the specified file (a PNG image will be saved to th
 binwalk -E file_name.bin
 ```
 
-To save signature or entropy analysis results to a JSON file:
+Save signature or entropy analysis results to a JSON file:
 
 ```
 binwalk --log=results.json file_name.bin
