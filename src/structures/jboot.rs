@@ -1,4 +1,4 @@
-use crate::common::get_cstring;
+use crate::common::{crc32, get_cstring};
 use crate::structures::common::{self, StructureError};
 use std::collections::HashMap;
 
@@ -51,6 +51,9 @@ pub fn parse_jboot_arm_header(jboot_data: &[u8]) -> Result<JBOOTArmHeader, Struc
         ("header_checksum", "u16"),
     ];
 
+    let structure_size: usize = common::size(&arm_structure);
+    let header_size: usize = structure_size + STRUCTURE_OFFSET;
+
     if let Some(header_data) = jboot_data.get(STRUCTURE_OFFSET..) {
         // Parse the header structure
         if let Ok(arm_header) = common::parse(header_data, &arm_structure, "little") {
@@ -70,9 +73,8 @@ pub fn parse_jboot_arm_header(jboot_data: &[u8]) -> Result<JBOOTArmHeader, Struc
                     && arm_header["header_id"] == HEADER_ID_VALUE
                     && arm_header["header_version"] == HEADER_VERSION_VALUE
                 {
-                    // TODO: Validate header checksum
                     return Ok(JBOOTArmHeader {
-                        header_size: STRUCTURE_OFFSET + common::size(&arm_structure),
+                        header_size: header_size,
                         rom_id: get_cstring(&jboot_data[0..STRUCTURE_OFFSET]),
                         data_size: arm_header["data_size"],
                         data_offset: arm_header["data_start"],
@@ -122,7 +124,6 @@ pub fn parse_jboot_stag_header(jboot_data: &[u8]) -> Result<JBOOTStagHeader, Str
         result.is_factory_image = stag_header["cmark"] == FACTORY_IMAGE_TYPE;
         result.is_sysupgrade_image = stag_header["cmark"] == stag_header["id"];
 
-        // TODO: Validate checksums
         if result.is_factory_image || result.is_sysupgrade_image {
             return Ok(result);
         }
@@ -137,8 +138,7 @@ pub struct JBOOTSchHeader {
     pub compression: String,
     pub kernel_size: usize,
     pub kernel_entry_point: usize,
-    pub rootfs_address: usize,
-    pub rootfs_size: usize,
+    pub kernel_checksum: usize,
 }
 
 /// Parses a JBOOT SCH2 header
@@ -170,21 +170,47 @@ pub fn parse_jboot_sch2_header(jboot_data: &[u8]) -> Result<JBOOTSchHeader, Stru
     };
 
     if let Ok(sch2_header) = common::parse(jboot_data, &sch2_structure, "little") {
+        // Sanity check some header fields
         if sch2_header["version"] == VERSION_VALUE {
             if sch2_header["header_size"] == result.header_size {
                 if compression_types.contains_key(&sch2_header["compression_type"]) {
-                    // TODO: Validate checksums
-                    result.compression =
-                        compression_types[&sch2_header["compression_type"]].to_string();
-                    result.kernel_size = sch2_header["kernel_image_size"];
-                    result.kernel_entry_point = sch2_header["ram_entry_address"];
-                    result.rootfs_address = sch2_header["rootfs_flash_address"];
-                    result.rootfs_size = sch2_header["rootfs_size"];
-                    return Ok(result);
+                    // Validate the header checksum
+                    if let Some(header_bytes) = jboot_data.get(0..sch2_header["header_size"]) {
+                        if sch2_header_crc(header_bytes) == sch2_header["header_crc"] {
+                            result.compression =
+                                compression_types[&sch2_header["compression_type"]].to_string();
+                            result.kernel_checksum = sch2_header["kernel_image_crc"];
+                            result.kernel_size = sch2_header["kernel_image_size"];
+                            result.kernel_entry_point = sch2_header["ram_entry_address"];
+                            return Ok(result);
+                        }
+                    }
                 }
             }
         }
     }
 
     return Err(StructureError);
+}
+
+/// Calculate a JBOOT SCH2 header CRC
+fn sch2_header_crc(sch2_header_bytes: &[u8]) -> usize {
+    // Start and end offsets of the header CRC field
+    const HEADER_CRC_START: usize = 32;
+    const HEADER_CRC_END: usize = 36;
+
+    let mut crc: usize = 0;
+
+    if sch2_header_bytes.len() > HEADER_CRC_END {
+        let mut crc_data: Vec<u8> = sch2_header_bytes.to_vec();
+
+        // Header CRC field has to be NULL'd out
+        for i in HEADER_CRC_START..HEADER_CRC_END {
+            crc_data[i] = 0;
+        }
+
+        crc = crc32(&crc_data) as usize;
+    }
+
+    return crc;
 }

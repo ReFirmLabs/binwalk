@@ -7,6 +7,7 @@ pub mod dtb;
 pub mod dumpifs;
 pub mod gzip;
 pub mod inflate;
+pub mod jboot;
 pub mod jffs2;
 pub mod jpeg;
 pub mod linux;

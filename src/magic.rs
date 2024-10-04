@@ -837,7 +837,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         magic: signatures::jboot::jboot_sch2_magic(),
         parser: signatures::jboot::jboot_sch2_parser,
         description: signatures::jboot::JBOOT_SCH2_DESCRIPTION.to_string(),
-        extractor: None,
+        extractor: Some(extractors::jboot::sch2_extractor()),
     });
 
     return binary_signatures;
