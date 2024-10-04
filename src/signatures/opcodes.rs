@@ -89,6 +89,26 @@ fn supported_opcodes() -> Vec<OpCode> {
             disassembler: x86_64,
             description: "Intel 64 bit indirect branch termination".to_string(),
         },
+        // ARM32 LE function call
+        OpCode {
+            // blx
+            magic: b"\xFF\xF7".to_vec(),
+            offset: 0,
+            size: 8,
+            insns: 2,
+            disassembler: arm_le,
+            description: "ARM 32 bit little endian function call".to_string(),
+        },
+        // ARM32 BE function prologue
+        OpCode {
+            // STMFD SP!, {XX}
+            magic: b"\xE9\x2D".to_vec(),
+            offset: 0,
+            size: 8,
+            insns: 2,
+            disassembler: arm_be,
+            description: "ARM 32 bit big endian function prologue".to_string(),
+        },
     ];
 
     return opcode_definitions;
@@ -210,6 +230,37 @@ fn x86_64() -> Result<Capstone, SignatureError> {
     match Capstone::new()
         .x86()
         .mode(arch::x86::ArchMode::Mode64)
+        .build()
+    {
+        Err(e) => {
+            error!("Failed to initialize Capstone: {}", e);
+            return Err(SignatureError);
+        }
+        Ok(cs) => {
+            return Ok(cs);
+        }
+    }
+}
+
+/// Insantiates Capstone for 32-bit ARM
+fn arm_le() -> Result<Capstone, SignatureError> {
+    match Capstone::new().arm().mode(arch::arm::ArchMode::Arm).build() {
+        Err(e) => {
+            error!("Failed to initialize Capstone: {}", e);
+            return Err(SignatureError);
+        }
+        Ok(cs) => {
+            return Ok(cs);
+        }
+    }
+}
+
+/// Insantiates Capstone for 32-bit ARMBE
+fn arm_be() -> Result<Capstone, SignatureError> {
+    match Capstone::new()
+        .arm()
+        .mode(arch::arm::ArchMode::Arm)
+        .endian(Endian::Big)
         .build()
     {
         Err(e) => {
