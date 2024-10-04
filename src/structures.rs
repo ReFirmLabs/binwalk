@@ -87,6 +87,7 @@ pub mod elf;
 pub mod ext;
 pub mod gzip;
 pub mod iso9660;
+pub mod jboot;
 pub mod jffs2;
 pub mod lz4;
 pub mod lzfse;

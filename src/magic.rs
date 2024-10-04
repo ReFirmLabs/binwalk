@@ -804,5 +804,41 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         extractor: None,
     });
 
+    // JBOOT ARM firmware image
+    binary_signatures.push(signatures::common::Signature {
+        name: "jboot_arm".to_string(),
+        short: false,
+        magic_offset: 0,
+        always_display: false,
+        magic: signatures::jboot::jboot_arm_magic(),
+        parser: signatures::jboot::jboot_arm_parser,
+        description: signatures::jboot::JBOOT_ARM_DESCRIPTION.to_string(),
+        extractor: None,
+    });
+
+    // JBOOT STAG header
+    binary_signatures.push(signatures::common::Signature {
+        name: "jboot_stag".to_string(),
+        short: false,
+        magic_offset: 0,
+        always_display: false,
+        magic: signatures::jboot::jboot_stag_magic(),
+        parser: signatures::jboot::jboot_stag_parser,
+        description: signatures::jboot::JBOOT_STAG_DESCRIPTION.to_string(),
+        extractor: None,
+    });
+
+    // JBOOT SCH2 header
+    binary_signatures.push(signatures::common::Signature {
+        name: "jboot_sch2".to_string(),
+        short: false,
+        magic_offset: 0,
+        always_display: false,
+        magic: signatures::jboot::jboot_sch2_magic(),
+        parser: signatures::jboot::jboot_sch2_parser,
+        description: signatures::jboot::JBOOT_SCH2_DESCRIPTION.to_string(),
+        extractor: None,
+    });
+
     return binary_signatures;
 }

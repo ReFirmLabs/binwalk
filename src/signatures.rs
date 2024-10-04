@@ -20,6 +20,7 @@ pub mod gpg;
 pub mod gzip;
 pub mod hashes;
 pub mod iso9660;
+pub mod jboot;
 pub mod jffs2;
 pub mod jpeg;
 pub mod linux;
