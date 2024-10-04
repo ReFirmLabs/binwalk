@@ -14,10 +14,10 @@ type Disassembler = fn() -> Result<Capstone, SignatureError>;
 #[derive(Debug, Clone)]
 struct OpCode {
     /// The magic bytes to search for
-    pub magics: Vec<Vec<u8>>,
+    pub magic: Vec<u8>,
     /// The offset of the magic bytes from the beginning of the opcode
     pub offset: usize,
-    /// Number of bytes required for valiating this opcode signature
+    /// Number of bytes to disassemble
     pub size: usize,
     /// Number of instructions that should be disassembled
     pub insns: usize,
@@ -33,7 +33,7 @@ fn supported_opcodes() -> Vec<OpCode> {
     let opcode_definitions: Vec<OpCode> = vec![
         // MIPS32 big endian function prologue
         OpCode {
-            magics: vec![b"\x27\xBD\xFF".to_vec()],
+            magic: b"\x27\xBD\xFF".to_vec(),
             offset: 0,
             size: 8,
             insns: 2,
@@ -42,24 +42,33 @@ fn supported_opcodes() -> Vec<OpCode> {
         },
         // MIPS32 little endian function prologue
         OpCode {
-            magics: vec![b"\xFF\xBD\x27".to_vec()],
+            magic: b"\xFF\xBD\x27".to_vec(),
             offset: 1,
             size: 8,
             insns: 2,
             disassembler: mips_le,
             description: "MIPS 32 bit little endian function prologue".to_string(),
         },
-        // x86
+        // x86 function prologue
         OpCode {
-            magics: vec![
-                b"\x55\x89\xE5\x83\xEC".to_vec(),
-                b"\x55\x89\xE5\x57\x56".to_vec(),
-            ],
+            // move ebp, esp
+            // push edi
+            magic: b"\x55\x89\xE5".to_vec(),
             offset: 0,
-            size: 5,
-            insns: 3,
+            size: 3,
+            insns: 2,
             disassembler: x86_32,
-            description: "x86 32 bit function prologue".to_string(),
+            description: "Intel 32 bit function prologue".to_string(),
+        },
+        // x86 endbr32
+        OpCode {
+            magic: b"\xF3\x0F\x1E\xFB".to_vec(),
+            offset: 0,
+            size: 4,
+            insns: 1,
+            disassembler: x86_32,
+            description: "Intel 32 bit indirect branch termination (compatibility mode)"
+                .to_string(),
         },
     ];
 
@@ -71,9 +80,7 @@ pub fn opcode_magic() -> Vec<Vec<u8>> {
     let mut opcode_magics: Vec<Vec<u8>> = vec![];
 
     for opcode_definition in supported_opcodes() {
-        for opcode_magic in opcode_definition.magics {
-            opcode_magics.push(opcode_magic.clone());
-        }
+        opcode_magics.push(opcode_definition.magic.clone());
     }
 
     return opcode_magics;
@@ -93,23 +100,30 @@ pub fn opcode_parser(
 
     // Loop through all supported opcode definitions
     for opcode_definition in supported_opcodes() {
-        // Calculate the start and end offsets for this opcode
-        let opcode_start = offset - opcode_definition.offset;
-        let opcode_end = opcode_start + opcode_definition.size;
+        if let Some(match_bytes) = file_data.get(offset..offset + opcode_definition.magic.len()) {
+            // If the sample bytes match the magic bytes defined here, let's try to disassemble them
+            if match_bytes == opcode_definition.magic {
+                // Calculate the start and end offsets for this opcode
+                let opcode_start = offset - opcode_definition.offset;
+                let opcode_end = opcode_start + opcode_definition.size;
 
-        // Get the opcode raw bytes
-        if let Some(raw_opcode_bytes) = file_data.get(opcode_start..opcode_end) {
-            // Build this CPU disassembler instance
-            if let Ok(cs) = (opcode_definition.disassembler)() {
-                // Attempt to disassemble the bytes
-                if let Ok(insns) = cs.disasm_all(raw_opcode_bytes, 0) {
-                    // If the number of disassembled instructions equals the expected number of instructions, consider this signature valid
-                    if insns.len() == opcode_definition.insns {
-                        result.offset = opcode_start;
-                        result.size = opcode_definition.size;
-                        result.description =
-                            format!("{}: {}", result.description, opcode_definition.description);
-                        return Ok(result);
+                // Get the opcode raw bytes
+                if let Some(raw_opcode_bytes) = file_data.get(opcode_start..opcode_end) {
+                    // Build this CPU disassembler instance
+                    if let Ok(cs) = (opcode_definition.disassembler)() {
+                        // Attempt to disassemble the bytes
+                        if let Ok(insns) = cs.disasm_all(raw_opcode_bytes, 0) {
+                            // If the number of disassembled instructions equals the expected number of instructions, consider this signature valid
+                            if insns.len() == opcode_definition.insns {
+                                result.offset = opcode_start;
+                                result.size = opcode_definition.size;
+                                result.description = format!(
+                                    "{}: {}",
+                                    result.description, opcode_definition.description
+                                );
+                                return Ok(result);
+                            }
+                        }
                     }
                 }
             }
