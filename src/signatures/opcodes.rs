@@ -109,6 +109,16 @@ fn supported_opcodes() -> Vec<OpCode> {
             disassembler: arm_be,
             description: "ARM 32 bit big endian function prologue".to_string(),
         },
+        // ARM32 LE function return
+        OpCode {
+            // ret
+            magic: b"\xC0\x03\x5F\xD6".to_vec(),
+            offset: 0,
+            size: 4,
+            insns: 1,
+            disassembler: arm64_le,
+            description: "ARM 64 bit little endian function return".to_string(),
+        },
     ];
 
     return opcode_definitions;
@@ -261,6 +271,23 @@ fn arm_be() -> Result<Capstone, SignatureError> {
         .arm()
         .mode(arch::arm::ArchMode::Arm)
         .endian(Endian::Big)
+        .build()
+    {
+        Err(e) => {
+            error!("Failed to initialize Capstone: {}", e);
+            return Err(SignatureError);
+        }
+        Ok(cs) => {
+            return Ok(cs);
+        }
+    }
+}
+
+/// Insantiates Capstone for 64-bit ARM
+fn arm64_le() -> Result<Capstone, SignatureError> {
+    match Capstone::new()
+        .arm64()
+        .mode(arch::arm64::ArchMode::Arm)
         .build()
     {
         Err(e) => {
