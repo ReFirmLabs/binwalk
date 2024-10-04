@@ -120,7 +120,7 @@ sudo pip3 install --upgrade git+https://github.com/marin-m/vmlinux-to-elf
 
 ## Usage
 
-To list all supported file types and required extraction utilities:
+List all signatures and required extraction utilities:
 
 ```
 binwalk --list
