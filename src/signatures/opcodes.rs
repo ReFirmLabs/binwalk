@@ -67,8 +67,27 @@ fn supported_opcodes() -> Vec<OpCode> {
             size: 4,
             insns: 1,
             disassembler: x86_32,
-            description: "Intel 32 bit indirect branch termination (compatibility mode)"
-                .to_string(),
+            description: "Intel 32 bit indirect branch termination".to_string(),
+        },
+        // x86_64 function prologue
+        OpCode {
+            // push rbp
+            // move rbp, rsp
+            magic: b"\x55\x48\x89\xE5".to_vec(),
+            offset: 0,
+            size: 4,
+            insns: 2,
+            disassembler: x86_64,
+            description: "Intel 64 bit function prologue".to_string(),
+        },
+        // x86_64 endbr64
+        OpCode {
+            magic: b"\xF3\x0F\x1E\xFA".to_vec(),
+            offset: 0,
+            size: 4,
+            insns: 1,
+            disassembler: x86_64,
+            description: "Intel 64 bit indirect branch termination".to_string(),
         },
     ];
 
@@ -174,6 +193,23 @@ fn x86_32() -> Result<Capstone, SignatureError> {
     match Capstone::new()
         .x86()
         .mode(arch::x86::ArchMode::Mode32)
+        .build()
+    {
+        Err(e) => {
+            error!("Failed to initialize Capstone: {}", e);
+            return Err(SignatureError);
+        }
+        Ok(cs) => {
+            return Ok(cs);
+        }
+    }
+}
+
+/// Insantiates Capstone for 64-bit Intel
+fn x86_64() -> Result<Capstone, SignatureError> {
+    match Capstone::new()
+        .x86()
+        .mode(arch::x86::ArchMode::Mode64)
         .build()
     {
         Err(e) => {
