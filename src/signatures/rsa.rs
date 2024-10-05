@@ -199,7 +199,7 @@ struct RSAKeyInfo {
 
 /// Parse and validate key data based on the provided key definition
 fn rsa_key_parser(
-    key_data: &[u8],
+    raw_data: &[u8],
     key_definition: &RSAKeyDefinition,
 ) -> Result<RSAKeyInfo, SignatureError> {
     // Expected constant values
@@ -215,7 +215,9 @@ fn rsa_key_parser(
     };
 
     // This is the farthest offset we'll need to index into the key data
-    if key_data.len() > key_definition.terminator_offset {
+    let key_data_len: usize = key_definition.terminator_offset + std::mem::size_of::<u8>();
+
+    if let Some(key_data) = raw_data.get(0..key_data_len) {
         // Check the terminator byte
         if key_data[key_definition.terminator_offset] == TERMINATOR_BYTE {
             // Get the key ID
@@ -251,7 +253,7 @@ fn rsa_key_parser(
                             // Got 'em!
                             if key_bytes == expected_bytes {
                                 result.bits = key_definition.key_size;
-                                result.data_size = key_definition.terminator_offset + 1;
+                                result.data_size = key_data_len;
                                 return Ok(result);
                             }
                         }
