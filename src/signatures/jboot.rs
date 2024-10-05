@@ -1,6 +1,6 @@
 use crate::extractors::jboot::extract_jboot_sch2_kernel;
 use crate::signatures::common::{
-    SignatureError, SignatureResult, CONFIDENCE_HIGH, CONFIDENCE_MEDIUM,
+    SignatureError, SignatureResult, CONFIDENCE_LOW, CONFIDENCE_HIGH, CONFIDENCE_MEDIUM,
 };
 use crate::structures::jboot::{
     parse_jboot_arm_header, parse_jboot_sch2_header, parse_jboot_stag_header,
@@ -56,7 +56,7 @@ pub fn jboot_arm_parser(
         if let Ok(arm_header) = parse_jboot_arm_header(jboot_data) {
             result.size = arm_header.header_size;
             result.offset = header_start;
-            result.description = format!("{}, header size: {} bytes, ROM ID: {}, erase offset: {:#X}, erase size: {:#X}, data offset: {:#X}, data size: {:#X}",
+            result.description = format!("{}, header size: {} bytes, ROM ID: {}, erase offset: {:#X}, erase size: {:#X}, data flash offset: {:#X}, data size: {:#X}",
                 result.description,
                 arm_header.header_size,
                 arm_header.rom_id,
@@ -81,20 +81,32 @@ pub fn jboot_stag_parser(
     let mut result = SignatureResult {
         offset: offset,
         description: JBOOT_STAG_DESCRIPTION.to_string(),
-        confidence: CONFIDENCE_MEDIUM,
+        confidence: CONFIDENCE_LOW,
         ..Default::default()
     };
 
     if let Ok(stag_header) = parse_jboot_stag_header(&file_data[offset..]) {
-        result.size = stag_header.header_size;
-        result.description = format!("{}, kernel data, factory image: {}, system upgrade image: {}, header size: {}, kernel image size: {}",
-            result.description,
-            stag_header.is_factory_image,
-            stag_header.is_sysupgrade_image,
-            stag_header.header_size,
-            stag_header.image_size,
-        );
-        return Ok(result);
+        // Sanity check on the stag header reported size; it is expected that this
+        // type of header describes a kernel, and should not take up the entire firmware image
+        if (offset + stag_header.header_size + stag_header.image_size) < file_data.len() {
+            // Only report the header size, confidence in this signature is low, don't
+            // want to skip a bunch of data on a false positive
+            result.size = stag_header.header_size;
+
+            let mut image_type: &str = "factory image";
+
+            if stag_header.is_sysupgrade_image {
+                image_type = "system upgrade image";
+            }
+
+            result.description = format!("{}, {}, header size: {} bytes, kernel data size: {} bytes",
+                result.description,
+                image_type,
+                stag_header.header_size,
+                stag_header.image_size,
+            );
+            return Ok(result);
+        }
     }
 
     return Err(SignatureError);
@@ -119,7 +131,7 @@ pub fn jboot_sch2_parser(
         if let Some(total_size) = dry_run.size {
             if let Ok(sch2_header) = parse_jboot_sch2_header(&file_data[offset..]) {
                 result.size = total_size;
-                result.description = format!("{}, header size: {}, kernel size: {}, kernel compression: {}, kernel entry point: {:#X}",
+                result.description = format!("{}, header size: {} bytes, kernel size: {} bytes, kernel compression: {}, kernel entry point: {:#X}",
                     result.description,
                     sch2_header.header_size,
                     sch2_header.kernel_size,
