@@ -43,7 +43,7 @@ fn main() {
     env_logger::init();
 
     // Process command line aguments
-    let mut cliargs = cliparser::parse();
+    let cliargs = cliparser::parse();
 
     // If --list was specified, just display a list of signatures and return
     if cliargs.list == true {
@@ -79,11 +79,6 @@ fn main() {
     // If extraction was requested, we need to initialize the output directory
     if cliargs.extract == true {
         output_directory = Some(cliargs.directory);
-    }
-
-    // If an opcode scan was requested, set the include filter to only display opcode signatures
-    if cliargs.opcodes == true {
-        cliargs.include = Some(vec![magic::OPCODES.to_string()]);
     }
 
     // Initialize binwalk

@@ -29,7 +29,6 @@ pub mod lzfse;
 pub mod lzma;
 pub mod lzop;
 pub mod mbr;
-pub mod opcodes;
 pub mod openssl;
 pub mod packimg;
 pub mod pchrom;

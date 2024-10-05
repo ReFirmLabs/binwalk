@@ -121,11 +121,14 @@ pub fn parse_jboot_stag_header(jboot_data: &[u8]) -> Result<JBOOTStagHeader, Str
     if let Ok(stag_header) = common::parse(jboot_data, &stag_structure, "little") {
         result.header_size = common::size(&stag_structure);
         result.image_size = stag_header["image_size"];
-        result.is_factory_image = stag_header["cmark"] == FACTORY_IMAGE_TYPE;
-        result.is_sysupgrade_image = stag_header["cmark"] == stag_header["id"];
 
-        if result.is_factory_image || result.is_sysupgrade_image {
-            return Ok(result);
+        if result.image_size > result.header_size {
+            result.is_factory_image = stag_header["cmark"] == FACTORY_IMAGE_TYPE;
+            result.is_sysupgrade_image = stag_header["cmark"] == stag_header["id"];
+
+            if result.is_factory_image || result.is_sysupgrade_image {
+                return Ok(result);
+            }
         }
     }
 
