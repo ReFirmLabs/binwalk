@@ -156,12 +156,6 @@ Recursively scan and extract a file's contents:
 binwalk -Me file_name.bin
 ```
 
-Scan a file for raw CPU opcodes:
-
-```
-binwalk -A file_name.bin
-```
-
 Generate an entropy graph of the specified file (a PNG image will be saved to the current working directory):
 
 ```
