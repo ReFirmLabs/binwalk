@@ -96,6 +96,7 @@ pub mod lzop;
 pub mod mbr;
 pub mod openssl;
 pub mod packimg;
+pub mod pcap;
 pub mod pchrom;
 pub mod pe;
 pub mod png;

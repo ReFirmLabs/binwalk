@@ -1,6 +1,6 @@
 use crate::extractors::jboot::extract_jboot_sch2_kernel;
 use crate::signatures::common::{
-    SignatureError, SignatureResult, CONFIDENCE_LOW, CONFIDENCE_HIGH, CONFIDENCE_MEDIUM,
+    SignatureError, SignatureResult, CONFIDENCE_HIGH, CONFIDENCE_LOW, CONFIDENCE_MEDIUM,
 };
 use crate::structures::jboot::{
     parse_jboot_arm_header, parse_jboot_sch2_header, parse_jboot_stag_header,
@@ -99,11 +99,9 @@ pub fn jboot_stag_parser(
                 image_type = "system upgrade image";
             }
 
-            result.description = format!("{}, {}, header size: {} bytes, kernel data size: {} bytes",
-                result.description,
-                image_type,
-                stag_header.header_size,
-                stag_header.image_size,
+            result.description = format!(
+                "{}, {}, header size: {} bytes, kernel data size: {} bytes",
+                result.description, image_type, stag_header.header_size, stag_header.image_size,
             );
             return Ok(result);
         }

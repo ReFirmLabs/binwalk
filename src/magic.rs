@@ -825,5 +825,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         extractor: Some(extractors::jboot::sch2_extractor()),
     });
 
+    // pcap-ng
+    binary_signatures.push(signatures::common::Signature {
+        name: "pcapng".to_string(),
+        short: false,
+        magic_offset: 0,
+        always_display: false,
+        magic: signatures::pcap::pcapng_magic(),
+        parser: signatures::pcap::pcapng_parser,
+        description: signatures::pcap::PCAPNG_DESCRIPTION.to_string(),
+        extractor: Some(extractors::pcap::pcapng_extractor()),
+    });
+
     return binary_signatures;
 }
