@@ -837,5 +837,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         extractor: Some(extractors::pcap::pcapng_extractor()),
     });
 
+    // RSA encrypted data
+    binary_signatures.push(signatures::common::Signature {
+        name: "rsa".to_string(),
+        short: false,
+        magic_offset: 0,
+        always_display: true,
+        magic: signatures::rsa::rsa_magic(),
+        parser: signatures::rsa::rsa_parser,
+        description: signatures::rsa::DESCRIPTION.to_string(),
+        extractor: None,
+    });
+
     return binary_signatures;
 }
