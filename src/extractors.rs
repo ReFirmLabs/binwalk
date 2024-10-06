@@ -5,6 +5,7 @@ pub mod common;
 pub mod dmg;
 pub mod dtb;
 pub mod dumpifs;
+pub mod gif;
 pub mod gzip;
 pub mod inflate;
 pub mod jboot;

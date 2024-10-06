@@ -1,5 +1,4 @@
 pub mod androidsparse;
-pub mod gif;
 pub mod arcadyan;
 pub mod bzip2;
 pub mod cab;
@@ -17,6 +16,7 @@ pub mod dtb;
 pub mod ecos;
 pub mod elf;
 pub mod ext;
+pub mod gif;
 pub mod gpg;
 pub mod gzip;
 pub mod hashes;

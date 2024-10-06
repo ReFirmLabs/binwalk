@@ -848,7 +848,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         description: signatures::rsa::DESCRIPTION.to_string(),
         extractor: None,
     });
-    
+
     // GIF image
     binary_signatures.push(signatures::common::Signature {
         name: "gif".to_string(),
@@ -858,7 +858,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         magic: signatures::gif::gif_magic(),
         parser: signatures::gif::gif_parser,
         description: signatures::gif::DESCRIPTION.to_string(),
-        extractor: None,
+        extractor: Some(extractors::gif::gif_extractor()),
     });
 
     return binary_signatures;

@@ -520,8 +520,11 @@ impl Chroot {
 
                     match fs::set_permissions(&safe_file_path, permissions) {
                         Err(e) => {
-                            error!("Failed to set permissions for file {}: {}", safe_file_path, e);
-                        },
+                            error!(
+                                "Failed to set permissions for file {}: {}",
+                                safe_file_path, e
+                            );
+                        }
                         Ok(_) => {
                             return true;
                         }
@@ -529,7 +532,7 @@ impl Chroot {
                 }
                 #[cfg(windows)]
                 {
-                    return true
+                    return true;
                 }
             }
         }
