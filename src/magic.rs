@@ -848,6 +848,18 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         description: signatures::rsa::DESCRIPTION.to_string(),
         extractor: None,
     });
+    
+    // GIF image
+    binary_signatures.push(signatures::common::Signature {
+        name: "gif".to_string(),
+        short: false,
+        magic_offset: 0,
+        always_display: false,
+        magic: signatures::gif::gif_magic(),
+        parser: signatures::gif::gif_parser,
+        description: signatures::gif::DESCRIPTION.to_string(),
+        extractor: None,
+    });
 
     return binary_signatures;
 }

@@ -1,4 +1,5 @@
 pub mod androidsparse;
+pub mod gif;
 pub mod arcadyan;
 pub mod bzip2;
 pub mod cab;
