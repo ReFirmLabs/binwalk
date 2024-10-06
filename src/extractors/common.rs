@@ -3,11 +3,17 @@ use log::{debug, error, info, warn};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::io::Write;
-use std::os::unix;
-use std::os::unix::fs::PermissionsExt;
 use std::path;
 use std::process;
 use walkdir::WalkDir;
+
+#[cfg(windows)]
+use std::os::windows;
+
+#[cfg(unix)]
+use std::os::unix;
+#[cfg(unix)]
+use std::os::unix::fs::PermissionsExt;
 
 /// This contstant in command line arguments will be replaced with the path to the input file
 pub const SOURCE_FILE_PLACEHOLDER: &str = "%e";
@@ -506,19 +512,22 @@ impl Chroot {
                 );
             }
             Ok(metadata) => {
-                let mut permissions = metadata.permissions();
-                permissions.set_mode(permissions.mode() | UNIX_EXEC_FLAG);
-
-                match fs::set_permissions(safe_file_path.clone(), permissions) {
-                    Err(e) => {
-                        error!(
-                            "Failed to set permissions for file {}: {}",
-                            safe_file_path, e
-                        );
+                #[cfg(unix)]
+                {
+                    let mode = _metadata.permissions().mode() | UNIX_EXEC_FLAG;
+                    let new_permissions = _metadata.permissions().set_mode(mode);
+                    
+                    match fs::set_permissions(&file_path, new_permissions) {
+                        Err(e) => {
+                            error!("Failed to set permissions for file {}: {}", safe_file_path, e);
+                            false
+                        },
+                        Ok(_) => true
                     }
-                    Ok(_) => {
-                        return true;
-                    }
+                }
+                #[cfg(windows)]
+                {
+                    return true
                 }
             }
         }
@@ -587,16 +596,39 @@ impl Chroot {
             safe_target_path = path::Path::new(&safe_target);
         }
 
-        match unix::fs::symlink(&safe_target_path, &safe_symlink_path) {
-            Ok(_) => {
-                return true;
+        #[cfg(unix)]
+        {
+            match unix::fs::symlink(&safe_target_path, &safe_symlink_path) {
+                Ok(_) => {
+                    return true;
+                }
+                Err(e) => {
+                    error!(
+                        "Failed to create symlink from {} -> {}: {}",
+                        symlink, target, e
+                    );
+                    return false;
+                }
             }
-            Err(e) => {
-                error!(
-                    "Failed to created symlink from {} -> {}: {}",
-                    symlink, target, e
-                );
-                return false;
+        }
+        #[cfg(windows)]
+        {
+            // let sym = match safe_target_path.is_dir() {
+            //     true => windows::fs::symlink_dir(safe_target_path, safe_symlink_path),
+            //     false => windows::fs::symlink_file(safe_target_path, safe_symlink_path),
+            // };
+
+            match windows::fs::symlink_dir(safe_target_path, safe_symlink_path) {
+                Ok(_) => {
+                    return true;
+                }
+                Err(e) => {
+                    error!(
+                        "Failed to create symlink from {} -> {}: {}",
+                        symlink, target, e
+                    );
+                    return false;
+                }
             }
         }
     }
