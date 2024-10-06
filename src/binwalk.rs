@@ -5,9 +5,14 @@ use log::{debug, error, info, warn};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
-use std::os::unix;
 use std::path;
 use uuid::Uuid;
+
+#[cfg(windows)]
+use std::os::windows;
+
+#[cfg(unix)]
+use std::os::unix;
 
 use crate::common::read_file;
 use crate::extractors;
@@ -634,18 +639,38 @@ fn init_extraction_directory(
     );
 
     // Create a symlink from inside the extraction directory to the specified target file
-    match unix::fs::symlink(&target_path, &symlink_path) {
-        Ok(_) => {
-            return Ok(symlink_target_path_str);
+    #[cfg(unix)]
+    {
+        match unix::fs::symlink(&target_path, &symlink_path) {
+            Ok(_) => {
+                return Ok(symlink_target_path_str);
+            }
+            Err(e) => {
+                error!(
+                    "Failed to create symlink {} -> {}: {}",
+                    symlink_path.to_str().unwrap(),
+                    target_path.to_str().unwrap(),
+                    e
+                );
+                return Err(e);
+            }
         }
-        Err(e) => {
-            error!(
-                "Failed to create symlink {} -> {}: {}",
-                symlink_path.to_str().unwrap(),
-                target_path.to_str().unwrap(),
-                e
-            );
-            return Err(e);
+    }
+    #[cfg(windows)]
+    {
+        match windows::fs::symlink_file(target_path, symlink_path) {
+            Ok(_) => {
+                return Ok(symlink_target_path_str);
+            }
+            Err(e) => {
+                error!(
+                    "Failed to create symlink {} -> {}: {}",
+                    symlink_path.to_str().unwrap(),
+                    target_path.to_str().unwrap(),
+                    e
+                );
+                return Err(e);
+            }
         }
     }
 }
