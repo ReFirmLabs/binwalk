@@ -514,15 +514,17 @@ impl Chroot {
             Ok(metadata) => {
                 #[cfg(unix)]
                 {
-                    let mode = _metadata.permissions().mode() | UNIX_EXEC_FLAG;
-                    let new_permissions = _metadata.permissions().set_mode(mode);
-                    
-                    match fs::set_permissions(&file_path, new_permissions) {
+                    let mut permissions = metadata.permissions();
+                    let mode = permissions.mode() | UNIX_EXEC_FLAG;
+                    permissions.set_mode(mode);
+
+                    match fs::set_permissions(&safe_file_path, permissions) {
                         Err(e) => {
                             error!("Failed to set permissions for file {}: {}", safe_file_path, e);
-                            false
                         },
-                        Ok(_) => true
+                        Ok(_) => {
+                            return true;
+                        }
                     }
                 }
                 #[cfg(windows)]
