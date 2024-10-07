@@ -1,4 +1,4 @@
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_LOW};
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
 use crate::structures::dlob::parse_dlob_header;
 
 /// Human readable description
@@ -15,14 +15,20 @@ pub fn dlob_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
     let mut result = SignatureResult {
         offset: offset,
         description: DESCRIPTION.to_string(),
-        confidence: CONFIDENCE_LOW,
+        confidence: CONFIDENCE_MEDIUM,
         ..Default::default()
     };
 
+    let available_data: usize = file_data.len() - offset;
+
     if let Ok(dlob_header) = parse_dlob_header(&file_data[offset..]) {
-        result.size = dlob_header.size;
-        result.description = format!("{}, header size: {} bytes", result.description, result.size);
-        return Ok(result);
+        // Sanity check on the total reported DLOB size
+        if available_data >= (dlob_header.header_size + dlob_header.data_size) {
+            // Don't skip the DLOB contents; it's mostly just a metadata header
+            result.size = dlob_header.header_size;
+            result.description = format!("{}, header size: {} bytes, data size: {}", result.description, dlob_header.header_size, dlob_header.data_size);
+            return Ok(result);
+        }
     }
 
     return Err(SignatureError);
