@@ -35,6 +35,23 @@ pub struct AnalysisResults {
 }
 
 /// Analyze files / memory for file signatures
+///
+/// ## Example
+///
+/// ```
+/// use binwalk::Binwalk;
+///
+/// let target_file = "/bin/ls";
+/// let data_to_scan = std::fs::read(target_file).expect("Unable to read file");
+///
+/// let binwalker = Binwalk::new();
+///
+/// let signature_results = binwalker.scan(&data_to_scan);
+///
+/// for result in &signature_results {
+///     println!("Found '{}' at offset {:#X}", result.description, result.offset);
+/// }
+/// ```
 #[derive(Debug, Default, Clone)]
 pub struct Binwalk {
     /// Count of all signatures (short and regular)
@@ -481,7 +498,28 @@ impl Binwalk {
     }
 
     /// Extract all extractable signatures found in a file.
-    /// Returns a HashMap of <SignatureResult.id, ExtractionResult>.
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// use binwalk::Binwalk;
+    ///
+    /// # std::fs::remove_dir_all("/tmp/foobar");
+    /// let target_path = "/usr/share/man/man2/accept.2.gz".to_string();
+    /// let extraction_directory = "/tmp/foobar/extractions".to_string();
+    ///
+    /// let binwalker = Binwalk::configure(Some(target_path), Some(extraction_directory), None, None, None).unwrap();
+    ///
+    /// let file_data = std::fs::read(&binwalker.base_target_file).expect("Unable to read file");
+    ///
+    /// let scan_results = binwalker.scan(&file_data);
+    /// let extraction_results = binwalker.extract(&file_data, &binwalker.base_target_file, &scan_results);
+    ///
+    /// assert_eq!(scan_results.len(), 1);
+    /// assert_eq!(extraction_results.len(),  1);
+    /// assert_eq!(std::path::Path::new("/tmp/foobar/extractions/accept.2.gz.extracted/0/decompressed.bin").exists(), true);
+    /// # std::fs::remove_dir_all("/tmp/foobar");
+    /// ```
     pub fn extract(
         &self,
         file_data: &Vec<u8>,
@@ -560,6 +598,7 @@ impl Binwalk {
     /// ```
     /// use binwalk::Binwalk;
     ///
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// let target_path = "/usr/share/man/man2/accept.2.gz".to_string();
     /// let extraction_directory = "/tmp/foobar/extractions".to_string();
     ///
@@ -570,6 +609,7 @@ impl Binwalk {
     /// assert_eq!(analysis_results.file_map.len(), 1);
     /// assert_eq!(analysis_results.extractions.len(),  1);
     /// assert_eq!(std::path::Path::new("/tmp/foobar/extractions/accept.2.gz.extracted/0/decompressed.bin").exists(), true);
+    /// # std::fs::remove_dir_all("/tmp/foobar");
     /// ```
     pub fn analyze(&self, target_file: &String, do_extraction: bool) -> AnalysisResults {
         // Return value

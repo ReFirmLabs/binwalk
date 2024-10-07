@@ -36,7 +36,7 @@
 //!     description: "FooBar file".to_string(),
 //!     // The extractor to use to extract this file/data type
 //!     extractor: Some(foobar_extractor()),
-//! });
+//! };
 //! ```
 //!
 //! Internally, Binwalk keeps a list of `Signature` definitions in `magic.rs`.
