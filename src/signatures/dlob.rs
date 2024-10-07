@@ -26,7 +26,10 @@ pub fn dlob_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
         if available_data >= (dlob_header.header_size + dlob_header.data_size) {
             // Don't skip the DLOB contents; it's mostly just a metadata header
             result.size = dlob_header.header_size;
-            result.description = format!("{}, header size: {} bytes, data size: {}", result.description, dlob_header.header_size, dlob_header.data_size);
+            result.description = format!(
+                "{}, header size: {} bytes, data size: {}",
+                result.description, dlob_header.header_size, dlob_header.data_size
+            );
             return Ok(result);
         }
     }

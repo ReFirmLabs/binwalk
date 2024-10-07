@@ -161,7 +161,12 @@ fn print_extraction(
 
     match extraction {
         None => {
-            extraction_message = format!("[#] Extraction of {} data at offset {:#X} declined", signature.name, signature.offset).bold().yellow();
+            extraction_message = format!(
+                "[#] Extraction of {} data at offset {:#X} declined",
+                signature.name, signature.offset
+            )
+            .bold()
+            .yellow();
         }
         Some(extraction_result) => {
             if extraction_result.success == true {
