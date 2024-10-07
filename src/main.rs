@@ -22,7 +22,6 @@ fn main() {
     // Only use one thread if unable to auto-detect available core info
     const DEFAULT_WORKER_COUNT: usize = 1;
 
-    let binwalker: binwalk::Binwalk;
     let mut output_directory: Option<String> = None;
 
     // Statistics variables; keeps track of analyzed file count and total analysis run time
@@ -82,20 +81,14 @@ fn main() {
     }
 
     // Initialize binwalk
-    match binwalk::Binwalk::configure(
+    let binwalker = binwalk::Binwalk::configure(
         cliargs.file_name,
         output_directory,
         cliargs.include,
         cliargs.exclude,
         None,
-    ) {
-        Err(_) => {
-            panic!("Binwalk initialization failed");
-        }
-        Ok(bw) => {
-            binwalker = bw;
-        }
-    }
+    )
+    .expect("Binwalk initialization failed");
 
     // If the user specified --threads, honor that request; else, auto-detect available parallelism
     match cliargs.threads {
