@@ -36,7 +36,6 @@ fn main() {
 
     // Thread pool related variables
     let mut pending_jobs = 0;
-    let mut available_workers = DEFAULT_WORKER_COUNT;
 
     // Initialize logging
     env_logger::init();
@@ -91,18 +90,17 @@ fn main() {
     .expect("Binwalk initialization failed");
 
     // If the user specified --threads, honor that request; else, auto-detect available parallelism
-    match cliargs.threads {
-        Some(threads) => {
-            available_workers = threads;
-        }
-        None => {
-            // Get CPU core info
-            match thread::available_parallelism() {
-                Err(e) => error!("Failed to retrieve CPU core info: {}", e),
-                Ok(coreinfo) => available_workers = coreinfo.get(),
+    let available_workers = cliargs.threads.unwrap_or_else(|| {
+        // Get CPU core info
+        match thread::available_parallelism() {
+            // In case of error use the default
+            Err(e) => {
+                error!("Failed to retrieve CPU core info: {e}");
+                DEFAULT_WORKER_COUNT
             }
+            Ok(coreinfo) => coreinfo.get(),
         }
-    }
+    });
 
     // Sanity check the number of available worker threads
     if available_workers < 1 {
