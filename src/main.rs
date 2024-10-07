@@ -227,7 +227,7 @@ fn main() {
 
                 // Print signature & extraction results
                 if display_results == true {
-                    display::print_analysis_results(cliargs.quiet, &results);
+                    display::print_analysis_results(cliargs.quiet, cliargs.extract, &results);
                 }
 
                 // If running recursively, add extraction results to list of files to analyze

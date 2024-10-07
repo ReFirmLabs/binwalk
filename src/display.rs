@@ -155,24 +155,31 @@ fn print_signatures(signatures: &Vec<signatures::common::SignatureResult>) {
 
 fn print_extraction(
     signature: &signatures::common::SignatureResult,
-    extraction_result: &extractors::common::ExtractionResult,
+    extraction: Option<&extractors::common::ExtractionResult>,
 ) {
     let extraction_message: ColoredString;
 
-    if extraction_result.success == true {
-        extraction_message = format!(
-            "[+] Extraction of {} data at offset {:#X} completed successfully",
-            signature.name, signature.offset
-        )
-        .bold()
-        .green();
-    } else {
-        extraction_message = format!(
-            "[-] Extraction of {} data at offset {:#X} failed!",
-            signature.name, signature.offset
-        )
-        .bold()
-        .red();
+    match extraction {
+        None => {
+            extraction_message = format!("[#] Extraction of {} data at offset {:#X} declined", signature.name, signature.offset).bold().yellow();
+        }
+        Some(extraction_result) => {
+            if extraction_result.success == true {
+                extraction_message = format!(
+                    "[+] Extraction of {} data at offset {:#X} completed successfully",
+                    signature.name, signature.offset
+                )
+                .bold()
+                .green();
+            } else {
+                extraction_message = format!(
+                    "[-] Extraction of {} data at offset {:#X} failed!",
+                    signature.name, signature.offset
+                )
+                .bold()
+                .red();
+            }
+        }
     }
 
     println!("{extraction_message}");
@@ -182,14 +189,32 @@ fn print_extractions(
     signatures: &Vec<signatures::common::SignatureResult>,
     extraction_results: &HashMap<String, extractors::common::ExtractionResult>,
 ) {
+    let mut delimiter_printed: bool = false;
+
     for signature in signatures {
-        if extraction_results.contains_key(&signature.id) {
-            print_extraction(signature, &extraction_results[&signature.id]);
+        let mut printable_extraction: bool = false;
+        let mut extraction_result: Option<&extractors::common::ExtractionResult> = None;
+
+        // Only print extraction results if an extraction was attempted or explicitly declined
+        if signature.extraction_declined == true {
+            printable_extraction = true
+        } else if extraction_results.contains_key(&signature.id) {
+            printable_extraction = true;
+            extraction_result = Some(&extraction_results[&signature.id]);
+        }
+
+        if printable_extraction {
+            // Only print the delimiter line once
+            if delimiter_printed == false {
+                print_delimiter();
+                delimiter_printed = true;
+            }
+            print_extraction(signature, extraction_result);
         }
     }
 }
 
-pub fn print_analysis_results(quiet: bool, results: &AnalysisResults) {
+pub fn print_analysis_results(quiet: bool, extraction_attempted: bool, results: &AnalysisResults) {
     if quiet == true {
         return;
     }
@@ -198,14 +223,12 @@ pub fn print_analysis_results(quiet: bool, results: &AnalysisResults) {
     print_header(&results.file_path);
     print_signatures(&results.file_map);
 
-    if results.extractions.len() > 0 {
-        // Print a delimiter to delimit extractor messages from signatures results in terminal
-        print_delimiter();
-
-        // Display extractions
+    // If extraction was attempted, print extraction results
+    if extraction_attempted {
         print_extractions(&results.file_map, &results.extractions);
     }
 
+    // Print the footer text
     print_footer();
 }
 

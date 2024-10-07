@@ -1,6 +1,6 @@
 # Binwalk v3
 
-![binwalk v3](images/binwalk.png)
+![binwalk v3](images/binwalk_animated.svg)
 
 ## About
 
