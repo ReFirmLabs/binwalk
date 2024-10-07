@@ -131,6 +131,7 @@ pub mod romfs;
 pub mod seama;
 pub mod sevenzip;
 pub mod squashfs;
+pub mod svg;
 pub mod tplink;
 pub mod trx;
 pub mod ubi;

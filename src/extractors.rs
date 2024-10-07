@@ -167,6 +167,7 @@ pub mod romfs;
 pub mod sevenzip;
 pub mod squashfs;
 pub mod srec;
+pub mod svg;
 pub mod tarball;
 pub mod trx;
 pub mod tsk;

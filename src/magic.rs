@@ -861,5 +861,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         extractor: Some(extractors::gif::gif_extractor()),
     });
 
+    // SVG image
+    binary_signatures.push(signatures::common::Signature {
+        name: "svg".to_string(),
+        short: false,
+        magic_offset: 0,
+        always_display: false,
+        magic: signatures::svg::svg_magic(),
+        parser: signatures::svg::svg_parser,
+        description: signatures::svg::DESCRIPTION.to_string(),
+        extractor: Some(extractors::svg::svg_extractor()),
+    });
+
     return binary_signatures;
 }
