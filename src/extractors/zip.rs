@@ -1,6 +1,6 @@
 use crate::extractors;
 
-/* Describes how to run the unzip utility to extract ZIP archives */
+/// Describes how to run the unzip utility to extract ZIP archives
 pub fn zip_extractor() -> extractors::common::Extractor {
     return extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("unzip".to_string()),

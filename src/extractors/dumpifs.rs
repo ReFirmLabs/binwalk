@@ -1,6 +1,6 @@
 use crate::extractors;
 
-/* Describes how to run the dumpifs utility to extract QNX IFS images */
+/// Describes how to run the dumpifs utility to extract QNX IFS images
 pub fn dumpifs_extractor() -> extractors::common::Extractor {
     return extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("dumpifs".to_string()),

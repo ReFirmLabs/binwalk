@@ -1,6 +1,6 @@
 use crate::extractors;
 
-/* Describes how to run the cabextract utility to extract MS CAB archives */
+/// Describes how to run the cabextract utility to extract MS CAB archives
 pub fn cab_extractor() -> extractors::common::Extractor {
     return extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("cabextract".to_string()),

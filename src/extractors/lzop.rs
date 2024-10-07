@@ -1,6 +1,6 @@
 use crate::extractors;
 
-/* Describes how to run the lzop utility to extract LZO compressed files */
+/// Describes how to run the lzop utility to extract LZO compressed files
 pub fn lzop_extractor() -> extractors::common::Extractor {
     return extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("lzop".to_string()),

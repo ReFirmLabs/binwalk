@@ -26,7 +26,7 @@ struct RomFSEntry {
     children: Vec<RomFSEntry>,
 }
 
-/* Defines the internal extractor function for extracting RomFS file systems */
+/// Defines the internal extractor function for extracting RomFS file systems */
 pub fn romfs_extractor() -> Extractor {
     return Extractor {
         utility: ExtractorType::Internal(extract_romfs),
@@ -34,9 +34,7 @@ pub fn romfs_extractor() -> Extractor {
     };
 }
 
-/*
- * Main RomFS extraction function.
- */
+/// Internal RomFS extractor
 pub fn extract_romfs(
     file_data: &Vec<u8>,
     offset: usize,

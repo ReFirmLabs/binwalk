@@ -12,10 +12,7 @@ pub fn inflate_extractor() -> Extractor {
 }
 */
 
-/*
- * Inflates deflated data.
- * WARNING: The decompressed data is stored completely in memory. Use flate2 wrapper instead?
- */
+/// Internal extractor for inflating deflated data.
 pub fn inflate_decompressor(
     file_data: &Vec<u8>,
     offset: usize,
@@ -48,6 +45,7 @@ pub fn inflate_decompressor(
     }
 
     // Do decompression
+    // WARNING: The decompressed data is stored completely in memory. Use flate2 wrapper instead?
     match inflate::decompress_to_vec(&file_data[compressed_data_start..compressed_data_end]) {
         Ok(decompressed_data) => {
             // Make sure some data was actually decompresed

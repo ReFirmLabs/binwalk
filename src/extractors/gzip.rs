@@ -2,7 +2,7 @@ use crate::extractors::common::{ExtractionResult, Extractor, ExtractorType};
 use crate::extractors::inflate;
 use crate::structures::gzip::parse_gzip_header;
 
-// Defines the internal extractor function for decompressing gzip data
+/// Defines the internal extractor function for decompressing gzip data
 pub fn gzip_extractor() -> Extractor {
     return Extractor {
         utility: ExtractorType::Internal(gzip_decompress),
@@ -10,6 +10,7 @@ pub fn gzip_extractor() -> Extractor {
     };
 }
 
+/// Internal extractor for gzip compressed data
 pub fn gzip_decompress(
     file_data: &Vec<u8>,
     offset: usize,

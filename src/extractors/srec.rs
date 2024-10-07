@@ -1,6 +1,6 @@
 use crate::extractors;
 
-/* Describes how to run the srec2bin utility to convert Motorola S-records to binary */
+/// Describes how to run the srec2bin utility to convert Motorola S-records to binary
 pub fn srec_extractor() -> extractors::common::Extractor {
     return extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("srec2bin".to_string()),

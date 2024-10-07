@@ -1,7 +1,7 @@
 use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use aho_corasick::AhoCorasick;
 
-// Defines the internal extractor function for carving out JPEG images
+/// Defines the internal extractor function for carving out JPEG images
 pub fn jpeg_extractor() -> Extractor {
     return Extractor {
         utility: ExtractorType::Internal(extract_jpeg_image),
@@ -9,6 +9,7 @@ pub fn jpeg_extractor() -> Extractor {
     };
 }
 
+/// Internal extractor for carving JPEG images to disk
 pub fn extract_jpeg_image(
     file_data: &Vec<u8>,
     offset: usize,

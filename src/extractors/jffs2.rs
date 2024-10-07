@@ -1,6 +1,6 @@
 use crate::extractors;
 
-/* Describes how to run the jefferson utility to extract JFFS file systems */
+/// Describes how to run the jefferson utility to extract JFFS file systems
 pub fn jffs2_extractor() -> extractors::common::Extractor {
     return extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("jefferson".to_string()),

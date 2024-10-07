@@ -1,6 +1,7 @@
 use crate::extractors::common::{ExtractionResult, Extractor, ExtractorType};
 use crate::extractors::lzma::lzma_decompress;
 
+/// Defines the internal extractor for Arcadyn Obfuscated LZMA
 pub fn obfuscated_lzma_extractor() -> Extractor {
     return Extractor {
         utility: ExtractorType::Internal(extract_obfuscated_lzma),
@@ -8,6 +9,7 @@ pub fn obfuscated_lzma_extractor() -> Extractor {
     };
 }
 
+/// Internal extractor for Arcadyn Obfuscated LZMA
 pub fn extract_obfuscated_lzma(
     file_data: &Vec<u8>,
     offset: usize,

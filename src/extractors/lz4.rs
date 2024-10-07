@@ -1,6 +1,6 @@
 use crate::extractors;
 
-/* Describes how to run the lz4 utility to extract LZ4 compressed files */
+/// Describes how to run the lz4 utility to extract LZ4 compressed files
 pub fn lz4_extractor() -> extractors::common::Extractor {
     return extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("lz4".to_string()),

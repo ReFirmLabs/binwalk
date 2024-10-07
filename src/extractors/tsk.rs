@@ -1,6 +1,6 @@
 use crate::extractors;
 
-/* Describes how to run the tsk_recover utility to extract various file systems */
+/// Describes how to run the tsk_recover utility to extract various file systems
 pub fn tsk_extractor() -> extractors::common::Extractor {
     return extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("tsk_recover".to_string()),

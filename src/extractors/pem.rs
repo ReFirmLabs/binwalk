@@ -1,7 +1,7 @@
 use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use aho_corasick::AhoCorasick;
 
-// Defines the internal extractor function for carving out PEM keys
+/// Defines the internal extractor function for carving out PEM keys
 pub fn pem_key_extractor() -> Extractor {
     return Extractor {
         do_not_recurse: true,
@@ -10,7 +10,7 @@ pub fn pem_key_extractor() -> Extractor {
     };
 }
 
-// Defines the internal extractor function for carving out PEM certs
+/// Internal extractor function for carving out PEM certs
 pub fn pem_certificate_extractor() -> Extractor {
     return Extractor {
         do_not_recurse: true,

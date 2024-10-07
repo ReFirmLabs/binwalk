@@ -1,6 +1,7 @@
 use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::riff::parse_riff_header;
 
+/// Describes the internal RIFF image extactor
 pub fn riff_extractor() -> Extractor {
     return Extractor {
         utility: ExtractorType::Internal(extract_riff_image),
@@ -9,6 +10,7 @@ pub fn riff_extractor() -> Extractor {
     };
 }
 
+/// Internal extractor for carving RIFF files to disk
 pub fn extract_riff_image(
     file_data: &Vec<u8>,
     offset: usize,

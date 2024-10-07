@@ -1,7 +1,7 @@
 use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use lzma;
 
-// Defines the internal extractor function for decompressing gzip data
+/// Defines the internal extractor function for decompressing gzip data
 pub fn lzma_extractor() -> Extractor {
     return Extractor {
         utility: ExtractorType::Internal(lzma_decompress),
@@ -9,6 +9,7 @@ pub fn lzma_extractor() -> Extractor {
     };
 }
 
+/// Internal extractor for decompressing LZMA data
 pub fn lzma_decompress(
     file_data: &Vec<u8>,
     offset: usize,

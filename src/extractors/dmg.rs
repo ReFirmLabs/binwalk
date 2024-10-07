@@ -1,6 +1,6 @@
 use crate::extractors;
 
-/* Describes how to run the 7z utility to extract DMG images. This kinda-sorta works, sometimes. DMG is a bitch. */
+/// Describes how to run the 7z utility to extract DMG images
 pub fn dmg_extractor() -> extractors::common::Extractor {
     return extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("7z".to_string()),

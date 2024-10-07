@@ -1,6 +1,6 @@
 use crate::extractors;
 
-/* Describes how to run the dtc utility to extract DTB files */
+/// Describes how to run the dtc utility to extract DTB files
 pub fn dtb_extractor() -> extractors::common::Extractor {
     return extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("dtc".to_string()),

@@ -2,7 +2,7 @@ use crate::common::is_offset_safe;
 use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::androidsparse;
 
-// Defines the internal extractor function for decompressing zlib data
+/// Defines the internal extractor function for decompressing zlib data
 pub fn android_sparse_extractor() -> Extractor {
     return Extractor {
         utility: ExtractorType::Internal(extract_android_sparse),
@@ -10,6 +10,7 @@ pub fn android_sparse_extractor() -> Extractor {
     };
 }
 
+/// Android sparse internal extractor
 pub fn extract_android_sparse(
     file_data: &Vec<u8>,
     offset: usize,

@@ -1,6 +1,6 @@
 use crate::extractors::common::{Extractor, ExtractorType, SOURCE_FILE_PLACEHOLDER};
 
-/* Describes how to run the lzfse utility to decompress LZFSE files */
+/// Describes how to run the lzfse utility to decompress LZFSE files
 pub fn lzfse_extractor() -> Extractor {
     const OUTPUT_FILE_NAME: &str = "decompressed.bin";
 

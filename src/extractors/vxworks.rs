@@ -5,6 +5,7 @@ use crate::structures::vxworks::{
 };
 use serde_json;
 
+/// Describes the VxWorks symbol table extractor
 pub fn vxworks_symtab_extractor() -> Extractor {
     return Extractor {
         do_not_recurse: true,
@@ -13,6 +14,7 @@ pub fn vxworks_symtab_extractor() -> Extractor {
     };
 }
 
+/// Internal extractor for writing VxWorks symbol tables to JSON
 pub fn extract_symbol_table(
     file_data: &Vec<u8>,
     offset: usize,

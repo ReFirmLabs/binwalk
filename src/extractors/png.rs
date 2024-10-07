@@ -2,7 +2,7 @@ use crate::common::is_offset_safe;
 use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::png::parse_png_chunk_header;
 
-// Defines the internal extractor function for carving out PNG images
+/// Defines the internal extractor function for carving out PNG images
 pub fn png_extractor() -> Extractor {
     return Extractor {
         utility: ExtractorType::Internal(extract_png_image),
@@ -10,6 +10,7 @@ pub fn png_extractor() -> Extractor {
     };
 }
 
+/// Internal extractor for carving PNG files to disk
 pub fn extract_png_image(
     file_data: &Vec<u8>,
     offset: usize,

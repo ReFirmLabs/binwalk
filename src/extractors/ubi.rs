@@ -1,6 +1,6 @@
 use crate::extractors;
 
-/* Describes how to run the ubireader_extract_images utility to extract UBI images */
+/// Describes how to run the ubireader_extract_images utility to extract UBI images
 pub fn ubi_extractor() -> extractors::common::Extractor {
     return extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External(
@@ -13,7 +13,7 @@ pub fn ubi_extractor() -> extractors::common::Extractor {
     };
 }
 
-/* Describes how to run the ubireader_extract_files utility to extract UBIFS images */
+/// Describes how to run the ubireader_extract_files utility to extract UBIFS images
 pub fn ubifs_extractor() -> extractors::common::Extractor {
     return extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("ubireader_extract_files".to_string()),

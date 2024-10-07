@@ -1,6 +1,6 @@
 use crate::extractors;
 
-/* Describes how to run the sasquatch utility to extract SquashFS images */
+/// Describes how to run the sasquatch utility to extract SquashFS images
 pub fn squashfs_extractor() -> extractors::common::Extractor {
     return extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("sasquatch".to_string()),
@@ -12,7 +12,7 @@ pub fn squashfs_extractor() -> extractors::common::Extractor {
     };
 }
 
-/* Describes how to run the sasquatch-v4be utility to extract big endian SquashFSv4 images */
+/// Describes how to run the sasquatch-v4be utility to extract big endian SquashFSv4 images
 pub fn squashfs_v4_be_extractor() -> extractors::common::Extractor {
     return extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("sasquatch-v4be".to_string()),

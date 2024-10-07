@@ -1,6 +1,6 @@
 use crate::extractors;
 
-/* Describes how to run the 7z utility, supports multiple file formats */
+/// Describes how to run the 7z utility, supports multiple file formats
 pub fn sevenzip_extractor() -> extractors::common::Extractor {
     return extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("7z".to_string()),

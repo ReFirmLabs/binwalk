@@ -2,6 +2,7 @@ use crate::common::crc32;
 use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::trx::parse_trx_header;
 
+/// Defines the internal TRX extractor
 pub fn trx_extractor() -> Extractor {
     return Extractor {
         utility: ExtractorType::Internal(extract_trx_partitions),
@@ -9,6 +10,7 @@ pub fn trx_extractor() -> Extractor {
     };
 }
 
+/// Internal extractor for TRX partitions
 pub fn extract_trx_partitions(
     file_data: &Vec<u8>,
     offset: usize,

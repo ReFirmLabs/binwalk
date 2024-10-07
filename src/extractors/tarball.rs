@@ -1,6 +1,6 @@
 use crate::extractors;
 
-/* Describes how to run the tar utility to extract tarball archives */
+/// Describes how to run the tar utility to extract tarball archives
 pub fn tarball_extractor() -> extractors::common::Extractor {
     return extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("tar".to_string()),
