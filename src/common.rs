@@ -1,3 +1,4 @@
+//! Common Functions
 use chrono::prelude::DateTime;
 use crc32_v2;
 use log::{debug, error};
@@ -9,7 +10,7 @@ use std::io::Read;
 /// ## Example
 ///
 /// ```
-/// use binwalk::read_file;
+/// use binwalk::common::read_file;
 ///
 /// let file_data = read_file("/etc/passwd").unwrap();
 ///
@@ -46,7 +47,7 @@ pub fn read_file(file: impl Into<String>) -> Result<Vec<u8>, std::io::Error> {
 /// ## Example
 ///
 /// ```
-/// use binwalk::crc32;
+/// use binwalk::common::crc32;
 ///
 /// let my_data: &[u8] = b"ABCD";
 ///
@@ -63,7 +64,7 @@ pub fn crc32(data: &[u8]) -> u32 {
 /// ## Example
 ///
 /// ```
-/// use binwalk::epoch_to_string;
+/// use binwalk::common::epoch_to_string;
 ///
 /// let timestamp = epoch_to_string(0);
 ///
@@ -98,7 +99,7 @@ fn get_cstring_bytes(raw_data: &[u8]) -> Vec<u8> {
 /// ## Example
 ///
 /// ```
-/// use binwalk::get_cstring;
+/// use binwalk::common::get_cstring;
 ///
 /// let raw_data: &[u8] = b"this_is_a_c_string\x00";
 ///
@@ -129,7 +130,7 @@ pub fn get_cstring(raw_data: &[u8]) -> String {
 /// ## Example
 ///
 /// ```
-/// use binwalk::is_offset_safe;
+/// use binwalk::common::is_offset_safe;
 ///
 /// let my_data: &[u8] = b"ABCD";
 /// let available_data = my_data.len();

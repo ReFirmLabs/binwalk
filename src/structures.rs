@@ -36,35 +36,58 @@
 //!
 //! ### Example
 //!
-//! To write a parser for a fictional, simple, data structure:
+//! To write a structure parser for a simple, fictional, `FooBar` file header:
 //!
 //! ```no_run
-//! use binwalk::crc32;
+//! use binwalk::common::{crc32, get_cstring};
 //! use binwalk::structures::common::{self, StructureError};
 //!
-//! /// This function parses the file structure as defined in my_struct.
-//! /// It returns the size reported in the data structure on success.
-//! /// It returns structures::common::StructureError on failure.
-//! fn parse_my_structure(data: &[u8]) -> Result<usize, StructureError> {
-//!     // The header CRC is calculated over the first 15 bytes of the header (everything except the header_crc field)
-//!     const CRC_CALC_LEN: usize = 15;
+//! #[derive(Debug, Default, Clone)]
+//! pub struct FooBarHeader {
+//!     pub data_crc: usize,
+//!     pub data_size: usize,
+//!     pub header_size: usize,
+//!     pub original_file_name: String,
+//! }
+//!
+//! /// This function parses and validates the FooBar file header.
+//! /// It returns a FooBarHeader struct on success, StructureError on failure.
+//! fn parse_foobar_header(foobar_data: &[u8]) -> Result<FooBarHeader, StructureError> {
+//!     // The header CRC is calculated over the first 13 bytes of the header (everything except the header_crc field)
+//!     const HEADER_CRC_LEN: usize = 13;
 //!
 //!     // Define a data structure; structure members must be in the order in which they appear in the data
-//!     let my_struct = vec![
+//!     let foobar_struct = vec![
 //!         ("magic", "u32"),
 //!         ("flags", "u8"),
-//!         ("size", "u64"),
-//!         ("volume_id", "u16"),
+//!         ("data_size", "u32"),
+//!         ("data_crc", "u32"),
 //!         ("header_crc", "u32"),
+//!         // NULL-terminated original file name immediately follows the header structure
 //!     ];
 //!
-//!     // Parse the provided data in accordance with the layout defined in my_struct, interpret fields as little endian
-//!     if let Ok(parsed_structure) = common::parse(data, &my_struct, "little") {
+//!     let struct_size: usize = common::size(&foobar_struct);
+//!
+//!     // Parse the provided data in accordance with the layout defined in foobar_struct, interpret fields as little endian
+//!     if let Ok(foobar_header) = common::parse(foobar_data, &foobar_struct, "little") {
 //!         
-//!         // Validate the header CRC
-//!         if let Some(crc_data) = data.get(0..CRC_CALC_LEN) {
-//!             if parsed_structure["header_crc"] == (crc32(crc_data) as usize) {
-//!                 return Ok(parsed_structure["size"]);
+//!         if let Some(crc_data) = foobar_data.get(0..HEADER_CRC_LEN) {
+//!             // Validate the header CRC
+//!             if foobar_header["header_crc"] == (crc32(crc_data) as usize) {
+//!                 // Get the NULL-terminated file name that immediately follows the header structure
+//!                 if let Some(file_name_bytes) = foobar_data.get(struct_size..) {
+//!                     let file_name = get_cstring(file_name_bytes);
+//!
+//!                     // The file name should be non-zero in length
+//!                     if file_name.len() > 0 {
+//!                         return Ok(FooBarHeader{
+//!                             data_crc: foobar_header["data_crc"],
+//!                             data_size: foobar_header["data_size"],
+//!                             header_size: struct_size + file_name.len() + 1,  // Total header size is structure size + name length + NULL byte
+//!                             original_file_name: file_name.clone(),
+//!                         });
+//!                     }
+//!                 }
 //!             }
 //!         }
 //!     }

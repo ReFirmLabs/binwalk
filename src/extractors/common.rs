@@ -90,7 +90,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
-    /// use binwalk::Chroot;
+    /// use binwalk::extractors::common::Chroot;
     ///
     /// # std::fs::remove_dir_all("/tmp/foobar");
     /// let chroot_directory = "/tmp/foobar".to_string();
@@ -149,7 +149,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
-    /// use binwalk::Chroot;
+    /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_directory = "/tmp/foobar".to_string();
     ///
@@ -193,7 +193,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
-    /// use binwalk::Chroot;
+    /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_dir = "/tmp/foobar/".to_string();
     ///
@@ -211,7 +211,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
-    /// use binwalk::Chroot;
+    /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
     /// let file_data: &[u8] = b"foobar";
@@ -250,7 +250,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
-    /// use binwalk::Chroot;
+    /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
     /// let file_data_with_trailing_junk: &[u8] = b"foobarJUNK";
@@ -304,7 +304,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
-    /// use binwalk::Chroot;
+    /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
     /// let dev_major: usize = 1;
@@ -333,7 +333,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
-    /// use binwalk::Chroot;
+    /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
     /// let dev_major: usize = 1;
@@ -362,7 +362,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
-    /// use binwalk::Chroot;
+    /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
     ///
@@ -384,7 +384,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
-    /// use binwalk::Chroot;
+    /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
     ///
@@ -406,7 +406,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
-    /// use binwalk::Chroot;
+    /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
     /// let my_file_data: &[u8] = b"foobar";
@@ -456,7 +456,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
-    /// use binwalk::Chroot;
+    /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
     ///
@@ -487,7 +487,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
-    /// use binwalk::Chroot;
+    /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
     ///
@@ -549,7 +549,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
-    /// use binwalk::Chroot;
+    /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
     ///
