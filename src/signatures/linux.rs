@@ -1,10 +1,14 @@
 use crate::common::get_cstring;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_LOW};
+use crate::signatures::common::{
+    SignatureError, SignatureResult, CONFIDENCE_LOW, CONFIDENCE_MEDIUM,
+};
+use crate::structures::linux::parse_linux_arm64_boot_image_header;
 use aho_corasick::AhoCorasick;
 
 /// Human readable descriptions
 pub const LINUX_BOOT_IMAGE_DESCRIPTION: &str = "Linux kernel boot image";
 pub const LINUX_KERNEL_VERSION_DESCRIPTION: &str = "Linux kernel version";
+pub const LINUX_ARM64_BOOT_IMAGE_DESCRIPTION: &str = "Linux kernel ARM64 boot image";
 
 /// Magic bytes for a linux boot image
 pub fn linux_boot_image_magic() -> Vec<Vec<u8>> {
@@ -14,6 +18,43 @@ pub fn linux_boot_image_magic() -> Vec<Vec<u8>> {
 /// Kernel version string magic
 pub fn linux_kernel_version_magic() -> Vec<Vec<u8>> {
     return vec![b"Linux\x20version\x20".to_vec()];
+}
+
+/// Magic bytes for a linux ARM64 boot image
+pub fn linux_arm64_boot_image_magic() -> Vec<Vec<u8>> {
+    return vec![b"\x00\x00\x00\x00\x00\x00\x00\x00ARMd".to_vec()];
+}
+
+/// Validate a linux ARM64 boot image signature
+pub fn linux_arm64_boot_image_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<SignatureResult, SignatureError> {
+    // Magic bytes are 56 bytes into the image
+    const MAGIC_OFFSET: usize = 0x30;
+
+    let mut result = SignatureResult {
+        confidence: CONFIDENCE_MEDIUM,
+        description: LINUX_ARM64_BOOT_IMAGE_DESCRIPTION.to_string(),
+        ..Default::default()
+    };
+
+    if offset >= MAGIC_OFFSET {
+        // Set the real starting offset
+        result.offset = offset - MAGIC_OFFSET;
+
+        // Parse and validate the header data
+        if let Ok(image_header) = parse_linux_arm64_boot_image_header(&file_data[result.offset..]) {
+            result.size = image_header.header_size;
+            result.description = format!(
+                "{}, {} endian, effective image size: {} bytes",
+                result.description, image_header.endianness, image_header.image_size
+            );
+            return Ok(result);
+        }
+    }
+
+    return Err(SignatureError);
 }
 
 /// Validate a linux boot image signature

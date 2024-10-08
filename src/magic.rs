@@ -873,5 +873,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         extractor: Some(extractors::svg::svg_extractor()),
     });
 
+    // Linux ARM64 boot image
+    binary_signatures.push(signatures::common::Signature {
+        name: "linux_arm64_boot_image".to_string(),
+        short: false,
+        magic_offset: 0,
+        always_display: false,
+        magic: signatures::linux::linux_arm64_boot_image_magic(),
+        parser: signatures::linux::linux_arm64_boot_image_parser,
+        description: signatures::linux::LINUX_ARM64_BOOT_IMAGE_DESCRIPTION.to_string(),
+        extractor: None,
+    });
+
     return binary_signatures;
 }

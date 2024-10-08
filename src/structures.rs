@@ -113,6 +113,7 @@ pub mod gzip;
 pub mod iso9660;
 pub mod jboot;
 pub mod jffs2;
+pub mod linux;
 pub mod lz4;
 pub mod lzfse;
 pub mod lzma;
