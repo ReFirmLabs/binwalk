@@ -143,3 +143,4 @@ pub mod xz;
 pub mod yaffs;
 pub mod zip;
 pub mod zstd;
+pub mod fat;

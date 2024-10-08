@@ -885,5 +885,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         extractor: None,
     });
 
+    // FAT
+    binary_signatures.push(signatures::common::Signature {
+        name: "fat".to_string(),
+        short: true,
+        magic_offset: signatures::fat::MAGIC_OFFSET,
+        always_display: false,
+        magic: signatures::fat::fat_magic(),
+        parser: signatures::fat::fat_parser,
+        description: signatures::fat::DESCRIPTION.to_string(),
+        extractor: Some(extractors::tsk::tsk_extractor()),
+    });
+
     return binary_signatures;
 }
