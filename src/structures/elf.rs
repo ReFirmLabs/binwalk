@@ -126,6 +126,7 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, StructureError> {
         (78, "Element 14 64-bit DSP"),
         (79, "LSI Logic 16-bit DSP"),
         (94, "Tensilica Xtensa"),
+        (137, "Broadcom VideoCore III processor"),
         (140, "TMS320C6000"),
         (175, "MCST Elbrus e2k"),
         (183, "ARM 64-bit"),
