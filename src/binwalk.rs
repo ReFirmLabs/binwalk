@@ -674,8 +674,8 @@ fn init_extraction_directory(
 
     debug!(
         "Creating symlink from {} -> {}",
-        symlink_path.to_str().unwrap(),
-        target_path.to_str().unwrap()
+        symlink_path.display(),
+        target_path.display()
     );
 
     // Create a symlink from inside the extraction directory to the specified target file
@@ -688,8 +688,8 @@ fn init_extraction_directory(
             Err(e) => {
                 error!(
                     "Failed to create symlink {} -> {}: {}",
-                    symlink_path.to_str().unwrap(),
-                    target_path.to_str().unwrap(),
+                    symlink_path.display(),
+                    target_path.display(),
                     e
                 );
                 return Err(e);
@@ -705,8 +705,8 @@ fn init_extraction_directory(
             Err(e) => {
                 error!(
                     "Failed to create symlink {} -> {}: {}",
-                    symlink_path.to_str().unwrap(),
-                    target_path.to_str().unwrap(),
+                    symlink_path.display(),
+                    target_path.display(),
                     e
                 );
                 return Err(e);

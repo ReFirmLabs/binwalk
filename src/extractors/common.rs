@@ -591,7 +591,7 @@ impl Chroot {
                 }
                 Some(parent_dir) => {
                     // Got the parent directory
-                    relative_dir = parent_dir.to_str().unwrap().to_string();
+                    relative_dir = parent_dir.display().to_string();
                 }
             }
 
@@ -725,7 +725,7 @@ pub fn get_extracted_files(directory: &String) -> Vec<String> {
                     Ok(md) => {
                         // Only interested in non-empty, regular files
                         if md.is_file() && md.len() > 0 {
-                            regular_files.push(entry_path.to_str().unwrap().to_string());
+                            regular_files.push(entry_path.display().to_string());
                         }
                     }
                 }
