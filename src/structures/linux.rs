@@ -12,8 +12,7 @@ pub struct LinuxARM64BootHeader {
 pub fn parse_linux_arm64_boot_image_header(
     img_data: &[u8],
 ) -> Result<LinuxARM64BootHeader, StructureError> {
-    const P: u8 = 0x50;
-    const E: u8 = 0x45;
+    const PE: &[u8] = b"PE";
     const FLAGS_RESERVED_MASK: usize =
         0b11111111_11111111_11111111_11111111_11111111_11111111_11111111_11110000;
     const FLAGS_ENDIAN_MASK: usize = 1;
@@ -44,26 +43,28 @@ pub fn parse_linux_arm64_boot_image_header(
             && img_header["reserved2"] == 0
             && img_header["reserved3"] == 0
         {
+            // Start and end of PE signature
+            let pe_start = img_header["pe_offset"];
+            let pe_end = pe_start + PE.len();
+
             // Get the data pointed to by the pe_offset header field
-            if let Some(pe_offset_data) = img_data.get(img_header["pe_offset"]..) {
+            if let Some(pe_data) = img_data.get(pe_start..pe_end) {
                 // There should be a PE header here
-                if pe_offset_data.len() >= 2 {
-                    if pe_offset_data[0] == P && pe_offset_data[1] == E {
-                        // Make sure the reserved flag bits are not set
-                        if (img_header["flags"] & FLAGS_RESERVED_MASK) == 0 {
-                            // Determine the endianness from the flags field
-                            if (img_header["flags"] & FLAGS_ENDIAN_MASK) == BIG_ENDIAN {
-                                result.endianness = "big".to_string();
-                            } else {
-                                result.endianness = "little".to_string();
-                            }
-
-                            // Report the kernel image and header sizes
-                            result.image_size = img_header["image_size"];
-                            result.header_size = common::size(&boot_img_structure);
-
-                            return Ok(result);
+                if pe_data == PE {
+                    // Make sure the reserved flag bits are not set
+                    if (img_header["flags"] & FLAGS_RESERVED_MASK) == 0 {
+                        // Determine the endianness from the flags field
+                        if (img_header["flags"] & FLAGS_ENDIAN_MASK) == BIG_ENDIAN {
+                            result.endianness = "big".to_string();
+                        } else {
+                            result.endianness = "little".to_string();
                         }
+
+                        // Report the kernel image and header sizes
+                        result.image_size = img_header["image_size"];
+                        result.header_size = common::size(&boot_img_structure);
+
+                        return Ok(result);
                     }
                 }
             }
