@@ -63,7 +63,7 @@ pub fn linux_kernel_version_parser(
     const PERIOD_OFFSET_2: usize = 17;
     const MIN_FILE_SIZE: usize = 100 * 1024;
     const MIN_VERSION_STRING_LENGTH: usize = 75;
-    const GCC_VERSION_STRING: &str = "(gcc version ";
+    const GCC_VERSION_STRING: &str = "gcc ";
 
     let mut result = SignatureResult {
         offset: offset,
