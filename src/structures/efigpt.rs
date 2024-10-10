@@ -1,5 +1,5 @@
-use crate::structures::common::{self, StructureError};
 use crate::common::crc32;
+use crate::structures::common::{self, StructureError};
 
 const BLOCK_SIZE: usize = 512;
 
@@ -32,7 +32,9 @@ pub fn parse_efigpt_header(efi_data: &[u8]) -> Result<EFIGPTHeader, StructureErr
         ("partition_entries_crc", "u32"),
     ];
 
-    let mut result = EFIGPTHeader{ ..Default::default() };
+    let mut result = EFIGPTHeader {
+        ..Default::default()
+    };
 
     // EFI GPT structure starts at the second block (first block is MBR)
     if let Some(gpt_data) = efi_data.get(BLOCK_SIZE..) {
@@ -43,13 +45,20 @@ pub fn parse_efigpt_header(efi_data: &[u8]) -> Result<EFIGPTHeader, StructureErr
                 // Make sure the revision field is the expected valid
                 if gpt_header["revision"] == EXPTECTED_REVISION {
                     // Calculate the start and end offsets of the partition entries
-                    let partition_entries_start: usize = lba_to_offset(gpt_header["partition_entry_lba"]);
-                    let partition_entries_end: usize = partition_entries_start + (gpt_header["partition_entry_count"] * gpt_header["partition_entry_size"]);
+                    let partition_entries_start: usize =
+                        lba_to_offset(gpt_header["partition_entry_lba"]);
+                    let partition_entries_end: usize = partition_entries_start
+                        + (gpt_header["partition_entry_count"]
+                            * gpt_header["partition_entry_size"]);
 
                     // Get the partition entires
-                    if let Some(partition_entries_data) = efi_data.get(partition_entries_start..partition_entries_end) {
+                    if let Some(partition_entries_data) =
+                        efi_data.get(partition_entries_start..partition_entries_end)
+                    {
                         // Validate the partition entries' CRC
-                        if crc32(partition_entries_data) == (gpt_header["partition_entries_crc"] as u32) {
+                        if crc32(partition_entries_data)
+                            == (gpt_header["partition_entries_crc"] as u32)
+                        {
                             // Alternate GPT header is at the end of the EFI GPT, and is one block in size
                             result.total_size = lba_to_offset(gpt_header["alternate_lba"] + 1);
                             return Ok(result);

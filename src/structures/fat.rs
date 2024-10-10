@@ -45,7 +45,9 @@ pub fn parse_fat_header(fat_data: &[u8]) -> Result<FATHeader, StructureError> {
     let valid_media_types: Vec<usize> = vec![0xF0, 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE];
 
     // Return value
-    let mut result = FATHeader { ..Default::default() };
+    let mut result = FATHeader {
+        ..Default::default()
+    };
 
     // Parse the boot sector header
     if let Ok(bs_header) = common::parse(fat_data, &fat_boot_sector_structure, "little") {
@@ -66,11 +68,12 @@ pub fn parse_fat_header(fat_data: &[u8]) -> Result<FATHeader, StructureError> {
 
                                 // total_sectors_16 is used for FAT12/16 that have less than 0x10000 sectors
                                 if bs_header["total_sectors_16"] != 0 {
-                                    result.total_size = bs_header["total_sectors_16"] * bs_header["bytes_per_sector"];
+                                    result.total_size = bs_header["total_sectors_16"]
+                                        * bs_header["bytes_per_sector"];
                                 // Else, total_sectors_32 is used to define the number of sectors
                                 } else {
-                                    result.total_size = bs_header["total_sectors_32"] * bs_header["bytes_per_sector"];
-
+                                    result.total_size = bs_header["total_sectors_32"]
+                                        * bs_header["bytes_per_sector"];
                                 }
 
                                 // If both total_sectors_32 and total_sectors_16 is 0, this is not a valid FAT

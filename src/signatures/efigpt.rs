@@ -10,7 +10,10 @@ pub fn efigpt_magic() -> Vec<Vec<u8>> {
 }
 
 /// Validates the EFI GPT header
-pub fn efigpt_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn efigpt_parser(
+    file_data: &Vec<u8>,
+    offset: usize,
+) -> Result<SignatureResult, SignatureError> {
     // Offset of magic bytes from the start of the MBR
     const MAGIC_OFFSET: usize = 0x01FE;
 
@@ -24,7 +27,7 @@ pub fn efigpt_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResu
     if offset >= MAGIC_OFFSET {
         // MBR actually starts this may bytes before the magic bytes
         result.offset = offset - MAGIC_OFFSET;
-       
+
         // Get the EFI data, including the MBR block
         if let Some(efi_data) = file_data.get(result.offset..) {
             // Parse the EFI data; this also validates CRC so if this succeeds, confidence is high

@@ -38,7 +38,10 @@ pub fn fat_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
                     fat_type_desc = "FAT32";
                 }
 
-                result.description = format!("{}, type: {}, total size: {} bytes", result.description, fat_type_desc, result.size);
+                result.description = format!(
+                    "{}, type: {}, total size: {} bytes",
+                    result.description, fat_type_desc, result.size
+                );
                 return Ok(result);
             }
         }
