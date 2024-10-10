@@ -897,5 +897,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         extractor: Some(extractors::tsk::tsk_extractor()),
     });
 
+    // EFI GPT
+    binary_signatures.push(signatures::common::Signature {
+        name: "efigpt".to_string(),
+        short: false,
+        magic_offset: 0,
+        always_display: false,
+        magic: signatures::efigpt::efigpt_magic(),
+        parser: signatures::efigpt::efigpt_parser,
+        description: signatures::efigpt::DESCRIPTION.to_string(),
+        extractor: Some(extractors::sevenzip::sevenzip_extractor()),
+    });
+
     return binary_signatures;
 }

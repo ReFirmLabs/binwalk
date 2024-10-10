@@ -144,3 +144,4 @@ pub mod yaffs;
 pub mod zip;
 pub mod zstd;
 pub mod fat;
+pub mod efigpt;
