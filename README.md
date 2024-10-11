@@ -35,16 +35,13 @@ It is recommended that you run Binwalk on a Debian-based system.
 
 ## Installation
 
-### Build Dependencies
+### Dependencies
 
-To compile Binwalk from source, you must first have the [Rust compiler](https://www.rust-lang.org/tools/install) installed:
+Binwalk relies on several external utilities to perform extraction. These are not required, but automated extraction of certain file types will fail if they are not installed.
 
-```
-sudo apt install curl
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-```
+To install *all* required dependencies, run the included `dependencies/ubuntu.sh` script.
 
-Some system libraries are also required:
+To install *only* the build dependencies:
 
 ```
 sudo apt install libfontconfig1-dev liblzma-dev
@@ -52,10 +49,11 @@ sudo apt install libfontconfig1-dev liblzma-dev
 
 ### Compiling From Source
 
-To download and build the Binwalk source code:
+To compile Binwalk from source, you must have the [Rust compiler](https://www.rust-lang.org/tools/install) installed.
+
+Download and build the Binwalk source code:
 
 ```
-sudo apt install git
 git clone -b binwalkv3 https://github.com/ReFirmLabs/binwalk.git
 cd binwalk
 cargo build --release
@@ -64,66 +62,6 @@ cargo build --release
 
 The Binwalk binary will be located at the `target/release/binwalk` path, as shown above.
 You may copy it to, and run it from, any location on your system that you prefer.
-
-### Runtime Dependencies
-
-Binwalk relies on several external command-line utilities to perform extraction. Some are installed on most Linux systems by default, others are not.
-
-To install all required extraction utilities:
-
-```
-sudo apt install p7zip-full zstd unzip tar sleuthkit cabextract lz4 lzop device-tree-compiler unrar unyaffs
-```
-
-```
-sudo apt install python3-pip
-sudo pip3 install uefi_firmware
-sudo pip3 install jefferson
-sudo pip3 install ubi-reader
-```
-
-```
-# Thanks to the ONEKEY team for maintaining this Sasquatch Debian package!
-curl -L -o sasquatch_1.0.deb "https://github.com/onekey-sec/sasquatch/releases/download/sasquatch-v4.5.1-4/sasquatch_1.0_$(dpkg --print-architecture).deb"
-sudo dpkg -i sasquatch_1.0.deb
-rm sasquatch_1.0.deb
-```
-
-```
-sudo apt install build-essential clang liblzo2-dev libucl-dev liblz4-dev
-git clone https://github.com/askac/dumpifs.git
-cd dumpifs
-make dumpifs
-sudo cp ./dumpifs /usr/local/bin/dumpifs
-```
-
-```
-sudo apt install libbz2-dev
-
-git clone https://github.com/lzfse/lzfse.git
-cd lzfse
-sudo make install
-
-git clone https://github.com/Lekensteyn/dmg2img.git
-cd dmg2img
-make dmg2img HAVE_LZFSE=1
-sudo make install
-```
-
-```
-mkdir srec
-cd srec
-wget http://www.goffart.co.uk/s-record/download/srec_151_src.zip
-unzip srec_151_src.zip
-make
-sudo cp srec2bin /usr/local/bin/
-```
-
-```
-sudo apt install python3-pip liblzo2-dev
-sudo pip3 install --upgrade lz4 zstandard git+https://github.com/clubby789/python-lzo@b4e39df
-sudo pip3 install --upgrade git+https://github.com/marin-m/vmlinux-to-elf
-```
 
 ## Usage
 
