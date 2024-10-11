@@ -24,6 +24,8 @@ pub fn efigpt_parser(
         ..Default::default()
     };
 
+    let available_data = file_data.len() - offset;
+
     if offset >= MAGIC_OFFSET {
         // MBR actually starts this may bytes before the magic bytes
         result.offset = offset - MAGIC_OFFSET;
@@ -32,7 +34,13 @@ pub fn efigpt_parser(
         if let Some(efi_data) = file_data.get(result.offset..) {
             // Parse the EFI data; this also validates CRC so if this succeeds, confidence is high
             if let Ok(efi_header) = parse_efigpt_header(efi_data) {
-                result.size = efi_header.total_size;
+                // Some EFI images have been observed to define partitions that extend beyond EOF.
+                // If that is the case, assume the EFI image extends to EOF.
+                if efi_header.total_size > available_data {
+                    result.size = available_data;
+                } else {
+                    result.size = efi_header.total_size;
+                }
                 result.description = format!("{}, total size: {}", result.description, result.size);
                 return Ok(result);
             }

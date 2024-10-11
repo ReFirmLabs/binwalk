@@ -1,4 +1,4 @@
-use crate::common::crc32;
+use crate::common::{crc32, is_offset_safe};
 use crate::structures::common::{self, StructureError};
 
 const BLOCK_SIZE: usize = 512;
@@ -59,9 +59,26 @@ pub fn parse_efigpt_header(efi_data: &[u8]) -> Result<EFIGPTHeader, StructureErr
                         if crc32(partition_entries_data)
                             == (gpt_header["partition_entries_crc"] as u32)
                         {
-                            // Alternate GPT header is at the end of the EFI GPT, and is one block in size
-                            result.total_size = lba_to_offset(gpt_header["alternate_lba"] + 1);
-                            return Ok(result);
+                            let mut next_partition_offset = 0;
+                            let mut previous_partition_offset = None;
+                            let available_data = partition_entries_data.len();
+
+                            // Loop through all partition entries
+                            while is_offset_safe(available_data, next_partition_offset, previous_partition_offset) {
+                                if let Some(partition) = parse_gpt_partition_entry(&partition_entries_data[next_partition_offset..]) {
+                                    // EOF is the end of the farthest away partition
+                                    if partition.start_offset < partition.end_offset && partition.end_offset > result.total_size {
+                                        result.total_size = partition.end_offset;
+                                    }
+                                }
+                                
+                                previous_partition_offset = Some(next_partition_offset);
+                                next_partition_offset += gpt_header["partition_entry_size"];
+                            }
+
+                            if result.total_size > 0 {
+                                return Ok(result);
+                            }
                         }
                     }
                 }
@@ -70,6 +87,38 @@ pub fn parse_efigpt_header(efi_data: &[u8]) -> Result<EFIGPTHeader, StructureErr
     }
 
     return Err(StructureError);
+}
+
+#[derive(Debug, Default, Clone)]
+struct GPTPartitionEntry {
+    pub end_offset: usize,
+    pub start_offset: usize,
+}
+
+/// Parse a GPT partition entry
+fn parse_gpt_partition_entry(entry_data: &[u8]) -> Option<GPTPartitionEntry> {
+    let entry_structure = vec![
+        ("type_guid_p1", "u64"),
+        ("type_guid_p2", "u64"),
+        ("partition_guid_p1", "u64"),
+        ("partition_guid_p2", "u64"),
+        ("starting_lba", "u64"),
+        ("ending_lba", "u64"),
+        ("attributes", "u64"),
+    ];
+
+    let mut result = GPTPartitionEntry { ..Default::default() };
+
+    if let Ok(entry_header) = common::parse(entry_data, &entry_structure, "little") {
+        // GUID types of NULL can be ignored
+        if entry_header["type_guid_p1"] != 0 && entry_header["type_guid_p2"] != 0 {
+            result.start_offset = lba_to_offset(entry_header["starting_lba"]);
+            result.end_offset = lba_to_offset(entry_header["ending_lba"]);
+            return Some(result);
+        }
+    }
+
+    return None;
 }
 
 // Convert LBA to offset

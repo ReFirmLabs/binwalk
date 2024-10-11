@@ -1,3 +1,4 @@
+use aho_corasick::AhoCorasick;
 use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 use crate::structures::dmg::parse_dmg_footer;
 
@@ -12,12 +13,12 @@ pub fn dmg_magic() -> Vec<Vec<u8>> {
 
 /// Validates the DMG footer
 pub fn dmg_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
-    // XML data should start with this string
-    const XML_SIGNATURE: &str = "<?xml";
-
+    // Confidence is set to HIGH + 1 to ensure this overrides other signatures.
+    // DMG's typically start with compressed data, and the file should be treated
+    // as a DMG, not just compressed data.
     let mut result = SignatureResult {
         description: DESCRIPTION.to_string(),
-        confidence: CONFIDENCE_HIGH,
+        confidence: CONFIDENCE_HIGH + 1,
         ..Default::default()
     };
 
@@ -35,35 +36,49 @@ pub fn dmg_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
          * be related to signing certificates and is variable in length, making the above theoretical calculations of the DMG offset
          * and size invalid.
          *
-         * The current extractor (7z) cannot handle these signed DMGs anyway, and the beginning of the DMG is often compressed.
-         * So while the DMG will not be matched, the compressed data will, and at least something gets extracted.
-         *
-         * Non-signed DMGs should be identified and extracted correctly.
+         * Instead, we have to search the file data for the XML property, then the correct offset can be calculated.
          */
 
         // Make sure the length of image data and length of XML data are sane
         if (dmg_footer.data_length + dmg_footer.xml_length) <= offset {
-            // Calculate the start and end offset of the XML tag, based on the XML data length provided in the DMG footer
-            let start_xml_signature: usize = offset - dmg_footer.xml_length;
-            let end_xml_signature: usize = start_xml_signature + XML_SIGNATURE.len();
-
-            if let Some(xml_data) = file_data.get(start_xml_signature..end_xml_signature) {
-                // Convert the XML tag to a string
-                if let Ok(xml_signature) = String::from_utf8(xml_data.to_vec()) {
-                    // XML tag should start with "<?xml"
-                    if xml_signature == XML_SIGNATURE {
-                        // Report the result
-                        result.size =
-                            dmg_footer.data_length + dmg_footer.xml_length + dmg_footer.footer_size;
-                        result.offset = offset - (dmg_footer.data_length + dmg_footer.xml_length);
-                        result.description =
-                            format!("{}, total size: {} bytes", result.description, result.size);
-                        return Ok(result);
-                    }
+            // Locate the XML data
+            if let Some(xml_offset) = find_xml_property_list(&file_data) {
+                // Make sure the XML data comes after the image data
+                if xml_offset >= dmg_footer.data_length {
+                    // Report the result
+                    result.size = offset + dmg_footer.footer_size;
+                    result.offset = xml_offset - dmg_footer.data_length;
+                    result.description =
+                        format!("{}, total size: {} bytes", result.description, result.size);
+                    return Ok(result);
                 }
             }
         }
     }
 
     return Err(SignatureError);
+}
+
+fn find_xml_property_list(file_data: &[u8]) -> Option<usize> {
+    // XML data should start with this string
+    const XML_SIGNATURE: &str = "<?xml";
+    const MIN_XML_LENGTH: usize = 1024;
+    const BLKX_KEY: &str = "<key>blkx</key>";
+
+    let grep = AhoCorasick::new(vec![XML_SIGNATURE]).unwrap();
+
+    for xml_match in grep.find_overlapping_iter(file_data) {
+        let xml_start = xml_match.start();
+        let xml_end = xml_start + MIN_XML_LENGTH;
+
+        if let Some(xml_data) = file_data.get(xml_start..xml_end) {
+            if let Ok(xml_string) = String::from_utf8(xml_data.to_vec()) {
+                if xml_string.contains(BLKX_KEY) {
+                    return Some(xml_start);
+                }
+            }
+        }
+    }
+
+    return None;
 }

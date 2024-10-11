@@ -98,8 +98,15 @@ sudo cp ./dumpifs /usr/local/bin/dumpifs
 ```
 
 ```
+sudo apt install libbz2-dev
+
 git clone https://github.com/lzfse/lzfse.git
 cd lzfse
+sudo make install
+
+git clone https://github.com/Lekensteyn/dmg2img.git
+cd dmg2img
+make dmg2img HAVE_LZFSE=1
 sudo make install
 ```
 
