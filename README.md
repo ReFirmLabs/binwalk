@@ -37,9 +37,9 @@ It is recommended that you run Binwalk on a Debian-based system.
 
 ### Dependencies
 
-Binwalk relies on several external utilities to perform extraction. These are not required, but automated extraction of certain file types will fail if they are not installed.
+Binwalk relies on several external utilities to perform extraction at runtime. These are not required, but automated extraction of certain file types will fail if they are not installed.
 
-To install *all* required dependencies, run the included `dependencies/ubuntu.sh` script.
+To install *all* build and runtime dependencies, run the included `dependencies/ubuntu.sh` script.
 
 To install *only* the build dependencies:
 
