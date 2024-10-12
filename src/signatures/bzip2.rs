@@ -1,4 +1,5 @@
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
+use crate::extractors::bzip2::bzip2_decompressor;
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 
 /// Human readable description
 pub const DESCRIPTION: &str = "bzip2 compressed data";
@@ -19,23 +20,24 @@ pub fn bzip2_magic() -> Vec<Vec<u8>> {
 }
 
 /// Bzip2 header parser
-pub fn bzip2_parser(
-    _file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<SignatureResult, SignatureError> {
+pub fn bzip2_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
     // Return value
-    let result = SignatureResult {
+    let mut result = SignatureResult {
         description: DESCRIPTION.to_string(),
         offset: offset,
-        confidence: CONFIDENCE_MEDIUM,
+        confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };
 
-    /*
-     * Signature is long enough that, currently, we just assume it's valid
-     * The full bz2 header structure does contain a CRC, but this appears to
-     * be the CRC of the uncompressed data, and while there is an end-of-stream
-     * marker, it is not guarunteed to be byte-aligned (https://en.wikipedia.org/wiki/Bzip2).
-     */
+    let dry_run = bzip2_decompressor(file_data, offset, None);
+
+    if dry_run.success == true {
+        if let Some(bzip2_size) = dry_run.size {
+            result.size = bzip2_size;
+            result.description =
+                format!("{}, total size: {} bytes", result.description, result.size);
+        }
+    }
+
     return Ok(result);
 }

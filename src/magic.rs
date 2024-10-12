@@ -111,7 +111,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         magic: signatures::bzip2::bzip2_magic(),
         parser: signatures::bzip2::bzip2_parser,
         description: signatures::bzip2::DESCRIPTION.to_string(),
-        extractor: Some(extractors::sevenzip::sevenzip_extractor()),
+        extractor: Some(extractors::bzip2::bzip2_extractor()),
     });
 
     // uimage

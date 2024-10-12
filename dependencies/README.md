@@ -1,6 +1,6 @@
 # Binwalk Dependencies
 
-These scripts install the requied Binwalk build and runtime system dependencies, except for the Rust compiler itself.
+These scripts install the required Binwalk build and runtime system dependencies, except for the Rust compiler itself.
 
 Execute the appropriate script for your operating system (e.g., `ubuntu.sh` for Ubuntu).
 

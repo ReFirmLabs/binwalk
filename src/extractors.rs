@@ -141,6 +141,7 @@
 
 pub mod androidsparse;
 pub mod arcadyan;
+pub mod bzip2;
 pub mod cab;
 pub mod common;
 pub mod dmg;
