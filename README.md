@@ -19,10 +19,8 @@ This results in fewer false positives, more reliable file extraction, and more d
 
 ### Faster Analysis and Extraction
 
-Execution time is noticably faster than previous Binwalk versions, in large part thanks to the Rust language.
-
-Combined with [efficient](https://cp-algorithms.com/string/aho_corasick.html) pattern matching and multi-threaded recursive extraction, analysis and extraction is as much as 70x faster
-than previous Binwalk releases.
+Rust is inherently faster than Python; this, combined with [efficient](https://cp-algorithms.com/string/aho_corasick.html) pattern matching and multi-threaded recursive extraction makes
+analysis and extraction much faster than previous Binwalk releases.
 
 ### JSON Output
 
