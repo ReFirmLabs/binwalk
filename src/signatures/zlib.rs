@@ -15,7 +15,7 @@ pub fn zlib_magic() -> Vec<Vec<u8>> {
 
 /// Validate a zlib signature
 pub fn zlib_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
-    let result = SignatureResult {
+    let mut result = SignatureResult {
         offset: offset,
         confidence: CONFIDENCE_HIGH,
         description: DESCRIPTION.to_string(),
@@ -29,7 +29,12 @@ pub fn zlib_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
 
         // If the decompression dry run was a success, this signature is almost certianly valid
         if decompression_dry_run.success == true {
-            return Ok(result);
+            if let Some(zlib_file_size) = decompression_dry_run.size {
+                result.size = zlib_file_size;
+                result.description =
+                    format!("{}, total size: {} bytes", result.description, result.size);
+                return Ok(result);
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 use crate::extractors::common::{Chroot, ExtractionResult};
-use miniz_oxide::inflate;
+use flate2::bufread::DeflateDecoder;
+use std::io::Read;
 
 /*
  * The inflate_decompressor extractor is currently not directly used by any signature definitions.
@@ -18,57 +19,57 @@ pub fn inflate_decompressor(
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {
-    const MIN_DECOMPRESSED_SIZE: usize = 1;
-    const DECOMPRESS_TEST_SIZE: usize = 512;
+    // Size of decompression buffer
+    const BLOCK_SIZE: usize = 8192;
+    // Output file for decompressed data
     const OUTPUT_FILE_NAME: &str = "decompressed.bin";
-
-    let dry_run: bool;
-    let compressed_data_start: usize = offset;
-    let mut compressed_data_end: usize = file_data.len();
 
     let mut result = ExtractionResult {
         ..Default::default()
     };
 
-    match output_directory {
-        None => {
-            dry_run = true;
-        }
-        Some(_) => {
-            dry_run = false;
-        }
-    }
+    let mut decompressed_buffer = [0; BLOCK_SIZE];
+    let mut decompressor = DeflateDecoder::new(&file_data[offset..]);
 
-    // During a dry run, limit the size of compressed data to DECOMPRESS_TEST_SIZE.
-    if dry_run == true && compressed_data_end > (compressed_data_start + DECOMPRESS_TEST_SIZE) {
-        compressed_data_end = compressed_data_start + DECOMPRESS_TEST_SIZE;
-    }
-
-    // Do decompression
-    // WARNING: The decompressed data is stored completely in memory. Use flate2 wrapper instead?
-    match inflate::decompress_to_vec(&file_data[compressed_data_start..compressed_data_end]) {
-        Ok(decompressed_data) => {
-            // Make sure some data was actually decompresed
-            if decompressed_data.len() > 0 {
-                if dry_run == true {
-                    result.success = true;
-                } else {
-                    let chroot = Chroot::new(output_directory);
-                    result.success = chroot.create_file(OUTPUT_FILE_NAME, &decompressed_data);
-                }
+    /*
+     * Loop through all compressed data and decompress it.
+     *
+     * This has a significant performance hit since 1) decompression takes time, and 2) data is
+     * decompressed once during signature validation and a second time during extraction (if extraction
+     * was requested).
+     *
+     * The advantage is that not only are we 100% sure that this data is a valid deflate stream, but we
+     * can also determine the exact size of the deflated data.
+     */
+    loop {
+        // Decompress a block of data
+        match decompressor.read(&mut decompressed_buffer) {
+            Err(_) => {
+                // Break on decompression error
+                break;
             }
-        }
-        Err(e) => {
-            /*
-             * Failure due to truncated data is possible, and expected, when doing a dry run since
-             * the compressed data provided to the inflate function is truncated to DECOMPRESS_TEST_SIZE bytes.
-             * In this case, consider decompression a success.
-             */
-            if dry_run == true
-                && e.status == inflate::TINFLStatus::FailedCannotMakeProgress
-                && e.output.len() >= MIN_DECOMPRESSED_SIZE
-            {
-                result.success = true;
+            Ok(n) => {
+                // Decompressed a block of data, if extraction was requested write the decompressed block to the output file
+                if n > 0 && !output_directory.is_none() {
+                    let chroot = Chroot::new(output_directory);
+                    if chroot.append_to_file(OUTPUT_FILE_NAME, &decompressed_buffer[0..n]) == false
+                    {
+                        // If writing data to file fails, break
+                        break;
+                    }
+                }
+
+                // No data was read, end of compression stream
+                if n == 0 {
+                    // If some data was actually decompressed, report success and the number of input bytes consumed
+                    if decompressor.total_out() > 0 {
+                        result.success = true;
+                        result.size = Some(decompressor.total_in() as usize);
+                    }
+
+                    // Nothing else to do, break
+                    break;
+                }
             }
         }
     }
