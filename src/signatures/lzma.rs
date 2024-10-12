@@ -65,14 +65,18 @@ pub fn lzma_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
 
         // Return success if dry run succeeded
         if dry_run.success == true {
-            result.description = format!(
-                "{}, properties: {:#04X}, dictionary size: {} bytes, uncompressed size: {} bytes",
-                result.description,
-                lzma_header.properties,
-                lzma_header.dictionary_size,
-                lzma_header.decompressed_size
-            );
-            return Ok(result);
+            if let Some(lzma_stream_size) = dry_run.size {
+                result.size = lzma_stream_size;
+                result.description = format!(
+                    "{}, properties: {:#04X}, dictionary size: {} bytes, compressed size: {} bytes, uncompressed size: {} bytes",
+                    result.description,
+                    lzma_header.properties,
+                    lzma_header.dictionary_size,
+                    result.size,
+                    lzma_header.decompressed_size
+                );
+                return Ok(result);
+            }
         }
     }
 

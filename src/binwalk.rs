@@ -270,9 +270,10 @@ impl Binwalk {
                                 "Found valid {} short signature at offset {:#X}",
                                 signature_result.name, FILE_START_OFFSET
                             );
-                
+
                             // Only update the next_valid_offset if confidence is at least medium
-                            if signature_result.confidence >= signatures::common::CONFIDENCE_MEDIUM {
+                            if signature_result.confidence >= signatures::common::CONFIDENCE_MEDIUM
+                            {
                                 next_valid_offset = signature_result.offset + signature_result.size;
                             }
 

@@ -50,7 +50,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         magic: signatures::xz::xz_magic(),
         parser: signatures::xz::xz_parser,
         description: signatures::xz::DESCRIPTION.to_string(),
-        extractor: Some(extractors::sevenzip::sevenzip_extractor()),
+        extractor: Some(extractors::lzma::lzma_extractor()),
     });
 
     // tarball
