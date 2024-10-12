@@ -1,7 +1,7 @@
 use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use xz2::stream::{Action, Status, Stream};
 
-/// Defines the internal extractor function for decompressing gzip data
+/// Defines the internal extractor function for decompressing LZMA/XZ data
 pub fn lzma_extractor() -> Extractor {
     return Extractor {
         utility: ExtractorType::Internal(lzma_decompress),
@@ -47,7 +47,7 @@ pub fn lzma_decompress(
          * was requested).
          *
          * The advantage is that not only are we 100% sure that this data is a valid LZMA stream, but we
-         * can also determine the exact size of the deflated data.
+         * can also determine the exact size of the LZMA data.
          */
         loop {
             // Decompress data into output_buf
