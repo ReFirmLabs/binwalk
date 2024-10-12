@@ -42,7 +42,7 @@ To install *all* build and runtime dependencies, run the included `dependencies/
 To install *only* the build dependencies:
 
 ```
-sudo apt install libfontconfig1-dev liblzma-dev
+sudo apt install build-essential libfontconfig1-dev liblzma-dev
 ```
 
 ### Compiling From Source
