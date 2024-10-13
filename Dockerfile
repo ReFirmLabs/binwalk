@@ -43,7 +43,7 @@ FROM python:3-slim-bookworm as final-install
 RUN sed -i 's/^Components: main$/& contrib non-free/' /etc/apt/sources.list.d/debian.sources
 
 # Install dependencies from official repository
-RUN apt-get update && apt-get upgrade -y && apt-get install -y libfontconfig1 liblzo2-2 libucl1 liblz4-1 \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y gcc libfontconfig1 liblzo2-2 libucl1 liblz4-1 \
     p7zip-full zstd unzip tar sleuthkit cabextract lz4 lzop device-tree-compiler unrar curl
 
 # Install python dependencies
