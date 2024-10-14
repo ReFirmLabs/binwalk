@@ -4,7 +4,7 @@
 SCRIPT_DIRECTORY=$(dirname -- "$( readlink -f -- "$0"; )")
 
 # Install dependencies from apt repository
-sudo apt-get -y install p7zip-full \
+apt-get -y install p7zip-full \
                         zstd \
                         unzip \
                         tar \
@@ -27,11 +27,12 @@ sudo apt-get -y install p7zip-full \
                         libbz2-dev \
                         zlib1g-dev \
                         libfontconfig1-dev \
-                        liblzma-dev
+                        liblzma-dev \
+                        libssl-dev
 
 # Install sasquatch Debian package
 curl -L -o sasquatch_1.0.deb "https://github.com/onekey-sec/sasquatch/releases/download/sasquatch-v4.5.1-4/sasquatch_1.0_$(dpkg --print-architecture).deb"
-sudo dpkg -i sasquatch_1.0.deb
+dpkg -i sasquatch_1.0.deb
 rm sasquatch_1.0.deb
 
 # Install Python dependencies
