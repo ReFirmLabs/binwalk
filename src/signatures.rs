@@ -105,6 +105,7 @@
 //!    return Err(SignatureError);
 //! }
 //! ```
+pub mod aes;
 pub mod androidsparse;
 pub mod arcadyan;
 pub mod bzip2;

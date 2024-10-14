@@ -921,5 +921,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         extractor: None,
     });
 
+    // AES S-Box
+    binary_signatures.push(signatures::common::Signature {
+        name: "aes_sbox".to_string(),
+        short: false,
+        magic_offset: 0,
+        always_display: false,
+        magic: signatures::aes::aes_sbox_magic(),
+        parser: signatures::aes::aes_sbox_parser,
+        description: signatures::aes::DESCRIPTION.to_string(),
+        extractor: None,
+    });
+
     return binary_signatures;
 }
