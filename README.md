@@ -33,25 +33,35 @@ It is recommended that you run Binwalk on a Debian-based system.
 
 ## Installation
 
-### Dependencies
+### Dockerfile
 
-Binwalk relies on several external utilities to perform extraction at runtime. These are not required, but automated extraction of certain file types will fail if they are not installed.
+The easiest way to get up and running quickly is to use the included `Dockerfile` to build a [docker](https://www.docker.com) image.
 
-To install *all* build and runtime dependencies, run the included `dependencies/ubuntu.sh` script.
-
-To install *only* the build dependencies:
+To build a Binwalk docker image with all dependencies included:
 
 ```
-sudo apt install build-essential libfontconfig1-dev liblzma-dev
+sudo apt install git docker.io
+git clone -b binwalkv3 https://github.com/ReFirmLabs/binwalk.git
+cd binwalk
+sudo docker build -t binwalk . 
 ```
+
+To analyze and extract a local file `/tmp/firmware.bin` using the Binwalk docker image:
+
+```
+sudo docker run -v /tmp:/home/appuser binwalk -Me firmware.bin
+```
+
+The extracted files will be located in your `/tmp/extractions` directory.
 
 ### Compiling From Source
 
-To compile Binwalk from source, you must have the [Rust compiler](https://www.rust-lang.org/tools/install) installed.
+To compile Binwalk, you must first have the [Rust compiler](https://www.rust-lang.org/tools/install) installed.
 
-Download and build the Binwalk source code:
+Once Rust is installed, you can download and compile the Binwalk source code:
 
 ```
+sudo apt install git build-essential libfontconfig1-dev liblzma-dev
 git clone -b binwalkv3 https://github.com/ReFirmLabs/binwalk.git
 cd binwalk
 cargo build --release
@@ -60,6 +70,11 @@ cargo build --release
 
 The Binwalk binary will be located at the `target/release/binwalk` path, as shown above.
 You may copy it to, and run it from, any location on your system that you prefer.
+
+*NOTE*: Binwalk relies on several external utilities to perform extraction at runtime.
+These are not required, but automated extraction of certain file types will fail if they are not installed.
+
+To install *all* build and runtime dependencies, run the included `dependencies/ubuntu.sh` script.
 
 ## Usage
 
