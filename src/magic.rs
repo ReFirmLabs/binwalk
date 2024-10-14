@@ -909,5 +909,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         extractor: Some(extractors::sevenzip::sevenzip_extractor()),
     });
 
+    // RTK firmware header
+    binary_signatures.push(signatures::common::Signature {
+        name: "rtk".to_string(),
+        short: true,
+        magic_offset: 0,
+        always_display: false,
+        magic: signatures::rtk::rtk_magic(),
+        parser: signatures::rtk::rtk_parser,
+        description: signatures::rtk::DESCRIPTION.to_string(),
+        extractor: None,
+    });
+
     return binary_signatures;
 }
