@@ -35,7 +35,8 @@ It is recommended that you run Binwalk on a Debian-based system.
 
 ### Dockerfile
 
-The easiest way to get up and running quickly is to use the included `Dockerfile` to build a [docker](https://www.docker.com) image.
+> [!TIP]
+> The easiest way to get up and running quickly is to use the included `Dockerfile` to build a [docker](https://www.docker.com) image.
 
 To build a Binwalk docker image with all dependencies included:
 
@@ -71,8 +72,9 @@ cargo build --release
 The Binwalk binary will be located at the `target/release/binwalk` path, as shown above.
 You may copy it to, and run it from, any location on your system that you prefer.
 
-*NOTE*: Binwalk relies on several external utilities to perform extraction at runtime.
-These are not required, but automated extraction of certain file types will fail if they are not installed.
+> [!NOTE]
+> Binwalk relies on several external utilities to perform extraction at runtime.
+> These are not required, but automated extraction of certain file types will fail if they are not installed.
 
 To install *all* build and runtime dependencies, run the included `dependencies/ubuntu.sh` script.
 
@@ -136,11 +138,17 @@ Output is color-coded to indicate the confidence of the reported results:
 
 There is no strict definition for the confidence level of each result, but they can generally be interpreted as:
 
-- `red`: Low confidence; the "magic bytes" for the reported file type were identified, but little-to-no additional validation was performed
-- `yellow`: Medium confidence; a reasonable amount of validation/sanity-checking was performed on the file metadata
-- `green`: High confidence; both file metadata and at least some portions of the file data were checked for accuracy
+> [!CAUTION]
+> `red`: Low confidence; the "magic bytes" for the reported file type were identified, but little-to-no additional validation was performed
 
-Note that during recursive extraction only "interesting" results will be displayed; use the `--verbose` command line option to display *all* results.
+> [!WARNING] 
+> `yellow`: Medium confidence; a reasonable amount of validation/sanity-checking was performed on the file metadata
+
+> [!TIP] 
+> `green`: High confidence; both file metadata and at least some portions of the file data were checked for accuracy
+
+> [!NOTE]
+> During recursive extraction only "interesting" results will be displayed; use the `--verbose` command line option to display _all_ results.
 
 ## Supported Signatures
 
