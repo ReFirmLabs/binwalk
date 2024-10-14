@@ -49,7 +49,7 @@ sudo docker build -t binwalk .
 To analyze and extract a local file `/tmp/firmware.bin` using the Binwalk docker image:
 
 ```
-sudo docker run -v /tmp:/home/appuser binwalk -Me firmware.bin
+sudo docker run -t -v /tmp:/home/appuser binwalk -Me firmware.bin
 ```
 
 The extracted files will be located in your `/tmp/extractions` directory.
