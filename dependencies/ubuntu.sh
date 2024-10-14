@@ -5,7 +5,8 @@ SCRIPT_DIRECTORY=$(dirname -- "$( readlink -f -- "$0"; )")
 
 # Install dependencies from apt repository
 sudo apt-get -y install p7zip-full \
-                        zstd unzip \
+                        zstd \
+                        unzip \
                         tar \
                         sleuthkit \
                         cabextract \
@@ -24,6 +25,7 @@ sudo apt-get -y install p7zip-full \
                         libucl-dev \
                         liblz4-dev \
                         libbz2-dev \
+                        zlib1g-dev \
                         libfontconfig1-dev \
                         liblzma-dev
 
