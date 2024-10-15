@@ -8,7 +8,7 @@ Execute the appropriate script for your operating system (e.g., `ubuntu.sh` for 
 
 This script installs *all* required dependencies for Ubuntu-based systems, including the dependencies listed in `pip.sh` and `src.sh`.
 
-This should work for most Debian / Debian-based systems as well, but is only tested on Ubunutu.
+This should work for most Debian / Debian-based systems as well, but is only tested on Ubuntu.
 
 ## pip.sh
 
