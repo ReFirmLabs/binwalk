@@ -6,7 +6,7 @@ WORKDIR /tmp
 RUN apt-get update && apt-get upgrade -y && apt-get install -y git
 
 # Pull down latest Binwalk code
-RUN git clone -b binwalkv3 https://github.com/ReFirmLabs/binwalk.git
+RUN git clone https://github.com/ReFirmLabs/binwalk.git
 
 # Install all system dependencies
 RUN /tmp/binwalk/dependencies/ubuntu.sh
