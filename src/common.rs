@@ -138,6 +138,7 @@ pub fn get_cstring(raw_data: &[u8]) -> String {
 /// assert!(is_offset_safe(available_data, 0, None));
 /// assert!(!is_offset_safe(available_data, 4, None));
 /// assert!(is_offset_safe(available_data, 2, Some(1)));
+/// assert!(!is_offset_safe(available_data, 2, Some(2)));
 /// assert!(!is_offset_safe(available_data, 1, Some(2)));
 /// ```
 pub fn is_offset_safe(
