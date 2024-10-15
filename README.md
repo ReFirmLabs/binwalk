@@ -4,7 +4,7 @@
 
 ## About
 
-This is an updated version of the Binwalk firmware analysis tool. It has been re-written in Rust, and is currently considered unstable/experimental.
+This is an updated version of the Binwalk firmware analysis tool. It has been re-written in Rust, and is currently in the beta testing phase.
 
 While the usage and output is similar to that of previous Binwalk releases, this version has several notable improvements:
 
@@ -26,12 +26,14 @@ While the usage and output is similar to that of previous Binwalk releases, this
 
 > Analysis and extraction results can be saved in [JSON format](#json-logging), making Binwalk results easily ingestible by other tools.
 
+A fork of the old Binwalk repository is currently maintained by [OSPG](https://github.com/OSPG/binwalk).
+
 ***
 
 ## Supported Platforms
 
-Binwalk is only supported on 64-bit Linux systems, and only tested on Debian/Ubuntu Linux.
-It is recommended that you run Binwalk on a Debian-based system.
+Binwalk is only supported on 64-bit Linux systems, and only tested on DUbuntu Linux.
+It is recommended that you run Binwalk on a Ubuntu-based system.
 
 ***
 
@@ -46,7 +48,7 @@ To build a Binwalk docker image with all dependencies included:
 
 ```
 sudo apt install git docker.io
-git clone -b binwalkv3 https://github.com/ReFirmLabs/binwalk.git
+git clone https://github.com/ReFirmLabs/binwalk.git
 cd binwalk
 sudo docker build -t binwalk . 
 ```
@@ -71,7 +73,7 @@ Download the Binwalk git repository:
 
 ```
 sudo apt install git
-git clone -b binwalkv3 https://github.com/ReFirmLabs/binwalk.git
+git clone https://github.com/ReFirmLabs/binwalk.git
 ```
 
 #### Step 2
