@@ -1,3 +1,0 @@
-# Base64 index tables
-0   string  ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/    Base64 standard index table
-0   string  ACEGIKMOQSUWYBDFHJLNPRTVXZacegikmoqsuwybdfhjlnprtvxz0246813579=+/   Base64 SerComm index table

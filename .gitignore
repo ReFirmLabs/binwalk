@@ -1,6 +1,2 @@
-build
-dist
-.coverage
-*.extracted
-*.pyc
-**/*.egg-info
+Cargo.lock
+target

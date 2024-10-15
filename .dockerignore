@@ -1,11 +1,2 @@
-build
-dist
-.coverage
-*.extracted
-*.pyc
-.editorconfig
-.gitignore
-images
+target
 Dockerfile
-.dockerignore
-.git
