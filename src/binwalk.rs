@@ -14,7 +14,7 @@ use std::os::windows;
 #[cfg(unix)]
 use std::os::unix;
 
-use crate::common::read_file;
+use crate::common::{read_file, is_offset_safe};
 use crate::extractors;
 use crate::magic;
 use crate::signatures;
@@ -233,6 +233,7 @@ impl Binwalk {
 
         let mut index_adjustment: usize = 0;
         let mut next_valid_offset: usize = 0;
+        let mut previous_valid_offset = None;
 
         let available_data = file_data.len();
 
@@ -299,67 +300,89 @@ impl Binwalk {
 
         debug!("Running Aho-Corasick scan");
 
-        // Find all matching patterns in the target file
-        for magic_match in grep.find_overlapping_iter(&file_data) {
-            // Get the location of the magic bytes inside the file data
-            let magic_offset: usize = magic_match.start();
+        /*
+         * Outer loop wrapper for AhoCorasick scan loop. This will loop until:
+         * 
+         *  1) next_valid_offset exceeds available_data
+         *  2) previous_valid_offset <= next_valid_offset
+         */
+        while is_offset_safe(available_data, next_valid_offset, previous_valid_offset) {
+            // Update the previous valid offset in praparation for the next loop iteration
+            previous_valid_offset = Some(next_valid_offset);
 
-            // No sense processing signatures that we know we don't want
-            if magic_offset < next_valid_offset {
-                continue;
-            }
-
-            // Get the signature associated with this magic signature
-            let magic_pattern_index: usize = magic_match.pattern().as_usize();
-            let signature: signatures::common::Signature = self
-                .pattern_signature_table
-                .get(&magic_pattern_index)
-                .unwrap()
-                .clone();
-
-            debug!(
-                "Found {} magic match at offset {:#X}",
-                signature.description, magic_offset
-            );
+            debug!("Continuing scan from offset {:#X}", next_valid_offset);
 
             /*
-             * Invoke the signature parser to parse and validate the signature.
-             * An error indicates a false positive match for the signature type.
+             * Run a new AhoCorasick scan starting at the next valid offset in the file data.
+             * This will loop until:
+             *
+             *  1) All data has been exhausted, in which case previous_valid_offset and next_valid_offset
+             *     will be identical, causing the outer while loop to break.
+             *  2) A valid signature with a defined size is found, in which case next_valid_offset will
+             *     be updated to point the end of the valid signature data, causing a new AhoCorasick
+             *     scan to start at the new next_valid_offset file location.
              */
-            if let Ok(mut signature_result) = (signature.parser)(&file_data, magic_offset) {
-                let signature_end_offset = signature_result.offset + signature_result.size;
+            for magic_match in grep.find_overlapping_iter(&file_data[next_valid_offset..]) {
+                // Get the location of the magic bytes inside the file data
+                let magic_offset: usize = next_valid_offset + magic_match.start();
 
-                // Sanity check the reported offset and size vs file size
-                if signature_end_offset > available_data {
-                    info!("Signature {} extends beyond EOF; ignoring", signature.name);
-                    continue;
-                }
+                // Get the signature associated with this magic signature
+                let magic_pattern_index: usize = magic_match.pattern().as_usize();
+                let signature: signatures::common::Signature = self
+                    .pattern_signature_table
+                    .get(&magic_pattern_index)
+                    .unwrap()
+                    .clone();
 
-                // Auto populate some signature result fields
-                signature_result_auto_populate(&mut signature_result, &signature);
-
-                // Add this signature to the file map
-                file_map.push(signature_result.clone());
-
-                // Only update the next_valid_offset if confidence is at least medium
-                if signature_result.confidence >= signatures::common::CONFIDENCE_MEDIUM {
-                    next_valid_offset = signature_result.offset + signature_result.size;
-                }
-
-                info!(
-                    "Found valid {} signature at offset {:#X}",
-                    signature_result.name, signature_result.offset
-                );
-
-                // If we've found a signature that extends to EOF, no need to keep processing additional signatures
-                if next_valid_offset == file_data.len() {
-                    break;
-                }
-            } else {
                 debug!(
-                    "{} magic match at offset {:#X} is invalid",
+                    "Found {} magic match at offset {:#X}",
                     signature.description, magic_offset
                 );
+
+                /*
+                 * Invoke the signature parser to parse and validate the signature.
+                 * An error indicates a false positive match for the signature type.
+                 */
+                if let Ok(mut signature_result) = (signature.parser)(&file_data, magic_offset) {
+                    // Calculate the end of this signature's data
+                    let signature_end_offset = signature_result.offset + signature_result.size;
+
+                    // Sanity check the reported offset and size vs file size
+                    if signature_end_offset > available_data {
+                        info!("Signature {} extends beyond EOF; ignoring", signature.name);
+                        // Continue inner loop
+                        continue;
+                    }
+
+                    // Auto populate some signature result fields
+                    signature_result_auto_populate(&mut signature_result, &signature);
+
+                    // Add this signature to the file map
+                    file_map.push(signature_result.clone());
+
+                    info!(
+                        "Found valid {} signature at offset {:#X}",
+                        signature_result.name, signature_result.offset
+                    );
+
+                    // Only update the next_valid_offset if confidence is at least medium
+                    if signature_result.confidence >= signatures::common::CONFIDENCE_MEDIUM {
+                        // Only update the next_valid offset if the end of the signature's data is beyond the starting
+                        // offset for the current AhoCorasick scan.
+                        if signature_end_offset > next_valid_offset {
+                            // This file's signature has a known size, so there's no need to scan inside this file's data.
+                            // Update next_valid_offset to point to the end of this file signature and break out of the
+                            // inner loop.
+                            next_valid_offset = signature_end_offset;
+                            break;
+                        }
+                    }
+                } else {
+                    debug!(
+                        "{} magic match at offset {:#X} is invalid",
+                        signature.description, magic_offset
+                    );
+                }
             }
         }
 
