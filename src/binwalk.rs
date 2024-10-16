@@ -367,9 +367,8 @@ impl Binwalk {
 
                     // Only update the next_valid_offset if confidence is at least medium
                     if signature_result.confidence >= signatures::common::CONFIDENCE_MEDIUM {
-                        // Only update the next_valid offset if the end of the signature's data is beyond the starting
-                        // offset for the current AhoCorasick scan.
-                        if signature_end_offset > next_valid_offset {
+                        // Only update the next_valid offset if the end of the signature reported the size of its contents
+                        if signature_result.size > 0 {
                             // This file's signature has a known size, so there's no need to scan inside this file's data.
                             // Update next_valid_offset to point to the end of this file signature and break out of the
                             // inner loop.
