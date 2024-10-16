@@ -2,7 +2,7 @@ use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDI
 use crate::structures::luks::parse_luks_header;
 
 /// Human readable description
-pub const DESCRIPTION: &str = "LUKS Header";
+pub const DESCRIPTION: &str = "LUKS header";
 
 /// LUKS Headers start with these bytes
 pub fn luks_magic() -> Vec<Vec<u8>> {
@@ -25,7 +25,8 @@ pub fn luks_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
         // Version 1 and version 2 have different header fields
         if luks_header.version == 1 {
             result.description = format!(
-                "LUKS header, version: {}, cipher algorithm: {}, cipher mode: {}, hash fn: {}",
+                "{}, version: {}, cipher algorithm: {}, cipher mode: {}, hash fn: {}",
+                result.description,
                 luks_header.version,
                 luks_header.cipher_algorithm,
                 luks_header.cipher_mode,
@@ -33,8 +34,11 @@ pub fn luks_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
             );
         } else {
             result.description = format!(
-                "LUKS header, version: {}, header size: {} bytes, hash fn: {}",
-                luks_header.version, luks_header.header_size, luks_header.hashfn
+                "{}, version: {}, header size: {} bytes, hash fn: {}",
+                result.description,
+                luks_header.version,
+                luks_header.header_size,
+                luks_header.hashfn
             );
         }
 
