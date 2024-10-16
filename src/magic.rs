@@ -933,5 +933,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
         extractor: None,
     });
 
+    // LUKS
+    binary_signatures.push(signatures::common::Signature {
+        name: "luks".to_string(),
+        short: false,
+        magic_offset: 0,
+        always_display: false,
+        magic: signatures::luks::luks_magic(),
+        parser: signatures::luks::luks_parser,
+        description: signatures::luks::DESCRIPTION.to_string(),
+        extractor: None,
+    });
+
     return binary_signatures;
 }
