@@ -22,7 +22,22 @@ pub fn luks_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
 
     // If the header is parsed successfully, consider it valid
     if let Ok(luks_header) = parse_luks_header(&file_data[offset..]) {
-        result.description = format!("LUKS header, version: {}, hash fn: {}", luks_header.version, luks_header.hashfn);
+        // Version 1 and version 2 have different header fields
+        if luks_header.version == 1 {
+            result.description = format!(
+                "LUKS header, version: {}, cipher algorithm: {}, cipher mode: {}, hash fn: {}",
+                luks_header.version,
+                luks_header.cipher_algorithm,
+                luks_header.cipher_mode,
+                luks_header.hashfn
+            );
+        } else {
+            result.description = format!(
+                "LUKS header, version: {}, header size: {} bytes, hash fn: {}",
+                luks_header.version, luks_header.header_size, luks_header.hashfn
+            );
+        }
+
         return Ok(result);
     }
 

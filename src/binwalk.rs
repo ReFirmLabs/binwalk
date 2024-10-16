@@ -14,7 +14,7 @@ use std::os::windows;
 #[cfg(unix)]
 use std::os::unix;
 
-use crate::common::{read_file, is_offset_safe};
+use crate::common::{is_offset_safe, read_file};
 use crate::extractors;
 use crate::magic;
 use crate::signatures;
@@ -302,7 +302,7 @@ impl Binwalk {
 
         /*
          * Outer loop wrapper for AhoCorasick scan loop. This will loop until:
-         * 
+         *
          *  1) next_valid_offset exceeds available_data
          *  2) previous_valid_offset <= next_valid_offset
          */
