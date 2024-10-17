@@ -646,6 +646,8 @@ impl Binwalk {
             ..Default::default()
         };
 
+        debug!("Analysis start: {}", target_file);
+
         // Read file into memory
         if let Ok(file_data) = read_file(target_file) {
             // Scan file data for signatures
@@ -662,6 +664,8 @@ impl Binwalk {
                 results.extractions = self.extract(&file_data, &target_file, &results.file_map);
             }
         }
+
+        debug!("Analysis end: {}", target_file);
 
         return results;
     }

@@ -30,9 +30,11 @@ pub fn lzfse_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResul
 
     // Walk through all the LZFSE blocks until an end of stream block is found
     while is_offset_safe(available_data, next_block_offset, previous_block_offset) {
+        // Update previous block offset value in preparation for the next loop
+        previous_block_offset = Some(next_block_offset);
+
         // Parse the next block
         if let Ok(lzfse_block) = parse_lzfse_block_header(&file_data[next_block_offset..]) {
-            previous_block_offset = Some(next_block_offset);
             next_block_offset += lzfse_block.header_size + lzfse_block.data_size;
 
             // Only return success if an end-of-stream block is found
