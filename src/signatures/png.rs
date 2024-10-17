@@ -30,8 +30,8 @@ pub fn png_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
     if dry_run.success == true {
         // Get the total size of the PNG
         if let Some(png_size) = dry_run.size {
-            // If this file, from start to finish, is just a PNG, there's no need to extract it
-            if offset == 0 && file_data.len() == png_size {
+            // If the start of a file PNG, there's no need to extract it
+            if offset == 0 {
                 result.extraction_declined = true;
             }
 

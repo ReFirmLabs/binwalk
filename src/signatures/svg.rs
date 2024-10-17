@@ -26,8 +26,8 @@ pub fn svg_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
     if dry_run.success == true {
         // Get the total size of the SVG
         if let Some(svg_size) = dry_run.size {
-            // If this file, from start to finish, is just a SVG, there's no need to extract it
-            if offset == 0 && file_data.len() == svg_size {
+            // If this file starts with SVG data, there's no need to extract it
+            if offset == 0 {
                 result.extraction_declined = true;
             }
 

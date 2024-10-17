@@ -227,7 +227,7 @@ impl Chroot {
         let safe_file_path: String = self.chrooted_path(file_path);
 
         if path::Path::new(&safe_file_path).exists() == false {
-            match fs::write(safe_file_path.clone(), file_data.to_vec()) {
+            match fs::write(safe_file_path.clone(), file_data) {
                 Ok(_) => {
                     return true;
                 }
@@ -775,6 +775,7 @@ pub fn execute(
                     }
 
                     ExtractorType::Internal(func) => {
+                        debug!("Executing internal {} extractor", signature.name);
                         // Run the internal extractor function
                         result = func(file_data, signature.offset, Some(&output_directory));
                         // Set the extractor name to "<signature name>_built_in"

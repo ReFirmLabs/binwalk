@@ -1,5 +1,6 @@
 use binwalk::AnalysisResults;
-use log::{debug, error};
+use log::{debug, error, info};
+use std::collections::VecDeque;
 use std::panic;
 use std::process;
 use std::sync::mpsc;
@@ -22,11 +23,24 @@ fn main() {
     // Only use one thread if unable to auto-detect available core info
     const DEFAULT_WORKER_COUNT: usize = 1;
 
+    // Number of seconds to wait before printing debug progress info
+    const PROGRESS_INTERVAL: u64 = 30;
+
+    // Output directory for extracted files
     let mut output_directory: Option<String> = None;
+
+    /*
+     * Maintain a queue of files waiting to be analyzed.
+     * Note that ThreadPool has its own internal queue so this may seem redundant, however,
+     * queuing a large number of jobs via the ThreadPool queue results in *massive* amounts
+     * of unecessary memory consumption, especially when recursively analyzing many files.
+     */
+    let mut target_files = VecDeque::new();
 
     // Statistics variables; keeps track of analyzed file count and total analysis run time
     let mut file_count: usize = 0;
     let run_time = time::Instant::now();
+    let mut last_progress_interval = time::Instant::now();
 
     // Initialize logging
     env_logger::init();
@@ -117,100 +131,82 @@ fn main() {
         process::exit(-1);
     }));
 
-    // Spawn the first worker with the base file
     debug!(
         "Queuing initial target file: {}",
         binwalker.base_target_file
     );
-    spawn_worker(
-        &workers,
-        binwalker.clone(),
-        binwalker.base_target_file.clone(),
-        cliargs.extract,
-        worker_tx.clone(),
-    );
 
-    // Keep track of results expected, start with 1 for the base target file
-    let mut expected_results: usize = 1;
+    // Queue the initial file path
+    target_files.insert(target_files.len(), binwalker.base_target_file.clone());
 
     /*
      * Main loop.
      * Loop until all pending thread jobs are complete and there are no more files in the queue.
      */
-    loop {
-        // If no further results are expected, exit the loop.
-        if expected_results < 1 {
-            break;
+    while target_files.is_empty() == false || workers.active_count() > 0 {
+        // If there are files waiting to be analyzed and there is at least one free thread in the pool
+        if target_files.is_empty() == false && workers.active_count() < workers.max_count() {
+            // Get the next file path from the target_files queue
+            let target_file = target_files
+                .pop_front()
+                .expect("Failed to retrieve next file from the queue");
+
+            // Spawn a new worker for the new file
+            spawn_worker(
+                &workers,
+                binwalker.clone(),
+                target_file,
+                cliargs.extract,
+                worker_tx.clone(),
+            );
         }
 
-        // Wait for a result from a worker
-        let results = worker_rx
-            .recv()
-            .expect("Failed to read from worker channel");
-
-        expected_results -= 1;
-
-        // Keep a tally of how many files have been analyzed
-        file_count += 1;
-
-        // Log analysis results to JSON file
-        json::log(&cliargs.log, json::JSONType::Analysis(results.clone()));
-
-        // Nothing found? Nothing else to do for this file.
-        if results.file_map.len() == 0 {
-            debug!("Found no results for file {}", results.file_path);
-            continue;
+        // Don't spin CPU cycles if there is no backlog of files to analyze
+        if target_files.is_empty() == true {
+            let sleep_time = time::Duration::from_millis(1);
+            thread::sleep(sleep_time);
         }
 
-        // Boolean flag to indicate if a result should be displayed to screen or not
-        let mut display_results: bool;
+        // Some debug info on analysis progress
+        if last_progress_interval.elapsed().as_secs() >= PROGRESS_INTERVAL {
+            info!(
+                "Waiting on {}/{} workers to complete",
+                workers.active_count(),
+                workers.max_count()
+            );
+            info!("Queue backlog: {}", target_files.len());
+            last_progress_interval = time::Instant::now();
+        }
 
-        /*
-         * For brevity, when analyzing more than one file only display subsequent files whose results
-         * contain signatures that we always want displayed, or which contain extractable signatures.
-         * This can be overridden with the --verbose command line flag.
-         */
-        if file_count == 1 || cliargs.verbose == true {
-            display_results = true;
-        } else {
-            display_results = false;
+        // Get response from a worker thread, if any
+        if let Ok(results) = worker_rx.try_recv() {
+            // Keep a tally of how many files have been analyzed
+            file_count += 1;
 
-            if results.extractions.len() > 0 {
-                display_results = true;
-            } else {
-                for signature in &results.file_map {
-                    if signature.always_display == true {
-                        display_results = true;
-                        break;
-                    }
-                }
+            // Log analysis results to JSON file
+            json::log(&cliargs.log, json::JSONType::Analysis(results.clone()));
+
+            // Nothing found? Nothing else to do for this file.
+            if results.file_map.len() == 0 {
+                debug!("Found no results for file {}", results.file_path);
+                continue;
             }
-        };
 
-        // Print signature & extraction results
-        if display_results == true {
-            display::print_analysis_results(cliargs.quiet, cliargs.extract, &results);
-        }
+            // Print analysis results to screen
+            if should_display(&results, file_count, cliargs.verbose) == true {
+                display::print_analysis_results(cliargs.quiet, cliargs.extract, &results);
+            }
 
-        // If running recursively, add extraction results to list of files to analyze
-        if cliargs.matryoshka {
-            for (_signature_id, extraction_result) in results.extractions.into_iter() {
-                if extraction_result.do_not_recurse == false {
-                    for file_path in
-                        extractors::common::get_extracted_files(&extraction_result.output_directory)
-                    {
-                        debug!("Queuing {file_path} for analysis");
-
-                        // Spawn a new worker for the new file
-                        spawn_worker(
-                            &workers,
-                            binwalker.clone(),
-                            file_path,
-                            cliargs.extract,
-                            worker_tx.clone(),
-                        );
-
-                        expected_results += 1;
+            // If running recursively, add extraction results to list of files to analyze
+            if cliargs.matryoshka {
+                for (_signature_id, extraction_result) in results.extractions.into_iter() {
+                    if extraction_result.do_not_recurse == false {
+                        for file_path in extractors::common::get_extracted_files(
+                            &extraction_result.output_directory,
+                        ) {
+                            debug!("Queuing {file_path} for analysis");
+                            target_files.insert(target_files.len(), file_path.clone());
+                        }
                     }
                 }
             }
@@ -227,6 +223,34 @@ fn main() {
     );
 }
 
+/// Returns true if the specified results should be displayed to screen
+fn should_display(results: &AnalysisResults, file_count: usize, verbose: bool) -> bool {
+    let mut display_results: bool = false;
+
+    /*
+     * For brevity, when analyzing more than one file only display subsequent files whose results
+     * contain signatures that we always want displayed, or which contain extractable signatures.
+     * This can be overridden with the --verbose command line flag.
+     */
+    if file_count == 1 || verbose == true {
+        display_results = true;
+    } else {
+        if results.extractions.len() > 0 {
+            display_results = true;
+        } else {
+            for signature in &results.file_map {
+                if signature.always_display == true {
+                    display_results = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    return display_results;
+}
+
+/// Spawn a worker thread to analyze a file
 fn spawn_worker(
     pool: &ThreadPool,
     bw: binwalk::Binwalk,

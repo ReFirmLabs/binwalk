@@ -32,8 +32,8 @@ pub fn jpeg_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
     if dry_run.success == true {
         // Get the total size of the JPEG
         if let Some(jpeg_size) = dry_run.size {
-            // If this file, from start to finish, is just a JPEG, there's no need to extract it
-            if offset == 0 && file_data.len() == jpeg_size {
+            // If the start of a file is a JPEG, there's no need to extract it
+            if offset == 0 {
                 result.extraction_declined = true;
             }
 
