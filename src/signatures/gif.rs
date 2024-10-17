@@ -28,8 +28,8 @@ pub fn gif_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         if let Some(total_size) = dry_run.size {
             // Everything looks ok, parse the GIF header to report some info to the user
             if let Ok(gif_header) = parse_gif_header(&file_data[offset..]) {
-                // No sense in extracting a GIF from a file that is just a single GIF
-                if offset == 0 && total_size == file_data.len() {
+                // No sense in extracting a GIF from a file if the GIF data starts at offset 0
+                if offset == 0 {
                     result.extraction_declined = true;
                 }
 
