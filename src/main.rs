@@ -170,11 +170,11 @@ fn main() {
         // Some debug info on analysis progress
         if last_progress_interval.elapsed().as_secs() >= PROGRESS_INTERVAL {
             info!(
-                "Waiting on {}/{} workers to complete",
+                "Status: waiting on {}/{} workers to complete, files waiting in queue: {}",
                 workers.active_count(),
-                workers.max_count()
+                workers.max_count(),
+                target_files.len()
             );
-            info!("Queue backlog: {}", target_files.len());
             last_progress_interval = time::Instant::now();
         }
 
