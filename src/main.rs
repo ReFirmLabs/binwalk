@@ -170,7 +170,7 @@ fn main() {
         // Some debug info on analysis progress
         if last_progress_interval.elapsed().as_secs() >= PROGRESS_INTERVAL {
             info!(
-                "Status: waiting on {}/{} workers to complete, files waiting in queue: {}",
+                "Status: active worker threads: {}/{}, files waiting in queue: {}",
                 workers.active_count(),
                 workers.max_count(),
                 target_files.len()
