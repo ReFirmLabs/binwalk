@@ -1,0 +1,37 @@
+#! /bin/bash -
+# https://unix.stackexchange.com/questions/290696/display-stdout-and-stderr-in-two-separate-streams
+# 
+# This script will run binwalk in a split screen, displaying results in the top screen and debug output in the bottom screen.
+# The `screen` utility must be installed.
+
+# If BINWALK_PATH is not set, assume it is in the default cargo target path
+if [[ -z "${BINWALK_PATH}" ]]; then
+    BINWALK_PATH="$(cd "$(dirname $0)" && pwd)/../target/release/binwalk"
+fi
+
+# If no RUST_LOG level is defined, default to `info`
+if [[ -z "${RUST_LOG}" ]]; then
+    export RUST_LOG=info
+fi
+
+tmpdir=$(mktemp -d) || exit
+trap 'rm -rf "$tmpdir"' EXIT INT TERM HUP
+
+FIFO=$tmpdir/FIFO
+mkfifo "$FIFO" || exit
+
+conf=$tmpdir/conf
+
+cat > "$conf" << 'EOF' || exit
+split -h
+focus
+screen -t stderr sh -c 'tty > "$FIFO"; read done < "$FIFO"'
+focus
+screen -t stdout sh -c 'read tty < "$FIFO"; eval "$CMD" 2> "$tty"; echo "[Command exited with status $?, press enter to exit]"; read prompt; echo done > "$FIFO"'
+EOF
+
+CMD="$BINWALK_PATH $*"
+
+export FIFO CMD
+
+screen -mc "$conf"
