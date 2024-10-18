@@ -1,6 +1,8 @@
 # Binwalk v3
 
-This is an updated version of the Binwalk firmware analysis tool. It has been re-written in Rust, and is currently in the beta testing phase.
+This is an updated version of the Binwalk firmware analysis tool.
+
+It has been re-written in Rust, and is currently in the beta testing phase.
 
 ![binwalk v3](images/binwalk_animated.svg)
 
