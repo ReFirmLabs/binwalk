@@ -12,7 +12,7 @@ While its primary focus is firmware analysis, it supports a [wide variety](https
 
 Through [entropy analysis](https://github.com/ReFirmLabs/binwalk/wiki/Generating-Entropy-Graphs), it can even help to identify unknown compression or encryption!
 
-## How can I get it?
+## How do I get it?
 
 The easiest way to install Binwalk and all dependencies is to [build a Docker image](https://github.com/ReFirmLabs/binwalk/wiki/Building-A-Binwalk-Docker-Image).
 
