@@ -63,7 +63,7 @@ pub fn parse_lz4_file_header(lz4_data: &[u8]) -> Result<LZ4FileHeader, Structure
                 if let Some(actual_crc) = lz4_data.get(crc_data_end) {
                     // Calculate the header CRC, which is the second byte of the xxh32 hash. It is calculated over the header, excluding the magic bytes.
                     let calculated_crc: u8 =
-                        ((xxhash_rust::xxh32::xxh32(&crc_data, 0) >> 8) & 0xFF) as u8;
+                        ((xxhash_rust::xxh32::xxh32(crc_data, 0) >> 8) & 0xFF) as u8;
 
                     // Make sure the CRC's match
                     if *actual_crc == calculated_crc {
@@ -120,7 +120,7 @@ pub fn parse_lz4_block_header(
         lz4_block.last_block = block_header["block_size"] == END_MARKER;
 
         // If a checksum is present, it will be an extra 4 bytes at the end of the block
-        if checksum_present == true {
+        if checksum_present {
             lz4_block.checksum_size = CHECKSUM_SIZE;
         }
 

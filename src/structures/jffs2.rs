@@ -69,5 +69,5 @@ pub fn parse_jffs2_node_header(node_data: &[u8]) -> Result<JFFS2Node, StructureE
 
 /// CRC calculation for JFFS
 fn jffs2_node_crc(file_data: &[u8]) -> usize {
-    return (crc32_v2::crc32(0xFFFFFFFF, &file_data) ^ 0xFFFFFFFF) as usize;
+    (crc32_v2::crc32(0xFFFFFFFF, file_data) ^ 0xFFFFFFFF) as usize
 }

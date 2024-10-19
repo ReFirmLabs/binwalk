@@ -208,12 +208,12 @@ fn sch2_header_crc(sch2_header_bytes: &[u8]) -> usize {
         let mut crc_data: Vec<u8> = sch2_header_bytes.to_vec();
 
         // Header CRC field has to be NULL'd out
-        for i in HEADER_CRC_START..HEADER_CRC_END {
-            crc_data[i] = 0;
+        for crc_byte in crc_data.iter_mut().take(HEADER_CRC_END).skip(HEADER_CRC_START) {
+            *crc_byte = 0;
         }
 
         crc = crc32(&crc_data) as usize;
     }
 
-    return crc;
+    crc
 }

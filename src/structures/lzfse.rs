@@ -44,11 +44,11 @@ pub fn parse_lzfse_block_header(lzfse_data: &[u8]) -> Result<LZFSEBlock, Structu
 /// Parse an end-of-stream LZFSE block header
 fn parse_endofstream_block_header(_lzfse_data: &[u8]) -> Result<LZFSEBlock, StructureError> {
     // This is easy; it's just the 4-byte magic bytes marking the end-of-stream
-    return Ok(LZFSEBlock {
+    Ok(LZFSEBlock {
         eof: true,
         data_size: 0,
         header_size: 4,
-    });
+    })
 }
 
 /// Parse an uncompressed LZFSE block header
