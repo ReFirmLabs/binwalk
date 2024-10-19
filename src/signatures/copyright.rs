@@ -40,5 +40,5 @@ pub fn copyright_parser(
         return Ok(result);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

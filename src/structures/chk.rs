@@ -32,7 +32,7 @@ pub fn parse_chk_header(header_data: &[u8]) -> Result<CHKHeader, StructureError>
     let struct_size: usize = common::size(&chk_header_structure);
 
     // Parse the CHK header
-    if let Ok(chk_header) = common::parse(&header_data, &chk_header_structure, "big") {
+    if let Ok(chk_header) = common::parse(header_data, &chk_header_structure, "big") {
         // Validate the reported header size
         if chk_header["header_size"] > struct_size
             && chk_header["header_size"] <= MAX_EXPECTED_HEADER_SIZE
@@ -57,5 +57,5 @@ pub fn parse_chk_header(header_data: &[u8]) -> Result<CHKHeader, StructureError>
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

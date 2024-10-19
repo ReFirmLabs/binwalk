@@ -7,11 +7,11 @@ use serde_json;
 
 /// Describes the VxWorks symbol table extractor
 pub fn vxworks_symtab_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         do_not_recurse: true,
         utility: ExtractorType::Internal(extract_symbol_table),
         ..Default::default()
-    };
+    }
 }
 
 /// Internal extractor for writing VxWorks symbol tables to JSON

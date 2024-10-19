@@ -35,7 +35,7 @@ pub fn parse_romfs_header(romfs_data: &[u8]) -> Result<RomFSHeader, StructureErr
 
                 // Validate the header CRC
                 if let Some(crc_data) = romfs_data.get(0..crc_data_len) {
-                    if romfs_crc_valid(crc_data) == true {
+                    if romfs_crc_valid(crc_data) {
                         return Ok(RomFSHeader {
                             image_size: header["image_size"],
                             volume_name: volume_name.clone(),
@@ -48,7 +48,7 @@ pub fn parse_romfs_header(romfs_data: &[u8]) -> Result<RomFSHeader, StructureErr
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Struct to store info on a RomFS file entry
@@ -106,7 +106,7 @@ pub fn parse_romfs_file_entry(romfs_data: &[u8]) -> Result<RomFSFileHeader, Stru
             let file_name = get_cstring(file_name_bytes);
 
             // A file should have a name
-            if file_name.len() > 0 {
+            if !file_name.is_empty() {
                 // Instantiate a new RomFSEntry structure
                 let mut file_header = RomFSFileHeader {
                     ..Default::default()
@@ -144,7 +144,7 @@ pub fn parse_romfs_file_entry(romfs_data: &[u8]) -> Result<RomFSFileHeader, Stru
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// RomFS aligns things to a 16-byte boundary
@@ -158,7 +158,7 @@ fn romfs_align(x: usize) -> usize {
         padding = ALIGNMENT - remainder;
     }
 
-    return x + padding;
+    x + padding
 }
 
 /// Pretty simple checksum used by RomFS
@@ -182,5 +182,5 @@ fn romfs_crc_valid(crc_data: &[u8]) -> bool {
         return sum == 0;
     }
 
-    return false;
+    false
 }

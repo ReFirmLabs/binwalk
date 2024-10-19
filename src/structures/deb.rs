@@ -57,5 +57,5 @@ pub fn parse_deb_header(deb_data: &[u8]) -> Result<DebHeader, StructureError> {
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

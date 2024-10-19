@@ -51,5 +51,5 @@ pub fn sevenzip_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

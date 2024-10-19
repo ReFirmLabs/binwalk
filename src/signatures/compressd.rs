@@ -26,5 +26,5 @@ pub fn compressd_parser(
         return Ok(result);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

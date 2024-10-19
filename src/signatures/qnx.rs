@@ -39,5 +39,5 @@ pub fn qnx_ifs_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

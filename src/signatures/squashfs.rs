@@ -120,5 +120,5 @@ pub fn squashfs_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

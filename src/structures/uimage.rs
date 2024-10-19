@@ -188,7 +188,7 @@ pub fn parse_uimage_header(uimage_data: &[u8]) -> Result<UImageHeader, Structure
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// uImage checksum calculator
@@ -199,9 +199,9 @@ fn calculate_uimage_header_checksum(hdr: &[u8]) -> usize {
     // Header checksum has to be nulled out to calculate the CRC
     let mut uimage_header: Vec<u8> = hdr.to_vec();
 
-    for i in HEADER_CRC_START..HEADER_CRC_END {
-        uimage_header[i] = 0;
+    for crc_byte in uimage_header.iter_mut().take(HEADER_CRC_END).skip(HEADER_CRC_START) {
+        *crc_byte = 0;
     }
 
-    return crc32(&uimage_header) as usize;
+    crc32(&uimage_header) as usize
 }

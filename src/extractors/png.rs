@@ -4,10 +4,10 @@ use crate::structures::png::parse_png_chunk_header;
 
 /// Defines the internal extractor function for carving out PNG images
 pub fn png_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         utility: ExtractorType::Internal(extract_png_image),
         ..Default::default()
-    };
+    }
 }
 
 /// Internal extractor for carving PNG files to disk

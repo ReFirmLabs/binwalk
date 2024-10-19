@@ -40,5 +40,5 @@ pub fn obfuscated_lzma_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

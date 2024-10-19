@@ -2,7 +2,7 @@ use crate::extractors;
 
 /// Describes how to run the vmlinux-to-elf utility to convert raw kernel images to ELF files
 pub fn linux_kernel_extractor() -> extractors::common::Extractor {
-    return extractors::common::Extractor {
+    extractors::common::Extractor {
         do_not_recurse: true,
         utility: extractors::common::ExtractorType::External("vmlinux-to-elf".to_string()),
         extension: "bin".to_string(),
@@ -14,5 +14,5 @@ pub fn linux_kernel_extractor() -> extractors::common::Extractor {
         ],
         exit_codes: vec![0],
         ..Default::default()
-    };
+    }
 }

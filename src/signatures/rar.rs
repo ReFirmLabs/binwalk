@@ -39,7 +39,7 @@ pub fn rar_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         return Ok(result);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Determine the size of the RAR file
@@ -64,5 +64,5 @@ fn get_rar_size(file_data: &[u8], rar_version: usize) -> Result<usize, Signature
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

@@ -44,5 +44,5 @@ pub fn android_sparse_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

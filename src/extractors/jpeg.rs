@@ -3,11 +3,11 @@ use aho_corasick::AhoCorasick;
 
 /// Defines the internal extractor function for carving out JPEG images
 pub fn jpeg_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         do_not_recurse: true,
         utility: ExtractorType::Internal(extract_jpeg_image),
         ..Default::default()
-    };
+    }
 }
 
 /// Internal extractor for carving JPEG images to disk

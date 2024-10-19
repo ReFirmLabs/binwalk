@@ -35,5 +35,5 @@ pub fn packimg_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

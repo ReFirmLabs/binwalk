@@ -3,10 +3,10 @@ use crate::structures::mbr::parse_mbr_image;
 
 /// Defines the internal extractor function for MBR partitions
 pub fn mbr_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         utility: ExtractorType::Internal(extract_mbr_partitions),
         ..Default::default()
-    };
+    }
 }
 
 /// Validate and extract partitions from an MBR

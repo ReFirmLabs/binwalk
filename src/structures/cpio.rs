@@ -69,7 +69,7 @@ pub fn parse_cpio_entry_header(cpio_data: &[u8]) -> Result<CPIOEntryHeader, Stru
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// File data and CPIO headers are padded to 4-byte boundaries

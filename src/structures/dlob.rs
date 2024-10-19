@@ -54,5 +54,5 @@ pub fn parse_dlob_header(dlob_data: &[u8]) -> Result<DlobHeader, StructureError>
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

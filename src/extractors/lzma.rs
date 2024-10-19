@@ -3,10 +3,10 @@ use xz2::stream::{Action, Status, Stream};
 
 /// Defines the internal extractor function for decompressing LZMA/XZ data
 pub fn lzma_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         utility: ExtractorType::Internal(lzma_decompress),
         ..Default::default()
-    };
+    }
 }
 
 /// Internal extractor for decompressing LZMA/XZ data streams

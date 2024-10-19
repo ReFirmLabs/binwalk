@@ -38,7 +38,7 @@ pub fn parse_lzfse_block_header(lzfse_data: &[u8]) -> Result<LZFSEBlock, Structu
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Parse an end-of-stream LZFSE block header
@@ -65,7 +65,7 @@ fn parse_uncompressed_block_header(lzfse_data: &[u8]) -> Result<LZFSEBlock, Stru
         });
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Parse a compressed (version 1) LZFSE block header
@@ -97,7 +97,7 @@ fn parse_compressedv1_block_header(lzfse_data: &[u8]) -> Result<LZFSEBlock, Stru
         });
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Parse a compressed (version 2) LZFSE block header
@@ -129,7 +129,7 @@ fn parse_compressedv2_block_header(lzfse_data: &[u8]) -> Result<LZFSEBlock, Stru
         });
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Parse a LZVN compressed LZFSE block header
@@ -150,5 +150,5 @@ fn parse_compressedlzvn_block_header(lzfse_data: &[u8]) -> Result<LZFSEBlock, St
         });
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

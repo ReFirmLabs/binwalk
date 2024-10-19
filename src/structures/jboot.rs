@@ -86,7 +86,7 @@ pub fn parse_jboot_arm_header(jboot_data: &[u8]) -> Result<JBOOTArmHeader, Struc
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Stores info about JBOOT STAG headers
@@ -132,7 +132,7 @@ pub fn parse_jboot_stag_header(jboot_data: &[u8]) -> Result<JBOOTStagHeader, Str
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 #[derive(Default, Debug, Clone)]
@@ -193,7 +193,7 @@ pub fn parse_jboot_sch2_header(jboot_data: &[u8]) -> Result<JBOOTSchHeader, Stru
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Calculate a JBOOT SCH2 header CRC

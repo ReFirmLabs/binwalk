@@ -47,7 +47,7 @@ pub fn lz4_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Processes the LZ4 data blocks and returns the size of the raw LZ4 data
@@ -86,5 +86,5 @@ fn get_lz4_data_size(lz4_data: &[u8], checksum_present: bool) -> Result<usize, S
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

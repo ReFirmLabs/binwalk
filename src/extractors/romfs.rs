@@ -28,10 +28,10 @@ struct RomFSEntry {
 
 /// Defines the internal extractor function for extracting RomFS file systems */
 pub fn romfs_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         utility: ExtractorType::Internal(extract_romfs),
         ..Default::default()
-    };
+    }
 }
 
 /// Internal RomFS extractor

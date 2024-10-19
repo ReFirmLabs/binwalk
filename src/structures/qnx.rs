@@ -48,5 +48,5 @@ pub fn parse_ifs_header(ifs_data: &[u8]) -> Result<IFSHeader, StructureError> {
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

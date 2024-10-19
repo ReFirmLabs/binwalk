@@ -32,7 +32,7 @@ pub fn srec_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
     let available_data = file_data.len();
 
     // Srec lines, and hence the last line of an s-record, should end with a new line or line feed
-    let terminating_characters = vec![WINDOWS_TERMINATING_CHARACTER, UNIX_TERMINATING_CHARACTER];
+    let terminating_characters = [WINDOWS_TERMINATING_CHARACTER, UNIX_TERMINATING_CHARACTER];
 
     // Possible srec footers
     let srec_footers = vec![b"\nS9", b"\nS8", b"\nS7"];
@@ -88,5 +88,5 @@ pub fn srec_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
     }
 
     // No valid srec footers found
-    return Err(SignatureError);
+    Err(SignatureError)
 }

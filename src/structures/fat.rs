@@ -88,5 +88,5 @@ pub fn parse_fat_header(fat_data: &[u8]) -> Result<FATHeader, StructureError> {
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

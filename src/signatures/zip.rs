@@ -33,7 +33,7 @@ pub fn zip_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 struct ZipEOCDInfo {
@@ -66,5 +66,5 @@ fn find_zip_eof(file_data: &Vec<u8>, offset: usize) -> Result<ZipEOCDInfo, Signa
     }
 
     // No valid EOCD record found :(
-    return Err(SignatureError);
+    Err(SignatureError)
 }

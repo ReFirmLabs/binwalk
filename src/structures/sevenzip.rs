@@ -46,5 +46,5 @@ pub fn parse_7z_header(sevenzip_data: &[u8]) -> Result<SevenZipHeader, Structure
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

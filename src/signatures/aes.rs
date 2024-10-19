@@ -25,5 +25,5 @@ pub fn aes_sbox_parser(
     };
 
     // Nothing to do, just return success
-    return Ok(result);
+    Ok(result)
 }

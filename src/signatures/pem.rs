@@ -94,7 +94,7 @@ pub fn pem_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Base64 decode PEM file contents
@@ -133,5 +133,5 @@ fn decode_pem_data(pem_file_data: &[u8]) -> Result<usize, SignatureError> {
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

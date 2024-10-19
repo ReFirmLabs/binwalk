@@ -37,7 +37,7 @@ pub fn ubifs_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResul
         return Ok(result);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Validates a UBI signature
@@ -69,7 +69,7 @@ pub fn ubi_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Determines the LEB size and returns the size of the UBI image
@@ -125,5 +125,5 @@ fn get_ubi_image_size(ubi_data: &[u8]) -> Result<usize, SignatureError> {
         return Ok(block_count * leb_size);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

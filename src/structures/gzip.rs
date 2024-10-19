@@ -146,5 +146,5 @@ pub fn parse_gzip_header(header_data: &[u8]) -> Result<GzipHeader, StructureErro
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

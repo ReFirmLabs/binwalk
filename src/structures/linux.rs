@@ -71,5 +71,5 @@ pub fn parse_linux_arm64_boot_image_header(
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

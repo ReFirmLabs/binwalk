@@ -79,5 +79,5 @@ pub fn cpio_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
     }
 
     // No EOF marker was found, or an error occurred in processing the CPIO headers
-    return Err(SignatureError);
+    Err(SignatureError)
 }

@@ -55,7 +55,7 @@ pub fn wind_kernel_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Validates VxWorks symbol table signatures
@@ -94,5 +94,5 @@ pub fn symbol_table_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

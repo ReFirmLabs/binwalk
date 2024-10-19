@@ -34,7 +34,7 @@ pub fn parse_lz4_file_header(lz4_data: &[u8]) -> Result<LZ4FileHeader, Structure
     };
 
     // Parse the header
-    if let Ok(lz4_header) = common::parse(&lz4_data, &lz4_structure, "little") {
+    if let Ok(lz4_header) = common::parse(lz4_data, &lz4_structure, "little") {
         // Make sure the reserved bits aren't set
         if (lz4_header["flags"] & FLAGS_RESERVED_MASK) == 0
             && (lz4_header["bd"] & BD_RESERVED_MASK) == 0
@@ -81,7 +81,7 @@ pub fn parse_lz4_file_header(lz4_data: &[u8]) -> Result<LZ4FileHeader, Structure
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Struct to store LZ4 block header info
@@ -112,7 +112,7 @@ pub fn parse_lz4_block_header(
     };
 
     // Parse the block header
-    if let Ok(block_header) = common::parse(&lz4_block_data, &block_structure, "little") {
+    if let Ok(block_header) = common::parse(lz4_block_data, &block_structure, "little") {
         // Header size is always 4 bytes
         lz4_block.header_size = BLOCK_STRUCT_SIZE;
 
@@ -130,5 +130,5 @@ pub fn parse_lz4_block_header(
         return Ok(lz4_block);
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

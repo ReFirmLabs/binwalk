@@ -39,5 +39,5 @@ pub fn romfs_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResul
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

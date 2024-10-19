@@ -57,7 +57,7 @@ pub fn uefi_volume_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Validates UEFI capsule signatures
@@ -88,5 +88,5 @@ pub fn uefi_capsule_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

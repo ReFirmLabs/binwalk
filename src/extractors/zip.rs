@@ -2,7 +2,7 @@ use crate::extractors;
 
 /// Describes how to run the unzip utility to extract ZIP archives
 pub fn zip_extractor() -> extractors::common::Extractor {
-    return extractors::common::Extractor {
+    extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("unzip".to_string()),
         extension: "zip".to_string(),
         arguments: vec![
@@ -14,5 +14,5 @@ pub fn zip_extractor() -> extractors::common::Extractor {
         // Exit code 2 occurs when a CRC fails; files are still extracted though
         exit_codes: vec![0, 2],
         ..Default::default()
-    };
+    }
 }

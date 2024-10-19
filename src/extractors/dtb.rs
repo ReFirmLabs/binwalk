@@ -2,7 +2,7 @@ use crate::extractors;
 
 /// Describes how to run the dtc utility to extract DTB files
 pub fn dtb_extractor() -> extractors::common::Extractor {
-    return extractors::common::Extractor {
+    extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("dtc".to_string()),
         extension: "dtb".to_string(),
         arguments: vec![
@@ -16,5 +16,5 @@ pub fn dtb_extractor() -> extractors::common::Extractor {
         ],
         exit_codes: vec![0],
         ..Default::default()
-    };
+    }
 }

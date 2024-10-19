@@ -54,7 +54,7 @@ pub fn linux_arm64_boot_image_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Validate a linux boot image signature
@@ -87,7 +87,7 @@ pub fn linux_boot_image_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Validate a linux kernel version signature and detect if a symbol table is present
@@ -159,7 +159,7 @@ pub fn linux_kernel_version_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Searches the file data for a linux symbol table

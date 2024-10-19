@@ -3,10 +3,10 @@ use crate::extractors::inflate;
 
 /// Defines the internal extractor function for decompressing zlib data
 pub fn zlib_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         utility: ExtractorType::Internal(zlib_decompress),
         ..Default::default()
-    };
+    }
 }
 
 /// Internal extractor for decompressing ZLIB data

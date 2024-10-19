@@ -34,5 +34,5 @@ pub fn elf_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         return Ok(result);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

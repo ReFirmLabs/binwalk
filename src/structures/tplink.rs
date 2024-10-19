@@ -67,5 +67,5 @@ pub fn parse_tplink_header(tplink_data: &[u8]) -> Result<TPLinkFirmwareHeader, S
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

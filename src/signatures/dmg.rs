@@ -56,7 +56,7 @@ pub fn dmg_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 fn find_xml_property_list(file_data: &[u8]) -> Option<usize> {

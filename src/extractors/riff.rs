@@ -3,11 +3,11 @@ use crate::structures::riff::parse_riff_header;
 
 /// Describes the internal RIFF image extactor
 pub fn riff_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         utility: ExtractorType::Internal(extract_riff_image),
         do_not_recurse: true,
         ..Default::default()
-    };
+    }
 }
 
 /// Internal extractor for carving RIFF files to disk

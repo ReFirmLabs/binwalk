@@ -3,11 +3,11 @@ use crate::structures::svg::parse_svg_image;
 
 /// Defines the internal extractor function for carving out SVG images
 pub fn svg_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         do_not_recurse: true,
         utility: ExtractorType::Internal(extract_svg_image),
         ..Default::default()
-    };
+    }
 }
 
 /// Internal extractor for carving SVG images to disk

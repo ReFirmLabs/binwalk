@@ -184,7 +184,7 @@ pub fn rsa_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Stores info about a validated RSA key
@@ -263,5 +263,5 @@ fn rsa_key_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

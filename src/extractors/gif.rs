@@ -5,11 +5,11 @@ use crate::structures::gif::{parse_gif_extension, parse_gif_header, parse_gif_im
 
 /// Defines the internal extractor function for carving out JPEG images
 pub fn gif_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         do_not_recurse: true,
         utility: ExtractorType::Internal(extract_gif_image),
         ..Default::default()
-    };
+    }
 }
 
 /// Parses and carves a GIF image from a file

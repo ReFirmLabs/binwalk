@@ -36,5 +36,5 @@ pub fn gpg_signed_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

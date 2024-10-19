@@ -11,7 +11,7 @@ pub struct PcapBlock {
 /// Parse a Pcap-ng block
 pub fn parse_pcapng_block(
     block_data: &[u8],
-    endianness: &String,
+    endianness: &str,
 ) -> Result<PcapBlock, StructureError> {
     // Reserved bit in block type field
     const BLOCK_TYPE_RESERVED_MASK: usize = 0x80000000;
@@ -51,7 +51,7 @@ pub fn parse_pcapng_block(
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 #[derive(Debug, Default, Clone)]
@@ -98,5 +98,5 @@ pub fn parse_pcapng_section_block(block_data: &[u8]) -> Result<PcapSectionBlock,
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

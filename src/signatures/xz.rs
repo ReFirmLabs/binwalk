@@ -34,7 +34,7 @@ pub fn xz_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, 
         }
     };
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// XZ file format has detectable, verifiable, end-of-stream markers.
@@ -66,5 +66,5 @@ fn xz_stream_size(xz_data: &[u8]) -> Result<usize, SignatureError> {
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

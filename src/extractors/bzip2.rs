@@ -3,10 +3,10 @@ use bzip2::{Decompress, Status};
 
 /// Defines the internal extractor function for decompressing BZIP2 files
 pub fn bzip2_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         utility: ExtractorType::Internal(bzip2_decompressor),
         ..Default::default()
-    };
+    }
 }
 
 /// Internal extractor for decompressing BZIP2 data

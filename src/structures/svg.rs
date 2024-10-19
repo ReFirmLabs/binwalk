@@ -30,15 +30,15 @@ pub fn parse_svg_image(svg_data: &[u8]) -> Result<SVGImage, StructureError> {
                 break;
             }
             Ok(svg_tag) => {
-                if svg_tag.is_head == true {
+                if svg_tag.is_head {
                     head_tag_count += 1;
                 }
 
-                if svg_tag.is_open == true {
+                if svg_tag.is_open {
                     unclosed_svg_tags += 1;
                 }
 
-                if svg_tag.is_close == true {
+                if svg_tag.is_close {
                     unclosed_svg_tags -= 1;
                 }
 
@@ -57,7 +57,7 @@ pub fn parse_svg_image(svg_data: &[u8]) -> Result<SVGImage, StructureError> {
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Stores info about a parsed SVG tag
@@ -94,5 +94,5 @@ fn parse_svg_tag(tag_data: &[u8]) -> Result<SVGTag, StructureError> {
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

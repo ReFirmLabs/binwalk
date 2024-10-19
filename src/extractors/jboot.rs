@@ -4,10 +4,10 @@ use crate::structures::jboot::parse_jboot_sch2_header;
 
 /// Defines the internal extractor function for carving out JBOOT SCH2 kernels
 pub fn sch2_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         utility: ExtractorType::Internal(extract_jboot_sch2_kernel),
         ..Default::default()
-    };
+    }
 }
 
 /// Extract the kernel described by a JBOOT SCH2 header

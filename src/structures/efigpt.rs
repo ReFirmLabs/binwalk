@@ -94,7 +94,7 @@ pub fn parse_efigpt_header(efi_data: &[u8]) -> Result<EFIGPTHeader, StructureErr
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 #[derive(Debug, Default, Clone)]

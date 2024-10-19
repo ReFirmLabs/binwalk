@@ -157,14 +157,14 @@ pub fn parse_squashfs_header(sqsh_data: &[u8]) -> Result<SquashFSHeader, Structu
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Parse a UID entry for either SquashFSv4 or SquashFSv3
 pub fn parse_squashfs_uid_entry(
     uid_data: &[u8],
     version: usize,
-    endianness: &String,
+    endianness: &str,
 ) -> Result<usize, StructureError> {
     let squashfs_v4_uid_table_structure = vec![("uid_block_ptr", "u64")];
     let squashfs_v3_uid_table_structure = vec![("uid_block_ptr", "u32")];
@@ -173,19 +173,19 @@ pub fn parse_squashfs_uid_entry(
     if version == 4 {
         match common::parse(uid_data, &squashfs_v4_uid_table_structure, endianness) {
             Err(e) => {
-                return Err(e);
+                Err(e)
             }
             Ok(uidv4) => {
-                return Ok(uidv4["uid_block_ptr"]);
+                Ok(uidv4["uid_block_ptr"])
             }
         }
     } else {
         match common::parse(uid_data, &squashfs_v3_uid_table_structure, endianness) {
             Err(e) => {
-                return Err(e);
+                Err(e)
             }
             Ok(uidv3) => {
-                return Ok(uidv3["uid_block_ptr"]);
+                Ok(uidv3["uid_block_ptr"])
             }
         }
     }

@@ -36,5 +36,5 @@ pub fn pch_rom_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

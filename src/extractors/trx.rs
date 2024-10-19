@@ -4,10 +4,10 @@ use crate::structures::trx::parse_trx_header;
 
 /// Defines the internal TRX extractor
 pub fn trx_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         utility: ExtractorType::Internal(extract_trx_partitions),
         ..Default::default()
-    };
+    }
 }
 
 /// Internal extractor for TRX partitions

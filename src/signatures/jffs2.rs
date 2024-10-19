@@ -103,7 +103,7 @@ pub fn jffs2_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResul
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// JFFS2 nodes are padded to a 4 byte boundary

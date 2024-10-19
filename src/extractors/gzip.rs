@@ -4,10 +4,10 @@ use crate::structures::gzip::parse_gzip_header;
 
 /// Defines the internal extractor function for decompressing gzip data
 pub fn gzip_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         utility: ExtractorType::Internal(gzip_decompress),
         ..Default::default()
-    };
+    }
 }
 
 /// Internal extractor for gzip compressed data

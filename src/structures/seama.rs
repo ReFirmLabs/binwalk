@@ -24,11 +24,11 @@ pub fn parse_seama_header(seama_data: &[u8]) -> Result<SeamaHeader, StructureErr
     let header_size: usize = common::size(&seama_structure);
 
     // Parse the header; try little endian first
-    if let Ok(mut seama_header) = common::parse(&seama_data, &seama_structure, endianness) {
+    if let Ok(mut seama_header) = common::parse(seama_data, &seama_structure, endianness) {
         // If the magic bytes don't match, switch to big endian
         if seama_header["magic"] != MAGIC {
             endianness = "big";
-            match common::parse(&seama_data, &seama_structure, endianness) {
+            match common::parse(seama_data, &seama_structure, endianness) {
                 Err(_) => {
                     return Err(StructureError);
                 }
@@ -54,5 +54,5 @@ pub fn parse_seama_header(seama_data: &[u8]) -> Result<SeamaHeader, StructureErr
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

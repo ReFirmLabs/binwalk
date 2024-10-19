@@ -67,5 +67,5 @@ pub fn parse_iso_header(iso_data: &[u8]) -> Result<ISOHeader, StructureError> {
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

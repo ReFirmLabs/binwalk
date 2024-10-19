@@ -4,10 +4,10 @@ use crate::structures::androidsparse;
 
 /// Defines the internal extractor function for decompressing zlib data
 pub fn android_sparse_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         utility: ExtractorType::Internal(extract_android_sparse),
         ..Default::default()
-    };
+    }
 }
 
 /// Android sparse internal extractor

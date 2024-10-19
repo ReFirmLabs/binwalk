@@ -2,7 +2,7 @@ use crate::extractors;
 
 /// Describes how to run the zstd utility to extract ZSTD compressed files
 pub fn zstd_extractor() -> extractors::common::Extractor {
-    return extractors::common::Extractor {
+    extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("zstd".to_string()),
         extension: "zst".to_string(),
         arguments: vec![
@@ -13,5 +13,5 @@ pub fn zstd_extractor() -> extractors::common::Extractor {
         ],
         exit_codes: vec![0],
         ..Default::default()
-    };
+    }
 }

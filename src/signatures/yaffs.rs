@@ -62,7 +62,7 @@ pub fn yaffs_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResul
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Returns the detected page size used by the YAFFS image
@@ -96,7 +96,7 @@ fn get_page_size(file_data: &[u8]) -> Result<usize, SignatureError> {
     }
 
     // Nothing valid found
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Returns the detected spare size of the YAFFS image
@@ -123,7 +123,7 @@ fn get_spare_size(
     }
 
     // Nothing valid found
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Returns the total size of the image, in bytes
@@ -187,7 +187,7 @@ fn get_image_size(
         return Ok(image_size);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Returns the number of data blocks used to store file data; this size is only valid for file type objects
@@ -209,5 +209,5 @@ fn get_file_block_count(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

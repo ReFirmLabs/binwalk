@@ -2,7 +2,7 @@ use crate::extractors;
 
 /// Describes how to run the tsk_recover utility to extract various file systems
 pub fn tsk_extractor() -> extractors::common::Extractor {
-    return extractors::common::Extractor {
+    extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("tsk_recover".to_string()),
         extension: "img".to_string(),
         arguments: vec![
@@ -14,5 +14,5 @@ pub fn tsk_extractor() -> extractors::common::Extractor {
         ],
         exit_codes: vec![0],
         ..Default::default()
-    };
+    }
 }

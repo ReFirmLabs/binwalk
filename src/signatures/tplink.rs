@@ -37,5 +37,5 @@ pub fn tplink_parser(
         return Ok(result);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

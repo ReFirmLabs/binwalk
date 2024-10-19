@@ -4,11 +4,11 @@ use crate::structures::pcap::{parse_pcapng_block, parse_pcapng_section_block};
 
 /// Defines the internal extractor function for extracting pcap-ng files
 pub fn pcapng_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         do_not_recurse: true,
         utility: ExtractorType::Internal(pcapng_carver),
         ..Default::default()
-    };
+    }
 }
 
 /// Carves a pcap-ng file to disk

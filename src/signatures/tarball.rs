@@ -94,7 +94,7 @@ pub fn tarball_parser(
         });
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Validate a tarball entry checksum
@@ -140,7 +140,7 @@ fn tarball_entry_size(tarball_entry_data: &[u8]) -> Result<usize, SignatureError
         return Ok(block_count * TARBALL_BLOCK_SIZE);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Convert octal string to a number

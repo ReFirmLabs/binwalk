@@ -69,7 +69,7 @@ pub fn jboot_arm_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Parse and validate a JBOOT STAG header
@@ -107,7 +107,7 @@ pub fn jboot_stag_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Parse and validate a JBOOT SCH2 header
@@ -141,5 +141,5 @@ pub fn jboot_sch2_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

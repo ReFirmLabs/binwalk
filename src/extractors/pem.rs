@@ -3,20 +3,20 @@ use aho_corasick::AhoCorasick;
 
 /// Defines the internal extractor function for carving out PEM keys
 pub fn pem_key_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         do_not_recurse: true,
         utility: ExtractorType::Internal(pem_key_carver),
         ..Default::default()
-    };
+    }
 }
 
 /// Internal extractor function for carving out PEM certs
 pub fn pem_certificate_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         do_not_recurse: true,
         utility: ExtractorType::Internal(pem_certificate_carver),
         ..Default::default()
-    };
+    }
 }
 
 pub fn pem_certificate_carver(

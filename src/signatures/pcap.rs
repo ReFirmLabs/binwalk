@@ -41,5 +41,5 @@ pub fn pcapng_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

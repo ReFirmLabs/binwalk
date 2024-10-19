@@ -142,7 +142,7 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, StructureError> {
     };
 
     // Endianness doesn't matter here, and we don't know what the ELF's endianness is yet
-    if let Ok(e_ident) = common::parse(&elf_data, &elf_ident_structure, "little") {
+    if let Ok(e_ident) = common::parse(elf_data, &elf_ident_structure, "little") {
         // Sanity check the e_ident fields
         if e_ident["padding_1"] == 0 && e_ident["padding_2"] == 0 {
             if e_ident["version"] == EXPECTED_VERSION {
@@ -189,5 +189,5 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, StructureError> {
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

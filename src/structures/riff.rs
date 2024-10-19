@@ -24,7 +24,7 @@ pub fn parse_riff_header(riff_data: &[u8]) -> Result<RIFFHeader, StructureError>
     ];
 
     // Parse the riff header
-    if let Ok(riff_header) = common::parse(&riff_data, &riff_structure, "little") {
+    if let Ok(riff_header) = common::parse(riff_data, &riff_structure, "little") {
         // Sanity check expected magic bytes
         if riff_header["magic1"] == MAGIC1 && riff_header["magic2"] == MAGIC2 {
             // Get the RIFF type string (e.g., "WAV")
@@ -39,5 +39,5 @@ pub fn parse_riff_header(riff_data: &[u8]) -> Result<RIFFHeader, StructureError>
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

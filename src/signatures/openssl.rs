@@ -35,5 +35,5 @@ pub fn openssl_crypt_parser(
         return Ok(result);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

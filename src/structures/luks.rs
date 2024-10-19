@@ -41,7 +41,7 @@ pub fn parse_luks_header(luks_data: &[u8]) -> Result<LUKSHeader, StructureError>
         ..Default::default()
     };
 
-    if let Ok(luks_base) = common::parse(&luks_data, &luks_base_structure, "big") {
+    if let Ok(luks_base) = common::parse(luks_data, &luks_base_structure, "big") {
         luks_hdr_info.version = luks_base["version"];
 
         // Both v1 and v2 include the hash function string at the same offset
@@ -87,5 +87,5 @@ pub fn parse_luks_header(luks_data: &[u8]) -> Result<LUKSHeader, StructureError>
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

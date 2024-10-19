@@ -36,8 +36,9 @@ pub fn bzip2_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResul
             result.size = bzip2_size;
             result.description =
                 format!("{}, total size: {} bytes", result.description, result.size);
+            return Ok(result);
         }
     }
 
-    return Ok(result);
+    Err(SignatureError)
 }

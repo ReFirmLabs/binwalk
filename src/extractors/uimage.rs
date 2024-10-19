@@ -3,10 +3,10 @@ use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorTy
 use crate::structures::uimage::parse_uimage_header;
 
 pub fn uimage_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         utility: ExtractorType::Internal(extract_uimage),
         ..Default::default()
-    };
+    }
 }
 
 pub fn extract_uimage(

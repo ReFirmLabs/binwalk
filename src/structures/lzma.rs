@@ -29,7 +29,7 @@ pub fn parse_lzma_header(lzma_data: &[u8]) -> Result<LZMAHeader, StructureError>
     };
 
     // Parse the lzma header
-    if let Ok(lzma_header) = common::parse(&lzma_data, &lzma_structure, "little") {
+    if let Ok(lzma_header) = common::parse(lzma_data, &lzma_structure, "little") {
         // Sanity check expected values for LZMA header fields
         if lzma_header["null_byte"] == 0 {
             if lzma_header["decompressed_size"] >= MIN_SUPPORTED_DECOMPRESSED_SIZE {
@@ -46,5 +46,5 @@ pub fn parse_lzma_header(lzma_data: &[u8]) -> Result<LZMAHeader, StructureError>
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

@@ -51,5 +51,5 @@ pub fn uimage_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

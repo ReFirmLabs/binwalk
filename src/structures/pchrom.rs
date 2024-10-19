@@ -41,7 +41,7 @@ pub fn parse_pchrom_header(pch_data: &[u8]) -> Result<PCHRomHeader, StructureErr
                     if expected_nc_values.contains(&pch_header["flmap0_nc"]) {
                         // Parse the flash rom region entries to determine the total image size
                         if let Ok(pch_regions_size) =
-                            get_pch_regions_size(&pch_data, 0, pch_header["flmap0_fcba"])
+                            get_pch_regions_size(pch_data, 0, pch_header["flmap0_fcba"])
                         {
                             return Ok(PCHRomHeader {
                                 header_size: HEADER_STRUCTURE_OFFSET,
@@ -54,7 +54,7 @@ pub fn parse_pchrom_header(pch_data: &[u8]) -> Result<PCHRomHeader, StructureErr
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Determine the total size of PCHROM regions
@@ -113,7 +113,7 @@ fn get_pch_regions_size(
 
     if image_size > 0 {
         return Ok(image_size);
-    } else {
-        return Err(StructureError);
     }
+    
+    Err(StructureError)
 }
