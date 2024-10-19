@@ -8,6 +8,9 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y git
 # Pull down latest Binwalk code
 RUN git clone https://github.com/ReFirmLabs/binwalk.git
 
+# Allow pip to install packages system-wide
+RUN mkdir -p $HOME/.config/pip && echo "[global]" > $HOME/.config/pip/pip.conf && echo "break-system-packages = true" >> $HOME/.config/pip/pip.conf
+
 # Install all system dependencies
 RUN /tmp/binwalk/dependencies/ubuntu.sh
 
