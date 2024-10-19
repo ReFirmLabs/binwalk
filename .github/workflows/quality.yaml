@@ -1,0 +1,40 @@
+name: Quality Checks
+on:
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  lychee-link-check:
+    name: Link check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v4
+
+      - name: Link Checker
+        uses: lycheeverse/lychee-action@v1.8.0
+        with:
+          fail: true
+
+  fmt:
+    name: Formatting (rustfmt)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - target: x86_64-unknown-linux-gnu
+
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain (stable)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          target: ${{ matrix.platform.target }}
+          components: rustfmt
+
+      - name: Formatting (rustfmt)
+        run: cargo fmt -- --check
