@@ -6,11 +6,11 @@ pub const DESCRIPTION: &str = "Debian package file";
 
 /// Debian archives always start with these bytes
 pub fn deb_magic() -> Vec<Vec<u8>> {
-    return vec![b"!<arch>\ndebian-binary\x20\x20\x20".to_vec()];
+    vec![b"!<arch>\ndebian-binary\x20\x20\x20".to_vec()]
 }
 
 /// Validates debian archive signatures
-pub fn deb_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn deb_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Successful return value
     let mut result = SignatureResult {
         offset: offset,

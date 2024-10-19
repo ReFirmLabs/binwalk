@@ -12,18 +12,18 @@ pub fn jffs2_magic() -> Vec<Vec<u8>> {
      * These assume that the first JFFS2 node will be a directory, inode, or clean marker type.
      * Longer signatures are less prone to false positive matches.
      */
-    return vec![
+    vec![
         b"\x19\x85\xe0\x01".to_vec(),
         b"\x19\x85\xe0\x02".to_vec(),
         b"\x19\x85\x20\x03".to_vec(),
         b"\x85\x19\x01\xe0".to_vec(),
         b"\x85\x19\x02\xe0".to_vec(),
         b"\x85\x19\x03\x20".to_vec(),
-    ];
+    ]
 }
 
 /// Parse and validate a JFFS2 image
-pub fn jffs2_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn jffs2_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Useful contstants
     const MAX_PAGE_SIZE: usize = 0x10000;
     const MIN_VALID_NODE_COUNT: usize = 2;

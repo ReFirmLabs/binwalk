@@ -41,7 +41,7 @@ pub fn parse_cramfs_header(cramfs_data: &[u8]) -> Result<CramFSHeader, Structure
 
     // Parse the CramFS header, try little endian first
     if let Ok(mut cramfs_header) = common::parse(
-        &cramfs_data,
+        cramfs_data,
         &cramfs_header_structure,
         &cramfs_info.endianness,
     ) {

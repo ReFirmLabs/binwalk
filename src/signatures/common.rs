@@ -21,7 +21,7 @@ pub struct SignatureError;
 /// Each signature parser is responsible for parsing and validating signature candidates.
 ///
 /// They must return either a SignatureResult struct if validation succeeds, or a SignatureError if validation fails.
-pub type SignatureParser = fn(&Vec<u8>, usize) -> Result<SignatureResult, SignatureError>;
+pub type SignatureParser = fn(&[u8], usize) -> Result<SignatureResult, SignatureError>;
 
 /// Describes a valid identified file signature
 ///

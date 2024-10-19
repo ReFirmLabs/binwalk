@@ -8,12 +8,12 @@ pub const DESCRIPTION: &str = "OpenSSL encryption";
 
 /// OpenSSL crypto magic
 pub fn openssl_crypt_magic() -> Vec<Vec<u8>> {
-    return vec![b"Salted__".to_vec()];
+    vec![b"Salted__".to_vec()]
 }
 
 /// Validate an openssl signature
 pub fn openssl_crypt_parser(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
 ) -> Result<SignatureResult, SignatureError> {
     // Success return value

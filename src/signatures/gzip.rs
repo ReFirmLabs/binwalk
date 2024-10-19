@@ -8,11 +8,11 @@ pub const DESCRIPTION: &str = "gzip compressed data";
 
 /// Gzip magic bytes, plus compression type field (always 8 for deflate)
 pub fn gzip_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x1f\x8b\x08".to_vec()];
+    vec![b"\x1f\x8b\x08".to_vec()]
 }
 
 /// Validates gzip signatures
-pub fn gzip_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn gzip_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Length of the GZIP CRC located at the end of the deflate data stream
     const GZIP_CRC_SIZE: usize = 4;
     // Length of the ISIZE field located after the CRC field
@@ -22,7 +22,7 @@ pub fn gzip_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
     let dry_run = gzip_decompress(file_data, offset, None);
 
     // If dry-run was successful, this is almost certianly a valid gzip file
-    if dry_run.success == true {
+    if dry_run.success {
         // Get the size of the deflate data stream
         if let Some(deflate_data_size) = dry_run.size {
             // The dry run has already validated the header, but we want some header info to display to the user

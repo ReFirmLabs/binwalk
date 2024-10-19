@@ -6,11 +6,11 @@ pub const DESCRIPTION: &str = "CHK firmware header";
 
 /// CHK firmware always start with these bytes
 pub fn chk_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x2A\x23\x24\x5E".to_vec()];
+    vec![b"\x2A\x23\x24\x5E".to_vec()]
 }
 
 /// Parse and validate CHK headers
-pub fn chk_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn chk_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Successful return value
     let mut result = SignatureResult {
         offset: offset,

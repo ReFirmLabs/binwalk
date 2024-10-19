@@ -6,7 +6,7 @@ pub const DESCRIPTION: &str = "bzip2 compressed data";
 
 /// Bzip2 magic bytes; includes the magic bytes, version number, block size, and compressed magic signature
 pub fn bzip2_magic() -> Vec<Vec<u8>> {
-    return vec![
+    vec![
         b"BZh91AY&SY".to_vec(),
         b"BZh81AY&SY".to_vec(),
         b"BZh71AY&SY".to_vec(),
@@ -16,11 +16,11 @@ pub fn bzip2_magic() -> Vec<Vec<u8>> {
         b"BZh31AY&SY".to_vec(),
         b"BZh21AY&SY".to_vec(),
         b"BZh11AY&SY".to_vec(),
-    ];
+    ]
 }
 
 /// Bzip2 header parser
-pub fn bzip2_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn bzip2_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Return value
     let mut result = SignatureResult {
         description: DESCRIPTION.to_string(),
@@ -31,7 +31,7 @@ pub fn bzip2_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResul
 
     let dry_run = bzip2_decompressor(file_data, offset, None);
 
-    if dry_run.success == true {
+    if dry_run.success {
         if let Some(bzip2_size) = dry_run.size {
             result.size = bzip2_size;
             result.description =

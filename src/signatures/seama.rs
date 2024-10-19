@@ -6,14 +6,14 @@ pub const DESCRIPTION: &str = "SEAMA firmware header";
 
 /// SEAMA magic bytes, big and little endian
 pub fn seama_magic() -> Vec<Vec<u8>> {
-    return vec![
+    vec![
         b"\x5E\xA3\xA4\x17\x00\x00".to_vec(),
         b"\x17\xA4\xA3\x5E\x00\x00".to_vec(),
-    ];
+    ]
 }
 
 /// Validate SEAMA signatures
-pub fn seama_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn seama_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Success return value
     let mut result = SignatureResult {
         offset: offset,

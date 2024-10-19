@@ -6,14 +6,11 @@ pub const PCAPNG_DESCRIPTION: &str = "Pcap-NG capture file";
 
 /// Pcap-NG files always start with these bytes
 pub fn pcapng_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x0A\x0D\x0D\x0A".to_vec()];
+    vec![b"\x0A\x0D\x0D\x0A".to_vec()]
 }
 
 /// Parses and validates the Pcap-NG file
-pub fn pcapng_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<SignatureResult, SignatureError> {
+pub fn pcapng_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Successful return value
     let mut result = SignatureResult {
         offset: offset,

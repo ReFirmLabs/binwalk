@@ -8,16 +8,16 @@ pub const SREC_SHORT_DESCRIPTION: &str = "Motorola S-record (generic)";
 
 /// Generic, short signature for s-records, should only be matched at the beginning of a file
 pub fn srec_short_magic() -> Vec<Vec<u8>> {
-    return vec![b"S0".to_vec()];
+    vec![b"S0".to_vec()]
 }
 
 /// This assumes a srec header with the hex encoded string of "HDR"
 pub fn srec_magic() -> Vec<Vec<u8>> {
-    return vec![b"S00600004844521B".to_vec()];
+    vec![b"S00600004844521B".to_vec()]
 }
 
 /// Validates a SREC signature
-pub fn srec_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn srec_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // \r and \n
     const UNIX_TERMINATING_CHARACTER: u8 = 0x0A;
     const WINDOWS_TERMINATING_CHARACTER: u8 = 0x0D;

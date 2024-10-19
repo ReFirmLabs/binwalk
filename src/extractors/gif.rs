@@ -14,7 +14,7 @@ pub fn gif_extractor() -> Extractor {
 
 /// Parses and carves a GIF image from a file
 pub fn extract_gif_image(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {

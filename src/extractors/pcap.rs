@@ -13,7 +13,7 @@ pub fn pcapng_extractor() -> Extractor {
 
 /// Carves a pcap-ng file to disk
 pub fn pcapng_carver(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {

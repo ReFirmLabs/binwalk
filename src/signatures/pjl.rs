@@ -6,11 +6,11 @@ pub const DESCRIPTION: &str = "HP Printer Job Language data";
 
 /// PJL files typically start with these bytes
 pub fn pjl_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x1B%-12345X@PJL".to_vec()];
+    vec![b"\x1B%-12345X@PJL".to_vec()]
 }
 
 /// Parses display info for the PJL
-pub fn pjl_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn pjl_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Offset to the first "@PJL" string
     const PJL_COMMANDS_OFFSET: usize = 9;
 

@@ -12,7 +12,7 @@ pub fn sch2_extractor() -> Extractor {
 
 /// Extract the kernel described by a JBOOT SCH2 header
 pub fn extract_jboot_sch2_kernel(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {

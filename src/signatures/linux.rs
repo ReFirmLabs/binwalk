@@ -12,22 +12,22 @@ pub const LINUX_ARM64_BOOT_IMAGE_DESCRIPTION: &str = "Linux kernel ARM64 boot im
 
 /// Magic bytes for a linux boot image
 pub fn linux_boot_image_magic() -> Vec<Vec<u8>> {
-    return vec![b"\xb8\xc0\x07\x8e\xd8\xb8\x00\x90\x8e\xc0\xb9\x00\x01\x29\xf6\x29".to_vec()];
+    vec![b"\xb8\xc0\x07\x8e\xd8\xb8\x00\x90\x8e\xc0\xb9\x00\x01\x29\xf6\x29".to_vec()]
 }
 
 /// Kernel version string magic
 pub fn linux_kernel_version_magic() -> Vec<Vec<u8>> {
-    return vec![b"Linux\x20version\x20".to_vec()];
+    vec![b"Linux\x20version\x20".to_vec()]
 }
 
 /// Magic bytes for a linux ARM64 boot image
 pub fn linux_arm64_boot_image_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x00\x00\x00\x00\x00\x00\x00\x00ARMd".to_vec()];
+    vec![b"\x00\x00\x00\x00\x00\x00\x00\x00ARMd".to_vec()]
 }
 
 /// Validate a linux ARM64 boot image signature
 pub fn linux_arm64_boot_image_parser(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
 ) -> Result<SignatureResult, SignatureError> {
     // Magic bytes are 56 bytes into the image
@@ -59,7 +59,7 @@ pub fn linux_arm64_boot_image_parser(
 
 /// Validate a linux boot image signature
 pub fn linux_boot_image_parser(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
 ) -> Result<SignatureResult, SignatureError> {
     // There should be the string "!HdrS" 514 bytes from the start of the magic signature
@@ -92,7 +92,7 @@ pub fn linux_boot_image_parser(
 
 /// Validate a linux kernel version signature and detect if a symbol table is present
 pub fn linux_kernel_version_parser(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
 ) -> Result<SignatureResult, SignatureError> {
     // Kernel version string format is expected to be something like:

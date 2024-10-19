@@ -10,27 +10,27 @@ pub const PEM_CERTIFICATE_DESCRIPTION: &str = "PEM certificate";
 
 /// Public key magic
 pub fn pem_public_key_magic() -> Vec<Vec<u8>> {
-    return vec![b"-----BEGIN PUBLIC KEY-----".to_vec()];
+    vec![b"-----BEGIN PUBLIC KEY-----".to_vec()]
 }
 
 /// Private key magics
 pub fn pem_private_key_magic() -> Vec<Vec<u8>> {
-    return vec![
+    vec![
         b"-----BEGIN PRIVATE KEY-----".to_vec(),
         b"-----BEGIN EC PRIVATE KEY-----".to_vec(),
         b"-----BEGIN RSA PRIVATE KEY-----".to_vec(),
         b"-----BEGIN DSA PRIVATE KEY-----".to_vec(),
         b"-----BEGIN OPENSSH PRIVATE KEY-----".to_vec(),
-    ];
+    ]
 }
 
 /// Certificate magic
 pub fn pem_certificate_magic() -> Vec<Vec<u8>> {
-    return vec![b"-----BEGIN CERTIFICATE-----".to_vec()];
+    vec![b"-----BEGIN CERTIFICATE-----".to_vec()]
 }
 
 /// Validates both PEM certificate and key signatures
-pub fn pem_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn pem_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Enough bytes to uniquely differentiate certs from keys
     const MIN_PEM_LEN: usize = 26;
 

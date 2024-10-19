@@ -6,11 +6,11 @@ pub const DESCRIPTION: &str = "Device tree blob (DTB)";
 
 /// DTB files start with these magic bytes
 pub fn dtb_magic() -> Vec<Vec<u8>> {
-    return vec![b"\xD0\x0D\xFE\xED".to_vec()];
+    vec![b"\xD0\x0D\xFE\xED".to_vec()]
 }
 
 /// Validates the DTB header
-pub fn dtb_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn dtb_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Sucessful result
     let mut result = SignatureResult {
         offset: offset,

@@ -162,7 +162,7 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, StructureError> {
                             if let Some(elf_info_raw) = elf_data.get(elf_info_start..elf_info_end) {
                                 // Parse the remaining info from the ELF header
                                 if let Ok(elf_info) = common::parse(
-                                    &elf_info_raw,
+                                    elf_info_raw,
                                     &elf_info_structure,
                                     elf_endianness[&e_ident["endianness"]],
                                 ) {

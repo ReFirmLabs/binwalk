@@ -7,16 +7,16 @@ pub const DESCRIPTION: &str = "LZFSE compressed data";
 
 /// LZFSE block magics
 pub fn lzfse_magic() -> Vec<Vec<u8>> {
-    return vec![
+    vec![
         b"bvx-".to_vec(),
         b"bvx1".to_vec(),
         b"bvx2".to_vec(),
         b"bvxn".to_vec(),
-    ];
+    ]
 }
 
 /// Validate LZFSE signatures
-pub fn lzfse_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn lzfse_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     let mut result = SignatureResult {
         offset: offset,
         confidence: CONFIDENCE_HIGH,
@@ -38,7 +38,7 @@ pub fn lzfse_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResul
             next_block_offset += lzfse_block.header_size + lzfse_block.data_size;
 
             // Only return success if an end-of-stream block is found
-            if lzfse_block.eof == true {
+            if lzfse_block.eof {
                 result.size = next_block_offset - offset;
                 result.description =
                     format!("{}, total size: {} bytes", result.description, result.size);

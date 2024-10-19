@@ -42,10 +42,10 @@ pub fn parse_chk_header(header_data: &[u8]) -> Result<CHKHeader, StructureError>
             let board_id_end: usize = chk_header["header_size"];
 
             if let Some(board_id_raw_bytes) = header_data.get(board_id_start..board_id_end) {
-                let board_id_string = get_cstring(&board_id_raw_bytes);
+                let board_id_string = get_cstring(board_id_raw_bytes);
 
                 // We expect that there must be a valid board ID string
-                if board_id_string.len() > 0 {
+                if !board_id_string.is_empty() {
                     return Ok(CHKHeader {
                         board_id: board_id_string.clone(),
                         header_size: chk_header["header_size"],

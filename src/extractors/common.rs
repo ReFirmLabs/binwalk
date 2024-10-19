@@ -24,7 +24,7 @@ pub struct ExtractionError;
 
 /// Built-in internal extractors must provide a function conforming to this definition.
 /// Arguments: file_data, offset, output_directory.
-pub type InternalExtractor = fn(&Vec<u8>, usize, Option<&String>) -> ExtractionResult;
+pub type InternalExtractor = fn(&[u8], usize, Option<&String>) -> ExtractionResult;
 
 /// Enum to define either an Internal or External extractor type
 #[derive(Debug, Default, Clone, Eq, PartialEq, Ord, PartialOrd)]

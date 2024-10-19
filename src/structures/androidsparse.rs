@@ -108,11 +108,7 @@ pub fn parse_android_sparse_chunk_header(
             chonker.is_dont_care = chunk_header["chunk_type"] == CHUNK_TYPE_DONT_CARE;
 
             // The chunk type must be one of the known chunk types
-            if chonker.is_crc == true
-                || chonker.is_raw == true
-                || chonker.is_fill == true
-                || chonker.is_dont_care == true
-            {
+            if chonker.is_crc || chonker.is_raw || chonker.is_fill || chonker.is_dont_care {
                 return Ok(chonker);
             }
         }

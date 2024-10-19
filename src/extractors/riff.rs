@@ -12,7 +12,7 @@ pub fn riff_extractor() -> Extractor {
 
 /// Internal extractor for carving RIFF files to disk
 pub fn extract_riff_image(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {

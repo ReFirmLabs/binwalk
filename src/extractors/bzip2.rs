@@ -11,7 +11,7 @@ pub fn bzip2_extractor() -> Extractor {
 
 /// Internal extractor for decompressing BZIP2 data
 pub fn bzip2_decompressor(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {

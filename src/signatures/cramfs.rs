@@ -9,14 +9,11 @@ pub const DESCRIPTION: &str = "CramFS filesystem";
 
 /// This is technically the CramFS "signature", not the magic bytes, but it's endian-agnostic
 pub fn cramfs_magic() -> Vec<Vec<u8>> {
-    return vec![b"Compressed ROMFS".to_vec()];
+    vec![b"Compressed ROMFS".to_vec()]
 }
 
 /// Parse and validate the CramFS header
-pub fn cramfs_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<SignatureResult, SignatureError> {
+pub fn cramfs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Some constant relative offsets
     const SIGNATURE_OFFSET: usize = 16;
     const CRC_START_OFFSET: usize = 32;

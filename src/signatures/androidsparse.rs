@@ -7,12 +7,12 @@ pub const DESCRIPTION: &str = "Android sparse image";
 
 /// Magic bytes for Android Sparse files
 pub fn android_sparse_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x3A\xFF\x26\xED".to_vec()];
+    vec![b"\x3A\xFF\x26\xED".to_vec()]
 }
 
 /// Parses Android Sparse files
 pub fn android_sparse_parser(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
 ) -> Result<SignatureResult, SignatureError> {
     // Default result, returned on success
@@ -26,7 +26,7 @@ pub fn android_sparse_parser(
     // Do a dry-run extraction
     let dry_run = extract_android_sparse(file_data, offset, None);
 
-    if dry_run.success == true {
+    if dry_run.success {
         if let Some(total_size) = dry_run.size {
             // Dry-run went OK, parse the header to get some useful info to report
             if let Ok(header) = parse_android_sparse_header(&file_data[offset..]) {

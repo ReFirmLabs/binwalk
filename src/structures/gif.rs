@@ -57,7 +57,7 @@ fn parse_gif_flags(flags: usize) -> GIFFlags {
         retval.color_table_size = 3 * usize::pow(2, encoded_table_size);
     }
 
-    return retval;
+    retval
 }
 
 /// Parses an image descriptor; returns the total size of the descriptor and following image data

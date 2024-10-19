@@ -10,16 +10,16 @@ pub const DESCRIPTION: &str = "YAFFSv2 filesystem";
 
 /// Expect the first YAFFS entry to be either a directory (0x00000003) or file (0x00000001), big or little endian
 pub fn yaffs_magic() -> Vec<Vec<u8>> {
-    return vec![
+    vec![
         b"\x03\x00\x00\x00\x01\x00\x00\x00\xFF\xFF".to_vec(),
         b"\x00\x00\x00\x03\x00\x00\x00\x01\xFF\xFF".to_vec(),
         b"\x01\x00\x00\x00\x01\x00\x00\x00\xFF\xFF".to_vec(),
         b"\x00\x00\x00\x01\x00\x00\x00\x01\xFF\xFF".to_vec(),
-    ];
+    ]
 }
 
 /// Validate a YAFFS signature
-pub fn yaffs_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn yaffs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Max page size + max spare size
     const MAX_OBJ_SIZE: usize = 16896;
     const BIG_ENDIAN_FIRST_BYTE: u8 = 0;
@@ -116,7 +116,7 @@ fn get_spare_size(
 
         if let Some(obj_header_data) = file_data.get(next_obj_offset..) {
             // Attempt to parse this data as a YAFFS object header
-            if let Ok(_) = parse_yaffs_obj_header(obj_header_data, endianness) {
+            if parse_yaffs_obj_header(obj_header_data, endianness).is_ok() {
                 return Ok(*spare_size);
             }
         }

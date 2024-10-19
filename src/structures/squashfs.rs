@@ -172,21 +172,13 @@ pub fn parse_squashfs_uid_entry(
     // Parse one entry from the UID table
     if version == 4 {
         match common::parse(uid_data, &squashfs_v4_uid_table_structure, endianness) {
-            Err(e) => {
-                Err(e)
-            }
-            Ok(uidv4) => {
-                Ok(uidv4["uid_block_ptr"])
-            }
+            Err(e) => Err(e),
+            Ok(uidv4) => Ok(uidv4["uid_block_ptr"]),
         }
     } else {
         match common::parse(uid_data, &squashfs_v3_uid_table_structure, endianness) {
-            Err(e) => {
-                Err(e)
-            }
-            Ok(uidv3) => {
-                Ok(uidv3["uid_block_ptr"])
-            }
+            Err(e) => Err(e),
+            Ok(uidv3) => Ok(uidv3["uid_block_ptr"]),
         }
     }
 }

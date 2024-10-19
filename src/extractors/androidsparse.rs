@@ -12,7 +12,7 @@ pub fn android_sparse_extractor() -> Extractor {
 
 /// Android sparse internal extractor
 pub fn extract_android_sparse(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {

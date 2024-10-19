@@ -199,7 +199,11 @@ fn calculate_uimage_header_checksum(hdr: &[u8]) -> usize {
     // Header checksum has to be nulled out to calculate the CRC
     let mut uimage_header: Vec<u8> = hdr.to_vec();
 
-    for crc_byte in uimage_header.iter_mut().take(HEADER_CRC_END).skip(HEADER_CRC_START) {
+    for crc_byte in uimage_header
+        .iter_mut()
+        .take(HEADER_CRC_END)
+        .skip(HEADER_CRC_START)
+    {
         *crc_byte = 0;
     }
 

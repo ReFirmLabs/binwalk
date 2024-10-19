@@ -13,30 +13,30 @@ pub const JBOOT_SCH2_DESCRIPTION: &str = "JBOOT SCH2 header";
 
 /// JBOOT firmware header magic bytes
 pub fn jboot_arm_magic() -> Vec<Vec<u8>> {
-    return vec![
+    vec![
         b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x42\x48\x02\x00\x00\x00"
             .to_vec(),
-    ];
+    ]
 }
 
 /// JBOOT STAG header magic bytes
 pub fn jboot_stag_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x04\x04\x24\x2B".to_vec(), b"\xFF\x04\x24\x2B".to_vec()];
+    vec![b"\x04\x04\x24\x2B".to_vec(), b"\xFF\x04\x24\x2B".to_vec()]
 }
 
 /// JBOOT SCH2 header magic bytes
 pub fn jboot_sch2_magic() -> Vec<Vec<u8>> {
-    return vec![
+    vec![
         b"\x24\x21\x00\x02".to_vec(),
         b"\x24\x21\x01\x02".to_vec(),
         b"\x24\x21\x02\x02".to_vec(),
         b"\x24\x21\x03\x02".to_vec(),
-    ];
+    ]
 }
 
 /// Parse and validate the JBOOT ARM header
 pub fn jboot_arm_parser(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
 ) -> Result<SignatureResult, SignatureError> {
     // Magic bytes start at this offset into the header
@@ -74,7 +74,7 @@ pub fn jboot_arm_parser(
 
 /// Parse and validate a JBOOT STAG header
 pub fn jboot_stag_parser(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
 ) -> Result<SignatureResult, SignatureError> {
     // Successful return value
@@ -112,7 +112,7 @@ pub fn jboot_stag_parser(
 
 /// Parse and validate a JBOOT SCH2 header
 pub fn jboot_sch2_parser(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
 ) -> Result<SignatureResult, SignatureError> {
     // Successful return value
@@ -125,7 +125,7 @@ pub fn jboot_sch2_parser(
 
     let dry_run = extract_jboot_sch2_kernel(file_data, offset, None);
 
-    if dry_run.success == true {
+    if dry_run.success {
         if let Some(total_size) = dry_run.size {
             if let Ok(sch2_header) = parse_jboot_sch2_header(&file_data[offset..]) {
                 result.size = total_size;

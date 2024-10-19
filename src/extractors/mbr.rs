@@ -11,7 +11,7 @@ pub fn mbr_extractor() -> Extractor {
 
 /// Validate and extract partitions from an MBR
 pub fn extract_mbr_partitions(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {

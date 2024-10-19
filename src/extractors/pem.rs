@@ -20,7 +20,7 @@ pub fn pem_certificate_extractor() -> Extractor {
 }
 
 pub fn pem_certificate_carver(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {
@@ -34,7 +34,7 @@ pub fn pem_certificate_carver(
 }
 
 pub fn pem_key_carver(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {
@@ -43,7 +43,7 @@ pub fn pem_key_carver(
 }
 
 pub fn pem_carver(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
     fname: Option<&str>,
@@ -68,7 +68,7 @@ pub fn pem_carver(
     return result;
 }
 
-fn get_pem_size(file_data: &Vec<u8>, start_of_pem_offset: usize) -> Option<usize> {
+fn get_pem_size(file_data: &[u8], start_of_pem_offset: usize) -> Option<usize> {
     let eof_markers = vec![
         b"-----END PUBLIC KEY-----".to_vec(),
         b"-----END CERTIFICATE-----".to_vec(),

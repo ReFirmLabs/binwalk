@@ -76,8 +76,8 @@ pub fn parse_cpio_entry_header(cpio_data: &[u8]) -> Result<CPIOEntryHeader, Stru
 fn byte_padding(n: usize) -> usize {
     let modulus: usize = n % 4;
     if modulus == 0 {
-        return 0;
+        0
     } else {
-        return 4 - modulus;
+        4 - modulus
     }
 }

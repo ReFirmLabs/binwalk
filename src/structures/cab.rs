@@ -99,7 +99,7 @@ pub fn parse_cab_header(header_data: &[u8]) -> Result<CabinetHeader, StructureEr
                 }
 
                 // If everything checked out OK, return the result
-                if everything_ok == true {
+                if everything_ok {
                     return Ok(header_info);
                 }
             }

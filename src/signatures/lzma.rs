@@ -41,11 +41,11 @@ pub fn lzma_magic() -> Vec<Vec<u8>> {
         }
     }
 
-    return magic_signatures;
+    magic_signatures
 }
 
 /// Validate LZMA signatures
-pub fn lzma_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn lzma_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Success return value
     let mut result = SignatureResult {
         offset: offset,
@@ -64,7 +64,7 @@ pub fn lzma_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
         let dry_run = lzma::lzma_decompress(file_data, offset, None);
 
         // Return success if dry run succeeded
-        if dry_run.success == true {
+        if dry_run.success {
             if let Some(lzma_stream_size) = dry_run.size {
                 result.size = lzma_stream_size;
                 result.description = format!(

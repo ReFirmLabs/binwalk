@@ -8,11 +8,11 @@ pub const DESCRIPTION: &str = "Apple Disk iMaGe";
 /// 4-byte magic, 4-byte version (v4), 4-byte structure size (0x0200).
 ///  This is actually the magic bytes of the DMG footer, there is no standard header format.
 pub fn dmg_magic() -> Vec<Vec<u8>> {
-    return vec![b"koly\x00\x00\x00\x04\x00\x00\x02\x00".to_vec()];
+    vec![b"koly\x00\x00\x00\x04\x00\x00\x02\x00".to_vec()]
 }
 
 /// Validates the DMG footer
-pub fn dmg_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn dmg_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Confidence is set to HIGH + 1 to ensure this overrides other signatures.
     // DMG's typically start with compressed data, and the file should be treated
     // as a DMG, not just compressed data.

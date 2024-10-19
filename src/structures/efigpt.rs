@@ -128,10 +128,10 @@ fn parse_gpt_partition_entry(entry_data: &[u8]) -> Option<GPTPartitionEntry> {
         }
     }
 
-    return None;
+    None
 }
 
 // Convert LBA to offset
 fn lba_to_offset(lba: usize) -> usize {
-    return lba * BLOCK_SIZE;
+    lba * BLOCK_SIZE
 }

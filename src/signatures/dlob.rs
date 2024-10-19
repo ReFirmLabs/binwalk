@@ -6,11 +6,11 @@ pub const DESCRIPTION: &str = "DLOB firmware header";
 
 /// DLOB firmware images always start with these bytes
 pub fn dlob_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x5e\xa3\xa4\x17".to_vec()];
+    vec![b"\x5e\xa3\xa4\x17".to_vec()]
 }
 
 /// Validates the DLOB header
-pub fn dlob_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn dlob_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Successful return value
     let mut result = SignatureResult {
         offset: offset,

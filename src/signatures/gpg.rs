@@ -6,12 +6,12 @@ pub const GPG_SIGNED_DESCRIPTION: &str = "GPG signed file";
 
 /// GPG signed files start with these two bytes
 pub fn gpg_signed_magic() -> Vec<Vec<u8>> {
-    return vec![b"\xA3\x01".to_vec()];
+    vec![b"\xA3\x01".to_vec()]
 }
 
 /// Validates GPG signatures
 pub fn gpg_signed_parser(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
 ) -> Result<SignatureResult, SignatureError> {
     // Success result; confidence is high since this signature is only reported what it starts at the beginning of a file
@@ -31,7 +31,7 @@ pub fn gpg_signed_parser(
         let decompression_dry_run = zlib_decompress(&file_data, offset, None);
 
         // If the decompression dry run was a success, this signature is almost certianly valid
-        if decompression_dry_run.success == true {
+        if decompression_dry_run.success {
             return Ok(result);
         }
     }

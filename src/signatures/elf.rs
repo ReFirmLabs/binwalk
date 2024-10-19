@@ -6,11 +6,11 @@ pub const DESCRIPTION: &str = "ELF binary";
 
 /// ELF files start with these bytes
 pub fn elf_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x7FELF".to_vec()];
+    vec![b"\x7FELF".to_vec()]
 }
 
 /// Parse and validate the ELF header
-pub fn elf_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn elf_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Successful result
     let mut result = SignatureResult {
         offset: offset,

@@ -24,7 +24,7 @@ struct RSAKeyDefinition {
 
 /// Returns a list of RSA key definitions
 fn rsa_key_definitions() -> Vec<RSAKeyDefinition> {
-    return vec![
+    vec![
         // 1024b RSA key
         RSAKeyDefinition {
             magic: b"\x84\x8C\x03".to_vec(),
@@ -130,7 +130,7 @@ fn rsa_key_definitions() -> Vec<RSAKeyDefinition> {
                 ],
             )]),
         },
-    ];
+    ]
 }
 
 /// RSA crypto magic bytes
@@ -141,11 +141,11 @@ pub fn rsa_magic() -> Vec<Vec<u8>> {
         magics.push(key_definition.magic.clone());
     }
 
-    return magics;
+    magics
 }
 
 /// Validates an RSA encrypted file header
-pub fn rsa_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn rsa_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Successful return value
     let mut result = SignatureResult {
         offset: offset,

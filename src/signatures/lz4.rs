@@ -7,11 +7,11 @@ pub const DESCRIPTION: &str = "LZ4 compressed data";
 
 /// LZ4 files start with these magic bytes
 pub fn lz4_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x04\x22\x4D\x18".to_vec()];
+    vec![b"\x04\x22\x4D\x18".to_vec()]
 }
 
 /// Validate a LZ4 signature
-pub fn lz4_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn lz4_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Checksums are 4 bytes in length
     const CONTENT_CHECKSUM_LEN: usize = 4;
 

@@ -12,7 +12,7 @@ pub fn svg_extractor() -> Extractor {
 
 /// Internal extractor for carving SVG images to disk
 pub fn extract_svg_image(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {

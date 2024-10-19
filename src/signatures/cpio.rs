@@ -7,11 +7,11 @@ pub const DESCRIPTION: &str = "CPIO ASCII archive";
 
 /// Magic bytes for CPIO archives with and without CRC's
 pub fn cpio_magic() -> Vec<Vec<u8>> {
-    return vec![b"070701".to_vec(), b"070702".to_vec()];
+    vec![b"070701".to_vec(), b"070702".to_vec()]
 }
 
 /// Parse and validate CPIO archives
-pub fn cpio_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn cpio_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // The last CPIO entry will have this file name
     const EOF_MARKER: &str = "TRAILER!!!";
 

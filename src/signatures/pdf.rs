@@ -6,11 +6,11 @@ pub const DESCRIPTION: &str = "PDF document";
 /// PDF magic bytes
 pub fn pdf_magic() -> Vec<Vec<u8>> {
     // This assumes a major version of 1
-    return vec![b"%PDF-1.".to_vec()];
+    vec![b"%PDF-1.".to_vec()]
 }
 
 /// Validate a PDF signature
-pub fn pdf_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn pdf_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // More than enough data for our needs
     const MIN_PDF_SIZE: usize = 16;
 

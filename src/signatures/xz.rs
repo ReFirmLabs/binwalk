@@ -7,11 +7,11 @@ pub const DESCRIPTION: &str = "XZ compressed data";
 
 /// XZ magic bytes
 pub fn xz_magic() -> Vec<Vec<u8>> {
-    return vec![b"\xFD\x37\x7a\x58\x5a\x00".to_vec()];
+    vec![b"\xFD\x37\x7a\x58\x5a\x00".to_vec()]
 }
 
 /// Validates XZ signatures
-pub fn xz_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn xz_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Success return value
     let mut result = SignatureResult {
         offset: offset,

@@ -11,7 +11,7 @@ pub fn zlib_extractor() -> Extractor {
 
 /// Internal extractor for decompressing ZLIB data
 pub fn zlib_decompress(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {

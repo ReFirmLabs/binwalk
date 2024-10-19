@@ -87,7 +87,7 @@ pub fn parse_gzip_header(header_data: &[u8]) -> Result<GzipHeader, StructureErro
                             Some(extra_header_data) => {
                                 // Parse the extra header and update the header_info.size to include this data
                                 match common::parse(
-                                    &extra_header_data,
+                                    extra_header_data,
                                     &gzip_extra_header_structure,
                                     "little",
                                 ) {

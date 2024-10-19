@@ -11,7 +11,7 @@ pub fn lzma_extractor() -> Extractor {
 
 /// Internal extractor for decompressing LZMA/XZ data streams
 pub fn lzma_decompress(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {

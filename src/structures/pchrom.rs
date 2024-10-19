@@ -114,6 +114,6 @@ fn get_pch_regions_size(
     if image_size > 0 {
         return Ok(image_size);
     }
-    
+
     Err(StructureError)
 }

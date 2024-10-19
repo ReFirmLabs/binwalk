@@ -12,7 +12,7 @@ pub fn png_extractor() -> Extractor {
 
 /// Internal extractor for carving PNG files to disk
 pub fn extract_png_image(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {

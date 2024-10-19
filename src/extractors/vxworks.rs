@@ -16,7 +16,7 @@ pub fn vxworks_symtab_extractor() -> Extractor {
 
 /// Internal extractor for writing VxWorks symbol tables to JSON
 pub fn extract_symbol_table(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {

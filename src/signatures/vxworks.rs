@@ -9,25 +9,25 @@ pub const WIND_KERNEL_DESCRIPTION: &str = "VxWorks WIND kernel version";
 /// WIND kernel version magic
 pub fn wind_kernel_magic() -> Vec<Vec<u8>> {
     // Magic version string for WIND kernels
-    return vec![b"WIND version ".to_vec()];
+    vec![b"WIND version ".to_vec()]
 }
 
 /// VxWorks symbol table magic bytes
 pub fn symbol_table_magic() -> Vec<Vec<u8>> {
     // These magic bytes match the type and group fields in the VxWorks symbol table, for both big and little endian targets
-    return vec![
+    vec![
         b"\x00\x00\x05\x00\x00\x00\x00\x00".to_vec(),
         b"\x00\x00\x07\x00\x00\x00\x00\x00".to_vec(),
         b"\x00\x00\x09\x00\x00\x00\x00\x00".to_vec(),
         b"\x00\x05\x00\x00\x00\x00\x00\x00".to_vec(),
         b"\x00\x07\x00\x00\x00\x00\x00\x00".to_vec(),
         b"\x00\x09\x00\x00\x00\x00\x00\x00".to_vec(),
-    ];
+    ]
 }
 
 /// Validates WIND kernel version signatures
 pub fn wind_kernel_parser(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
 ) -> Result<SignatureResult, SignatureError> {
     // Length of the magic signatures bytes
@@ -48,7 +48,7 @@ pub fn wind_kernel_parser(
         let version_string = get_cstring(version_bytes);
 
         // Make sure we got a string
-        if version_string.len() > 0 {
+        if !version_string.is_empty() {
             result.size = MAGIC_SIZE + version_string.len();
             result.description = format!("{} {}", result.description, version_string);
             return Ok(result);
@@ -60,7 +60,7 @@ pub fn wind_kernel_parser(
 
 /// Validates VxWorks symbol table signatures
 pub fn symbol_table_parser(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
 ) -> Result<SignatureResult, SignatureError> {
     // The magic bytes start at this offset from the beginning of the symbol table
@@ -81,7 +81,7 @@ pub fn symbol_table_parser(
         let dry_run = extract_symbol_table(file_data, symtab_start, None);
 
         // If dry run was a success, this is very likely a valid symbol table
-        if dry_run.success == true {
+        if dry_run.success {
             // Get the size of the symbol table from the dry-run
             if let Some(symtab_size) = dry_run.size {
                 result.size = symtab_size;
