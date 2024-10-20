@@ -42,7 +42,7 @@ pub fn cpio_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, S
                     }
                     Ok(cpio_header) => {
                         // Sanity check the magic bytes
-                        if cpio_magic().contains(&cpio_header.magic) == false {
+                        if !cpio_magic().contains(&cpio_header.magic) {
                             break;
                         }
 

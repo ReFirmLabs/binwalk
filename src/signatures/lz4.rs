@@ -34,7 +34,7 @@ pub fn lz4_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, Si
                 result.size = lz4_file_header.header_size + lz4_data_size;
 
                 // If this flag is set, an additional 4-byte checksum will be present at the end of the LZ4 data
-                if lz4_file_header.content_checksum_present == true {
+                if lz4_file_header.content_checksum_present {
                     result.size += CONTENT_CHECKSUM_LEN;
                 }
 
@@ -77,7 +77,7 @@ fn get_lz4_data_size(lz4_data: &[u8], checksum_present: bool) -> Result<usize, S
                             + block_header.checksum_size;
 
                         // Only return success if a last block header is found
-                        if block_header.last_block == true {
+                        if block_header.last_block {
                             return Ok(lz4_data_size);
                         }
                     }

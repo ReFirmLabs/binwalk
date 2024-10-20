@@ -28,7 +28,7 @@ pub fn gpg_signed_parser(
          * GPG signed files are just zlib compressed files with the zlib magic bytes replaced with the GPG magic bytes.
          * Decompress the signed file; no output directory specified, dry run only.
          */
-        let decompression_dry_run = zlib_decompress(&file_data, offset, None);
+        let decompression_dry_run = zlib_decompress(file_data, offset, None);
 
         // If the decompression dry run was a success, this signature is almost certianly valid
         if decompression_dry_run.success {

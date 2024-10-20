@@ -42,8 +42,12 @@ pub fn cramfs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult,
                 let mut cramfs_image: Vec<u8> = cramfs_image_data.to_vec();
 
                 // Null out the checksum field
-                for i in CRC_START_OFFSET..CRC_END_OFFSET {
-                    cramfs_image[i] = 0;
+                for crc_byte in cramfs_image
+                    .iter_mut()
+                    .take(CRC_END_OFFSET)
+                    .skip(CRC_START_OFFSET)
+                {
+                    *crc_byte = 0;
                 }
 
                 // For displaying an error message in the description

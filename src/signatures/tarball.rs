@@ -107,7 +107,7 @@ fn header_checksum_is_valid(header_block: &[u8]) -> bool {
         if (TARBALL_CHECKSUM_START..TARBALL_CHECKSUM_END).contains(&i) {
             sum += 0x20;
         } else {
-            sum += (*header_byte as usize);
+            sum += *header_byte as usize;
         }
     }
 

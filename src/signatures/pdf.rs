@@ -41,7 +41,7 @@ pub fn pdf_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, Si
         let version_minor: u8 = pdf_header[MINOR_NUMBER_OFFSET];
 
         // Sanity check the minor version number
-        if version_minor <= ASCII_NINE && version_minor >= ASCII_ZERO {
+        if (ASCII_ZERO..=ASCII_NINE).contains(&version_minor) {
             // Update the result description to include the version number
             result.description = format!(
                 "{}, version 1.{}",
@@ -50,7 +50,7 @@ pub fn pdf_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, Si
             );
 
             // Search the remaining bytes for new line characters followed by a percent character
-            for byte in pdf_header[NEWLINE_OFFSET..].to_vec() {
+            for byte in pdf_header[NEWLINE_OFFSET..].iter().copied() {
                 // Any new line or carrige return byte is OK, just keep going
                 if newline_characters.contains(&byte) {
                     continue;

@@ -177,5 +177,5 @@ fn has_linux_symbol_table(file_data: &[u8]) -> bool {
     }
 
     // There should be only one match
-    return match_count == 1;
+    match_count == 1
 }

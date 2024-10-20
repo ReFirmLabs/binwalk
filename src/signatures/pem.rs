@@ -65,11 +65,11 @@ pub fn pem_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, Si
     // Sanity check available data
     if let Some(pem_magic) = file_data.get(offset..offset + MIN_PEM_LEN) {
         // Check if this magic is for a PEM cert or a PEM key
-        if public_magics.contains(&pem_magic.to_vec()) == true {
+        if public_magics.contains(&pem_magic.to_vec()) {
             result.description = PEM_PUBLIC_KEY_DESCRIPTION.to_string();
-        } else if private_magics.contains(&pem_magic.to_vec()) == true {
+        } else if private_magics.contains(&pem_magic.to_vec()) {
             result.description = PEM_PRIVATE_KEY_DESCRIPTION.to_string();
-        } else if certificate_magics.contains(&pem_magic.to_vec()) == true {
+        } else if certificate_magics.contains(&pem_magic.to_vec()) {
             result.description = PEM_CERTIFICATE_DESCRIPTION.to_string();
         } else {
             // This function will only be called if one of the magics was found, so this should never happen
@@ -78,10 +78,10 @@ pub fn pem_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, Si
 
         // Do an extraction dry-run to validate that this PEM file looks sane
         let dry_run = pem::pem_carver(file_data, offset, None, None);
-        if dry_run.success == true {
+        if dry_run.success {
             if let Some(pem_size) = dry_run.size {
                 // Make sure the PEM data can be base64 decoded
-                if let Ok(_) = decode_pem_data(&file_data[offset..offset + pem_size]) {
+                if decode_pem_data(&file_data[offset..offset + pem_size]).is_ok() {
                     // If the file starts and end with this PEM data, no sense in carving it out to another file on disk
                     if offset == 0 && pem_size == file_data.len() {
                         result.extraction_declined = true;
@@ -125,7 +125,7 @@ fn decode_pem_data(pem_file_data: &[u8]) -> Result<usize, SignatureError> {
         }
 
         // If we found some text between the delimiters, attempt to base64 decode it
-        if base64_string.len() > 0 {
+        if !base64_string.is_empty() {
             // PEM contents are base64 encoded, they should decode OK; if not, it's a false positive
             if let Ok(decoded_data) = BASE64_STANDARD.decode(&base64_string) {
                 return Ok(decoded_data.len());

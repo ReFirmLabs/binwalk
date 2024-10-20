@@ -42,7 +42,7 @@ pub fn crc32_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, 
         ..Default::default()
     };
 
-    return Ok(result);
+    Ok(result)
 }
 
 pub fn sha256_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
@@ -58,7 +58,7 @@ pub fn sha256_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult,
         ..Default::default()
     };
 
-    return Ok(result);
+    Ok(result)
 }
 
 /// Detects hash contstant endianess
@@ -70,5 +70,5 @@ fn hash_endianess(file_data: &[u8], offset: usize, magics: Vec<Vec<u8>>) -> Stri
         endianness = "big".to_string();
     }
 
-    return endianness;
+    endianness
 }

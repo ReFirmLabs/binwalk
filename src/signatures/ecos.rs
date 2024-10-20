@@ -46,5 +46,5 @@ pub fn exception_handler_parser(
     }
 
     result.description = format!("{}, MIPS {} endian", result.description, endianness);
-    return Ok(result);
+    Ok(result)
 }

@@ -30,7 +30,7 @@ pub fn gzip_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, S
                 // Original file name is optional
                 let mut original_file_name_text: String = "".to_string();
 
-                if gzip_header.original_name.len() > 0 {
+                if !gzip_header.original_name.is_empty() {
                     original_file_name_text =
                         format!(" original file name: \"{}\",", gzip_header.original_name);
                 }

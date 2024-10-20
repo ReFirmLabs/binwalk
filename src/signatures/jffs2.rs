@@ -111,5 +111,5 @@ fn roundup(num: usize) -> usize {
     let base: f64 = 4.0;
     let number: f64 = num as f64;
     let div: f64 = number / base;
-    return (base * div.ceil()) as usize;
+    (base * div.ceil()) as usize
 }

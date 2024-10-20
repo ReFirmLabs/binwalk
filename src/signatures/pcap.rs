@@ -23,7 +23,7 @@ pub fn pcapng_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult,
     let dry_run = pcapng_carver(file_data, offset, None);
 
     // If dry-run was successful, this is almost certianly a valid pcap-ng file
-    if dry_run.success == true {
+    if dry_run.success {
         if let Some(pcap_size) = dry_run.size {
             // If this file is just a pcap file, no need to carve it out to yet another file on disk
             if offset == 0 && pcap_size == file_data.len() {
