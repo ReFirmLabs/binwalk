@@ -81,12 +81,12 @@ pub fn lzma_decompress(
                     }
 
                     // Some data was decompressed successfully; if extraction was requested, write the data to disk.
-                    if !output_directory.is_none() {
+                    if output_directory.is_some() {
                         // Number of decompressed bytes in the output buffer
                         let n = (decompressor.total_out() as usize) - bytes_written;
 
                         let chroot = Chroot::new(output_directory);
-                        if chroot.append_to_file(OUTPUT_FILE_NAME, &output_buf[0..n]) == false {
+                        if !chroot.append_to_file(OUTPUT_FILE_NAME, &output_buf[0..n]) {
                             // If writing data to disk fails, report failure and break
                             result.success = false;
                             break;
@@ -97,7 +97,7 @@ pub fn lzma_decompress(
                     }
 
                     // If result.success is true, then everything has been processed and written to disk successfully.
-                    if result.success == true {
+                    if result.success {
                         break;
                     }
                 }
@@ -105,5 +105,5 @@ pub fn lzma_decompress(
         }
     }
 
-    return result;
+    result
 }

@@ -37,7 +37,7 @@ pub fn extract_jboot_sch2_kernel(
                     result.size = Some(sch2_header.header_size + sch2_header.kernel_size);
                     result.success = true;
 
-                    if let Some(_) = output_directory {
+                    if output_directory.is_some() {
                         let chroot = Chroot::new(output_directory);
                         result.success = chroot.carve_file(
                             OUTFILE_NAME,
@@ -51,5 +51,5 @@ pub fn extract_jboot_sch2_kernel(
         }
     }
 
-    return result;
+    result
 }

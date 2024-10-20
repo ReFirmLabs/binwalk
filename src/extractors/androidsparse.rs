@@ -18,20 +18,9 @@ pub fn extract_android_sparse(
 ) -> ExtractionResult {
     const OUTFILE_NAME: &str = "unsparsed.img";
 
-    let dry_run: bool;
     let mut result = ExtractionResult {
         ..Default::default()
     };
-
-    // Check if this is a dry-run or a full extraction
-    match output_directory {
-        Some(_) => {
-            dry_run = false;
-        }
-        None => {
-            dry_run = true;
-        }
-    }
 
     // Parse the sparse file header
     if let Ok(sparse_header) = androidsparse::parse_android_sparse_header(&file_data[offset..]) {
@@ -50,19 +39,19 @@ pub fn extract_android_sparse(
 
                 Ok(chunk_header) => {
                     // If not a dry run, extract the data from the next chunk
-                    if dry_run == false {
+                    if output_directory.is_some() {
                         let chroot = Chroot::new(output_directory);
                         let chunk_data_start: usize = next_chunk_offset + chunk_header.header_size;
                         let chunk_data_end: usize = chunk_data_start + chunk_header.data_size;
 
                         if let Some(chunk_data) = file_data.get(chunk_data_start..chunk_data_end) {
-                            if extract_chunk(
+                            if !extract_chunk(
                                 &sparse_header,
                                 &chunk_header,
                                 chunk_data,
                                 &OUTFILE_NAME.to_string(),
                                 &chroot,
-                            ) == false
+                            )
                             {
                                 break;
                             }
@@ -85,7 +74,7 @@ pub fn extract_android_sparse(
         }
     }
 
-    return result;
+    result
 }
 
 // Extract a sparse file chunk to disk
@@ -96,9 +85,9 @@ fn extract_chunk(
     outfile: &String,
     chroot: &Chroot,
 ) -> bool {
-    if chunk_header.is_raw == true {
+    if chunk_header.is_raw {
         // Raw chunks are just data chunks stored verbatim
-        if chroot.append_to_file(outfile, chunk_data) == false {
+        if !chroot.append_to_file(outfile, chunk_data) {
             return false;
         }
     } else if chunk_header.is_fill {
@@ -114,7 +103,7 @@ fn extract_chunk(
             }
 
             // Append fill block to file
-            if chroot.append_to_file(outfile, &fill_block) == false {
+            if !chroot.append_to_file(outfile, &fill_block) {
                 return false;
             }
         }
@@ -128,11 +117,11 @@ fn extract_chunk(
 
         // Write block_count NULL blocks to disk
         for _ in 0..chunk_header.block_count {
-            if chroot.append_to_file(outfile, &null_block) == false {
+            if !chroot.append_to_file(outfile, &null_block) {
                 return false;
             }
         }
     }
 
-    return true;
+    true
 }

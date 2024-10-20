@@ -35,7 +35,7 @@ pub fn extract_gif_image(
                 result.success = true;
 
                 // Do extraction, if requested
-                if let Some(_) = output_directory {
+                if output_directory.is_some() {
                     let chroot = Chroot::new(output_directory);
                     result.success =
                         chroot.carve_file(OUTFILE_NAME, file_data, offset, result.size.unwrap());
@@ -44,7 +44,7 @@ pub fn extract_gif_image(
         }
     }
 
-    return result;
+    result
 }
 
 /// Returns the size of the GIF data that follows the GIF header
@@ -93,5 +93,5 @@ fn get_gif_data_size(gif_data: &[u8]) -> Option<usize> {
     }
 
     // Something went wrong, failure
-    return None;
+    None
 }

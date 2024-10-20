@@ -63,11 +63,11 @@ pub fn bzip2_decompressor(
                 }
 
                 // Decompressed a block of data, if extraction was requested write the decompressed block to the output file
-                if !output_directory.is_none() {
+                if output_directory.is_some() {
                     let n: usize = (decompressor.total_out() as usize) - bytes_written;
 
                     let chroot = Chroot::new(output_directory);
-                    if chroot.append_to_file(OUTPUT_FILE_NAME, &decompressed_buffer[0..n]) == false
+                    if !chroot.append_to_file(OUTPUT_FILE_NAME, &decompressed_buffer[0..n])
                     {
                         // If writing data to file fails, break
                         break;
@@ -77,12 +77,12 @@ pub fn bzip2_decompressor(
                 }
 
                 // If everything has been processed successfully, we're done; break.
-                if result.success == true {
+                if result.success {
                     break;
                 }
             }
         }
     }
 
-    return result;
+    result
 }

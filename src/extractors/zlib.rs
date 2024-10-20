@@ -30,5 +30,5 @@ pub fn zlib_decompress(
         result.size = Some(HEADER_SIZE + deflate_size + CHECKSUM_SIZE);
     }
 
-    return result;
+    result
 }

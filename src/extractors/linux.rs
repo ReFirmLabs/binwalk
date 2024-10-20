@@ -13,6 +13,5 @@ pub fn linux_kernel_extractor() -> extractors::common::Extractor {
             "linux_kernel.elf".to_string(),
         ],
         exit_codes: vec![0],
-        ..Default::default()
     }
 }

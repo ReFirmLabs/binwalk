@@ -27,14 +27,14 @@ pub fn extract_jpeg_image(
         result.size = Some(jpeg_data_size);
         result.success = true;
 
-        if let Some(_) = output_directory {
+        if output_directory.is_some() {
             let chroot = Chroot::new(output_directory);
             result.success =
                 chroot.carve_file(OUTFILE_NAME, file_data, offset, result.size.unwrap());
         }
     }
 
-    return result;
+    result
 }
 
 fn get_jpeg_data_size(jpeg_data: &[u8]) -> Option<usize> {
@@ -57,5 +57,5 @@ fn get_jpeg_data_size(jpeg_data: &[u8]) -> Option<usize> {
         return Some(eof_match.start() + EOF_SIZE);
     }
 
-    return None;
+    None
 }

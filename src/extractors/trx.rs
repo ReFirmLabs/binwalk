@@ -34,7 +34,7 @@ pub fn extract_trx_partitions(
                     result.size = Some(trx_header.total_size);
 
                     // If extraction was requested, carve the TRX partitions
-                    if let Some(_) = output_directory {
+                    if output_directory.is_some() {
                         let chroot = Chroot::new(output_directory);
 
                         for i in 0..trx_header.partitions.len() {
@@ -58,7 +58,7 @@ pub fn extract_trx_partitions(
                                 this_partition_size,
                             );
 
-                            if result.success == false {
+                            if !result.success {
                                 break;
                             }
                         }
@@ -68,9 +68,9 @@ pub fn extract_trx_partitions(
         }
     }
 
-    return result;
+    result
 }
 
 fn trx_crc32(crc_data: &[u8]) -> usize {
-    return ((crc32(crc_data) ^ 0xFFFFFFFF) & 0xFFFFFFFF) as usize;
+    (crc32(crc_data) ^ 0xFFFFFFFF) as usize
 }

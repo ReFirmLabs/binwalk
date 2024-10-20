@@ -27,12 +27,12 @@ pub fn extract_svg_image(
         result.size = Some(svg_image.total_size);
         result.success = true;
 
-        if !output_directory.is_none() {
+        if output_directory.is_some() {
             let chroot = Chroot::new(output_directory);
             result.success =
                 chroot.carve_file(OUTFILE_NAME, file_data, offset, result.size.unwrap());
         }
     }
 
-    return result;
+    result
 }

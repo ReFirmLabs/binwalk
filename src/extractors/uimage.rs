@@ -35,12 +35,12 @@ pub fn extract_uimage(
                     result.size = Some(uimage_header.header_size + uimage_header.data_size);
 
                     // If extraction was requested, carve the uImage data out to a file
-                    if let Some(_) = output_directory {
+                    if output_directory.is_some() {
                         let chroot = Chroot::new(output_directory);
                         let mut file_base_name: String = DEFAULT_OUTPUT_FILE_NAME.to_string();
 
                         // Use the name specified in the uImage header as the file name, if one was provided
-                        if uimage_header.name.len() > 0 {
+                        if !uimage_header.name.is_empty() {
                             file_base_name = uimage_header.name.replace(" ", "_");
                         }
 
@@ -53,5 +53,5 @@ pub fn extract_uimage(
         }
     }
 
-    return result;
+    result
 }

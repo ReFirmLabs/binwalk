@@ -25,7 +25,7 @@ pub fn extract_mbr_partitions(
     // Parse the MBR header
     if let Ok(mbr_header) = parse_mbr_image(&file_data[offset..]) {
         // Make sure there is at least one valid partition
-        if mbr_header.partitions.len() > 0 {
+        if !mbr_header.partitions.is_empty() {
             // Make sure the reported size of the MBR does not extend beyond EOF
             if available_data >= mbr_header.image_size {
                 // Everything looks ok
@@ -33,15 +33,12 @@ pub fn extract_mbr_partitions(
                 result.size = Some(mbr_header.image_size);
 
                 // Do extraction if requested
-                if let Some(_) = output_directory {
+                if output_directory.is_some() {
                     // Chroot extracted files into the output directory
                     let chroot = Chroot::new(output_directory);
 
-                    // Keep track of how many partitions have been extracted
-                    let mut partition_count: usize = 0;
-
                     // Loop through each partition
-                    for partition in &mbr_header.partitions {
+                    for (partition_count, partition) in mbr_header.partitions.iter().enumerate() {
                         // Partition names are not unique, output file will be: "<name>_partition.<partition count>"
                         let partition_name =
                             format!("{}_partition.{}", partition.name, partition_count);
@@ -55,17 +52,14 @@ pub fn extract_mbr_partitions(
                         );
 
                         // If partition extraction failed, quit and report a failure
-                        if result.success == false {
+                        if !result.success {
                             break;
                         }
-
-                        // Increment partition counter
-                        partition_count += 1;
                     }
                 }
             }
         }
     }
 
-    return result;
+    result
 }

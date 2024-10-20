@@ -27,7 +27,7 @@ pub fn gzip_decompress(
     }
 
     // Return failure
-    return ExtractionResult {
+    ExtractionResult {
         ..Default::default()
-    };
+    }
 }

@@ -65,7 +65,7 @@ pub fn pcapng_carver(
             result.success = true;
 
             // Do extraction if requested
-            if let Some(_) = output_directory {
+            if output_directory.is_some() {
                 let chroot = Chroot::new(output_directory);
                 result.success =
                     chroot.carve_file(OUTPUT_FILE_NAME, file_data, offset, result.size.unwrap());
@@ -73,5 +73,5 @@ pub fn pcapng_carver(
         }
     }
 
-    return result;
+    result
 }
