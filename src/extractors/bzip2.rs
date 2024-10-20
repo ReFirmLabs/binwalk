@@ -67,8 +67,7 @@ pub fn bzip2_decompressor(
                     let n: usize = (decompressor.total_out() as usize) - bytes_written;
 
                     let chroot = Chroot::new(output_directory);
-                    if !chroot.append_to_file(OUTPUT_FILE_NAME, &decompressed_buffer[0..n])
-                    {
+                    if !chroot.append_to_file(OUTPUT_FILE_NAME, &decompressed_buffer[0..n]) {
                         // If writing data to file fails, break
                         break;
                     }

@@ -601,9 +601,7 @@ impl Chroot {
         #[cfg(unix)]
         {
             match unix::fs::symlink(safe_target_path, safe_symlink_path) {
-                Ok(_) => {
-                    true
-                }
+                Ok(_) => true,
                 Err(e) => {
                     error!(
                         "Failed to create symlink from {} -> {}: {}",
@@ -693,12 +691,7 @@ impl Chroot {
         // Concatenate each non-excluded part of the file path, with each part separated by '/'
         for (i, path_part) in path_parts.iter().enumerate() {
             if !exclude_indicies.contains(&i) {
-                sanitized_path = format!(
-                    "{}{}{}",
-                    sanitized_path,
-                    path::MAIN_SEPARATOR,
-                    path_part
-                );
+                sanitized_path = format!("{}{}{}", sanitized_path, path::MAIN_SEPARATOR, path_part);
             }
         }
 

@@ -84,7 +84,10 @@ fn get_pem_size(file_data: &[u8], start_of_pem_offset: usize) -> Option<usize> {
     let grep = AhoCorasick::new(eof_markers.clone()).unwrap();
 
     // Find the first end marker
-    if let Some(eof_match) = grep.find_overlapping_iter(&file_data[start_of_pem_offset..]).next() {
+    if let Some(eof_match) = grep
+        .find_overlapping_iter(&file_data[start_of_pem_offset..])
+        .next()
+    {
         let eof_marker_index: usize = eof_match.pattern().as_usize();
         let mut pem_size = eof_match.start() + eof_markers[eof_marker_index].len();
 

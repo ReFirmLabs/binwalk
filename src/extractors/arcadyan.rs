@@ -72,9 +72,12 @@ fn arcadyan_deobfuscator(obfuscated_data: &[u8]) -> Vec<u8> {
     deobfuscated_data.extend(p3);
 
     // Nibble swap each byte in what is now "block1"
-    for swapped_byte in deobfuscated_data.iter_mut().take(BLOCK1_END).skip(BLOCK1_START) {
-        *swapped_byte =
-            ((*swapped_byte & 0x0F) << 4) + ((*swapped_byte & 0xF0) >> 4);
+    for swapped_byte in deobfuscated_data
+        .iter_mut()
+        .take(BLOCK1_END)
+        .skip(BLOCK1_START)
+    {
+        *swapped_byte = ((*swapped_byte & 0x0F) << 4) + ((*swapped_byte & 0xF0) >> 4);
     }
 
     let mut i: usize = BLOCK1_START;

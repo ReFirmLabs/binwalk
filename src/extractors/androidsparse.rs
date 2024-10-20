@@ -51,8 +51,7 @@ pub fn extract_android_sparse(
                                 chunk_data,
                                 &OUTFILE_NAME.to_string(),
                                 &chroot,
-                            )
-                            {
+                            ) {
                                 break;
                             }
                         } else {
