@@ -38,3 +38,28 @@ jobs:
 
       - name: Formatting (rustfmt)
         run: cargo fmt -- --check
+
+  lint:
+    name: Lint (clippy)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - target: x86_64-unknown-linux-gnu
+
+    steps:
+      - name: Code checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain (stable)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          target: ${{ matrix.platform.target }}
+          components: clippy
+
+      - name: Clippy (all crates)
+        run: cargo clippy --locked --target=${{ matrix.platform.target }} --workspace --all-targets -- -D warnings
+
+      - name: Check build did not modify any files
+        run: test -z "$(git status --porcelain)"
