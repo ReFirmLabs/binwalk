@@ -7,11 +7,11 @@ pub const DESCRIPTION: &str = "ZSTD compressed data";
 
 /// ZSTD magic bytes
 pub fn zstd_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x28\xb5\x2f\xfd".to_vec()];
+    vec![b"\x28\xb5\x2f\xfd".to_vec()]
 }
 
 /// Validate a ZSTD signature
-pub fn zstd_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn zstd_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Size of checksum value at EOF
     const EOF_CHECKSUM_SIZE: usize = 4;
 
@@ -19,7 +19,7 @@ pub fn zstd_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
     const MIN_BLOCK_COUNT: usize = 2;
 
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_HIGH,
         ..Default::default()
@@ -37,7 +37,7 @@ pub fn zstd_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
         let mut previous_block_header_start = None;
 
         // If single segment flag is not set, then window descriptor byte is present in the header
-        if zstd_header.single_segment_flag == false {
+        if !zstd_header.single_segment_flag {
             next_block_header_start += 1;
         }
 
@@ -54,7 +54,7 @@ pub fn zstd_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
          * If the frame content flag is 0 and the single segment flag is set, then the frame content header field is 1 byte in length;
          * else, the frame content flag indicates the size of the grame content header field.
          */
-        if zstd_header.frame_content_flag == 0 && zstd_header.single_segment_flag == true {
+        if zstd_header.frame_content_flag == 0 && zstd_header.single_segment_flag {
             next_block_header_start += 1;
         } else if zstd_header.frame_content_flag == 1 {
             next_block_header_start += 2;
@@ -88,7 +88,7 @@ pub fn zstd_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
                     next_block_header_start += block_header.header_size + block_header.block_size;
 
                     // Was this the last block?
-                    if block_header.last_block == true {
+                    if block_header.last_block {
                         // Update the total size, which is the difference between the end of the last block and the start of the ZSTD header
                         result.size = next_block_header_start - offset;
 
@@ -113,5 +113,5 @@ pub fn zstd_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

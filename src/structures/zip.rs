@@ -34,7 +34,7 @@ pub fn parse_zip_header(zip_data: &[u8]) -> Result<bool, StructureError> {
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Stores info about a ZIP end-of-central-directory header
@@ -75,5 +75,5 @@ pub fn parse_eocd_header(eocd_data: &[u8]) -> Result<ZipEOCDHeader, StructureErr
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

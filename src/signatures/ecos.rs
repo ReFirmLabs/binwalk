@@ -17,22 +17,22 @@ pub fn exception_handler_magic() -> Vec<Vec<u8>> {
      * jr      $k1
      * nop
      */
-    return vec![
+    vec![
         b"\x00\x68\x1A\x40\x00\x00\x00\x00\x7F\x00\x5A\x33".to_vec(),
         b"\x00\x68\x1A\x40\x7F\x00\x5A\x33".to_vec(),
         b"\x40\x1A\x68\x00\x00\x00\x00\x00\x33\x5A\x00\x7F".to_vec(),
         b"\x40\x1A\x68\x00\x33\x5A\x00\x7F".to_vec(),
-    ];
+    ]
 }
 
 /// Parses the eCos exception handler signature
 pub fn exception_handler_parser(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
 ) -> Result<SignatureResult, SignatureError> {
     // Successful return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: EXCEPTION_HANDLER_DESCRIPTION.to_string(),
         confidence: CONFIDENCE_LOW,
         ..Default::default()
@@ -46,5 +46,5 @@ pub fn exception_handler_parser(
     }
 
     result.description = format!("{}, MIPS {} endian", result.description, endianness);
-    return Ok(result);
+    Ok(result)
 }

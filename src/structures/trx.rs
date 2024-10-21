@@ -79,5 +79,5 @@ pub fn parse_trx_header(header_data: &[u8]) -> Result<TRXHeader, StructureError>
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

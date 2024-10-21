@@ -29,22 +29,22 @@ pub fn parse_lzma_header(lzma_data: &[u8]) -> Result<LZMAHeader, StructureError>
     };
 
     // Parse the lzma header
-    if let Ok(lzma_header) = common::parse(&lzma_data, &lzma_structure, "little") {
-        // Sanity check expected values for LZMA header fields
+    if let Ok(lzma_header) = common::parse(lzma_data, &lzma_structure, "little") {
+        // Make sure the expected NULL byte is NULL
         if lzma_header["null_byte"] == 0 {
-            if lzma_header["decompressed_size"] >= MIN_SUPPORTED_DECOMPRESSED_SIZE {
-                if lzma_header["decompressed_size"] == LZMA_STREAM_SIZE
-                    || lzma_header["decompressed_size"] <= MAX_SUPPORTED_DECOMPRESSED_SIZE
-                {
-                    lzma_hdr_info.properties = lzma_header["properties"];
-                    lzma_hdr_info.dictionary_size = lzma_header["dictionary_size"];
-                    lzma_hdr_info.decompressed_size = lzma_header["decompressed_size"];
+            // Sanity check the reported decompressed size
+            if lzma_header["decompressed_size"] >= MIN_SUPPORTED_DECOMPRESSED_SIZE
+                && (lzma_header["decompressed_size"] == LZMA_STREAM_SIZE
+                    || lzma_header["decompressed_size"] <= MAX_SUPPORTED_DECOMPRESSED_SIZE)
+            {
+                lzma_hdr_info.properties = lzma_header["properties"];
+                lzma_hdr_info.dictionary_size = lzma_header["dictionary_size"];
+                lzma_hdr_info.decompressed_size = lzma_header["decompressed_size"];
 
-                    return Ok(lzma_hdr_info);
-                }
+                return Ok(lzma_hdr_info);
             }
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

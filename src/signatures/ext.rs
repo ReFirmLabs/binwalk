@@ -12,18 +12,18 @@ pub fn ext_magic() -> Vec<Vec<u8>> {
      * as well as the minor version number (assumed to be 0).
      * This means fewer false positive matches, and less time spent validating false positives.
      */
-    return vec![
+    vec![
         b"\x53\xEF\x01\x00\x01\x00\x00\x00".to_vec(),
         b"\x53\xEF\x01\x00\x02\x00\x00\x00".to_vec(),
         b"\x53\xEF\x01\x00\x03\x00\x00\x00".to_vec(),
         b"\x53\xEF\x02\x00\x01\x00\x00\x00".to_vec(),
         b"\x53\xEF\x02\x00\x02\x00\x00\x00".to_vec(),
         b"\x53\xEF\x02\x00\x03\x00\x00\x00".to_vec(),
-    ];
+    ]
 }
 
 /// Parse the EXT signature
-pub fn ext_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn ext_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Offset inside the EXT image where the magic bytes reside
     const MAGIC_OFFSET: usize = 1080;
 
@@ -50,5 +50,5 @@ pub fn ext_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

@@ -6,14 +6,11 @@ pub const DESCRIPTION: &str = "EFI Global Partition Table";
 
 /// EFI GPT always contains these bytes
 pub fn efigpt_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x55\xAAEFI PART".to_vec()];
+    vec![b"\x55\xAAEFI PART".to_vec()]
 }
 
 /// Validates the EFI GPT header
-pub fn efigpt_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<SignatureResult, SignatureError> {
+pub fn efigpt_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Offset of magic bytes from the start of the MBR
     const MAGIC_OFFSET: usize = 0x01FE;
 
@@ -47,5 +44,5 @@ pub fn efigpt_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

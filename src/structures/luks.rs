@@ -41,7 +41,7 @@ pub fn parse_luks_header(luks_data: &[u8]) -> Result<LUKSHeader, StructureError>
         ..Default::default()
     };
 
-    if let Ok(luks_base) = common::parse(&luks_data, &luks_base_structure, "big") {
+    if let Ok(luks_base) = common::parse(luks_data, &luks_base_structure, "big") {
         luks_hdr_info.version = luks_base["version"];
 
         // Both v1 and v2 include the hash function string at the same offset
@@ -49,7 +49,7 @@ pub fn parse_luks_header(luks_data: &[u8]) -> Result<LUKSHeader, StructureError>
             luks_hdr_info.hashfn = get_cstring(hashfn_bytes);
 
             // Make sure there was actually a string at the expected hash function offset
-            if luks_hdr_info.hashfn.len() > 0 {
+            if !luks_hdr_info.hashfn.is_empty() {
                 // Need to process v1 and v2 headers differently
                 if luks_hdr_info.version == 1 {
                     // Get the cipher algorithm string
@@ -65,8 +65,8 @@ pub fn parse_luks_header(luks_data: &[u8]) -> Result<LUKSHeader, StructureError>
                             luks_hdr_info.cipher_mode = get_cstring(cipher_mode_bytes);
 
                             // Make sure there were valid strings specified for both cipher algo and cipher mode
-                            if luks_hdr_info.cipher_mode.len() > 0
-                                && luks_hdr_info.cipher_algorithm.len() > 0
+                            if !luks_hdr_info.cipher_mode.is_empty()
+                                && !luks_hdr_info.cipher_algorithm.is_empty()
                             {
                                 return Ok(luks_hdr_info);
                             }
@@ -87,5 +87,5 @@ pub fn parse_luks_header(luks_data: &[u8]) -> Result<LUKSHeader, StructureError>
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

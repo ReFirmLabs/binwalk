@@ -103,5 +103,5 @@ pub fn parse_ext_header(ext_data: &[u8]) -> Result<EXTHeader, StructureError> {
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

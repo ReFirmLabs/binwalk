@@ -17,14 +17,11 @@ pub const DESCRIPTION: &str = "POSIX tar archive";
 
 /// Magic bytes for tarball and GNU tarball file types
 pub fn tarball_magic() -> Vec<Vec<u8>> {
-    return vec![b"ustar\x00".to_vec(), b"ustar\x20\x20\x00".to_vec()];
+    vec![b"ustar\x00".to_vec(), b"ustar\x20\x20\x00".to_vec()]
 }
 
 /// Validate tarball signatures
-pub fn tarball_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<SignatureResult, SignatureError> {
+pub fn tarball_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Stores the running total size of the tarball
     let mut tarball_total_size: usize = 0;
 
@@ -52,7 +49,7 @@ pub fn tarball_parser(
             }
             Some(tarball_header_block) => {
                 // Bad checksum? Quit processing headers.
-                if header_checksum_is_valid(tarball_header_block) == false {
+                if !header_checksum_is_valid(tarball_header_block) {
                     break;
                 }
 
@@ -89,12 +86,12 @@ pub fn tarball_parser(
             description: format!("{}, file count: {}", DESCRIPTION, valid_header_count),
             offset: tarball_start_offset,
             size: tarball_total_size,
-            confidence: confidence,
+            confidence,
             ..Default::default()
         });
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Validate a tarball entry checksum
@@ -106,15 +103,15 @@ fn header_checksum_is_valid(header_block: &[u8]) -> bool {
     let reported_checksum = tarball_octal(checksum_value_string);
     let mut sum: usize = 0;
 
-    for i in 0..header_block.len() {
-        if i >= TARBALL_CHECKSUM_START && i < TARBALL_CHECKSUM_END {
-            sum = sum + 0x20;
+    for (i, header_byte) in header_block.iter().enumerate() {
+        if (TARBALL_CHECKSUM_START..TARBALL_CHECKSUM_END).contains(&i) {
+            sum += 0x20;
         } else {
-            sum = sum + (header_block[i] as usize);
+            sum += *header_byte as usize;
         }
     }
 
-    return sum == reported_checksum;
+    sum == reported_checksum
 }
 
 /// Returns the size of a tarball entry, including header and data
@@ -140,22 +137,22 @@ fn tarball_entry_size(tarball_entry_data: &[u8]) -> Result<usize, SignatureError
         return Ok(block_count * TARBALL_BLOCK_SIZE);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Convert octal string to a number
 fn tarball_octal(octal_string: &[u8]) -> usize {
     let mut num: usize = 0;
 
-    for i in 0..octal_string.len() {
+    for octal_char in octal_string {
         // ASCII octal values should be ASCII
-        if octal_string[i] < 0x30 || octal_string[i] > 0x39 {
+        if *octal_char < 0x30 || *octal_char > 0x39 {
             break;
         } else {
-            num = num * 8;
-            num = num + (octal_string[i] as usize) - 0x30;
+            num *= 8;
+            num = num + (*octal_char as usize) - 0x30;
         }
     }
 
-    return num;
+    num
 }

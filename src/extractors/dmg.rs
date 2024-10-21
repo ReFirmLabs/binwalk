@@ -2,7 +2,7 @@ use crate::extractors;
 
 /// Describes how to run the dmg2img utility to convert DMG images to MBR
 pub fn dmg_extractor() -> extractors::common::Extractor {
-    return extractors::common::Extractor {
+    extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("dmg2img".to_string()),
         extension: "dmg".to_string(),
         arguments: vec![
@@ -13,5 +13,5 @@ pub fn dmg_extractor() -> extractors::common::Extractor {
         ],
         exit_codes: vec![0, 1],
         ..Default::default()
-    };
+    }
 }

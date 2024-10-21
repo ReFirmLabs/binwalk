@@ -4,7 +4,7 @@ use crate::extractors::common::{Extractor, ExtractorType, SOURCE_FILE_PLACEHOLDE
 pub fn lzfse_extractor() -> Extractor {
     const OUTPUT_FILE_NAME: &str = "decompressed.bin";
 
-    return Extractor {
+    Extractor {
         utility: ExtractorType::External("lzfse".to_string()),
         extension: "bin".to_string(),
         arguments: vec![
@@ -16,5 +16,5 @@ pub fn lzfse_extractor() -> Extractor {
         ],
         exit_codes: vec![0],
         ..Default::default()
-    };
+    }
 }

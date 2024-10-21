@@ -7,14 +7,11 @@ pub const DESCRIPTION: &str = "7-zip archive data";
 
 /// 7zip magic bytes
 pub fn sevenzip_magic() -> Vec<Vec<u8>> {
-    return vec![b"7z\xbc\xaf\x27\x1c".to_vec()];
+    vec![b"7z\xbc\xaf\x27\x1c".to_vec()]
 }
 
 /// Validates 7zip signatures
-pub fn sevenzip_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<SignatureResult, SignatureError> {
+pub fn sevenzip_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Parse the 7z header
     if let Ok(sevenzip_header) = parse_7z_header(&file_data[offset..]) {
         // Calculate the start and end offsets that the next header CRC was calculated over
@@ -35,7 +32,7 @@ pub fn sevenzip_parser(
 
                 // Report signature result
                 return Ok(SignatureResult {
-                    offset: offset,
+                    offset,
                     size: total_size,
                     confidence: CONFIDENCE_HIGH,
                     description: format!(
@@ -51,5 +48,5 @@ pub fn sevenzip_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

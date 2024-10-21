@@ -2,7 +2,7 @@ use crate::extractors;
 
 /* Describes how to run the uefi-firmware-parser utility to extract UEFI images */
 pub fn uefi_extractor() -> extractors::common::Extractor {
-    return extractors::common::Extractor {
+    extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("uefi-firmware-parser".to_string()),
         extension: "img".to_string(),
         arguments: vec![
@@ -17,6 +17,5 @@ pub fn uefi_extractor() -> extractors::common::Extractor {
          * Recursing into this data would result in double extractions for no good reason.
          */
         do_not_recurse: true,
-        ..Default::default()
-    };
+    }
 }

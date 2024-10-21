@@ -53,7 +53,7 @@ fn blocks(data: &[u8]) -> Vec<BlockEntropy> {
         offset += block_size;
     }
 
-    return entropy_blocks;
+    entropy_blocks
 }
 
 /// Generate a plot of a file's entropy.
@@ -81,7 +81,7 @@ pub fn plot(file_path: impl Into<String>) -> Result<FileEntropy, EntropyError> {
     let png_path = file_entropy.file.clone();
 
     // Make sure the output file doesn't already exist
-    if path::Path::new(&png_path).exists() == true {
+    if path::Path::new(&png_path).exists() {
         error!("Cannot create entropy graph {}: File exists", png_path);
         return Err(EntropyError);
     }
@@ -119,14 +119,14 @@ pub fn plot(file_path: impl Into<String>) -> Result<FileEntropy, EntropyError> {
 
         // Set the axis colors
         ctx.configure_mesh()
-            .axis_style(&GREEN)
+            .axis_style(GREEN)
             .x_label_style(&GREEN)
             .draw()
             .unwrap();
 
         // Line plot of the entropy points
         ctx.draw_series(LineSeries::new(
-            points.into_iter().map(|(x, y)| (x, y)),
+            points, //.into_iter().map(|(x, y)| (x, y)),
             &YELLOW,
         ))
         .unwrap();
@@ -136,7 +136,7 @@ pub fn plot(file_path: impl Into<String>) -> Result<FileEntropy, EntropyError> {
      * Plotter code doesn't throw any errors if graph file creation fails.
      * Make sure the output file was created.
      */
-    if path::Path::new(&png_path).exists() == false {
+    if !path::Path::new(&png_path).exists() {
         error!(
             "Failed to create entropy graph {}: possible permissions error?",
             png_path
@@ -144,5 +144,5 @@ pub fn plot(file_path: impl Into<String>) -> Result<FileEntropy, EntropyError> {
         return Err(EntropyError);
     }
 
-    return Ok(file_entropy);
+    Ok(file_entropy)
 }

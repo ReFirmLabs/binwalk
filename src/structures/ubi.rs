@@ -76,7 +76,7 @@ pub fn parse_ubi_superblock_header(ubi_data: &[u8]) -> Result<UbiSuperBlockHeade
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Stores info about a UBI erase count header
@@ -134,7 +134,7 @@ pub fn parse_ubi_ec_header(ubi_data: &[u8]) -> Result<UbiECHeader, StructureErro
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Dummy structure indicating a UBI volume header was parsed successfully
@@ -167,7 +167,7 @@ pub fn parse_ubi_volume_header(ubi_data: &[u8]) -> Result<UbiVolumeHeader, Struc
     let crc_data_size: usize = vol_header_size - std::mem::size_of::<u32>();
 
     // Parse the volume header
-    if let Ok(ubi_vol_header) = common::parse(&ubi_data, &ubi_vol_structure, "big") {
+    if let Ok(ubi_vol_header) = common::parse(ubi_data, &ubi_vol_structure, "big") {
         // Sanity check padding fields, they should all be null
         if ubi_vol_header["padding1"] == 0
             && ubi_vol_header["padding2"] == 0
@@ -183,11 +183,11 @@ pub fn parse_ubi_volume_header(ubi_data: &[u8]) -> Result<UbiVolumeHeader, Struc
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Calculate a UBI checksum
 fn ubi_crc(data: &[u8]) -> usize {
     const UBI_CRC_INIT: u32 = 0xFFFFFFFF;
-    return ((!crc32(data)) & UBI_CRC_INIT) as usize;
+    ((!crc32(data)) & UBI_CRC_INIT) as usize
 }

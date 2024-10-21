@@ -122,7 +122,7 @@ pub fn parse_mbr_image(mbr_data: &[u8]) -> Result<MBRHeader, StructureError> {
         }
 
         // There should be at least one valid partition
-        if mbr_header.partitions.len() > 0 {
+        if !mbr_header.partitions.is_empty() {
             // Total size should be greater than minimum size
             if mbr_header.image_size > MIN_IMAGE_SIZE {
                 return Ok(mbr_header);
@@ -130,5 +130,5 @@ pub fn parse_mbr_image(mbr_data: &[u8]) -> Result<MBRHeader, StructureError> {
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

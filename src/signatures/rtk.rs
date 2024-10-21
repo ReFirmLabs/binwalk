@@ -6,14 +6,14 @@ pub const DESCRIPTION: &str = "RTK firmware header";
 
 /// RTK firmware images always start with these bytes
 pub fn rtk_magic() -> Vec<Vec<u8>> {
-    return vec![b"RTK0".to_vec()];
+    vec![b"RTK0".to_vec()]
 }
 
 /// Validates the RTK header
-pub fn rtk_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn rtk_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Successful return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_MEDIUM,
         ..Default::default()
@@ -34,5 +34,5 @@ pub fn rtk_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

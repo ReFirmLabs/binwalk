@@ -33,7 +33,7 @@ pub fn parse_gif_header(gif_data: &[u8]) -> Result<GIFHeader, StructureError> {
         });
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Struct to store GIF flags info
@@ -57,7 +57,7 @@ fn parse_gif_flags(flags: usize) -> GIFFlags {
         retval.color_table_size = 3 * usize::pow(2, encoded_table_size);
     }
 
-    return retval;
+    retval
 }
 
 /// Parses an image descriptor; returns the total size of the descriptor and following image data
@@ -92,7 +92,7 @@ pub fn parse_gif_image_descriptor(gif_data: &[u8]) -> Result<usize, StructureErr
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Parses all data sub blocks until a sub-block terminator byte is found.
@@ -119,7 +119,7 @@ fn parse_gif_sub_blocks(sub_block_data: &[u8]) -> Result<usize, StructureError> 
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Parses a GIF extension block, returns the size of the extension block, in bytes.
@@ -154,5 +154,5 @@ pub fn parse_gif_extension(extension_data: &[u8]) -> Result<usize, StructureErro
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

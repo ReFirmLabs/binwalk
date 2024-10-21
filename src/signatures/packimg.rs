@@ -6,16 +6,13 @@ pub const DESCRIPTION: &str = "PackImg firmware header";
 
 /// PackIMG magic bytes
 pub fn packimg_magic() -> Vec<Vec<u8>> {
-    return vec![b"--PaCkImGs--".to_vec()];
+    vec![b"--PaCkImGs--".to_vec()]
 }
 
 /// Parse a PackIMG signature
-pub fn packimg_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<SignatureResult, SignatureError> {
+pub fn packimg_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         ..Default::default()
     };
@@ -35,5 +32,5 @@ pub fn packimg_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

@@ -7,16 +7,16 @@ pub const DESCRIPTION: &str = "LZ4 compressed data";
 
 /// LZ4 files start with these magic bytes
 pub fn lz4_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x04\x22\x4D\x18".to_vec()];
+    vec![b"\x04\x22\x4D\x18".to_vec()]
 }
 
 /// Validate a LZ4 signature
-pub fn lz4_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn lz4_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Checksums are 4 bytes in length
     const CONTENT_CHECKSUM_LEN: usize = 4;
 
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         confidence: CONFIDENCE_MEDIUM,
         description: DESCRIPTION.to_string(),
         ..Default::default()
@@ -34,7 +34,7 @@ pub fn lz4_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
                 result.size = lz4_file_header.header_size + lz4_data_size;
 
                 // If this flag is set, an additional 4-byte checksum will be present at the end of the LZ4 data
-                if lz4_file_header.content_checksum_present == true {
+                if lz4_file_header.content_checksum_present {
                     result.size += CONTENT_CHECKSUM_LEN;
                 }
 
@@ -47,7 +47,7 @@ pub fn lz4_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Processes the LZ4 data blocks and returns the size of the raw LZ4 data
@@ -77,7 +77,7 @@ fn get_lz4_data_size(lz4_data: &[u8], checksum_present: bool) -> Result<usize, S
                             + block_header.checksum_size;
 
                         // Only return success if a last block header is found
-                        if block_header.last_block == true {
+                        if block_header.last_block {
                             return Ok(lz4_data_size);
                         }
                     }
@@ -86,5 +86,5 @@ fn get_lz4_data_size(lz4_data: &[u8], checksum_present: bool) -> Result<usize, S
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

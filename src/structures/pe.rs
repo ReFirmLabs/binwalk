@@ -129,5 +129,5 @@ pub fn parse_pe_header(pe_data: &[u8]) -> Result<PEHeader, StructureError> {
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

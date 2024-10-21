@@ -7,14 +7,14 @@ pub const DESCRIPTION: &str = "XZ compressed data";
 
 /// XZ magic bytes
 pub fn xz_magic() -> Vec<Vec<u8>> {
-    return vec![b"\xFD\x37\x7a\x58\x5a\x00".to_vec()];
+    vec![b"\xFD\x37\x7a\x58\x5a\x00".to_vec()]
 }
 
 /// Validates XZ signatures
-pub fn xz_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn xz_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Success return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_HIGH,
         ..Default::default()
@@ -34,7 +34,7 @@ pub fn xz_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, 
         }
     };
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// XZ file format has detectable, verifiable, end-of-stream markers.
@@ -66,5 +66,5 @@ fn xz_stream_size(xz_data: &[u8]) -> Result<usize, SignatureError> {
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

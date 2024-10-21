@@ -8,11 +8,11 @@ pub const DESCRIPTION: &str = "gzip compressed data";
 
 /// Gzip magic bytes, plus compression type field (always 8 for deflate)
 pub fn gzip_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x1f\x8b\x08".to_vec()];
+    vec![b"\x1f\x8b\x08".to_vec()]
 }
 
 /// Validates gzip signatures
-pub fn gzip_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn gzip_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Length of the GZIP CRC located at the end of the deflate data stream
     const GZIP_CRC_SIZE: usize = 4;
     // Length of the ISIZE field located after the CRC field
@@ -22,7 +22,7 @@ pub fn gzip_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
     let dry_run = gzip_decompress(file_data, offset, None);
 
     // If dry-run was successful, this is almost certianly a valid gzip file
-    if dry_run.success == true {
+    if dry_run.success {
         // Get the size of the deflate data stream
         if let Some(deflate_data_size) = dry_run.size {
             // The dry run has already validated the header, but we want some header info to display to the user
@@ -30,7 +30,7 @@ pub fn gzip_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
                 // Original file name is optional
                 let mut original_file_name_text: String = "".to_string();
 
-                if gzip_header.original_name.len() > 0 {
+                if !gzip_header.original_name.is_empty() {
                     original_file_name_text =
                         format!(" original file name: \"{}\",", gzip_header.original_name);
                 }
@@ -40,7 +40,7 @@ pub fn gzip_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
                     gzip_header.size + deflate_data_size + GZIP_CRC_SIZE + GZIP_ISIZE_SIZE;
 
                 return Ok(SignatureResult {
-                    offset: offset,
+                    offset,
                     size: total_size,
                     confidence: CONFIDENCE_HIGH,
                     description: format!(
@@ -57,5 +57,5 @@ pub fn gzip_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

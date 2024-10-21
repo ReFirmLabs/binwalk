@@ -15,7 +15,7 @@ pub fn inflate_extractor() -> Extractor {
 
 /// Internal extractor for inflating deflated data.
 pub fn inflate_decompressor(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {
@@ -50,10 +50,9 @@ pub fn inflate_decompressor(
             }
             Ok(n) => {
                 // Decompressed a block of data, if extraction was requested write the decompressed block to the output file
-                if n > 0 && !output_directory.is_none() {
+                if n > 0 && output_directory.is_some() {
                     let chroot = Chroot::new(output_directory);
-                    if chroot.append_to_file(OUTPUT_FILE_NAME, &decompressed_buffer[0..n]) == false
-                    {
+                    if !chroot.append_to_file(OUTPUT_FILE_NAME, &decompressed_buffer[0..n]) {
                         // If writing data to file fails, break
                         break;
                     }
@@ -74,5 +73,5 @@ pub fn inflate_decompressor(
         }
     }
 
-    return result;
+    result
 }

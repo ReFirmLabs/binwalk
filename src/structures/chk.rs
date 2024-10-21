@@ -32,7 +32,7 @@ pub fn parse_chk_header(header_data: &[u8]) -> Result<CHKHeader, StructureError>
     let struct_size: usize = common::size(&chk_header_structure);
 
     // Parse the CHK header
-    if let Ok(chk_header) = common::parse(&header_data, &chk_header_structure, "big") {
+    if let Ok(chk_header) = common::parse(header_data, &chk_header_structure, "big") {
         // Validate the reported header size
         if chk_header["header_size"] > struct_size
             && chk_header["header_size"] <= MAX_EXPECTED_HEADER_SIZE
@@ -42,10 +42,10 @@ pub fn parse_chk_header(header_data: &[u8]) -> Result<CHKHeader, StructureError>
             let board_id_end: usize = chk_header["header_size"];
 
             if let Some(board_id_raw_bytes) = header_data.get(board_id_start..board_id_end) {
-                let board_id_string = get_cstring(&board_id_raw_bytes);
+                let board_id_string = get_cstring(board_id_raw_bytes);
 
                 // We expect that there must be a valid board ID string
-                if board_id_string.len() > 0 {
+                if !board_id_string.is_empty() {
                     return Ok(CHKHeader {
                         board_id: board_id_string.clone(),
                         header_size: chk_header["header_size"],
@@ -57,5 +57,5 @@ pub fn parse_chk_header(header_data: &[u8]) -> Result<CHKHeader, StructureError>
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

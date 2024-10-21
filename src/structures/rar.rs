@@ -25,5 +25,5 @@ pub fn parse_rar_archive_header(rar_data: &[u8]) -> Result<RarArchiveHeader, Str
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

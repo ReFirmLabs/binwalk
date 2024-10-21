@@ -10,17 +10,14 @@ pub fn qnx_ifs_magic() -> Vec<Vec<u8>> {
      * Assumes little endian.
      * Includes the magic bytes (u32) and version number (u16), which must be 1.
      */
-    return vec![b"\xEB\x7E\xFF\x00\x01\x00".to_vec()];
+    vec![b"\xEB\x7E\xFF\x00\x01\x00".to_vec()]
 }
 
 /// Validate a QNX IFS signature
-pub fn qnx_ifs_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<SignatureResult, SignatureError> {
+pub fn qnx_ifs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Success return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: IFS_DESCRIPTION.to_string(),
         ..Default::default()
     };
@@ -39,5 +36,5 @@ pub fn qnx_ifs_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

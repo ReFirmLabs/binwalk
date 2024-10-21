@@ -6,14 +6,14 @@ pub const DESCRIPTION: &str = "RIFF image";
 
 /// RIFF file magic bytes
 pub fn riff_magic() -> Vec<Vec<u8>> {
-    return vec![b"RIFF".to_vec()];
+    vec![b"RIFF".to_vec()]
 }
 
 /// Validate RIFF signatures
-pub fn riff_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn riff_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Success return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_MEDIUM,
         ..Default::default()
@@ -34,5 +34,5 @@ pub fn riff_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
         return Ok(result);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

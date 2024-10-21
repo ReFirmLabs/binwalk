@@ -24,7 +24,7 @@ pub struct ExtractionError;
 
 /// Built-in internal extractors must provide a function conforming to this definition.
 /// Arguments: file_data, offset, output_directory.
-pub type InternalExtractor = fn(&Vec<u8>, usize, Option<&String>) -> ExtractionResult;
+pub type InternalExtractor = fn(&[u8], usize, Option<&String>) -> ExtractionResult;
 
 /// Enum to define either an Internal or External extractor type
 #[derive(Debug, Default, Clone, Eq, PartialEq, Ord, PartialOrd)]
@@ -124,7 +124,7 @@ impl Chroot {
         }
 
         // Create the chroot directory if it does not exist
-        if path::Path::new(&chroot_instance.chroot_directory).exists() == false {
+        if !path::Path::new(&chroot_instance.chroot_directory).exists() {
             match fs::create_dir_all(&chroot_instance.chroot_directory) {
                 Ok(_) => {
                     debug!(
@@ -141,7 +141,7 @@ impl Chroot {
             }
         }
 
-        return chroot_instance;
+        chroot_instance
     }
 
     /// Joins two paths, ensuring that the final path does not traverse outside of the chroot directory.
@@ -176,7 +176,7 @@ impl Chroot {
 
         // If the joined path does not start with the chroot directory,
         // prepend the chroot directory to the final joined path.
-        if joined_path.starts_with(&self.chroot_directory) == false {
+        if !joined_path.starts_with(&self.chroot_directory) {
             joined_path = format!(
                 "{}{}{}",
                 self.chroot_directory,
@@ -185,7 +185,7 @@ impl Chroot {
             );
         }
 
-        return self.strip_double_slash(&joined_path);
+        self.strip_double_slash(&joined_path)
     }
 
     /// Given a file path, returns a sanitized path that is chrooted inside the specified chroot directory.
@@ -203,7 +203,7 @@ impl Chroot {
     /// assert_eq!(path, "/tmp/foobar/test.txt");
     /// ```
     pub fn chrooted_path(&self, file_path: impl Into<String>) -> String {
-        return self.safe_path_join(file_path, &"".to_string());
+        self.safe_path_join(file_path, "".to_string())
     }
 
     /// Creates a regular file in the chrooted directory and writes the provided data to it.
@@ -226,7 +226,7 @@ impl Chroot {
     pub fn create_file(&self, file_path: impl Into<String>, file_data: &[u8]) -> bool {
         let safe_file_path: String = self.chrooted_path(file_path);
 
-        if path::Path::new(&safe_file_path).exists() == false {
+        if !path::Path::new(&safe_file_path).exists() {
             match fs::write(safe_file_path.clone(), file_data) {
                 Ok(_) => {
                     return true;
@@ -242,7 +242,7 @@ impl Chroot {
             );
         }
 
-        return false;
+        false
     }
 
     /// Carve data and write it to a new file.
@@ -280,7 +280,7 @@ impl Chroot {
             );
         }
 
-        return retval;
+        retval
     }
 
     /// Creates a device file in the chroot directory.
@@ -294,7 +294,7 @@ impl Chroot {
         minor: usize,
     ) -> bool {
         let device_file_contents: String = format!("{} {} {}", device_type, major, minor);
-        return self.create_file(file_path, &device_file_contents.clone().into_bytes());
+        self.create_file(file_path, &device_file_contents.clone().into_bytes())
     }
 
     /// Creates a character device file in the chroot directory.
@@ -323,7 +323,7 @@ impl Chroot {
         major: usize,
         minor: usize,
     ) -> bool {
-        return self.create_device(file_path, "c", major, minor);
+        self.create_device(file_path, "c", major, minor)
     }
 
     /// Creates a block device file in the chroot directory.
@@ -352,7 +352,7 @@ impl Chroot {
         major: usize,
         minor: usize,
     ) -> bool {
-        return self.create_device(file_path, "b", major, minor);
+        self.create_device(file_path, "b", major, minor)
     }
 
     /// Creates a fifo file in the chroot directory.
@@ -374,7 +374,7 @@ impl Chroot {
     /// # std::fs::remove_dir_all("/tmp/foobar");
     /// ```
     pub fn create_fifo(&self, file_path: impl Into<String>) -> bool {
-        return self.create_file(file_path, b"fifo");
+        self.create_file(file_path, b"fifo")
     }
 
     /// Creates a socket file in the chroot directory.
@@ -396,7 +396,7 @@ impl Chroot {
     /// # std::fs::remove_dir_all("/tmp/foobar");
     /// ```
     pub fn create_socket(&self, file_path: impl Into<String>) -> bool {
-        return self.create_file(file_path, b"socket");
+        self.create_file(file_path, b"socket")
     }
 
     /// Append the provided data to the specified file in the chroot directory.
@@ -421,7 +421,7 @@ impl Chroot {
     pub fn append_to_file(&self, file_path: impl Into<String>, data: &[u8]) -> bool {
         let safe_file_path: String = self.chrooted_path(file_path);
 
-        if self.is_symlink(&safe_file_path) == false {
+        if !self.is_symlink(&safe_file_path) {
             match fs::OpenOptions::new()
                 .create(true)
                 .append(true)
@@ -446,7 +446,7 @@ impl Chroot {
             error!("Attempted to append data to a symlink: {}", safe_file_path);
         }
 
-        return false;
+        false
     }
 
     /// Creates a directory in the chroot directory.
@@ -479,7 +479,7 @@ impl Chroot {
             }
         }
 
-        return false;
+        false
     }
 
     /// Set executable permissions on an existing file in the chroot directory.
@@ -537,7 +537,7 @@ impl Chroot {
             }
         }
 
-        return false;
+        false
     }
 
     /// Creates a symbolic link in the chroot directory, named `symlink_path`, which points to `target_path`.
@@ -580,20 +580,17 @@ impl Chroot {
             safe_target = self.chrooted_path(&target);
             safe_target_path = path::Path::new(&safe_target);
         } else {
-            // Else, the target path is relative to the symlink file's directory
-            let relative_dir: String;
-
             // Get the symlink file's parent directory path
-            match safe_symlink_path.parent() {
+            let relative_dir: String = match safe_symlink_path.parent() {
                 None => {
                     // There is no parent, or parent is the root directory; assume the root directory
-                    relative_dir = path::MAIN_SEPARATOR.to_string();
+                    path::MAIN_SEPARATOR.to_string()
                 }
                 Some(parent_dir) => {
                     // Got the parent directory
-                    relative_dir = parent_dir.display().to_string();
+                    parent_dir.display().to_string()
                 }
-            }
+            };
 
             // Join the target path with its relative directory, ensuring it does not traverse outside
             // the specified chroot directory
@@ -603,16 +600,14 @@ impl Chroot {
 
         #[cfg(unix)]
         {
-            match unix::fs::symlink(&safe_target_path, &safe_symlink_path) {
-                Ok(_) => {
-                    return true;
-                }
+            match unix::fs::symlink(safe_target_path, safe_symlink_path) {
+                Ok(_) => true,
                 Err(e) => {
                     error!(
                         "Failed to create symlink from {} -> {}: {}",
                         symlink, target, e
                     );
-                    return false;
+                    false
                 }
             }
         }
@@ -644,12 +639,12 @@ impl Chroot {
             return metadata.file_type().is_symlink();
         }
 
-        return false;
+        false
     }
 
     /// Replace `//` with `/`. This is for asthetics only.
-    fn strip_double_slash(&self, path: &String) -> String {
-        let mut stripped_path = path.clone();
+    fn strip_double_slash(&self, path: &str) -> String {
+        let mut stripped_path = path.to_owned();
         let single_slash = path::MAIN_SEPARATOR.to_string();
         let double_slash = format!("{}{}", single_slash, single_slash);
 
@@ -657,17 +652,17 @@ impl Chroot {
             stripped_path = stripped_path.replace(&double_slash, &single_slash);
         }
 
-        return stripped_path;
+        stripped_path
     }
 
     /// Interprets a given path containing '..' directories.
-    fn sanitize_path(&self, file_path: &String, preserve_root_path_sep: bool) -> String {
+    fn sanitize_path(&self, file_path: &str, preserve_root_path_sep: bool) -> String {
         const DIR_TRAVERSAL: &str = "..";
 
         let mut exclude_indicies: Vec<usize> = vec![];
         let mut sanitized_path: String = "".to_string();
 
-        if preserve_root_path_sep == true && file_path.starts_with(path::MAIN_SEPARATOR) {
+        if preserve_root_path_sep && file_path.starts_with(path::MAIN_SEPARATOR) {
             sanitized_path = path::MAIN_SEPARATOR.to_string();
         }
 
@@ -675,9 +670,9 @@ impl Chroot {
         let path_parts: Vec<&str> = file_path.split(path::MAIN_SEPARATOR).collect();
 
         // Loop through each part of the file path
-        for i in 0..path_parts.len() {
+        for (i, path_part) in path_parts.iter().enumerate() {
             // If this part of the path is '..', don't include it in the final sanitized path
-            if path_parts[i] == DIR_TRAVERSAL {
+            if *path_part == DIR_TRAVERSAL {
                 exclude_indicies.push(i);
                 if i > 0 {
                     // Walk backwards through the path parts until a non-excluded part is found, then mark that part for exclusion as well
@@ -688,24 +683,19 @@ impl Chroot {
                     exclude_indicies.push(j);
                 }
             // If this part of the path is an empty string, don't include that either (happens if the original file path has '//' in it)
-            } else if path_parts[i].len() == 0 {
+            } else if path_part.is_empty() {
                 exclude_indicies.push(i);
             }
         }
 
         // Concatenate each non-excluded part of the file path, with each part separated by '/'
-        for i in 0..path_parts.len() {
-            if exclude_indicies.contains(&i) == false {
-                sanitized_path = format!(
-                    "{}{}{}",
-                    sanitized_path,
-                    path::MAIN_SEPARATOR,
-                    path_parts[i]
-                );
+        for (i, path_part) in path_parts.iter().enumerate() {
+            if !exclude_indicies.contains(&i) {
+                sanitized_path = format!("{}{}{}", sanitized_path, path::MAIN_SEPARATOR, path_part);
             }
         }
 
-        return self.strip_double_slash(&sanitized_path);
+        self.strip_double_slash(&sanitized_path)
     }
 }
 
@@ -733,12 +723,12 @@ pub fn get_extracted_files(directory: &String) -> Vec<String> {
         }
     }
 
-    return regular_files;
+    regular_files
 }
 
 /// Executes an extractor for the provided SignatureResult.
 pub fn execute(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     file_path: &String,
     signature: &SignatureResult,
     extractor: &Option<Extractor>,
@@ -820,17 +810,15 @@ pub fn execute(
                 result.do_not_recurse = extractor_definition.do_not_recurse;
 
                 // If the extractor reported success, make sure it extracted something other than just an empty file
-                if result.success == true {
-                    if was_something_extracted(&result.output_directory) == false {
-                        result.success = false;
-                        warn!("Extractor exited successfully, but no data was extracted");
-                    }
+                if result.success && !was_something_extracted(&result.output_directory) {
+                    result.success = false;
+                    warn!("Extractor exited successfully, but no data was extracted");
                 }
             }
         }
 
         // Clean up extractor's output directory if extraction failed
-        if result.success == false {
+        if !result.success {
             if let Err(e) = fs::remove_dir_all(&output_directory) {
                 warn!(
                     "Failed to clean up extraction directory {} after extraction failure: {}",
@@ -840,12 +828,12 @@ pub fn execute(
         }
     }
 
-    return result;
+    result
 }
 
 /// Spawn an external extractor process.
 fn spawn(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     file_path: &String,
     output_directory: &String,
     signature: &SignatureResult,
@@ -882,7 +870,7 @@ fn spawn(
 
     // If the entirety of the source file is this one file type, no need to carve a copy of it, just create a symlink
     if signature.offset == 0 && signature.size == file_data.len() {
-        if chroot.create_symlink(&carved_file, file_path) == false {
+        if !chroot.create_symlink(&carved_file, file_path) {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 "Failed to create carved file symlink",
@@ -890,7 +878,7 @@ fn spawn(
         }
     } else {
         // Copy file data to carved file path
-        if chroot.carve_file(&carved_file, file_data, signature.offset, signature.size) == false {
+        if !chroot.carve_file(&carved_file, file_data, signature.offset, signature.size) {
             return Err(std::io::Error::new(
                 std::io::ErrorKind::Other,
                 "Failed to carve data to disk",
@@ -910,7 +898,7 @@ fn spawn(
         .args(&extractor.arguments)
         .stdout(process::Stdio::null())
         .stderr(process::Stdio::null())
-        .current_dir(&output_directory)
+        .current_dir(output_directory)
         .spawn()
     {
         Err(e) => {
@@ -918,18 +906,18 @@ fn spawn(
                 "Failed to execute command {}{:?}: {}",
                 command, extractor.arguments, e
             );
-            return Err(e);
+            Err(e)
         }
 
         Ok(child) => {
             // If the process was spawned successfully, return some information about the process
             let proc_info = ProcInfo {
-                child: child,
+                child,
                 carved_file: carved_file.clone(),
                 exit_codes: extractor.exit_codes,
             };
 
-            return Ok(proc_info);
+            Ok(proc_info)
         }
     }
 }
@@ -945,7 +933,7 @@ fn proc_wait(mut worker_info: ProcInfo) -> Result<ExtractionResult, ExtractionEr
         // Child was terminated from an external signal, status unknown, assume failure but do nothing else
         Err(e) => {
             error!("Failed to retreive child process status: {}", e);
-            return Err(ExtractionError);
+            Err(ExtractionError)
         }
 
         // Child terminated with an exit status
@@ -979,10 +967,10 @@ fn proc_wait(mut worker_info: ProcInfo) -> Result<ExtractionResult, ExtractionEr
             }
 
             // Return an ExtractionResult with the appropriate success status
-            return Ok(ExtractionResult {
+            Ok(ExtractionResult {
                 success: extraction_success,
                 ..Default::default()
-            });
+            })
         }
     }
 }
@@ -1000,14 +988,14 @@ fn create_output_directory(file_path: &String, offset: usize) -> Result<String, 
     );
 
     // Create the output directory, equivalent of mkdir -p
-    if chroot.create_directory(&output_directory) == false {
+    if !chroot.create_directory(&output_directory) {
         return Err(std::io::Error::new(
             std::io::ErrorKind::Other,
             "Directory creation failed",
         ));
     }
 
-    return Ok(output_directory);
+    Ok(output_directory)
 }
 
 /// Returns true if the size of the provided extractor output directory is greater than zero.
@@ -1043,5 +1031,5 @@ fn was_something_extracted(output_directory: &String) -> bool {
         }
     }
 
-    return false;
+    false
 }

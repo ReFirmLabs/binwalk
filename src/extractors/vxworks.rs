@@ -7,23 +7,22 @@ use serde_json;
 
 /// Describes the VxWorks symbol table extractor
 pub fn vxworks_symtab_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         do_not_recurse: true,
         utility: ExtractorType::Internal(extract_symbol_table),
         ..Default::default()
-    };
+    }
 }
 
 /// Internal extractor for writing VxWorks symbol tables to JSON
 pub fn extract_symbol_table(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {
     const MIN_VALID_ENTRIES: usize = 250;
     const OUTFILE_NAME: &str = "symtab.json";
 
-    let dry_run: bool;
     let mut result = ExtractionResult {
         ..Default::default()
     };
@@ -32,16 +31,6 @@ pub fn extract_symbol_table(
     let mut previous_entry_offset = None;
     let mut symtab_entry_offset: usize = offset;
     let mut symtab_entries: Vec<VxWorksSymbolTableEntry> = vec![];
-
-    // Check if this is just a dry-run or a full extraction
-    match output_directory {
-        Some(_) => {
-            dry_run = false;
-        }
-        None => {
-            dry_run = true;
-        }
-    }
 
     // Determine the symbol table endianness first
     if let Ok(endianness) = get_symtab_endianness(&file_data[symtab_entry_offset..]) {
@@ -70,7 +59,7 @@ pub fn extract_symbol_table(
         result.size = Some(symtab_entry_offset - offset);
 
         // This is not a drill!
-        if dry_run == false {
+        if output_directory.is_some() {
             let chroot = Chroot::new(output_directory);
 
             // Convert symbol table entires to JSON
@@ -89,5 +78,5 @@ pub fn extract_symbol_table(
         }
     }
 
-    return result;
+    result
 }

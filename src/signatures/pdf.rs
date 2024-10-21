@@ -6,11 +6,11 @@ pub const DESCRIPTION: &str = "PDF document";
 /// PDF magic bytes
 pub fn pdf_magic() -> Vec<Vec<u8>> {
     // This assumes a major version of 1
-    return vec![b"%PDF-1.".to_vec()];
+    vec![b"%PDF-1.".to_vec()]
 }
 
 /// Validate a PDF signature
-pub fn pdf_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn pdf_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // More than enough data for our needs
     const MIN_PDF_SIZE: usize = 16;
 
@@ -25,7 +25,7 @@ pub fn pdf_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
 
     let mut result = SignatureResult {
         description: DESCRIPTION.to_string(),
-        offset: offset,
+        offset,
         size: 0,
         ..Default::default()
     };
@@ -41,7 +41,7 @@ pub fn pdf_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         let version_minor: u8 = pdf_header[MINOR_NUMBER_OFFSET];
 
         // Sanity check the minor version number
-        if version_minor <= ASCII_NINE && version_minor >= ASCII_ZERO {
+        if (ASCII_ZERO..=ASCII_NINE).contains(&version_minor) {
             // Update the result description to include the version number
             result.description = format!(
                 "{}, version 1.{}",
@@ -50,7 +50,7 @@ pub fn pdf_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
             );
 
             // Search the remaining bytes for new line characters followed by a percent character
-            for byte in pdf_header[NEWLINE_OFFSET..].to_vec() {
+            for byte in pdf_header[NEWLINE_OFFSET..].iter().copied() {
                 // Any new line or carrige return byte is OK, just keep going
                 if newline_characters.contains(&byte) {
                     continue;
@@ -65,5 +65,5 @@ pub fn pdf_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

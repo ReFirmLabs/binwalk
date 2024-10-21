@@ -6,14 +6,14 @@ pub const DESCRIPTION: &str = "LUKS header";
 
 /// LUKS Headers start with these bytes
 pub fn luks_magic() -> Vec<Vec<u8>> {
-    return vec![b"LUKS\xBA\xBE".to_vec()];
+    vec![b"LUKS\xBA\xBE".to_vec()]
 }
 
 /// Parse and validate the LUKS header
-pub fn luks_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn luks_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Successful result
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         name: "luks".to_string(),
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_MEDIUM,
@@ -45,5 +45,5 @@ pub fn luks_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
         return Ok(result);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

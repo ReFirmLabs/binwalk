@@ -9,11 +9,11 @@ pub const MAGIC_OFFSET: usize = 0x01FE;
 
 /// FAT always contains these bytes
 pub fn fat_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x55\xAA".to_vec()];
+    vec![b"\x55\xAA".to_vec()]
 }
 
 /// Validates the FAT header
-pub fn fat_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn fat_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Successful return value
     let mut result = SignatureResult {
         description: DESCRIPTION.to_string(),
@@ -47,5 +47,5 @@ pub fn fat_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

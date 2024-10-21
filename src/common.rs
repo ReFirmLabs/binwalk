@@ -1,6 +1,5 @@
 //! Common Functions
 use chrono::prelude::DateTime;
-use crc32_v2;
 use log::{debug, error};
 use std::fs::File;
 use std::io::Read;
@@ -23,16 +22,16 @@ pub fn read_file(file: impl Into<String>) -> Result<Vec<u8>, std::io::Error> {
     match File::open(&file_path) {
         Err(e) => {
             error!("Failed to open file {}: {}", file_path, e);
-            return Err(e);
+            Err(e)
         }
         Ok(mut fp) => match fp.read_to_end(&mut file_data) {
             Err(e) => {
                 error!("Failed to read file {} into memory: {}", file_path, e);
-                return Err(e);
+                Err(e)
             }
             Ok(file_size) => {
                 debug!("Loaded {} bytes from {}", file_size, file_path);
-                return Ok(file_data);
+                Ok(file_data)
             }
         },
     }
@@ -56,7 +55,7 @@ pub fn read_file(file: impl Into<String>) -> Result<Vec<u8>, std::io::Error> {
 /// assert_eq!(my_data_crc, 0xDB1720A5);
 /// ```
 pub fn crc32(data: &[u8]) -> u32 {
-    return crc32_v2::crc32(0, data);
+    crc32_v2::crc32(0, data)
 }
 
 /// Converts an epoch time to a formatted time string.
@@ -73,8 +72,8 @@ pub fn crc32(data: &[u8]) -> u32 {
 pub fn epoch_to_string(epoch_timestamp: u32) -> String {
     let date_time = DateTime::from_timestamp(epoch_timestamp.into(), 0);
     match date_time {
-        Some(dt) => return dt.format("%Y-%m-%d %H:%M:%S").to_string(),
-        None => return "".to_string(),
+        Some(dt) => dt.format("%Y-%m-%d %H:%M:%S").to_string(),
+        None => "".to_string(),
     }
 }
 
@@ -91,7 +90,7 @@ fn get_cstring_bytes(raw_data: &[u8]) -> Vec<u8> {
         }
     }
 
-    return cstring;
+    cstring
 }
 
 /// Get a C-style NULL-terminated string from the provided array of u8 bytes.
@@ -108,16 +107,14 @@ fn get_cstring_bytes(raw_data: &[u8]) -> Vec<u8> {
 /// assert_eq!(string, "this_is_a_c_string");
 /// ```
 pub fn get_cstring(raw_data: &[u8]) -> String {
-    let string: String;
-
     let raw_string = get_cstring_bytes(raw_data);
 
-    match String::from_utf8(raw_string) {
-        Err(_) => string = "".to_string(),
-        Ok(s) => string = s.clone(),
-    }
+    let string: String = match String::from_utf8(raw_string) {
+        Err(_) => "".to_string(),
+        Ok(s) => s.clone(),
+    };
 
-    return string;
+    string
 }
 
 /// Validates data offsets to prevent out-of-bounds access and infinite loops while parsing file formats.
@@ -158,5 +155,5 @@ pub fn is_offset_safe(
         return false;
     }
 
-    return true;
+    true
 }

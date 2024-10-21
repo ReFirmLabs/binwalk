@@ -3,47 +3,47 @@ use aho_corasick::AhoCorasick;
 
 /// Defines the internal extractor function for carving out PEM keys
 pub fn pem_key_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         do_not_recurse: true,
         utility: ExtractorType::Internal(pem_key_carver),
         ..Default::default()
-    };
+    }
 }
 
 /// Internal extractor function for carving out PEM certs
 pub fn pem_certificate_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         do_not_recurse: true,
         utility: ExtractorType::Internal(pem_certificate_carver),
         ..Default::default()
-    };
+    }
 }
 
 pub fn pem_certificate_carver(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {
     const CERTIFICATE_FILE_NAME: &str = "pem.crt";
-    return pem_carver(
+    pem_carver(
         file_data,
         offset,
         output_directory,
         Some(CERTIFICATE_FILE_NAME),
-    );
+    )
 }
 
 pub fn pem_key_carver(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {
     const KEY_FILE_NAME: &str = "pem.key";
-    return pem_carver(file_data, offset, output_directory, Some(KEY_FILE_NAME));
+    pem_carver(file_data, offset, output_directory, Some(KEY_FILE_NAME))
 }
 
 pub fn pem_carver(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
     fname: Option<&str>,
@@ -57,7 +57,7 @@ pub fn pem_carver(
         result.success = true;
 
         if let Some(outfile) = fname {
-            if let Some(_) = output_directory {
+            if output_directory.is_some() {
                 let chroot = Chroot::new(output_directory);
                 result.success =
                     chroot.carve_file(outfile, file_data, offset, result.size.unwrap());
@@ -65,10 +65,10 @@ pub fn pem_carver(
         }
     }
 
-    return result;
+    result
 }
 
-fn get_pem_size(file_data: &Vec<u8>, start_of_pem_offset: usize) -> Option<usize> {
+fn get_pem_size(file_data: &[u8], start_of_pem_offset: usize) -> Option<usize> {
     let eof_markers = vec![
         b"-----END PUBLIC KEY-----".to_vec(),
         b"-----END CERTIFICATE-----".to_vec(),
@@ -84,7 +84,10 @@ fn get_pem_size(file_data: &Vec<u8>, start_of_pem_offset: usize) -> Option<usize
     let grep = AhoCorasick::new(eof_markers.clone()).unwrap();
 
     // Find the first end marker
-    for eof_match in grep.find_overlapping_iter(&file_data[start_of_pem_offset..]) {
+    if let Some(eof_match) = grep
+        .find_overlapping_iter(&file_data[start_of_pem_offset..])
+        .next()
+    {
         let eof_marker_index: usize = eof_match.pattern().as_usize();
         let mut pem_size = eof_match.start() + eof_markers[eof_marker_index].len();
 
@@ -100,5 +103,5 @@ fn get_pem_size(file_data: &Vec<u8>, start_of_pem_offset: usize) -> Option<usize
         return Some(pem_size);
     }
 
-    return None;
+    None
 }

@@ -67,7 +67,7 @@ pub fn parse(
         for (name, ctype) in structure {
             let data_type: String = ctype.to_string();
 
-            csize = type_to_size(&ctype);
+            csize = type_to_size(ctype);
 
             if csize == std::mem::size_of::<u8>() {
                 // u8, endianness doesn't matter
@@ -123,7 +123,7 @@ pub fn parse(
         return Ok(parsed_structure);
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Returns the size of a given structure definition.
@@ -151,7 +151,7 @@ pub fn size(structure: &Vec<(&str, &str)>) -> usize {
         struct_size += type_to_size(ctype);
     }
 
-    return struct_size;
+    struct_size
 }
 
 /// Returns the size of a give type string
@@ -160,9 +160,9 @@ fn type_to_size(ctype: &str) -> usize {
     let size_lookup_table: HashMap<&str, usize> =
         HashMap::from([("u8", 1), ("u16", 2), ("u24", 3), ("u32", 4), ("u64", 8)]);
 
-    if size_lookup_table.contains_key(ctype) == false {
+    if !size_lookup_table.contains_key(ctype) {
         panic!("Unknown size for structure type '{}'!", ctype);
     }
 
-    return size_lookup_table[ctype];
+    size_lookup_table[ctype]
 }

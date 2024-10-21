@@ -6,16 +6,16 @@ pub const DESCRIPTION: &str = "Copyright text";
 
 /// Magic copyright strings to search for
 pub fn copyright_magic() -> Vec<Vec<u8>> {
-    return vec![
+    vec![
         b"copyright".to_vec(),
         b"Copyright".to_vec(),
         b"COPYRIGHT".to_vec(),
-    ];
+    ]
 }
 
 /// Parse copyright magic candidates
 pub fn copyright_parser(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
 ) -> Result<SignatureResult, SignatureError> {
     // Size of "copright" string
@@ -23,7 +23,7 @@ pub fn copyright_parser(
 
     // Successful return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_HIGH,
         ..Default::default()
@@ -40,5 +40,5 @@ pub fn copyright_parser(
         return Ok(result);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

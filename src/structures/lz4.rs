@@ -34,7 +34,7 @@ pub fn parse_lz4_file_header(lz4_data: &[u8]) -> Result<LZ4FileHeader, Structure
     };
 
     // Parse the header
-    if let Ok(lz4_header) = common::parse(&lz4_data, &lz4_structure, "little") {
+    if let Ok(lz4_header) = common::parse(lz4_data, &lz4_structure, "little") {
         // Make sure the reserved bits aren't set
         if (lz4_header["flags"] & FLAGS_RESERVED_MASK) == 0
             && (lz4_header["bd"] & BD_RESERVED_MASK) == 0
@@ -63,7 +63,7 @@ pub fn parse_lz4_file_header(lz4_data: &[u8]) -> Result<LZ4FileHeader, Structure
                 if let Some(actual_crc) = lz4_data.get(crc_data_end) {
                     // Calculate the header CRC, which is the second byte of the xxh32 hash. It is calculated over the header, excluding the magic bytes.
                     let calculated_crc: u8 =
-                        ((xxhash_rust::xxh32::xxh32(&crc_data, 0) >> 8) & 0xFF) as u8;
+                        ((xxhash_rust::xxh32::xxh32(crc_data, 0) >> 8) & 0xFF) as u8;
 
                     // Make sure the CRC's match
                     if *actual_crc == calculated_crc {
@@ -81,7 +81,7 @@ pub fn parse_lz4_file_header(lz4_data: &[u8]) -> Result<LZ4FileHeader, Structure
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Struct to store LZ4 block header info
@@ -112,7 +112,7 @@ pub fn parse_lz4_block_header(
     };
 
     // Parse the block header
-    if let Ok(block_header) = common::parse(&lz4_block_data, &block_structure, "little") {
+    if let Ok(block_header) = common::parse(lz4_block_data, &block_structure, "little") {
         // Header size is always 4 bytes
         lz4_block.header_size = BLOCK_STRUCT_SIZE;
 
@@ -120,7 +120,7 @@ pub fn parse_lz4_block_header(
         lz4_block.last_block = block_header["block_size"] == END_MARKER;
 
         // If a checksum is present, it will be an extra 4 bytes at the end of the block
-        if checksum_present == true {
+        if checksum_present {
             lz4_block.checksum_size = CHECKSUM_SIZE;
         }
 
@@ -130,5 +130,5 @@ pub fn parse_lz4_block_header(
         return Ok(lz4_block);
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

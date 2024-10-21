@@ -11,19 +11,19 @@ pub const UBI_IMAGE_DESCRIPTION: &str = "UBI image";
 
 /// Erase block magic bytes; header version is assumed to be 1
 pub fn ubi_magic() -> Vec<Vec<u8>> {
-    return vec![b"UBI#\x01\x00\x00\x00".to_vec()];
+    vec![b"UBI#\x01\x00\x00\x00".to_vec()]
 }
 
 /// UBI node magic; this matches *any* UBI node, but ubifs_parser ensures that only superblock nodes are reported
 pub fn ubifs_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x31\x18\x10\x06".to_vec()];
+    vec![b"\x31\x18\x10\x06".to_vec()]
 }
 
 /// Validates a UBIFS signature
-pub fn ubifs_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn ubifs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Success return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: UBI_FS_DESCRIPTION.to_string(),
         confidence: CONFIDENCE_HIGH,
         ..Default::default()
@@ -37,14 +37,14 @@ pub fn ubifs_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResul
         return Ok(result);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Validates a UBI signature
-pub fn ubi_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn ubi_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Success return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: UBI_IMAGE_DESCRIPTION.to_string(),
         confidence: CONFIDENCE_HIGH,
         ..Default::default()
@@ -69,7 +69,7 @@ pub fn ubi_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Determines the LEB size and returns the size of the UBI image
@@ -91,7 +91,7 @@ fn get_ubi_image_size(ubi_data: &[u8]) -> Result<usize, SignatureError> {
         let this_volume_offset: usize = magic_match.start();
 
         // Parse the volume header
-        if let Ok(_) = parse_ubi_volume_header(&ubi_data[this_volume_offset..]) {
+        if parse_ubi_volume_header(&ubi_data[this_volume_offset..]).is_ok() {
             // Header looks valid, increment the block count
             block_count += 1;
 
@@ -125,5 +125,5 @@ fn get_ubi_image_size(ubi_data: &[u8]) -> Result<usize, SignatureError> {
         return Ok(block_count * leb_size);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

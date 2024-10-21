@@ -120,7 +120,7 @@ pub fn parse_dmg_footer(dmg_data: &[u8]) -> Result<DMGFooter, StructureError> {
     let structure_size: usize = common::size(&dmg_footer_structure);
 
     // Parse the DMG footer
-    if let Ok(dmg_footer) = common::parse(&dmg_data, &dmg_footer_structure, "big") {
+    if let Ok(dmg_footer) = common::parse(dmg_data, &dmg_footer_structure, "big") {
         // Sanity check, make sure the reported header size is the size of this structure
         if dmg_footer["header_size"] == structure_size {
             return Ok(DMGFooter {
@@ -131,5 +131,5 @@ pub fn parse_dmg_footer(dmg_data: &[u8]) -> Result<DMGFooter, StructureError> {
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

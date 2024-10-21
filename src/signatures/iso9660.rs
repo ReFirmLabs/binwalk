@@ -6,11 +6,11 @@ pub const DESCRIPTION: &str = "ISO9660 primary volume";
 
 /// ISOs start with these magic bytes
 pub fn iso_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x01CD001\x01\x00".to_vec()];
+    vec![b"\x01CD001\x01\x00".to_vec()]
 }
 
 /// Validate ISO signatures
-pub fn iso_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn iso_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Offset from the beginning of the ISO image to the magic bytes
     const ISO_MAGIC_OFFSET: usize = 32768;
 
@@ -34,5 +34,5 @@ pub fn iso_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

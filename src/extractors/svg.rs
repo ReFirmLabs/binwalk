@@ -3,16 +3,16 @@ use crate::structures::svg::parse_svg_image;
 
 /// Defines the internal extractor function for carving out SVG images
 pub fn svg_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         do_not_recurse: true,
         utility: ExtractorType::Internal(extract_svg_image),
         ..Default::default()
-    };
+    }
 }
 
 /// Internal extractor for carving SVG images to disk
 pub fn extract_svg_image(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {
@@ -27,12 +27,12 @@ pub fn extract_svg_image(
         result.size = Some(svg_image.total_size);
         result.success = true;
 
-        if !output_directory.is_none() {
+        if output_directory.is_some() {
             let chroot = Chroot::new(output_directory);
             result.success =
                 chroot.carve_file(OUTFILE_NAME, file_data, offset, result.size.unwrap());
         }
     }
 
-    return result;
+    result
 }

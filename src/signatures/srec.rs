@@ -8,22 +8,22 @@ pub const SREC_SHORT_DESCRIPTION: &str = "Motorola S-record (generic)";
 
 /// Generic, short signature for s-records, should only be matched at the beginning of a file
 pub fn srec_short_magic() -> Vec<Vec<u8>> {
-    return vec![b"S0".to_vec()];
+    vec![b"S0".to_vec()]
 }
 
 /// This assumes a srec header with the hex encoded string of "HDR"
 pub fn srec_magic() -> Vec<Vec<u8>> {
-    return vec![b"S00600004844521B".to_vec()];
+    vec![b"S00600004844521B".to_vec()]
 }
 
 /// Validates a SREC signature
-pub fn srec_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn srec_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // \r and \n
     const UNIX_TERMINATING_CHARACTER: u8 = 0x0A;
     const WINDOWS_TERMINATING_CHARACTER: u8 = 0x0D;
 
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: SREC_DESCRIPTION.to_string(),
         confidence: CONFIDENCE_HIGH,
         ..Default::default()
@@ -32,7 +32,7 @@ pub fn srec_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
     let available_data = file_data.len();
 
     // Srec lines, and hence the last line of an s-record, should end with a new line or line feed
-    let terminating_characters = vec![WINDOWS_TERMINATING_CHARACTER, UNIX_TERMINATING_CHARACTER];
+    let terminating_characters = [WINDOWS_TERMINATING_CHARACTER, UNIX_TERMINATING_CHARACTER];
 
     // Possible srec footers
     let srec_footers = vec![b"\nS9", b"\nS8", b"\nS7"];
@@ -88,5 +88,5 @@ pub fn srec_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
     }
 
     // No valid srec footers found
-    return Err(SignatureError);
+    Err(SignatureError)
 }

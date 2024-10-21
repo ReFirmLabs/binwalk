@@ -2,7 +2,7 @@ use crate::extractors;
 
 /// Describes how to run the unrar utility to extract RAR archives
 pub fn rar_extractor() -> extractors::common::Extractor {
-    return extractors::common::Extractor {
+    extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("unrar".to_string()),
         extension: "rar".to_string(),
         arguments: vec![
@@ -12,5 +12,5 @@ pub fn rar_extractor() -> extractors::common::Extractor {
         ],
         exit_codes: vec![0],
         ..Default::default()
-    };
+    }
 }

@@ -4,15 +4,15 @@ use crate::structures::png::parse_png_chunk_header;
 
 /// Defines the internal extractor function for carving out PNG images
 pub fn png_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         utility: ExtractorType::Internal(extract_png_image),
         ..Default::default()
-    };
+    }
 }
 
 /// Internal extractor for carving PNG files to disk
 pub fn extract_png_image(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {
@@ -31,7 +31,7 @@ pub fn extract_png_image(
             result.success = true;
 
             // If extraction was requested, extract the PNG
-            if let Some(_) = output_directory {
+            if output_directory.is_some() {
                 let chroot = Chroot::new(output_directory);
                 result.success =
                     chroot.carve_file(OUTFILE_NAME, file_data, offset, result.size.unwrap());
@@ -39,7 +39,7 @@ pub fn extract_png_image(
         }
     }
 
-    return result;
+    result
 }
 
 fn get_png_data_size(png_chunk_data: &[u8]) -> Option<usize> {
@@ -56,11 +56,11 @@ fn get_png_data_size(png_chunk_data: &[u8]) -> Option<usize> {
             png_chunk_offset += chunk_header.total_size;
 
             // If this was the last chunk, then png_chunk_offset is the total size of the PNG data
-            if chunk_header.is_last_chunk == true {
+            if chunk_header.is_last_chunk {
                 return Some(png_chunk_offset);
             }
         }
     }
 
-    return None;
+    None
 }

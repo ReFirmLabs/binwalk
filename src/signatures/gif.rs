@@ -8,14 +8,14 @@ pub const DESCRIPTION: &str = "GIF image";
 /// GIF images always start with these bytes
 pub fn gif_magic() -> Vec<Vec<u8>> {
     // https://giflib.sourceforge.net/whatsinagif/bits_and_bytes.html
-    return vec![b"GIF87a".to_vec(), b"GIF89a".to_vec()];
+    vec![b"GIF87a".to_vec(), b"GIF89a".to_vec()]
 }
 
 /// Validates the GIF header
-pub fn gif_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn gif_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Successful return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_HIGH,
         ..Default::default()
@@ -24,7 +24,7 @@ pub fn gif_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
     // Do an extraction dry-run to validate the GIF image
     let dry_run = extract_gif_image(file_data, offset, None);
 
-    if dry_run.success == true {
+    if dry_run.success {
         if let Some(total_size) = dry_run.size {
             // Everything looks ok, parse the GIF header to report some info to the user
             if let Ok(gif_header) = parse_gif_header(&file_data[offset..]) {
@@ -46,5 +46,5 @@ pub fn gif_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

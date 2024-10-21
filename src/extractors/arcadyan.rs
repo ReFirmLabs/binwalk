@@ -3,15 +3,15 @@ use crate::extractors::lzma::lzma_decompress;
 
 /// Defines the internal extractor for Arcadyn Obfuscated LZMA
 pub fn obfuscated_lzma_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         utility: ExtractorType::Internal(extract_obfuscated_lzma),
         ..Default::default()
-    };
+    }
 }
 
 /// Internal extractor for Arcadyn Obfuscated LZMA
 pub fn extract_obfuscated_lzma(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {
@@ -25,17 +25,15 @@ pub fn extract_obfuscated_lzma(
     let available_data: usize = file_data.len() - offset;
 
     // Sanity check data size
-    if available_data <= MAX_DATA_SIZE {
-        if available_data > MIN_DATA_SIZE {
-            // De-obfuscate the LZMA data
-            let deobfuscated_data = arcadyan_deobfuscator(&file_data[offset..]);
+    if available_data <= MAX_DATA_SIZE && available_data > MIN_DATA_SIZE {
+        // De-obfuscate the LZMA data
+        let deobfuscated_data = arcadyan_deobfuscator(&file_data[offset..]);
 
-            // Do a decompression on the LZMA data (actual LZMA data starts 4 bytes into the deobfuscated data)
-            result = lzma_decompress(&deobfuscated_data, LZMA_DATA_OFFSET, output_directory);
-        }
+        // Do a decompression on the LZMA data (actual LZMA data starts 4 bytes into the deobfuscated data)
+        result = lzma_decompress(&deobfuscated_data, LZMA_DATA_OFFSET, output_directory);
     }
 
-    return result;
+    result
 }
 
 fn arcadyan_deobfuscator(obfuscated_data: &[u8]) -> Vec<u8> {
@@ -72,9 +70,12 @@ fn arcadyan_deobfuscator(obfuscated_data: &[u8]) -> Vec<u8> {
     deobfuscated_data.extend(p3);
 
     // Nibble swap each byte in what is now "block1"
-    for i in BLOCK1_START..BLOCK1_END {
-        deobfuscated_data[i] =
-            ((deobfuscated_data[i] & 0x0F) << 4) + ((deobfuscated_data[i] & 0xF0) >> 4);
+    for swapped_byte in deobfuscated_data
+        .iter_mut()
+        .take(BLOCK1_END)
+        .skip(BLOCK1_START)
+    {
+        *swapped_byte = ((*swapped_byte & 0x0F) << 4) + ((*swapped_byte & 0xF0) >> 4);
     }
 
     let mut i: usize = BLOCK1_START;
@@ -88,5 +89,5 @@ fn arcadyan_deobfuscator(obfuscated_data: &[u8]) -> Vec<u8> {
         i += 2;
     }
 
-    return deobfuscated_data;
+    deobfuscated_data
 }

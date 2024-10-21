@@ -9,14 +9,14 @@ pub const DESCRIPTION: &str = "LZO compressed data";
 
 /// LZOP magic bytes
 pub fn lzop_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x89LZO\x00\x0D\x0A\x1A\x0A".to_vec()];
+    vec![b"\x89LZO\x00\x0D\x0A\x1A\x0A".to_vec()]
 }
 
 /// Validate an LZOP signature
-pub fn lzop_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn lzop_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Success retrun value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_HIGH,
         ..Default::default()
@@ -37,7 +37,7 @@ pub fn lzop_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 // Parse the LZO blocks to determine the size of the compressed data, including the terminating EOF marker
@@ -83,5 +83,5 @@ fn get_lzo_data_size(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

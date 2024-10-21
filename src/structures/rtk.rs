@@ -33,5 +33,5 @@ pub fn parse_rtk_header(rtk_data: &[u8]) -> Result<RTKHeader, StructureError> {
         return Ok(result);
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

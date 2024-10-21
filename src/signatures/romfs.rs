@@ -7,15 +7,15 @@ pub const DESCRIPTION: &str = "RomFS filesystem";
 
 /// ROMFS magic bytes
 pub fn romfs_magic() -> Vec<Vec<u8>> {
-    return vec![b"-rom1fs-".to_vec()];
+    vec![b"-rom1fs-".to_vec()]
 }
 
 /// Validate a ROMFS signature
-pub fn romfs_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn romfs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Success return value
     let mut result = SignatureResult {
         description: DESCRIPTION.to_string(),
-        offset: offset,
+        offset,
         confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };
@@ -24,7 +24,7 @@ pub fn romfs_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResul
     let dry_run = extract_romfs(file_data, offset, None);
 
     // If the dry run was a success, everything should be good to go
-    if dry_run.success == true {
+    if dry_run.success {
         if let Some(romfs_size) = dry_run.size {
             // Parse the RomFS header to get the volume name
             if let Ok(romfs_header) = parse_romfs_header(&file_data[offset..]) {
@@ -39,5 +39,5 @@ pub fn romfs_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResul
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

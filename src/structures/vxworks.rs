@@ -14,7 +14,7 @@ pub struct VxWorksSymbolTableEntry {
 /// Parse a single VxWorks symbol table entry
 pub fn parse_symtab_entry(
     symbol_data: &[u8],
-    endianness: &String,
+    endianness: &str,
 ) -> Result<VxWorksSymbolTableEntry, StructureError> {
     // This *seems* to be the correct structure for a symbol table entry, it may be different for different VxWorks versions...
     let symtab_structure = vec![
@@ -34,21 +34,22 @@ pub fn parse_symtab_entry(
     let symtab_structure_size: usize = common::size(&symtab_structure);
 
     // Parse the symbol table entry
-    if let Ok(symbol_entry) = common::parse(&symbol_data, &symtab_structure, endianness) {
+    if let Ok(symbol_entry) = common::parse(symbol_data, &symtab_structure, endianness) {
         // Sanity check expected values in the symbol table entry
-        if allowed_symbol_types.contains_key(&symbol_entry["type"]) {
-            if symbol_entry["name_ptr"] != 0 && symbol_entry["value_ptr"] != 0 {
-                return Ok(VxWorksSymbolTableEntry {
-                    size: symtab_structure_size,
-                    name: symbol_entry["name_ptr"],
-                    value: symbol_entry["value_ptr"],
-                    symtype: allowed_symbol_types[&symbol_entry["type"]].clone(),
-                });
-            }
+        if allowed_symbol_types.contains_key(&symbol_entry["type"])
+            && symbol_entry["name_ptr"] != 0
+            && symbol_entry["value_ptr"] != 0
+        {
+            return Ok(VxWorksSymbolTableEntry {
+                size: symtab_structure_size,
+                name: symbol_entry["name_ptr"],
+                value: symbol_entry["value_ptr"],
+                symtype: allowed_symbol_types[&symbol_entry["type"]].clone(),
+            });
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Detect a symbol table entry's endianness
@@ -66,5 +67,5 @@ pub fn get_symtab_endianness(symbol_data: &[u8]) -> Result<String, StructureErro
         return Ok(endianness.to_string());
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

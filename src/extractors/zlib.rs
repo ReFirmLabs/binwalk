@@ -3,15 +3,15 @@ use crate::extractors::inflate;
 
 /// Defines the internal extractor function for decompressing zlib data
 pub fn zlib_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         utility: ExtractorType::Internal(zlib_decompress),
         ..Default::default()
-    };
+    }
 }
 
 /// Internal extractor for decompressing ZLIB data
 pub fn zlib_decompress(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {
@@ -30,5 +30,5 @@ pub fn zlib_decompress(
         result.size = Some(HEADER_SIZE + deflate_size + CHECKSUM_SIZE);
     }
 
-    return result;
+    result
 }

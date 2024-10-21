@@ -8,11 +8,11 @@ pub const DESCRIPTION: &str = "Apple Disk iMaGe";
 /// 4-byte magic, 4-byte version (v4), 4-byte structure size (0x0200).
 ///  This is actually the magic bytes of the DMG footer, there is no standard header format.
 pub fn dmg_magic() -> Vec<Vec<u8>> {
-    return vec![b"koly\x00\x00\x00\x04\x00\x00\x02\x00".to_vec()];
+    vec![b"koly\x00\x00\x00\x04\x00\x00\x02\x00".to_vec()]
 }
 
 /// Validates the DMG footer
-pub fn dmg_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn dmg_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Confidence is set to HIGH + 1 to ensure this overrides other signatures.
     // DMG's typically start with compressed data, and the file should be treated
     // as a DMG, not just compressed data.
@@ -42,7 +42,7 @@ pub fn dmg_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         // Make sure the length of image data and length of XML data are sane
         if (dmg_footer.data_length + dmg_footer.xml_length) <= offset {
             // Locate the XML data
-            if let Some(xml_offset) = find_xml_property_list(&file_data) {
+            if let Some(xml_offset) = find_xml_property_list(file_data) {
                 // Make sure the XML data comes after the image data
                 if xml_offset >= dmg_footer.data_length {
                     // Report the result
@@ -56,7 +56,7 @@ pub fn dmg_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 fn find_xml_property_list(file_data: &[u8]) -> Option<usize> {
@@ -80,5 +80,5 @@ fn find_xml_property_list(file_data: &[u8]) -> Option<usize> {
         }
     }
 
-    return None;
+    None
 }

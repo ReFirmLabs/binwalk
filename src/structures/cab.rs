@@ -52,7 +52,7 @@ pub fn parse_cab_header(header_data: &[u8]) -> Result<CabinetHeader, StructureEr
     };
 
     // Parse the CAB header
-    if let Ok(cab_header) = common::parse(&header_data, &cab_header_structure, "little") {
+    if let Ok(cab_header) = common::parse(header_data, &cab_header_structure, "little") {
         // All reserved fields must be 0
         if cab_header["reserved1"] == 0
             && cab_header["reserved2"] == 0
@@ -84,7 +84,7 @@ pub fn parse_cab_header(header_data: &[u8]) -> Result<CabinetHeader, StructureEr
                     {
                         // Parse the extra header
                         if let Ok(extra_header) =
-                            common::parse(&extra_header_data, &cab_extra_header_structure, "little")
+                            common::parse(extra_header_data, &cab_extra_header_structure, "little")
                         {
                             // The extra data is expected to come immediately after the data specified in the main CAB header
                             if extra_header["data_offset"] == cab_header["size"] {
@@ -99,12 +99,12 @@ pub fn parse_cab_header(header_data: &[u8]) -> Result<CabinetHeader, StructureEr
                 }
 
                 // If everything checked out OK, return the result
-                if everything_ok == true {
+                if everything_ok {
                     return Ok(header_info);
                 }
             }
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

@@ -43,7 +43,7 @@ pub fn parse_uefi_volume_header(uefi_data: &[u8]) -> Result<UEFIVolumeHeader, St
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Stores info about a UEFI capsule header
@@ -74,5 +74,5 @@ pub fn parse_uefi_capsule_header(uefi_data: &[u8]) -> Result<UEFICapsuleHeader, 
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

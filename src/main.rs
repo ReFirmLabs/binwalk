@@ -49,7 +49,7 @@ fn main() {
     let cliargs = cliparser::parse();
 
     // If --list was specified, just display a list of signatures and return
-    if cliargs.list == true {
+    if cliargs.list {
         display::print_signature_list(cliargs.quiet, &magic::patterns());
         return;
     }
@@ -60,7 +60,7 @@ fn main() {
     }
 
     // If entropy analysis was requested, generate the entropy graph and return
-    if cliargs.entropy == true {
+    if cliargs.entropy {
         display::print_plain(cliargs.quiet, "Calculating file entropy...");
 
         if let Ok(entropy_results) = entropy::plot(cliargs.file_name.unwrap()) {
@@ -80,7 +80,7 @@ fn main() {
     }
 
     // If extraction was requested, we need to initialize the output directory
-    if cliargs.extract == true {
+    if cliargs.extract {
         output_directory = Some(cliargs.directory);
     }
 
@@ -143,9 +143,9 @@ fn main() {
      * Main loop.
      * Loop until all pending thread jobs are complete and there are no more files in the queue.
      */
-    while target_files.is_empty() == false || workers.active_count() > 0 {
+    while !target_files.is_empty() || workers.active_count() > 0 {
         // If there are files waiting to be analyzed and there is at least one free thread in the pool
-        if target_files.is_empty() == false && workers.active_count() < workers.max_count() {
+        if !target_files.is_empty() && workers.active_count() < workers.max_count() {
             // Get the next file path from the target_files queue
             let target_file = target_files
                 .pop_front()
@@ -162,7 +162,7 @@ fn main() {
         }
 
         // Don't spin CPU cycles if there is no backlog of files to analyze
-        if target_files.is_empty() == true {
+        if target_files.is_empty() {
             let sleep_time = time::Duration::from_millis(1);
             thread::sleep(sleep_time);
         }
@@ -187,20 +187,20 @@ fn main() {
             json::log(&cliargs.log, json::JSONType::Analysis(results.clone()));
 
             // Nothing found? Nothing else to do for this file.
-            if results.file_map.len() == 0 {
+            if results.file_map.is_empty() {
                 debug!("Found no results for file {}", results.file_path);
                 continue;
             }
 
             // Print analysis results to screen
-            if should_display(&results, file_count, cliargs.verbose) == true {
+            if should_display(&results, file_count, cliargs.verbose) {
                 display::print_analysis_results(cliargs.quiet, cliargs.extract, &results);
             }
 
             // If running recursively, add extraction results to list of files to analyze
             if cliargs.matryoshka {
                 for (_signature_id, extraction_result) in results.extractions.into_iter() {
-                    if extraction_result.do_not_recurse == false {
+                    if !extraction_result.do_not_recurse {
                         for file_path in extractors::common::get_extracted_files(
                             &extraction_result.output_directory,
                         ) {
@@ -232,22 +232,18 @@ fn should_display(results: &AnalysisResults, file_count: usize, verbose: bool) -
      * contain signatures that we always want displayed, or which contain extractable signatures.
      * This can be overridden with the --verbose command line flag.
      */
-    if file_count == 1 || verbose == true {
+    if file_count == 1 || verbose || !results.extractions.is_empty() {
         display_results = true;
     } else {
-        if results.extractions.len() > 0 {
-            display_results = true;
-        } else {
-            for signature in &results.file_map {
-                if signature.always_display == true {
-                    display_results = true;
-                    break;
-                }
+        for signature in &results.file_map {
+            if signature.always_display {
+                display_results = true;
+                break;
             }
         }
     }
 
-    return display_results;
+    display_results
 }
 
 /// Spawn a worker thread to analyze a file

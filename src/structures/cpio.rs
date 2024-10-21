@@ -69,15 +69,15 @@ pub fn parse_cpio_entry_header(cpio_data: &[u8]) -> Result<CPIOEntryHeader, Stru
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// File data and CPIO headers are padded to 4-byte boundaries
 fn byte_padding(n: usize) -> usize {
     let modulus: usize = n % 4;
     if modulus == 0 {
-        return 0;
+        0
     } else {
-        return 4 - modulus;
+        4 - modulus
     }
 }

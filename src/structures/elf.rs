@@ -142,52 +142,46 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, StructureError> {
     };
 
     // Endianness doesn't matter here, and we don't know what the ELF's endianness is yet
-    if let Ok(e_ident) = common::parse(&elf_data, &elf_ident_structure, "little") {
+    if let Ok(e_ident) = common::parse(elf_data, &elf_ident_structure, "little") {
         // Sanity check the e_ident fields
-        if e_ident["padding_1"] == 0 && e_ident["padding_2"] == 0 {
-            if e_ident["version"] == EXPECTED_VERSION {
-                if elf_classes.contains_key(&e_ident["class"]) {
-                    if elf_osabi.contains_key(&e_ident["osabi"]) {
-                        if elf_endianness.contains_key(&e_ident["endianness"]) {
-                            // Set the ident info
-                            elf_hdr_info.class = elf_classes[&e_ident["class"]].to_string();
-                            elf_hdr_info.osabi = elf_osabi[&e_ident["osabi"]].to_string();
-                            elf_hdr_info.endianness =
-                                elf_endianness[&e_ident["endianness"]].to_string();
+        if e_ident["padding_1"] == 0
+            && e_ident["padding_2"] == 0
+            && e_ident["version"] == EXPECTED_VERSION
+            && elf_classes.contains_key(&e_ident["class"])
+            && elf_osabi.contains_key(&e_ident["osabi"])
+            && elf_endianness.contains_key(&e_ident["endianness"])
+        {
+            // Set the ident info
+            elf_hdr_info.class = elf_classes[&e_ident["class"]].to_string();
+            elf_hdr_info.osabi = elf_osabi[&e_ident["osabi"]].to_string();
+            elf_hdr_info.endianness = elf_endianness[&e_ident["endianness"]].to_string();
 
-                            // The rest of the ELF info comes immediately after the ident structure
-                            let elf_info_start: usize = ELF_IDENT_STRUCT_SIZE;
-                            let elf_info_end: usize = elf_info_start + ELF_INFO_STRUCT_SIZE;
+            // The rest of the ELF info comes immediately after the ident structure
+            let elf_info_start: usize = ELF_IDENT_STRUCT_SIZE;
+            let elf_info_end: usize = elf_info_start + ELF_INFO_STRUCT_SIZE;
 
-                            if let Some(elf_info_raw) = elf_data.get(elf_info_start..elf_info_end) {
-                                // Parse the remaining info from the ELF header
-                                if let Ok(elf_info) = common::parse(
-                                    &elf_info_raw,
-                                    &elf_info_structure,
-                                    elf_endianness[&e_ident["endianness"]],
-                                ) {
-                                    // Sanity check the remaining ELF header fields
-                                    if elf_info["version"] == EXPECTED_VERSION {
-                                        if elf_types.contains_key(&elf_info["type"]) {
-                                            if elf_machines.contains_key(&elf_info["machine"]) {
-                                                // Set the ELF info fields
-                                                elf_hdr_info.exe_type =
-                                                    elf_types[&elf_info["type"]].to_string();
-                                                elf_hdr_info.machine =
-                                                    elf_machines[&elf_info["machine"]].to_string();
+            if let Some(elf_info_raw) = elf_data.get(elf_info_start..elf_info_end) {
+                // Parse the remaining info from the ELF header
+                if let Ok(elf_info) = common::parse(
+                    elf_info_raw,
+                    &elf_info_structure,
+                    elf_endianness[&e_ident["endianness"]],
+                ) {
+                    // Sanity check the remaining ELF header fields
+                    if elf_info["version"] == EXPECTED_VERSION
+                        && elf_types.contains_key(&elf_info["type"])
+                        && elf_machines.contains_key(&elf_info["machine"])
+                    {
+                        // Set the ELF info fields
+                        elf_hdr_info.exe_type = elf_types[&elf_info["type"]].to_string();
+                        elf_hdr_info.machine = elf_machines[&elf_info["machine"]].to_string();
 
-                                                return Ok(elf_hdr_info);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        return Ok(elf_hdr_info);
                     }
                 }
             }
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

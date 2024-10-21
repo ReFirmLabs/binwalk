@@ -1,6 +1,5 @@
 use log::error;
 use serde::{Deserialize, Serialize};
-use serde_json;
 use std::fs;
 use std::io;
 use std::io::Seek;
@@ -23,7 +22,7 @@ pub fn log(json_file: &Option<String>, results: JSONType) {
     const JSON_COMMA_SEPERATOR: &str = ",\n";
 
     match json_file {
-        None => return,
+        None => (),
         Some(file_name) => {
             // Convert analysis results to JSON
             match serde_json::to_string_pretty(&results) {
@@ -32,20 +31,18 @@ pub fn log(json_file: &Option<String>, results: JSONType) {
                     // Open file for reading and writing, create if does not already exist
                     match fs::OpenOptions::new()
                         .create(true)
+                        .append(true)
                         .read(true)
-                        .write(true)
-                        .open(&file_name)
+                        .open(file_name)
                     {
                         Err(e) => {
                             error!("Failed to open JSON log file '{}': {}", file_name, e);
-                            return;
                         }
                         Ok(mut fp) => {
                             // Seek to the end of the file and get the cursor position
                             match fp.seek(io::SeekFrom::End(0)) {
                                 Err(e) => {
                                     error!("Failed to see to end of JSON file: {}", e);
-                                    return;
                                 }
                                 Ok(pos) => {
                                     if pos == 0 {
@@ -82,8 +79,7 @@ pub fn log(json_file: &Option<String>, results: JSONType) {
 }
 
 fn write_to_json_file(mut fp: &fs::File, data: String) {
-    match fp.write_all(data.as_bytes()) {
-        Ok(_) => return,
-        Err(e) => error!("Failed to write to JSON log file: {}", e),
+    if let Err(e) = fp.write_all(data.as_bytes()) {
+        error!("Failed to write to JSON log file: {}", e);
     }
 }

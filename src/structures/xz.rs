@@ -22,7 +22,7 @@ pub fn parse_xz_header(xz_data: &[u8]) -> Result<usize, StructureError> {
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Parse and validate an XZ footer, returns the footer size
@@ -52,5 +52,5 @@ pub fn parse_xz_footer(xz_data: &[u8]) -> Result<usize, StructureError> {
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

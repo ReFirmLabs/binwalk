@@ -3,16 +3,16 @@ use aho_corasick::AhoCorasick;
 
 /// Defines the internal extractor function for carving out JPEG images
 pub fn jpeg_extractor() -> Extractor {
-    return Extractor {
+    Extractor {
         do_not_recurse: true,
         utility: ExtractorType::Internal(extract_jpeg_image),
         ..Default::default()
-    };
+    }
 }
 
 /// Internal extractor for carving JPEG images to disk
 pub fn extract_jpeg_image(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {
@@ -27,14 +27,14 @@ pub fn extract_jpeg_image(
         result.size = Some(jpeg_data_size);
         result.success = true;
 
-        if let Some(_) = output_directory {
+        if output_directory.is_some() {
             let chroot = Chroot::new(output_directory);
             result.success =
                 chroot.carve_file(OUTFILE_NAME, file_data, offset, result.size.unwrap());
         }
     }
 
-    return result;
+    result
 }
 
 fn get_jpeg_data_size(jpeg_data: &[u8]) -> Option<usize> {
@@ -48,14 +48,12 @@ fn get_jpeg_data_size(jpeg_data: &[u8]) -> Option<usize> {
         let eof_candidate: usize = eof_match.start() + EOF_SIZE;
 
         // Make sure the expected EOF marker is not immediately followed by 0xFF (which would indicate the JPEG continues...)
-        if eof_candidate < jpeg_data.len() {
-            if jpeg_data[eof_candidate] == JPEG_DELIM {
-                continue;
-            }
+        if eof_candidate < jpeg_data.len() && jpeg_data[eof_candidate] == JPEG_DELIM {
+            continue;
         }
 
         return Some(eof_match.start() + EOF_SIZE);
     }
 
-    return None;
+    None
 }

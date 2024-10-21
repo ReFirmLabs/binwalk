@@ -8,14 +8,14 @@ pub const DESCRIPTION: &str = "RAR archive";
 
 /// RAR magic bytes for both v4 and v5
 pub fn rar_magic() -> Vec<Vec<u8>> {
-    return vec![b"Rar!\x1A\x07".to_vec()];
+    vec![b"Rar!\x1A\x07".to_vec()]
 }
 
 /// Validate RAR signature
-pub fn rar_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn rar_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Success return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         ..Default::default()
     };
@@ -39,7 +39,7 @@ pub fn rar_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         return Ok(result);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Determine the size of the RAR file
@@ -58,11 +58,11 @@ fn get_rar_size(file_data: &[u8], rar_version: usize) -> Result<usize, Signature
         let grep = AhoCorasick::new(eof_marker.clone()).unwrap();
 
         // Search the file data for the EOF marker
-        for eof_match in grep.find_overlapping_iter(file_data) {
+        if let Some(eof_match) = grep.find_overlapping_iter(file_data).next() {
             // Accept the first match; total size is the start of the EOF marker plus the size of the EOF marker
             return Ok(eof_match.start() + eof_marker[0].len());
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

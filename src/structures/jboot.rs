@@ -74,7 +74,7 @@ pub fn parse_jboot_arm_header(jboot_data: &[u8]) -> Result<JBOOTArmHeader, Struc
                     && arm_header["header_version"] == HEADER_VERSION_VALUE
                 {
                     return Ok(JBOOTArmHeader {
-                        header_size: header_size,
+                        header_size,
                         rom_id: get_cstring(&jboot_data[0..STRUCTURE_OFFSET]),
                         data_size: arm_header["data_size"],
                         data_offset: arm_header["data_start"],
@@ -86,7 +86,7 @@ pub fn parse_jboot_arm_header(jboot_data: &[u8]) -> Result<JBOOTArmHeader, Struc
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Stores info about JBOOT STAG headers
@@ -132,7 +132,7 @@ pub fn parse_jboot_stag_header(jboot_data: &[u8]) -> Result<JBOOTStagHeader, Str
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 #[derive(Default, Debug, Clone)]
@@ -174,26 +174,25 @@ pub fn parse_jboot_sch2_header(jboot_data: &[u8]) -> Result<JBOOTSchHeader, Stru
 
     if let Ok(sch2_header) = common::parse(jboot_data, &sch2_structure, "little") {
         // Sanity check some header fields
-        if sch2_header["version"] == VERSION_VALUE {
-            if sch2_header["header_size"] == result.header_size {
-                if compression_types.contains_key(&sch2_header["compression_type"]) {
-                    // Validate the header checksum
-                    if let Some(header_bytes) = jboot_data.get(0..sch2_header["header_size"]) {
-                        if sch2_header_crc(header_bytes) == sch2_header["header_crc"] {
-                            result.compression =
-                                compression_types[&sch2_header["compression_type"]].to_string();
-                            result.kernel_checksum = sch2_header["kernel_image_crc"];
-                            result.kernel_size = sch2_header["kernel_image_size"];
-                            result.kernel_entry_point = sch2_header["ram_entry_address"];
-                            return Ok(result);
-                        }
-                    }
+        if sch2_header["version"] == VERSION_VALUE
+            && sch2_header["header_size"] == result.header_size
+            && compression_types.contains_key(&sch2_header["compression_type"])
+        {
+            // Validate the header checksum
+            if let Some(header_bytes) = jboot_data.get(0..sch2_header["header_size"]) {
+                if sch2_header_crc(header_bytes) == sch2_header["header_crc"] {
+                    result.compression =
+                        compression_types[&sch2_header["compression_type"]].to_string();
+                    result.kernel_checksum = sch2_header["kernel_image_crc"];
+                    result.kernel_size = sch2_header["kernel_image_size"];
+                    result.kernel_entry_point = sch2_header["ram_entry_address"];
+                    return Ok(result);
                 }
             }
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Calculate a JBOOT SCH2 header CRC
@@ -208,12 +207,16 @@ fn sch2_header_crc(sch2_header_bytes: &[u8]) -> usize {
         let mut crc_data: Vec<u8> = sch2_header_bytes.to_vec();
 
         // Header CRC field has to be NULL'd out
-        for i in HEADER_CRC_START..HEADER_CRC_END {
-            crc_data[i] = 0;
+        for crc_byte in crc_data
+            .iter_mut()
+            .take(HEADER_CRC_END)
+            .skip(HEADER_CRC_START)
+        {
+            *crc_byte = 0;
         }
 
         crc = crc32(&crc_data) as usize;
     }
 
-    return crc;
+    crc
 }

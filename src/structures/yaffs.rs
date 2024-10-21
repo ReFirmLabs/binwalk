@@ -38,7 +38,7 @@ pub fn parse_yaffs_obj_header(
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Stores info about a YAFFS file header
@@ -70,5 +70,5 @@ pub fn parse_yaffs_file_header(
         });
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

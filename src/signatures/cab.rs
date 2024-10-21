@@ -6,11 +6,11 @@ pub const DESCRIPTION: &str = "Microsoft Cabinet archive";
 
 /// CAB magic bytes; includes the magic bytes and the following reserved1 header entry, which must be 0.
 pub fn cab_magic() -> Vec<Vec<u8>> {
-    return vec![b"MSCF\x00\x00\x00\x00".to_vec()];
+    vec![b"MSCF\x00\x00\x00\x00".to_vec()]
 }
 
 /// Parses and cabinet file signature
-pub fn cab_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn cab_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Parse the CAB header
     if let Ok(cab_header) = parse_cab_header(&file_data[offset..]) {
         let available_data = file_data.len() - offset;
@@ -27,7 +27,7 @@ pub fn cab_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
                     cab_header.header_size,
                     cab_header.total_size
                 ),
-                offset: offset,
+                offset,
                 size: cab_header.total_size,
                 confidence: CONFIDENCE_MEDIUM,
                 ..Default::default()
@@ -35,5 +35,5 @@ pub fn cab_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult,
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

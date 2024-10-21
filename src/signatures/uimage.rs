@@ -8,18 +8,15 @@ pub const DESCRIPTION: &str = "uImage firmware image";
 
 /// uImage magic bytes
 pub fn uimage_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x27\x05\x19\x56".to_vec()];
+    vec![b"\x27\x05\x19\x56".to_vec()]
 }
 
 /// Validates uImage signatures
-pub fn uimage_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<SignatureResult, SignatureError> {
+pub fn uimage_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Success return value
     let mut result = SignatureResult {
         size: 0,
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_HIGH,
         ..Default::default()
@@ -28,7 +25,7 @@ pub fn uimage_parser(
     // Do an extraction dry-run
     let dry_run = extract_uimage(file_data, offset, None);
 
-    if dry_run.success == true {
+    if dry_run.success {
         if let Some(uimage_size) = dry_run.size {
             // Extraction dry-run ok, parse the header to display some useful info
             if let Ok(uimage_header) = parse_uimage_header(&file_data[offset..]) {
@@ -51,5 +48,5 @@ pub fn uimage_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

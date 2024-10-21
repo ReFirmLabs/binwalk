@@ -7,21 +7,21 @@ pub const CAPSULE_DESCRIPTION: &str = "UEFI capsule image";
 
 /// UEFI volume magic bytes
 pub fn uefi_volume_magic() -> Vec<Vec<u8>> {
-    return vec![b"_FVH".to_vec()];
+    vec![b"_FVH".to_vec()]
 }
 
 /// UEFI capsule GUIDs
 pub fn uefi_capsule_magic() -> Vec<Vec<u8>> {
-    return vec![
+    vec![
         b"\xBD\x86\x66\x3B\x76\x0D\x30\x40\xB7\x0E\xB5\x51\x9E\x2F\xC5\xA0".to_vec(), // EFI capsule GUID
         b"\x8B\xA6\x3C\x4A\x23\x77\xFB\x48\x80\x3D\x57\x8C\xC1\xFE\xC4\x4D".to_vec(), // EFI2 capsule GUID
         b"\xB9\x82\x91\x53\xB5\xAB\x91\x43\xB6\x9A\xE3\xA9\x43\xF7\x2F\xCC".to_vec(), // UEFI capsule GUID
-    ];
+    ]
 }
 
 /// Validates UEFI volume signatures
 pub fn uefi_volume_parser(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
 ) -> Result<SignatureResult, SignatureError> {
     // The magic signature begins this many bytes from the start of the UEFI volume
@@ -57,18 +57,18 @@ pub fn uefi_volume_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Validates UEFI capsule signatures
 pub fn uefi_capsule_parser(
-    file_data: &Vec<u8>,
+    file_data: &[u8],
     offset: usize,
 ) -> Result<SignatureResult, SignatureError> {
     // Success return value
     let mut result = SignatureResult {
         description: CAPSULE_DESCRIPTION.to_string(),
-        offset: offset,
+        offset,
         size: 0,
         confidence: CONFIDENCE_MEDIUM,
         ..Default::default()
@@ -88,5 +88,5 @@ pub fn uefi_capsule_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

@@ -9,7 +9,7 @@ pub const DESCRIPTION: &str = "SquashFS file system";
 
 /// All of the known magic bytes that could indicate the beginning of a SquashFS image
 pub fn squashfs_magic() -> Vec<Vec<u8>> {
-    return vec![
+    vec![
         b"sqsh".to_vec(),
         b"hsqs".to_vec(),
         b"sqlz".to_vec(),
@@ -17,14 +17,11 @@ pub fn squashfs_magic() -> Vec<Vec<u8>> {
         b"tqsh".to_vec(),
         b"hsqt".to_vec(),
         b"shsq".to_vec(),
-    ];
+    ]
 }
 
 /// Responsible for parsing and validating a suspected SquashFS image header
-pub fn squashfs_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<SignatureResult, SignatureError> {
+pub fn squashfs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     const SQUASHFSV4: usize = 4;
 
     let squashfs_compression_types = HashMap::from([
@@ -39,7 +36,7 @@ pub fn squashfs_parser(
 
     let mut result = SignatureResult {
         size: 0,
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_HIGH,
         ..Default::default()
@@ -120,5 +117,5 @@ pub fn squashfs_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

@@ -52,7 +52,7 @@ pub fn parse_zstd_header(zstd_data: &[u8]) -> Result<ZSTDHeader, StructureError>
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Stores info about a ZSTD block header
@@ -107,5 +107,5 @@ pub fn parse_block_header(block_data: &[u8]) -> Result<ZSTDBlockHeader, Structur
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

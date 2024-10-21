@@ -6,14 +6,11 @@ pub const DESCRIPTION: &str = "Intel serial flash for PCH ROM";
 
 /// PCH ROM magic bytes
 pub fn pch_rom_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x5a\xa5\xf0\x0f".to_vec()];
+    vec![b"\x5a\xa5\xf0\x0f".to_vec()]
 }
 
 /// Validate a PCH ROM signature
-pub fn pch_rom_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<SignatureResult, SignatureError> {
+pub fn pch_rom_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Magic bytes begin at this offset from the start of file
     const MAGIC_OFFSET: usize = 16;
 
@@ -36,5 +33,5 @@ pub fn pch_rom_parser(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

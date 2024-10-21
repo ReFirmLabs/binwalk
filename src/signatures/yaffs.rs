@@ -10,23 +10,23 @@ pub const DESCRIPTION: &str = "YAFFSv2 filesystem";
 
 /// Expect the first YAFFS entry to be either a directory (0x00000003) or file (0x00000001), big or little endian
 pub fn yaffs_magic() -> Vec<Vec<u8>> {
-    return vec![
+    vec![
         b"\x03\x00\x00\x00\x01\x00\x00\x00\xFF\xFF".to_vec(),
         b"\x00\x00\x00\x03\x00\x00\x00\x01\xFF\xFF".to_vec(),
         b"\x01\x00\x00\x00\x01\x00\x00\x00\xFF\xFF".to_vec(),
         b"\x00\x00\x00\x01\x00\x00\x00\x01\xFF\xFF".to_vec(),
-    ];
+    ]
 }
 
 /// Validate a YAFFS signature
-pub fn yaffs_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn yaffs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Max page size + max spare size
     const MAX_OBJ_SIZE: usize = 16896;
     const BIG_ENDIAN_FIRST_BYTE: u8 = 0;
 
     let mut result = SignatureResult {
         description: DESCRIPTION.to_string(),
-        offset: offset,
+        offset,
         size: 0,
         confidence: CONFIDENCE_MEDIUM,
         ..Default::default()
@@ -62,7 +62,7 @@ pub fn yaffs_parser(file_data: &Vec<u8>, offset: usize) -> Result<SignatureResul
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Returns the detected page size used by the YAFFS image
@@ -96,7 +96,7 @@ fn get_page_size(file_data: &[u8]) -> Result<usize, SignatureError> {
     }
 
     // Nothing valid found
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Returns the detected spare size of the YAFFS image
@@ -116,14 +116,14 @@ fn get_spare_size(
 
         if let Some(obj_header_data) = file_data.get(next_obj_offset..) {
             // Attempt to parse this data as a YAFFS object header
-            if let Ok(_) = parse_yaffs_obj_header(obj_header_data, endianness) {
+            if parse_yaffs_obj_header(obj_header_data, endianness).is_ok() {
                 return Ok(*spare_size);
             }
         }
     }
 
     // Nothing valid found
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Returns the total size of the image, in bytes
@@ -187,7 +187,7 @@ fn get_image_size(
         return Ok(image_size);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
 
 /// Returns the number of data blocks used to store file data; this size is only valid for file type objects
@@ -209,5 +209,5 @@ fn get_file_block_count(
         }
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

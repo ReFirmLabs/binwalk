@@ -19,12 +19,12 @@ pub fn parse_png_chunk_header(chunk_data: &[u8]) -> Result<PNGChunkHeader, Struc
     let chunk_structure_size: usize = common::size(&png_chunk_structure);
 
     // Parse the chunk header
-    if let Ok(chunk_header) = common::parse(&chunk_data, &png_chunk_structure, "big") {
+    if let Ok(chunk_header) = common::parse(chunk_data, &png_chunk_structure, "big") {
         return Ok(PNGChunkHeader {
             is_last_chunk: chunk_header["type"] == IEND_CHUNK_TYPE,
             total_size: chunk_structure_size + chunk_header["length"] + CRC_SIZE,
         });
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

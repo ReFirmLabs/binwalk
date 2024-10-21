@@ -20,12 +20,12 @@ pub fn parse_packimg_header(packimg_data: &[u8]) -> Result<PackIMGHeader, Struct
     ];
 
     // Parse the packimg header
-    if let Ok(packimg_header) = common::parse(&packimg_data, &packimg_structure, "little") {
+    if let Ok(packimg_header) = common::parse(packimg_data, &packimg_structure, "little") {
         return Ok(PackIMGHeader {
             header_size: PACKIMG_HEADER_SIZE,
             data_size: packimg_header["data_size"],
         });
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

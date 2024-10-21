@@ -7,11 +7,11 @@ pub const DESCRIPTION: &str = "CFE bootloader";
 
 /// CFE bootloader always contains this string
 pub fn cfe_magic() -> Vec<Vec<u8>> {
-    return vec![b"CFE1CFE1".to_vec()];
+    vec![b"CFE1CFE1".to_vec()]
 }
 
 /// Validate the CFE signature
-pub fn cfe_parser(_file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult, SignatureError> {
+pub fn cfe_parser(_file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Magic bytes occur this many bytes into the bootloader
     const CFE_MAGIC_OFFSET: usize = 28;
 
@@ -35,5 +35,5 @@ pub fn cfe_parser(_file_data: &Vec<u8>, offset: usize) -> Result<SignatureResult
         return Ok(result);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }

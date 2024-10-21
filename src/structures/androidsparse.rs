@@ -40,7 +40,7 @@ pub fn parse_android_sparse_header(
     let expected_header_size = common::size(&android_sparse_structure);
 
     // Parse the header
-    if let Ok(header) = common::parse(&sparse_data, &android_sparse_structure, "little") {
+    if let Ok(header) = common::parse(sparse_data, &android_sparse_structure, "little") {
         // Sanity check header values
         if header["major_version"] == MAJOR_VERSION
             && header["minor_version"] == MINOR_VERSION
@@ -58,7 +58,7 @@ pub fn parse_android_sparse_header(
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Storage structure for Android Sparse chunk headers
@@ -108,15 +108,11 @@ pub fn parse_android_sparse_chunk_header(
             chonker.is_dont_care = chunk_header["chunk_type"] == CHUNK_TYPE_DONT_CARE;
 
             // The chunk type must be one of the known chunk types
-            if chonker.is_crc == true
-                || chonker.is_raw == true
-                || chonker.is_fill == true
-                || chonker.is_dont_care == true
-            {
+            if chonker.is_crc || chonker.is_raw || chonker.is_fill || chonker.is_dont_care {
                 return Ok(chonker);
             }
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

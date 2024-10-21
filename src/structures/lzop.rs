@@ -51,7 +51,7 @@ pub fn parse_lzop_file_header(lzop_data: &[u8]) -> Result<LZOPFileHeader, Struct
     };
 
     // Parse the first part of the header
-    if let Ok(lzo_header_p1) = common::parse(&lzop_data, &lzo_structure_p1, "big") {
+    if let Ok(lzo_header_p1) = common::parse(lzop_data, &lzo_structure_p1, "big") {
         // Sanity check the methods field
         if allowed_methods.contains(&lzo_header_p1["method"]) {
             // Sanity check the header version numbers
@@ -92,7 +92,7 @@ pub fn parse_lzop_file_header(lzop_data: &[u8]) -> Result<LZOPFileHeader, Struct
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Struct to store info on LZOP block headers
@@ -120,7 +120,7 @@ pub fn parse_lzop_block_header(
     ];
 
     // Parse the block header
-    if let Ok(block_header) = common::parse(&lzo_data, &block_structure, "big") {
+    if let Ok(block_header) = common::parse(lzo_data, &block_structure, "big") {
         // Basic sanity check on the block header values
         if block_header["compressed_size"] != 0
             && block_header["uncompressed_size"] != 0
@@ -144,7 +144,7 @@ pub fn parse_lzop_block_header(
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }
 
 /// Parse an LZOP EOF marker, returns the size of the EOF marker (always 4 bytes)
@@ -158,7 +158,7 @@ pub fn parse_lzop_eof_marker(eof_data: &[u8]) -> Result<usize, StructureError> {
      * It is unclear, but observed, that LZOP files end with 0x00000000; this is assumed to be an EOF marker,
      * as other similar compression file formats use that. This assumption could be incorrect.
      */
-    if let Ok(eof_marker) = common::parse(&eof_data, &eof_structure, "big") {
+    if let Ok(eof_marker) = common::parse(eof_data, &eof_structure, "big") {
         // Sanity check the EOF marker
         if eof_marker["marker"] == EOF_MARKER {
             // Return the size of the EOF marker
@@ -166,5 +166,5 @@ pub fn parse_lzop_eof_marker(eof_data: &[u8]) -> Result<usize, StructureError> {
         }
     }
 
-    return Err(StructureError);
+    Err(StructureError)
 }

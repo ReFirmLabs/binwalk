@@ -6,17 +6,14 @@ pub const DESCRIPTION: &str = "TP-Link firmware header";
 
 /// TP-Link firmware headers start with these bytes
 pub fn tplink_magic() -> Vec<Vec<u8>> {
-    return vec![b"\x01\x00\x00\x00TP-LINK Technologies\x00\x00\x00\x00ver. 1.0".to_vec()];
+    vec![b"\x01\x00\x00\x00TP-LINK Technologies\x00\x00\x00\x00ver. 1.0".to_vec()]
 }
 
 /// Validates the TP-Link header
-pub fn tplink_parser(
-    file_data: &Vec<u8>,
-    offset: usize,
-) -> Result<SignatureResult, SignatureError> {
+pub fn tplink_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Successful return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_MEDIUM,
         ..Default::default()
@@ -37,5 +34,5 @@ pub fn tplink_parser(
         return Ok(result);
     }
 
-    return Err(SignatureError);
+    Err(SignatureError)
 }
