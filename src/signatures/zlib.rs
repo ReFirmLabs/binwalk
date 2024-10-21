@@ -16,7 +16,7 @@ pub fn zlib_magic() -> Vec<Vec<u8>> {
 /// Validate a zlib signature
 pub fn zlib_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         confidence: CONFIDENCE_HIGH,
         description: DESCRIPTION.to_string(),
         ..Default::default()

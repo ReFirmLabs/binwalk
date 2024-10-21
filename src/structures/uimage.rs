@@ -156,33 +156,27 @@ pub fn parse_uimage_header(uimage_data: &[u8]) -> Result<UImageHeader, Structure
     // Parse the first half of the header
     if let Ok(uimage_header) = common::parse(uimage_data, &uimage_structure, "big") {
         // Sanity check header fields
-        if valid_os_types.contains_key(&uimage_header["os_type"]) {
-            if valid_cpu_types.contains_key(&uimage_header["cpu_type"]) {
-                if valid_image_types.contains_key(&uimage_header["image_type"]) {
-                    if valid_compression_types.contains_key(&uimage_header["compression_type"]) {
-                        // Finally, validate the header CRC
-                        if let Some(crc_data) = uimage_data.get(0..UIMAGE_HEADER_SIZE) {
-                            if calculate_uimage_header_checksum(crc_data)
-                                == uimage_header["header_crc"]
-                            {
-                                return Ok(UImageHeader {
-                                    header_size: UIMAGE_HEADER_SIZE,
-                                    name: get_cstring(&uimage_data[UIMAGE_NAME_OFFSET..]),
-                                    data_size: uimage_header["data_size"],
-                                    data_checksum: uimage_header["data_crc"],
-                                    timestamp: uimage_header["creation_timestamp"],
-                                    compression_type: valid_compression_types
-                                        [&uimage_header["compression_type"]]
-                                        .to_string(),
-                                    cpu_type: valid_cpu_types[&uimage_header["cpu_type"]]
-                                        .to_string(),
-                                    os_type: valid_os_types[&uimage_header["os_type"]].to_string(),
-                                    image_type: valid_image_types[&uimage_header["image_type"]]
-                                        .to_string(),
-                                });
-                            }
-                        }
-                    }
+        if valid_os_types.contains_key(&uimage_header["os_type"])
+            && valid_cpu_types.contains_key(&uimage_header["cpu_type"])
+            && valid_image_types.contains_key(&uimage_header["image_type"])
+            && valid_compression_types.contains_key(&uimage_header["compression_type"])
+        {
+            // Finally, validate the header CRC
+            if let Some(crc_data) = uimage_data.get(0..UIMAGE_HEADER_SIZE) {
+                if calculate_uimage_header_checksum(crc_data) == uimage_header["header_crc"] {
+                    return Ok(UImageHeader {
+                        header_size: UIMAGE_HEADER_SIZE,
+                        name: get_cstring(&uimage_data[UIMAGE_NAME_OFFSET..]),
+                        data_size: uimage_header["data_size"],
+                        data_checksum: uimage_header["data_crc"],
+                        timestamp: uimage_header["creation_timestamp"],
+                        compression_type: valid_compression_types
+                            [&uimage_header["compression_type"]]
+                            .to_string(),
+                        cpu_type: valid_cpu_types[&uimage_header["cpu_type"]].to_string(),
+                        os_type: valid_os_types[&uimage_header["os_type"]].to_string(),
+                        image_type: valid_image_types[&uimage_header["image_type"]].to_string(),
+                    });
                 }
             }
         }

@@ -18,7 +18,7 @@ pub fn lzfse_magic() -> Vec<Vec<u8>> {
 /// Validate LZFSE signatures
 pub fn lzfse_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         confidence: CONFIDENCE_HIGH,
         description: DESCRIPTION.to_string(),
         ..Default::default()

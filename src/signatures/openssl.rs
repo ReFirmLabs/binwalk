@@ -18,7 +18,7 @@ pub fn openssl_crypt_parser(
 ) -> Result<SignatureResult, SignatureError> {
     // Success return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_LOW,
         ..Default::default()

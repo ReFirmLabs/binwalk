@@ -18,7 +18,7 @@ pub fn aes_sbox_parser(
 ) -> Result<SignatureResult, SignatureError> {
     // Successful return value
     let result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_LOW,
         ..Default::default()

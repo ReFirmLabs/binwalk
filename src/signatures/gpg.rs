@@ -16,7 +16,7 @@ pub fn gpg_signed_parser(
 ) -> Result<SignatureResult, SignatureError> {
     // Success result; confidence is high since this signature is only reported what it starts at the beginning of a file
     let result = SignatureResult {
-        offset: offset,
+        offset,
         confidence: CONFIDENCE_HIGH,
         description: GPG_SIGNED_DESCRIPTION.to_string(),
         ..Default::default()

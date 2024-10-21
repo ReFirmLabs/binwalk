@@ -810,11 +810,9 @@ pub fn execute(
                 result.do_not_recurse = extractor_definition.do_not_recurse;
 
                 // If the extractor reported success, make sure it extracted something other than just an empty file
-                if result.success {
-                    if !was_something_extracted(&result.output_directory) {
-                        result.success = false;
-                        warn!("Extractor exited successfully, but no data was extracted");
-                    }
+                if result.success && !was_something_extracted(&result.output_directory) {
+                    result.success = false;
+                    warn!("Extractor exited successfully, but no data was extracted");
                 }
             }
         }
@@ -914,7 +912,7 @@ fn spawn(
         Ok(child) => {
             // If the process was spawned successfully, return some information about the process
             let proc_info = ProcInfo {
-                child: child,
+                child,
                 carved_file: carved_file.clone(),
                 exit_codes: extractor.exit_codes,
             };

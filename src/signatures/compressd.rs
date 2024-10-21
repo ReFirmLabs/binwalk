@@ -15,7 +15,7 @@ pub fn compressd_parser(
 ) -> Result<SignatureResult, SignatureError> {
     // Successful return value; confidence is medium since this only matches magic bytes at the beginning of a file
     let result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_MEDIUM,
         ..Default::default()

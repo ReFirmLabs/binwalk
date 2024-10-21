@@ -19,7 +19,7 @@ pub fn zstd_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, S
     const MIN_BLOCK_COUNT: usize = 2;
 
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_HIGH,
         ..Default::default()

@@ -48,10 +48,8 @@ fn get_jpeg_data_size(jpeg_data: &[u8]) -> Option<usize> {
         let eof_candidate: usize = eof_match.start() + EOF_SIZE;
 
         // Make sure the expected EOF marker is not immediately followed by 0xFF (which would indicate the JPEG continues...)
-        if eof_candidate < jpeg_data.len() {
-            if jpeg_data[eof_candidate] == JPEG_DELIM {
-                continue;
-            }
+        if eof_candidate < jpeg_data.len() && jpeg_data[eof_candidate] == JPEG_DELIM {
+            continue;
         }
 
         return Some(eof_match.start() + EOF_SIZE);

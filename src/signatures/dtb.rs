@@ -13,7 +13,7 @@ pub fn dtb_magic() -> Vec<Vec<u8>> {
 pub fn dtb_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Sucessful result
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_MEDIUM,
         ..Default::default()

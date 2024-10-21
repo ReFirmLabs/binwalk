@@ -37,7 +37,7 @@ pub fn crc32_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, 
             CRC32_DESCRIPTION,
             hash_endianess(file_data, offset, crc32_magic())
         ),
-        offset: offset,
+        offset,
         size: HASH_MAGIC_LEN,
         ..Default::default()
     };
@@ -53,7 +53,7 @@ pub fn sha256_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult,
             SHA256_DESCRIPTION,
             hash_endianess(file_data, offset, sha256_magic())
         ),
-        offset: offset,
+        offset,
         size: HASH_MAGIC_LEN,
         ..Default::default()
     };

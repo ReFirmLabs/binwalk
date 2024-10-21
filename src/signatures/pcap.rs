@@ -13,7 +13,7 @@ pub fn pcapng_magic() -> Vec<Vec<u8>> {
 pub fn pcapng_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Successful return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: PCAPNG_DESCRIPTION.to_string(),
         confidence: CONFIDENCE_HIGH,
         ..Default::default()

@@ -16,7 +16,7 @@ pub fn pjl_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, Si
 
     // Successful return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_LOW,
         ..Default::default()

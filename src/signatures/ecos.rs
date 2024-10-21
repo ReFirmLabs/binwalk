@@ -32,7 +32,7 @@ pub fn exception_handler_parser(
 ) -> Result<SignatureResult, SignatureError> {
     // Successful return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: EXCEPTION_HANDLER_DESCRIPTION.to_string(),
         confidence: CONFIDENCE_LOW,
         ..Default::default()

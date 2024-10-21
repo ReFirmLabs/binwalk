@@ -18,7 +18,7 @@ pub fn cpio_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, S
     let mut header_count: usize = 0;
     let mut result = SignatureResult {
         description: DESCRIPTION.to_string(),
-        offset: offset,
+        offset,
         confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };

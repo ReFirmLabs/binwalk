@@ -15,7 +15,7 @@ pub fn rar_magic() -> Vec<Vec<u8>> {
 pub fn rar_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Success return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         ..Default::default()
     };

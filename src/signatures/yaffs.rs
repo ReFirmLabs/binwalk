@@ -26,7 +26,7 @@ pub fn yaffs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, 
 
     let mut result = SignatureResult {
         description: DESCRIPTION.to_string(),
-        offset: offset,
+        offset,
         size: 0,
         confidence: CONFIDENCE_MEDIUM,
         ..Default::default()

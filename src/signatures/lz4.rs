@@ -16,7 +16,7 @@ pub fn lz4_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, Si
     const CONTENT_CHECKSUM_LEN: usize = 4;
 
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         confidence: CONFIDENCE_MEDIUM,
         description: DESCRIPTION.to_string(),
         ..Default::default()

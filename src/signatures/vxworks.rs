@@ -34,7 +34,7 @@ pub fn wind_kernel_parser(
     const MAGIC_SIZE: usize = 13;
 
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: WIND_KERNEL_DESCRIPTION.to_string(),
         confidence: CONFIDENCE_LOW,
         ..Default::default()

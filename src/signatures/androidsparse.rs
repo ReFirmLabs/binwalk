@@ -17,7 +17,7 @@ pub fn android_sparse_parser(
 ) -> Result<SignatureResult, SignatureError> {
     // Default result, returned on success
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_HIGH,
         ..Default::default()

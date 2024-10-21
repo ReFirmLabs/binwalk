@@ -35,7 +35,7 @@ pub fn pem_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, Si
     const MIN_PEM_LEN: usize = 26;
 
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };

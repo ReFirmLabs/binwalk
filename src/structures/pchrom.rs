@@ -36,19 +36,18 @@ pub fn parse_pchrom_header(pch_data: &[u8]) -> Result<PCHRomHeader, StructureErr
             common::parse(pch_structure_data, &pch_rom_header_structure, "little")
         {
             // Sanity check the expected header values
-            if pch_header["flmap0_fcba"] == EXPECTED_FCBA {
-                if pch_header["flmap0_frba_nr"] == EXPECTED_FRBA {
-                    if expected_nc_values.contains(&pch_header["flmap0_nc"]) {
-                        // Parse the flash rom region entries to determine the total image size
-                        if let Ok(pch_regions_size) =
-                            get_pch_regions_size(pch_data, 0, pch_header["flmap0_fcba"])
-                        {
-                            return Ok(PCHRomHeader {
-                                header_size: HEADER_STRUCTURE_OFFSET,
-                                data_size: pch_regions_size,
-                            });
-                        }
-                    }
+            if pch_header["flmap0_fcba"] == EXPECTED_FCBA
+                && pch_header["flmap0_frba_nr"] == EXPECTED_FRBA
+                && expected_nc_values.contains(&pch_header["flmap0_nc"])
+            {
+                // Parse the flash rom region entries to determine the total image size
+                if let Ok(pch_regions_size) =
+                    get_pch_regions_size(pch_data, 0, pch_header["flmap0_fcba"])
+                {
+                    return Ok(PCHRomHeader {
+                        header_size: HEADER_STRUCTURE_OFFSET,
+                        data_size: pch_regions_size,
+                    });
                 }
             }
         }

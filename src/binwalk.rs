@@ -252,39 +252,35 @@ impl Binwalk {
                 let magic_start = FILE_START_OFFSET + signature.magic_offset;
                 let magic_end = magic_start + magic.len();
 
-                if file_data.len() > magic_end {
-                    if file_data[magic_start..magic_end] == magic {
-                        debug!(
-                            "Found {} short magic match at offset {:#X}",
-                            signature.description, magic_start
+                if file_data.len() > magic_end && file_data[magic_start..magic_end] == magic {
+                    debug!(
+                        "Found {} short magic match at offset {:#X}",
+                        signature.description, magic_start
+                    );
+
+                    if let Ok(mut signature_result) = (signature.parser)(file_data, magic_start) {
+                        // Auto populate some signature result fields
+                        signature_result_auto_populate(&mut signature_result, signature);
+
+                        // Add this signature to the file map
+                        file_map.push(signature_result.clone());
+                        info!(
+                            "Found valid {} short signature at offset {:#X}",
+                            signature_result.name, FILE_START_OFFSET
                         );
 
-                        if let Ok(mut signature_result) = (signature.parser)(file_data, magic_start)
-                        {
-                            // Auto populate some signature result fields
-                            signature_result_auto_populate(&mut signature_result, signature);
-
-                            // Add this signature to the file map
-                            file_map.push(signature_result.clone());
-                            info!(
-                                "Found valid {} short signature at offset {:#X}",
-                                signature_result.name, FILE_START_OFFSET
-                            );
-
-                            // Only update the next_valid_offset if confidence is at least medium
-                            if signature_result.confidence >= signatures::common::CONFIDENCE_MEDIUM
-                            {
-                                next_valid_offset = signature_result.offset + signature_result.size;
-                            }
-
-                            // Only one signature can match at fixed offset 0
-                            break;
-                        } else {
-                            debug!(
-                                "{} short signature match at offset {:#X} is invalid",
-                                signature.description, FILE_START_OFFSET
-                            );
+                        // Only update the next_valid_offset if confidence is at least medium
+                        if signature_result.confidence >= signatures::common::CONFIDENCE_MEDIUM {
+                            next_valid_offset = signature_result.offset + signature_result.size;
                         }
+
+                        // Only one signature can match at fixed offset 0
+                        break;
+                    } else {
+                        debug!(
+                            "{} short signature match at offset {:#X} is invalid",
+                            signature.description, FILE_START_OFFSET
+                        );
                     }
                 }
             }

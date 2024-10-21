@@ -32,7 +32,7 @@ pub fn jffs2_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, 
 
     let mut result = SignatureResult {
         size: 0,
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_HIGH,
         ..Default::default()

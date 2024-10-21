@@ -12,7 +12,7 @@ pub fn packimg_magic() -> Vec<Vec<u8>> {
 /// Parse a PackIMG signature
 pub fn packimg_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         ..Default::default()
     };

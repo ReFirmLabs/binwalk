@@ -40,7 +40,7 @@ pub fn gzip_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, S
                     gzip_header.size + deflate_data_size + GZIP_CRC_SIZE + GZIP_ISIZE_SIZE;
 
                 return Ok(SignatureResult {
-                    offset: offset,
+                    offset,
                     size: total_size,
                     confidence: CONFIDENCE_HIGH,
                     description: format!(

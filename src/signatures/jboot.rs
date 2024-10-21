@@ -79,7 +79,7 @@ pub fn jboot_stag_parser(
 ) -> Result<SignatureResult, SignatureError> {
     // Successful return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: JBOOT_STAG_DESCRIPTION.to_string(),
         confidence: CONFIDENCE_LOW,
         ..Default::default()
@@ -117,7 +117,7 @@ pub fn jboot_sch2_parser(
 ) -> Result<SignatureResult, SignatureError> {
     // Successful return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: JBOOT_SCH2_DESCRIPTION.to_string(),
         confidence: CONFIDENCE_HIGH,
         ..Default::default()

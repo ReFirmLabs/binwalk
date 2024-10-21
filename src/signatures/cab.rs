@@ -27,7 +27,7 @@ pub fn cab_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, Si
                     cab_header.header_size,
                     cab_header.total_size
                 ),
-                offset: offset,
+                offset,
                 size: cab_header.total_size,
                 confidence: CONFIDENCE_MEDIUM,
                 ..Default::default()

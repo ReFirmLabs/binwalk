@@ -32,7 +32,7 @@ pub fn sevenzip_parser(file_data: &[u8], offset: usize) -> Result<SignatureResul
 
                 // Report signature result
                 return Ok(SignatureResult {
-                    offset: offset,
+                    offset,
                     size: total_size,
                     confidence: CONFIDENCE_HIGH,
                     description: format!(

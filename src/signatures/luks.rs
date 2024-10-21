@@ -13,7 +13,7 @@ pub fn luks_magic() -> Vec<Vec<u8>> {
 pub fn luks_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Successful result
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         name: "luks".to_string(),
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_MEDIUM,

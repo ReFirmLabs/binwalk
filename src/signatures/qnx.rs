@@ -17,7 +17,7 @@ pub fn qnx_ifs_magic() -> Vec<Vec<u8>> {
 pub fn qnx_ifs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Success return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: IFS_DESCRIPTION.to_string(),
         ..Default::default()
     };

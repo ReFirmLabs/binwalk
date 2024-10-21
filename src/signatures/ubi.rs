@@ -23,7 +23,7 @@ pub fn ubifs_magic() -> Vec<Vec<u8>> {
 pub fn ubifs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Success return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: UBI_FS_DESCRIPTION.to_string(),
         confidence: CONFIDENCE_HIGH,
         ..Default::default()
@@ -44,7 +44,7 @@ pub fn ubifs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, 
 pub fn ubi_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Success return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: UBI_IMAGE_DESCRIPTION.to_string(),
         confidence: CONFIDENCE_HIGH,
         ..Default::default()

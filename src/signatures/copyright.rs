@@ -23,7 +23,7 @@ pub fn copyright_parser(
 
     // Successful return value
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: DESCRIPTION.to_string(),
         confidence: CONFIDENCE_HIGH,
         ..Default::default()

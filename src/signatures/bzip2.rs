@@ -24,7 +24,7 @@ pub fn bzip2_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, 
     // Return value
     let mut result = SignatureResult {
         description: DESCRIPTION.to_string(),
-        offset: offset,
+        offset,
         confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };

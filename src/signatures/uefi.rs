@@ -68,7 +68,7 @@ pub fn uefi_capsule_parser(
     // Success return value
     let mut result = SignatureResult {
         description: CAPSULE_DESCRIPTION.to_string(),
-        offset: offset,
+        offset,
         size: 0,
         confidence: CONFIDENCE_MEDIUM,
         ..Default::default()

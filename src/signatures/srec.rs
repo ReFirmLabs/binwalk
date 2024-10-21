@@ -23,7 +23,7 @@ pub fn srec_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, S
     const WINDOWS_TERMINATING_CHARACTER: u8 = 0x0D;
 
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         description: SREC_DESCRIPTION.to_string(),
         confidence: CONFIDENCE_HIGH,
         ..Default::default()

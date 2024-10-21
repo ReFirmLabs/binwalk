@@ -68,7 +68,7 @@ pub fn linux_boot_image_parser(
 
     let result = SignatureResult {
         description: LINUX_BOOT_IMAGE_DESCRIPTION.to_string(),
-        offset: offset,
+        offset,
         size: 0,
         ..Default::default()
     };
@@ -107,7 +107,7 @@ pub fn linux_kernel_version_parser(
     const GCC_VERSION_STRING: &str = "gcc ";
 
     let mut result = SignatureResult {
-        offset: offset,
+        offset,
         confidence: CONFIDENCE_LOW,
         ..Default::default()
     };

@@ -25,7 +25,7 @@ pub fn pdf_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, Si
 
     let mut result = SignatureResult {
         description: DESCRIPTION.to_string(),
-        offset: offset,
+        offset,
         size: 0,
         ..Default::default()
     };
