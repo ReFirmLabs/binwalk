@@ -52,5 +52,5 @@ pub struct CliArgs {
 }
 
 pub fn parse() -> CliArgs {
-    return CliArgs::parse();
+    CliArgs::parse()
 }

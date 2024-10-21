@@ -1,6 +1,5 @@
 //! Common Functions
 use chrono::prelude::DateTime;
-use crc32_v2;
 use log::{debug, error};
 use std::fs::File;
 use std::io::Read;

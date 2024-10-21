@@ -7,7 +7,6 @@ use std::collections::HashMap;
 use std::io;
 use std::io::Write;
 use std::time;
-use termsize;
 
 const DELIM_CHARACTER: &str = "-";
 const DEFAULT_TERMINAL_WIDTH: u16 = 200;
@@ -16,24 +15,22 @@ const COLUMN1_WIDTH: usize = 35;
 const COLUMN2_WIDTH: usize = 35;
 
 fn terminal_width() -> usize {
-    let terminal_width: u16;
-
-    match termsize::get() {
-        Some(ts) => terminal_width = ts.cols,
-        None => terminal_width = DEFAULT_TERMINAL_WIDTH,
+    let terminal_width: u16 = match termsize::get() {
+        Some(ts) => ts.cols,
+        None => DEFAULT_TERMINAL_WIDTH,
     };
 
-    return terminal_width as usize;
+    terminal_width as usize
 }
 
 fn line_delimiter() -> String {
     let mut delim: String = "".to_string();
 
     for _i in 0..terminal_width() {
-        delim = delim + DELIM_CHARACTER;
+        delim += DELIM_CHARACTER;
     }
 
-    return delim;
+    delim
 }
 
 fn center_text(text: &String) -> String {
@@ -55,7 +52,7 @@ fn center_text(text: &String) -> String {
 
     centered_string += text;
 
-    return centered_string;
+    centered_string
 }
 
 fn pad_to_length(text: &str, len: usize) -> String {
@@ -72,13 +69,13 @@ fn pad_to_length(text: &str, len: usize) -> String {
     }
 
     for _i in 0..pad_size {
-        padded_string = padded_string + " ";
+        padded_string += " ";
     }
 
-    return padded_string;
+    padded_string
 }
 
-fn line_wrap(text: &String, prefix_size: usize) -> String {
+fn line_wrap(text: &str, prefix_size: usize) -> String {
     let mut this_line = "".to_string();
     let mut formatted_string = "".to_string();
     let max_line_size: usize = terminal_width() - prefix_size;
@@ -89,7 +86,7 @@ fn line_wrap(text: &String, prefix_size: usize) -> String {
         } else {
             formatted_string = formatted_string + &this_line + "\n";
             for _i in 0..prefix_size {
-                formatted_string = formatted_string + " ";
+                formatted_string += " ";
             }
             this_line = word.to_string() + " ";
         }
@@ -116,7 +113,7 @@ fn print_delimiter() {
 }
 
 fn print_header(title_text: &String) {
-    println!("");
+    println!();
     println!("{}", center_text(title_text).bold().magenta());
     print_delimiter();
     print_column_headers("DECIMAL", "HEXADECIMAL", "DESCRIPTION");
@@ -125,7 +122,7 @@ fn print_header(title_text: &String) {
 
 fn print_footer() {
     print_delimiter();
-    println!("");
+    println!();
 }
 
 fn print_signature(signature: &signatures::common::SignatureResult) {
@@ -169,7 +166,7 @@ fn print_extraction(
             .yellow();
         }
         Some(extraction_result) => {
-            if extraction_result.success == true {
+            if extraction_result.success {
                 extraction_message = format!(
                     "[+] Extraction of {} data at offset {:#X} completed successfully",
                     signature.name, signature.offset
@@ -201,7 +198,7 @@ fn print_extractions(
         let mut extraction_result: Option<&extractors::common::ExtractionResult> = None;
 
         // Only print extraction results if an extraction was attempted or explicitly declined
-        if signature.extraction_declined == true {
+        if signature.extraction_declined {
             printable_extraction = true
         } else if extraction_results.contains_key(&signature.id) {
             printable_extraction = true;
@@ -210,7 +207,7 @@ fn print_extractions(
 
         if printable_extraction {
             // Only print the delimiter line once
-            if delimiter_printed == false {
+            if !delimiter_printed {
                 print_delimiter();
                 delimiter_printed = true;
             }
@@ -220,7 +217,7 @@ fn print_extractions(
 }
 
 pub fn print_analysis_results(quiet: bool, extraction_attempted: bool, results: &AnalysisResults) {
-    if quiet == true {
+    if quiet {
         return;
     }
 
@@ -253,7 +250,7 @@ pub fn print_signature_list(quiet: bool, signatures: &Vec<signatures::common::Si
     let mut sorted_descriptions: Vec<String> = vec![];
     let mut signature_lookup: HashMap<String, SignatureInfo> = HashMap::new();
 
-    if quiet == true {
+    if quiet {
         return;
     }
 
@@ -306,7 +303,7 @@ pub fn print_signature_list(quiet: bool, signatures: &Vec<signatures::common::Si
         signature_count += 1;
 
         // If there is an extractor for this signature, increment extractor count
-        if signature_info.has_extractor == true {
+        if signature_info.has_extractor {
             extractor_count += 1;
         }
 
@@ -331,7 +328,7 @@ pub fn print_signature_list(quiet: bool, signatures: &Vec<signatures::common::Si
             siginfo.extractor
         );
 
-        if siginfo.is_short == true {
+        if siginfo.is_short {
             println!("{}", display_line.yellow());
         } else {
             println!("{}", display_line.green());
@@ -339,7 +336,7 @@ pub fn print_signature_list(quiet: bool, signatures: &Vec<signatures::common::Si
     }
 
     print_delimiter();
-    println!("");
+    println!();
     println!("Total signatures: {}", signature_count);
     println!("Extractable signatures: {}", extractor_count);
 }
@@ -359,21 +356,21 @@ pub fn print_stats(
     let mut units = "milliseconds";
     let mut display_time: f64 = run_time.elapsed().as_millis() as f64;
 
-    if quiet == true {
+    if quiet {
         return;
     }
 
     // Format the output time in a more human-readable manner
     if display_time >= MS_IN_A_SECOND {
-        display_time = display_time / MS_IN_A_SECOND;
+        display_time /= MS_IN_A_SECOND;
         units = "seconds";
 
         if display_time >= SECONDS_IN_A_MINUTE {
-            display_time = display_time / SECONDS_IN_A_MINUTE;
+            display_time /= SECONDS_IN_A_MINUTE;
             units = "minutes";
 
             if display_time >= MINUTES_IN_AN_HOUR {
-                display_time = display_time / MINUTES_IN_AN_HOUR;
+                display_time /= MINUTES_IN_AN_HOUR;
                 units = "hours";
             }
         }
@@ -390,14 +387,14 @@ pub fn print_stats(
 }
 
 pub fn print_plain(quiet: bool, msg: &str) {
-    if quiet == false {
+    if !quiet {
         print!("{}", msg);
         let _ = io::stdout().flush();
     }
 }
 
 pub fn println_plain(quiet: bool, msg: &str) {
-    if quiet == false {
+    if !quiet {
         println!("{}", msg);
     }
 }
