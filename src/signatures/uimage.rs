@@ -32,7 +32,7 @@ pub fn uimage_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult,
                 // Configure SignatureResult; decline extraction if data size is 0 (looking at you, DD-WRT)
                 result.size = uimage_size;
                 result.extraction_declined = uimage_header.data_size == 0;
-                result.description = format!("{}, header size: {} bytes, data size: {} bytes, compression: {}, CPU: {}, OS: {}, image type: {}, creation time: {}, image name: \"{}\"",
+                result.description = format!("{}, header size: {} bytes, data size: {} bytes, compression: {}, CPU: {}, OS: {}, image type: {}, load address: {:#X}, entry point: {:#X}, creation time: {}, image name: \"{}\"",
                                                                                                                                     result.description,
                                                                                                                                     uimage_header.header_size,
                                                                                                                                     uimage_header.data_size,
@@ -40,6 +40,8 @@ pub fn uimage_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult,
                                                                                                                                     uimage_header.cpu_type,
                                                                                                                                     uimage_header.os_type,
                                                                                                                                     uimage_header.image_type,
+                                                                                                                                    uimage_header.load_address,
+                                                                                                                                    uimage_header.entry_point_address,
                                                                                                                                     epoch_to_string(uimage_header.timestamp as u32),
                                                                                                                                     uimage_header.name);
 

@@ -9,6 +9,8 @@ pub struct UImageHeader {
     pub name: String,
     pub data_size: usize,
     pub data_checksum: usize,
+    pub load_address: usize,
+    pub entry_point_address: usize,
     pub timestamp: usize,
     pub compression_type: String,
     pub cpu_type: String,
@@ -170,6 +172,8 @@ pub fn parse_uimage_header(uimage_data: &[u8]) -> Result<UImageHeader, Structure
                         data_size: uimage_header["data_size"],
                         data_checksum: uimage_header["data_crc"],
                         timestamp: uimage_header["creation_timestamp"],
+                        load_address: uimage_header["load_address"],
+                        entry_point_address: uimage_header["entry_point_address"],
                         compression_type: valid_compression_types
                             [&uimage_header["compression_type"]]
                             .to_string(),
