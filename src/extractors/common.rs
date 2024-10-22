@@ -596,8 +596,20 @@ impl Chroot {
         // Remove the chroot directory from the target and symlink paths.
         // This results in each being an absolute path that is relative to the chroot directory,
         // e.g., '/my_chroot_dir/bin/busybox' -> '/bin/busybox'.
-        let mut safe_target_rel_path = safe_target.replacen(&self.chroot_directory, "", 1);
-        let safe_symlink_rel_path = safe_symlink.replacen(&self.chroot_directory, "", 1);
+        //
+        // Note: need at least one leading '/', so if the chroot directory is just '/', just use the string as-is.
+        let mut safe_target_rel_path = if self.chroot_directory == path::MAIN_SEPARATOR.to_string()
+        {
+            safe_target.clone()
+        } else {
+            safe_target.replacen(&self.chroot_directory, "", 1)
+        };
+
+        let safe_symlink_rel_path = if self.chroot_directory == path::MAIN_SEPARATOR.to_string() {
+            safe_symlink.clone()
+        } else {
+            safe_symlink.replacen(&self.chroot_directory, "", 1)
+        };
 
         // Count the number of path separators (minus the leading one) and an '../' to the target
         // path for each; e.g., '/bin/busybox' -> '..//bin/busybox'.
