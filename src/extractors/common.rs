@@ -543,8 +543,7 @@ impl Chroot {
     /// Creates a symbolic link in the chroot directory, named `symlink_path`, which points to `target_path`.
     ///
     /// Note that both the symlink and target paths will be sanitized to stay in the chroot directory.
-    /// Both the symlink and target paths will be *absolute*, meaning that symlinks will break if the
-    /// symlink is later moved to a different absolute directory.
+    /// Both the target path will be converted into a path relative to the symlink file path.
     ///
     /// ## Example
     ///
@@ -565,9 +564,6 @@ impl Chroot {
         symlink_path: impl Into<String>,
         target_path: impl Into<String>,
     ) -> bool {
-        let safe_target: String;
-        let safe_target_path: &path::Path;
-
         let target = target_path.into();
         let symlink = symlink_path.into();
 
@@ -575,10 +571,10 @@ impl Chroot {
         let safe_symlink = self.chrooted_path(&symlink);
         let safe_symlink_path = path::Path::new(&safe_symlink);
 
-        if target.starts_with(path::MAIN_SEPARATOR) {
+        // Normalize the symlink target path to a chrooted absolute path
+        let safe_target = if target.starts_with(path::MAIN_SEPARATOR) {
             // If the target path is absolute, just chroot it inside the chroot directory
-            safe_target = self.chrooted_path(&target);
-            safe_target_path = path::Path::new(&safe_target);
+            self.chrooted_path(&target)
         } else {
             // Get the symlink file's parent directory path
             let relative_dir: String = match safe_symlink_path.parent() {
@@ -594,9 +590,32 @@ impl Chroot {
 
             // Join the target path with its relative directory, ensuring it does not traverse outside
             // the specified chroot directory
-            safe_target = self.safe_path_join(&relative_dir, &target);
-            safe_target_path = path::Path::new(&safe_target);
+            self.safe_path_join(&relative_dir, &target)
+        };
+
+        // Remove the chroot directory from the target and symlink paths.
+        // This results in each being an absolute path that is relative to the chroot directory,
+        // e.g., '/my_chroot_dir/bin/busybox' -> '/bin/busybox'.
+        let mut safe_target_rel_path = safe_target.replacen(&self.chroot_directory, "", 1);
+        let safe_symlink_rel_path = safe_symlink.replacen(&self.chroot_directory, "", 1);
+
+        // Count the number of path separators (minus the leading one) and an '../' to the target
+        // path for each; e.g., '/bin/busybox' -> '..//bin/busybox'.
+        for _i in 0..safe_symlink_rel_path.matches(path::MAIN_SEPARATOR).count() - 1 {
+            safe_target_rel_path = format!("..{}{}", path::MAIN_SEPARATOR, safe_target_rel_path);
         }
+
+        // Add a './' at the beginning of the target path and remove any double slashes;
+        // e.g., '..//bin/busybox' -> './../bin/busybox'.
+        safe_target_rel_path = format!(".{}{}", path::MAIN_SEPARATOR, safe_target_rel_path);
+        safe_target_rel_path = self.strip_double_slash(&safe_target_rel_path);
+
+        // The target path is now a safely chrooted path that is relative to the symlink file path.
+        // Ex:
+        //
+        //     Original symlink: "/my_chroot_dir/usr/sbin/ls" is a symlink to "/bin/busybox"
+        //     Safe relative symlink: "/my_chroot_dir/usr/sbin/ls" is a symlink to "./../../bin/busybox"
+        let safe_target_path = path::Path::new(&safe_target_rel_path);
 
         #[cfg(unix)]
         {
