@@ -605,9 +605,12 @@ impl Chroot {
             safe_target_rel_path = format!("..{}{}", path::MAIN_SEPARATOR, safe_target_rel_path);
         }
 
-        // Add a './' at the beginning of the target path and remove any double slashes;
-        // e.g., '..//bin/busybox' -> './../bin/busybox'.
-        safe_target_rel_path = format!(".{}{}", path::MAIN_SEPARATOR, safe_target_rel_path);
+        // Add a '.' at the beginning of any paths that start with '/', e.g., '/tmp' -> './tmp'.
+        if safe_target_rel_path.starts_with(path::MAIN_SEPARATOR) {
+            safe_target_rel_path = format!(".{}", safe_target_rel_path);
+        }
+
+        // Replace any instances of '//' with '/'
         safe_target_rel_path = self.strip_double_slash(&safe_target_rel_path);
 
         // The target path is now a safely chrooted path that is relative to the symlink file path.
