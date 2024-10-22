@@ -26,6 +26,10 @@ fn main() {
     // Number of seconds to wait before printing debug progress info
     const PROGRESS_INTERVAL: u64 = 30;
 
+    // If this env var is set during extraction, the Binwalk.base_target_file symlink will
+    // be deleted at the end of extraction.
+    const BINWALK_RM_SYMLINK: &str = "BINWALK_RM_EXTRACTION_SYMLINK";
+
     // Output directory for extracted files
     let mut output_directory: Option<String> = None;
 
@@ -210,6 +214,16 @@ fn main() {
                     }
                 }
             }
+        }
+    }
+
+    // If BINWALK_RM_SYMLINK env var was set, delete the base_target_file symlink
+    if cliargs.extract && std::env::var(BINWALK_RM_SYMLINK).is_ok() {
+        if let Err(e) = std::fs::remove_file(&binwalker.base_target_file) {
+            error!(
+                "Request to remove extraction symlink file {} failed: {}",
+                binwalker.base_target_file, e
+            );
         }
     }
 
