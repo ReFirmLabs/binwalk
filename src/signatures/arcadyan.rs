@@ -1,5 +1,5 @@
 use crate::extractors::arcadyan::extract_obfuscated_lzma;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
+use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 
 /// Human readable description
 pub const DESCRIPTION: &str = "Arcadyan obfuscated LZMA";
@@ -20,7 +20,7 @@ pub fn obfuscated_lzma_parser(
     // Success return value
     let mut result = SignatureResult {
         description: DESCRIPTION.to_string(),
-        confidence: CONFIDENCE_MEDIUM,
+        confidence: CONFIDENCE_HIGH,
         ..Default::default()
     };
 
