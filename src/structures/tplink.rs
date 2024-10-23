@@ -76,7 +76,8 @@ pub struct TPLinkRTOSFirmwareHeader {
     pub header_size: usize,
     pub total_size: usize,
     pub model_number: usize,
-    pub hardware_revision: usize,
+    pub hardware_rev_major: usize,
+    pub hardware_rev_minor: usize,
 }
 
 /// Parse a TP-Link RTOS firmware header
@@ -94,7 +95,8 @@ pub fn parse_tplink_rtos_header(
         ("magic2", "u32"),
         ("data_size", "u32"),
         ("model_number", "u16"),
-        ("hardware_revision", "u8"),
+        ("hardware_revision_major", "u8"),
+        ("hardware_revision_minor", "u8"),
     ];
 
     if let Ok(header) = common::parse(tplink_data, &tplink_rtos_structure, "big") {
@@ -103,7 +105,8 @@ pub fn parse_tplink_rtos_header(
                 header_size: HEADER_SIZE,
                 total_size: header["data_size"] + TOTAL_SIZE_OFFSET,
                 model_number: header["model_number"],
-                hardware_revision: header["hardware_revision"],
+                hardware_rev_major: header["hardware_revision_major"],
+                hardware_rev_minor: header["hardware_revision_minor"],
             });
         }
     }

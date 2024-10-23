@@ -58,10 +58,11 @@ pub fn tplink_rtos_parser(
     };
 
     if let Ok(fw_header) = parse_tplink_rtos_header(&file_data[offset..]) {
-        result.description = format!("{}, model number: {:X}, hardware version: {:X}, header size: {} bytes, total size: {} bytes",
+        result.description = format!("{}, model number: {:X}, hardware version: {:X}.{:X}, header size: {} bytes, total size: {} bytes",
             result.description,
             fw_header.model_number,
-            fw_header.hardware_revision,
+            fw_header.hardware_rev_major,
+            fw_header.hardware_rev_minor,
             fw_header.header_size,
             fw_header.total_size,
         );
