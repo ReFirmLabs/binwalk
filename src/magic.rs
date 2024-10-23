@@ -866,6 +866,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::luks::DESCRIPTION.to_string(),
             extractor: None,
         },
+        // TP-Link RTOS
+        signatures::common::Signature {
+            name: "tplink_rtos".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::tplink::tplink_rtos_magic(),
+            parser: signatures::tplink::tplink_rtos_parser,
+            description: signatures::tplink::RTOS_DESCRIPTION.to_string(),
+            extractor: None,
+        },
     ];
 
     binary_signatures
