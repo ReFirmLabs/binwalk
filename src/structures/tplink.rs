@@ -69,3 +69,44 @@ pub fn parse_tplink_header(tplink_data: &[u8]) -> Result<TPLinkFirmwareHeader, S
 
     Err(StructureError)
 }
+
+/// Stores info about a TP-Link RTOS firmware header
+#[derive(Debug, Default, Clone)]
+pub struct TPLinkRTOSFirmwareHeader {
+    pub header_size: usize,
+    pub total_size: usize,
+    pub model_number: usize,
+    pub hardware_revision: usize,
+}
+
+/// Parse a TP-Link RTOS firmware header
+pub fn parse_tplink_rtos_header(
+    tplink_data: &[u8],
+) -> Result<TPLinkRTOSFirmwareHeader, StructureError> {
+    const HEADER_SIZE: usize = 0x94;
+    const MAGIC2_VALUE: usize = 0x494D4730;
+    const TOTAL_SIZE_OFFSET: usize = 20;
+
+    let tplink_rtos_structure = vec![
+        ("magic1", "u32"),
+        ("unknown1", "u64"),
+        ("unknown2", "u64"),
+        ("magic2", "u32"),
+        ("data_size", "u32"),
+        ("model_number", "u16"),
+        ("hardware_revision", "u8"),
+    ];
+
+    if let Ok(header) = common::parse(tplink_data, &tplink_rtos_structure, "big") {
+        if header["magic2"] == MAGIC2_VALUE {
+            return Ok(TPLinkRTOSFirmwareHeader {
+                header_size: HEADER_SIZE,
+                total_size: header["data_size"] + TOTAL_SIZE_OFFSET,
+                model_number: header["model_number"],
+                hardware_revision: header["hardware_revision"],
+            });
+        }
+    }
+
+    Err(StructureError)
+}
