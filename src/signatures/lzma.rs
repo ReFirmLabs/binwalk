@@ -73,7 +73,7 @@ pub fn lzma_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, S
                     lzma_header.properties,
                     lzma_header.dictionary_size,
                     result.size,
-                    lzma_header.decompressed_size
+                    lzma_header.decompressed_size as i64
                 );
                 return Ok(result);
             }
