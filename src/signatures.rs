@@ -108,6 +108,7 @@
 pub mod aes;
 pub mod androidsparse;
 pub mod arcadyan;
+pub mod binhdr;
 pub mod bzip2;
 pub mod cab;
 pub mod cfe;

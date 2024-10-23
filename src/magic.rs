@@ -877,6 +877,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::tplink::RTOS_DESCRIPTION.to_string(),
             extractor: None,
         },
+        // BIN firmware header
+        signatures::common::Signature {
+            name: "binhdr".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::binhdr::bin_hdr_magic(),
+            parser: signatures::binhdr::bin_hdr_parser,
+            description: signatures::binhdr::DESCRIPTION.to_string(),
+            extractor: None,
+        },
     ];
 
     binary_signatures
