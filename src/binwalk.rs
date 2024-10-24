@@ -19,6 +19,7 @@ use crate::extractors;
 use crate::magic;
 use crate::signatures;
 
+/// Returned on initialization error
 #[derive(Debug, Default, Clone)]
 pub struct BinwalkError;
 
@@ -100,12 +101,19 @@ impl Binwalk {
     /// ## Example
     ///
     /// ```
+    /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_binwalk_rs_102_0() -> Result<binwalk::Binwalk, binwalk::BinwalkError> {
     /// use binwalk::Binwalk;
     ///
     /// // Don't scan for these file signatures
     /// let exclude_filters: Vec<String> = vec!["jpeg".to_string(), "png".to_string()];
     ///
-    /// let binwalker = Binwalk::configure(None, None, None, Some(exclude_filters), None).unwrap();
+    /// let binwalker = Binwalk::configure(None,
+    ///                                    None,
+    ///                                    None,
+    ///                                    Some(exclude_filters),
+    ///                                    None)?;
+    /// # Ok(binwalker)
+    /// # } _doctest_main_src_binwalk_rs_102_0(); }
     /// ```
     pub fn configure(
         target_file_name: Option<String>,
@@ -525,13 +533,18 @@ impl Binwalk {
     /// ## Example
     ///
     /// ```
+    /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_binwalk_rs_529_0() -> Result<binwalk::Binwalk, binwalk::BinwalkError> {
     /// use binwalk::Binwalk;
     ///
     /// # std::fs::remove_dir_all("/tmp/foobar");
     /// let target_path = "/usr/share/man/man2/accept.2.gz".to_string();
     /// let extraction_directory = "/tmp/foobar/extractions".to_string();
     ///
-    /// let binwalker = Binwalk::configure(Some(target_path), Some(extraction_directory), None, None, None).unwrap();
+    /// let binwalker = Binwalk::configure(Some(target_path),
+    ///                                    Some(extraction_directory),
+    ///                                    None,
+    ///                                    None,
+    ///                                    None)?;
     ///
     /// let file_data = std::fs::read(&binwalker.base_target_file).expect("Unable to read file");
     ///
@@ -542,6 +555,8 @@ impl Binwalk {
     /// assert_eq!(extraction_results.len(),  1);
     /// assert_eq!(std::path::Path::new("/tmp/foobar/extractions/accept.2.gz.extracted/0/decompressed.bin").exists(), true);
     /// # std::fs::remove_dir_all("/tmp/foobar");
+    /// # Ok(binwalker)
+    /// # } _doctest_main_src_binwalk_rs_529_0(); }
     /// ```
     pub fn extract(
         &self,
@@ -619,13 +634,18 @@ impl Binwalk {
     /// ## Example
     ///
     /// ```
+    /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_binwalk_rs_624_0() -> Result<binwalk::Binwalk, binwalk::BinwalkError> {
     /// use binwalk::Binwalk;
     ///
     /// # std::fs::remove_dir_all("/tmp/foobar");
     /// let target_path = "/usr/share/man/man2/accept.2.gz".to_string();
     /// let extraction_directory = "/tmp/foobar/extractions".to_string();
     ///
-    /// let binwalker = Binwalk::configure(Some(target_path), Some(extraction_directory), None, None, None).unwrap();
+    /// let binwalker = Binwalk::configure(Some(target_path),
+    ///                                    Some(extraction_directory),
+    ///                                    None,
+    ///                                    None,
+    ///                                    None)?;
     ///
     /// let analysis_results = binwalker.analyze(&binwalker.base_target_file, true);
     ///
@@ -633,6 +653,8 @@ impl Binwalk {
     /// assert_eq!(analysis_results.extractions.len(),  1);
     /// assert_eq!(std::path::Path::new("/tmp/foobar/extractions/accept.2.gz.extracted/0/decompressed.bin").exists(), true);
     /// # std::fs::remove_dir_all("/tmp/foobar");
+    /// # Ok(binwalker)
+    /// # } _doctest_main_src_binwalk_rs_624_0(); }
     /// ```
     pub fn analyze(&self, target_file: &String, do_extraction: bool) -> AnalysisResults {
         // Return value

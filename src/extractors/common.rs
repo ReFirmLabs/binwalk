@@ -211,6 +211,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
+    /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_extractors_common_rs_213_0() -> Result<(), Box<dyn std::error::Error>> {
     /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
@@ -220,8 +221,10 @@ impl Chroot {
     /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
     /// assert_eq!(chroot.create_file("created_file.txt", file_data), true);
-    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/created_file.txt").unwrap(), "foobar");
+    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/created_file.txt")?, "foobar");
     /// # std::fs::remove_dir_all("/tmp/foobar");
+    /// # Ok(())
+    /// # } _doctest_main_src_extractors_common_rs_213_0(); }
     /// ```
     pub fn create_file(&self, file_path: impl Into<String>, file_data: &[u8]) -> bool {
         let safe_file_path: String = self.chrooted_path(file_path);
@@ -250,6 +253,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
+    /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_extractors_common_rs_255_0() -> Result<(), Box<dyn std::error::Error>> {
     /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
@@ -259,8 +263,10 @@ impl Chroot {
     /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
     /// assert_eq!(chroot.carve_file("carved_file.txt", file_data_with_trailing_junk, 0, 6), true);
-    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/carved_file.txt").unwrap(), "foobar");
+    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/carved_file.txt")?, "foobar");
     /// # std::fs::remove_dir_all("/tmp/foobar");
+    /// # Ok(())
+    /// } _doctest_main_src_extractors_common_rs_255_0(); }
     /// ```
     pub fn carve_file(
         &self,
@@ -304,6 +310,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
+    /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_extractors_common_rs_312_0() -> Result<(), Box<dyn std::error::Error>> {
     /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
@@ -314,8 +321,10 @@ impl Chroot {
     /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
     /// assert_eq!(chroot.create_character_device("char_device", dev_major, dev_minor), true);
-    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/char_device").unwrap(), "c 1 2");
+    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/char_device")?, "c 1 2");
     /// # std::fs::remove_dir_all("/tmp/foobar");
+    /// # Ok(())
+    /// # } _doctest_main_src_extractors_common_rs_312_0(); }
     /// ```
     pub fn create_character_device(
         &self,
@@ -333,6 +342,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
+    /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_extractors_common_rs_345_0() -> Result<(), Box<dyn std::error::Error>> {
     /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
@@ -343,8 +353,10 @@ impl Chroot {
     /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
     /// assert_eq!(chroot.create_block_device("block_device", dev_major, dev_minor), true);
-    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/block_device").unwrap(), "b 1 2");
+    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/block_device")?, "b 1 2");
     /// # std::fs::remove_dir_all("/tmp/foobar");
+    /// # Ok(())
+    /// # } _doctest_main_src_extractors_common_rs_345_0(); }
     /// ```
     pub fn create_block_device(
         &self,
@@ -362,6 +374,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
+    /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_extractors_common_rs_377_0() -> Result<(), Box<dyn std::error::Error>> {
     /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
@@ -370,8 +383,10 @@ impl Chroot {
     /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
     /// assert_eq!(chroot.create_fifo("fifo_file"), true);
-    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/fifo_file").unwrap(), "fifo");
+    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/fifo_file")?, "fifo");
     /// # std::fs::remove_dir_all("/tmp/foobar");
+    /// # Ok(())
+    /// # } _doctest_main_src_extractors_common_rs_377_0(); }
     /// ```
     pub fn create_fifo(&self, file_path: impl Into<String>) -> bool {
         self.create_file(file_path, b"fifo")
@@ -384,6 +399,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
+    /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_extractors_common_rs_401_0() -> Result<(), Box<dyn std::error::Error>> {
     /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
@@ -392,8 +408,10 @@ impl Chroot {
     /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
     /// assert_eq!(chroot.create_socket("socket_file"), true);
-    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/socket_file").unwrap(), "socket");
+    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/socket_file")?, "socket");
     /// # std::fs::remove_dir_all("/tmp/foobar");
+    /// # Ok(())
+    /// # } _doctest_main_src_extractors_common_rs_401_0(); }
     /// ```
     pub fn create_socket(&self, file_path: impl Into<String>) -> bool {
         self.create_file(file_path, b"socket")
@@ -406,6 +424,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
+    /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_extractors_common_rs_426_0() -> Result<(), Box<dyn std::error::Error>> {
     /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
@@ -415,8 +434,10 @@ impl Chroot {
     /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
     /// assert_eq!(chroot.append_to_file("append.txt", my_file_data), true);
-    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/append.txt").unwrap(), "foobar");
+    /// assert_eq!(std::fs::read_to_string("/tmp/foobar/append.txt")?, "foobar");
     /// # std::fs::remove_dir_all("/tmp/foobar");
+    /// # Ok(())
+    /// # } _doctest_main_src_extractors_common_rs_426_0(); }
     /// ```
     pub fn append_to_file(&self, file_path: impl Into<String>, data: &[u8]) -> bool {
         let safe_file_path: String = self.chrooted_path(file_path);
@@ -548,6 +569,7 @@ impl Chroot {
     /// ## Example
     ///
     /// ```
+    /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_extractors_common_rs_571_0() -> Result<(), Box<dyn std::error::Error>> {
     /// use binwalk::extractors::common::Chroot;
     ///
     /// let chroot_dir = "/tmp/foobar".to_string();
@@ -556,8 +578,10 @@ impl Chroot {
     /// let chroot = Chroot::new(Some(&chroot_dir));
     ///
     /// assert_eq!(chroot.create_symlink("symlink", "/"), true);
-    /// assert_eq!(std::fs::canonicalize("/tmp/foobar/symlink").unwrap().to_str(), Some("/tmp/foobar"));
+    /// assert_eq!(std::fs::canonicalize("/tmp/foobar/symlink")?.to_str(), Some("/tmp/foobar"));
     /// # std::fs::remove_dir_all("/tmp/foobar");
+    /// # Ok(())
+    /// # } _doctest_main_src_extractors_common_rs_571_0(); }
     /// ```
     pub fn create_symlink(
         &self,
