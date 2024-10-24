@@ -3,6 +3,10 @@ name = "binwalk"
 version = "3.1.0"
 edition = "2021"
 authors = ["Craig Heffner <heffnercj@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/ReFirmLabs/binwalk"
+description = "Analyzes data for embedded file types"
+keywords = ["binwalk", "firmware", "analysis"]
 
 [dependencies]
 log = "0.4.22"
