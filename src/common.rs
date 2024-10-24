@@ -9,11 +9,13 @@ use std::io::Read;
 /// ## Example
 ///
 /// ```
+/// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_common_rs_11_0() -> Result<(), Box<dyn std::error::Error>> {
 /// use binwalk::common::read_file;
 ///
-/// let file_data = read_file("/etc/passwd").unwrap();
-///
+/// let file_data = read_file("/etc/passwd")?;
 /// assert!(file_data.len() > 0);
+/// # Ok(())
+/// # } _doctest_main_src_common_rs_11_0(); }
 /// ```
 pub fn read_file(file: impl Into<String>) -> Result<Vec<u8>, std::io::Error> {
     let mut file_data = Vec::new();

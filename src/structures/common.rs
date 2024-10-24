@@ -32,6 +32,7 @@ pub struct StructureError;
 /// ## Example:
 ///
 /// ```
+/// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_structures_common_rs_34_0() -> Result<bool, binwalk::structures::common::StructureError> {
 /// use binwalk::structures;
 ///
 /// let my_structure = vec![
@@ -43,10 +44,12 @@ pub struct StructureError;
 /// ];
 ///
 /// let some_data = b"AAAA\x01\x00\x00\x00\x00\x00\x00\x00\x08\x0A\x0B\x0C\x01\x02";
-/// let header = structures::common::parse(some_data, &my_structure, "little").unwrap();
+/// let header = structures::common::parse(some_data, &my_structure, "little")?;
 ///
 /// assert_eq!(header["magic"], 0x41414141);
 /// assert_eq!(header["checksum"], 0x0201);
+/// # Ok(true)
+/// # } _doctest_main_src_structures_common_rs_34_0(); }
 /// ```
 pub fn parse(
     data: &[u8],
