@@ -888,6 +888,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::binhdr::DESCRIPTION.to_string(),
             extractor: None,
         },
+        // Autel obfuscated firmware
+        signatures::common::Signature {
+            name: "autel".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::autel::autel_magic(),
+            parser: signatures::autel::autel_parser,
+            description: signatures::autel::DESCRIPTION.to_string(),
+            extractor: Some(extractors::autel::autel_extractor()),
+        },
     ];
 
     binary_signatures

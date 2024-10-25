@@ -1,6 +1,7 @@
 use crate::structures::common::{self, StructureError};
 
 /// Struct to store DLOB header info
+#[derive(Debug, Default, Clone)]
 pub struct DlobHeader {
     pub data_size: usize,
     pub header_size: usize,
