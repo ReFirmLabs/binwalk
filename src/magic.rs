@@ -910,6 +910,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::ntfs::DESCRIPTION.to_string(),
             extractor: Some(extractors::tsk::tsk_extractor()),
         },
+        // APFS
+        signatures::common::Signature {
+            name: "apfs".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::apfs::apfs_magic(),
+            parser: signatures::apfs::apfs_parser,
+            description: signatures::apfs::DESCRIPTION.to_string(),
+            extractor: Some(extractors::tsk::tsk_extractor()),
+        },
     ];
 
     binary_signatures
