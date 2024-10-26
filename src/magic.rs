@@ -899,6 +899,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::autel::DESCRIPTION.to_string(),
             extractor: Some(extractors::autel::autel_extractor()),
         },
+        // NTFS
+        signatures::common::Signature {
+            name: "ntfs".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::ntfs::ntfs_magic(),
+            parser: signatures::ntfs::ntfs_parser,
+            description: signatures::ntfs::DESCRIPTION.to_string(),
+            extractor: Some(extractors::tsk::tsk_extractor()),
+        },
     ];
 
     binary_signatures
