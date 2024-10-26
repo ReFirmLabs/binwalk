@@ -34,6 +34,7 @@ pub fn parse_mbr_image(mbr_data: &[u8]) -> Result<MBRHeader, StructureError> {
     ];
 
     let known_os_types = HashMap::from([
+        (0x07, "NTFS_IFS_HPFS_exFAT"),
         (0x0B, "FAT32"),
         (0x0C, "FAT32"),
         (0x43, "Linux"),
