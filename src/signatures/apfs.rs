@@ -27,6 +27,7 @@ pub fn apfs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, S
                 "{}, block size: {} bytes, block count: {}, total size: {} bytes",
                 result.description, apfs_header.block_size, apfs_header.block_count, result.size
             );
+            result.size = 0;
             return Ok(result);
         }
     }
