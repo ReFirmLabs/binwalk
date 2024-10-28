@@ -15,7 +15,7 @@ pub fn parse_apfs_header(apfs_data: &[u8]) -> Result<APFSHeader, StructureError>
     const MAX_FS_COUNT: usize = 100;
     const FS_COUNT_BLOCK_SIZE: usize = 512;
 
-    // Partial APFS header, just to figure out the size of the image.
+    // Partial APFS header, just to figure out the size of the image and validate some fields
     // https://developer.apple.com/support/downloads/Apple-File-System-Reference.pdf
     let apfs_structure = vec![
         ("magic", "u32"),
@@ -56,8 +56,6 @@ pub fn parse_apfs_header(apfs_data: &[u8]) -> Result<APFSHeader, StructureError>
     // Parse the header
     if let Some(apfs_structure_data) = apfs_data.get(apfs_struct_start..apfs_struct_end) {
         if let Ok(apfs_header) = common::parse(apfs_structure_data, &apfs_structure, "little") {
-            println!("{:?}", apfs_header);
-
             // Simple sanity check on the reported block data
             if apfs_header["block_size"] != 0 && apfs_header["block_count"] != 0 {
                 // Sanity check the feature flags
@@ -67,10 +65,12 @@ pub fn parse_apfs_header(apfs_data: &[u8]) -> Result<APFSHeader, StructureError>
                 {
                     // The test_type field *must* be NULL
                     if apfs_header["nx_xp_test_type"] == 0 {
-                        // Make sure the FS count is sane; this is max_file_systems divided by 512, rounded up to nearest whole
+                        // Calculate the file system count; this is max_file_systems divided by 512, rounded up to nearest whole
                         let fs_count = ((apfs_header["nx_xp_max_file_systems"] as f32)
                             / (FS_COUNT_BLOCK_SIZE as f32))
                             .ceil() as usize;
+
+                        // Sanity check the file system count
                         if fs_count > 0 && fs_count <= MAX_FS_COUNT {
                             return Ok(APFSHeader {
                                 block_size: apfs_header["block_size"],
