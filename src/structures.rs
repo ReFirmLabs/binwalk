@@ -97,6 +97,7 @@
 //! ```
 
 pub mod androidsparse;
+pub mod apfs;
 pub mod autel;
 pub mod binhdr;
 pub mod cab;

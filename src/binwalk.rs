@@ -277,8 +277,8 @@ impl Binwalk {
                             signature_result.name, FILE_START_OFFSET
                         );
 
-                        // Only update the next_valid_offset if confidence is at least medium
-                        if signature_result.confidence >= signatures::common::CONFIDENCE_MEDIUM {
+                        // Only update the next_valid_offset if confidence is high; these are, after all, short signatures
+                        if signature_result.confidence >= signatures::common::CONFIDENCE_HIGH {
                             next_valid_offset = signature_result.offset + signature_result.size;
                         }
 

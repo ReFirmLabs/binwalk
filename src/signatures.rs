@@ -107,6 +107,7 @@
 //! ```
 pub mod aes;
 pub mod androidsparse;
+pub mod apfs;
 pub mod arcadyan;
 pub mod autel;
 pub mod binhdr;
