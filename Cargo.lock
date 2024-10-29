@@ -110,6 +110,7 @@ dependencies = [
  "clap",
  "colored",
  "crc32-v2",
+ "crc32c",
  "entropy",
  "env_logger",
  "flate2",
@@ -324,6 +325,15 @@ name = "crc32-v2"
 version = "0.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f546fcecc3490696c3bea070d8949208279bbc220a5a7738573a10f584cda51"
+
+[[package]]
+name = "crc32c"
+version = "0.6.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3a47af21622d091a8f0fb295b88bc886ac74efcc613efc19f5d0b21de5c89e47"
+dependencies = [
+ "rustc_version",
+]
 
 [[package]]
 name = "crc32fast"
