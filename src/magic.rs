@@ -921,6 +921,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::apfs::DESCRIPTION.to_string(),
             extractor: Some(extractors::apfs::apfs_extractor()),
         },
+        // BTRFS
+        signatures::common::Signature {
+            name: "btrfs".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::btrfs::btrfs_magic(),
+            parser: signatures::btrfs::btrfs_parser,
+            description: signatures::btrfs::DESCRIPTION.to_string(),
+            extractor: None,
+        },
     ];
 
     binary_signatures

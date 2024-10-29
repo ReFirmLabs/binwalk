@@ -111,6 +111,7 @@ pub mod apfs;
 pub mod arcadyan;
 pub mod autel;
 pub mod binhdr;
+pub mod btrfs;
 pub mod bzip2;
 pub mod cab;
 pub mod cfe;

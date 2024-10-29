@@ -100,6 +100,7 @@ pub mod androidsparse;
 pub mod apfs;
 pub mod autel;
 pub mod binhdr;
+pub mod btrfs;
 pub mod cab;
 pub mod chk;
 pub mod common;
