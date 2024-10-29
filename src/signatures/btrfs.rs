@@ -11,6 +11,7 @@ pub fn btrfs_magic() -> Vec<Vec<u8>> {
 
 /// Validates the BTRFS header
 pub fn btrfs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
+    // Offset of the superblock magic bytes in a BTRFS image
     const MAGIC_OFFSET: usize = 0x10040;
 
     // Successful return value
@@ -22,6 +23,7 @@ pub fn btrfs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, 
 
     // Sanity check the reported offset
     if offset >= MAGIC_OFFSET {
+        // Actual offset is the location of the magic bytes minus the magic byte offset
         result.offset = offset - MAGIC_OFFSET;
 
         // Parse the superblock header; this also validates the superblock CRC

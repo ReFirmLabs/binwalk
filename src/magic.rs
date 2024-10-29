@@ -926,7 +926,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             name: "btrfs".to_string(),
             short: false,
             magic_offset: 0,
-            always_display: false,
+            always_display: true,
             magic: signatures::btrfs::btrfs_magic(),
             parser: signatures::btrfs::btrfs_parser,
             description: signatures::btrfs::DESCRIPTION.to_string(),

@@ -1,7 +1,7 @@
 use crate::structures::common::{self, StructureError};
 use crc32c::crc32c;
 
-/// Struct to store BTRFS header info
+/// Struct to store BTRFS super block info
 #[derive(Debug, Default, Clone)]
 pub struct BTRFSHeader {
     pub bytes_used: usize,
@@ -12,7 +12,7 @@ pub struct BTRFSHeader {
     pub sector_size: usize,
 }
 
-/// Parses a BTRFS header
+/// Parse and validate a BTRFS super block
 pub fn parse_btrfs_header(btrfs_data: &[u8]) -> Result<BTRFSHeader, StructureError> {
     const SUPERBLOCK_OFFSET: usize = 0x10000;
     const SUPERBLOCK_END: usize = SUPERBLOCK_OFFSET + 0x1000;
