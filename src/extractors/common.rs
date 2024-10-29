@@ -176,7 +176,10 @@ impl Chroot {
 
         // If the joined path does not start with the chroot directory,
         // prepend the chroot directory to the final joined path.
-        if !joined_path.starts_with(&self.chroot_directory) {
+        // on Windows: If no chroot directory is specified, skip the operation
+        if cfg!(windows) && self.chroot_directory == path::MAIN_SEPARATOR.to_string() {
+            // do nothing and skip
+        } else if !joined_path.starts_with(&self.chroot_directory) {
             joined_path = format!(
                 "{}{}{}",
                 self.chroot_directory,
@@ -749,6 +752,14 @@ impl Chroot {
         // Concatenate each non-excluded part of the file path, with each part separated by '/'
         for (i, path_part) in path_parts.iter().enumerate() {
             if !exclude_indicies.contains(&i) {
+                #[cfg(windows)]
+                {
+                    // on Windows: in the first loop run, we cannot really prepend a '\' to drive letters like 'C:'
+                    if sanitized_path.is_empty() {
+                        sanitized_path = path_part.to_string();
+                        continue;
+                    }
+                }
                 sanitized_path = format!("{}{}{}", sanitized_path, path::MAIN_SEPARATOR, path_part);
             }
         }
