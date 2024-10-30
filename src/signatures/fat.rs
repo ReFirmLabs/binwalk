@@ -21,8 +21,8 @@ pub fn fat_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, Si
         ..Default::default()
     };
 
-    // This signature is only matched at the beginning of files (see magic.rs), so this check is not strictly necessary
-    if offset == MAGIC_OFFSET {
+    // Sanity check the magic offset
+    if offset >= MAGIC_OFFSET {
         // FAT actually starts this may bytes before the magic bytes
         result.offset = offset - MAGIC_OFFSET;
 

@@ -22,19 +22,16 @@ pub fn zlib_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, S
         ..Default::default()
     };
 
-    // This is enforced in magic.rs, so this check is supurfulous
-    if offset == 0 {
-        // Decompress the zlib; no output directory specified, dry run only.
-        let decompression_dry_run = zlib_decompress(file_data, offset, None);
+    // Decompress the zlib; no output directory specified, dry run only.
+    let decompression_dry_run = zlib_decompress(file_data, offset, None);
 
-        // If the decompression dry run was a success, this signature is almost certianly valid
-        if decompression_dry_run.success {
-            if let Some(zlib_file_size) = decompression_dry_run.size {
-                result.size = zlib_file_size;
-                result.description =
-                    format!("{}, total size: {} bytes", result.description, result.size);
-                return Ok(result);
-            }
+    // If the decompression dry run was a success, this signature is almost certianly valid
+    if decompression_dry_run.success {
+        if let Some(zlib_file_size) = decompression_dry_run.size {
+            result.size = zlib_file_size;
+            result.description =
+                format!("{}, total size: {} bytes", result.description, result.size);
+            return Ok(result);
         }
     }
 
