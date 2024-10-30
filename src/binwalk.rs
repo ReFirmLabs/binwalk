@@ -546,7 +546,8 @@ impl Binwalk {
     ///                                    Some(extraction_directory),
     ///                                    None,
     ///                                    None,
-    ///                                    None)?;
+    ///                                    None,
+    ///                                    false)?;
     ///
     /// let file_data = std::fs::read(&binwalker.base_target_file).expect("Unable to read file");
     ///
@@ -647,7 +648,8 @@ impl Binwalk {
     ///                                    Some(extraction_directory),
     ///                                    None,
     ///                                    None,
-    ///                                    None)?;
+    ///                                    None,
+    ///                                    false)?;
     ///
     /// let analysis_results = binwalker.analyze(&binwalker.base_target_file, true);
     ///
