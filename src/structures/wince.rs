@@ -35,7 +35,6 @@ pub struct WinCEBlock {
     pub address: usize,
     pub data_size: usize,
     pub header_size: usize,
-    pub checksum: usize,
 }
 
 /// Parse a WindowsCE block header
@@ -46,7 +45,6 @@ pub fn parse_wince_block_header(block_data: &[u8]) -> Result<WinCEBlock, Structu
         return Ok(WinCEBlock {
             address: block_header["address"],
             data_size: block_header["size"],
-            checksum: block_header["checksum"],
             header_size: common::size(&wince_block_structure),
         });
     }
