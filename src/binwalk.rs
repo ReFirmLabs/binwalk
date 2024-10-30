@@ -73,7 +73,7 @@ pub struct Binwalk {
 
 impl Binwalk {
     /// Create a new Binwalk instance with all default values.
-    /// Equivalent to `Binwalk::configure(None, None, None, None, None)`.
+    /// Equivalent to `Binwalk::configure(None, None, None, None, None, false)`.
     ///
     /// ## Example
     ///
@@ -84,7 +84,7 @@ impl Binwalk {
     /// ```
     #[allow(dead_code)]
     pub fn new() -> Binwalk {
-        Binwalk::configure(None, None, None, None, None).unwrap()
+        Binwalk::configure(None, None, None, None, None, false).unwrap()
     }
 
     /// Create a new Binwalk instance.
@@ -111,7 +111,8 @@ impl Binwalk {
     ///                                    None,
     ///                                    None,
     ///                                    Some(exclude_filters),
-    ///                                    None)?;
+    ///                                    None,
+    ///                                    false)?;
     /// # Ok(binwalker)
     /// # } _doctest_main_src_binwalk_rs_102_0(); }
     /// ```
@@ -121,6 +122,7 @@ impl Binwalk {
         include: Option<Vec<String>>,
         exclude: Option<Vec<String>>,
         signatures: Option<Vec<signatures::common::Signature>>,
+        full_search: bool,
     ) -> Result<Binwalk, BinwalkError> {
         let mut new_instance = Binwalk {
             ..Default::default()
@@ -193,7 +195,7 @@ impl Binwalk {
 
             // Each signature may have multiple magic bytes associated with it
             for pattern in signature.magic.clone() {
-                if signature.short {
+                if signature.short && !full_search {
                     // These are short patterns, and should only be searched for at the very beginning of a file
                     new_instance.short_signatures.push(signature.clone());
                 } else {
@@ -544,7 +546,8 @@ impl Binwalk {
     ///                                    Some(extraction_directory),
     ///                                    None,
     ///                                    None,
-    ///                                    None)?;
+    ///                                    None,
+    ///                                    false)?;
     ///
     /// let file_data = std::fs::read(&binwalker.base_target_file).expect("Unable to read file");
     ///
@@ -645,7 +648,8 @@ impl Binwalk {
     ///                                    Some(extraction_directory),
     ///                                    None,
     ///                                    None,
-    ///                                    None)?;
+    ///                                    None,
+    ///                                    false)?;
     ///
     /// let analysis_results = binwalker.analyze(&binwalker.base_target_file, true);
     ///

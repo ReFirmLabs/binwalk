@@ -1,4 +1,6 @@
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
+use crate::signatures::common::{
+    SignatureError, SignatureResult, CONFIDENCE_LOW, CONFIDENCE_MEDIUM,
+};
 
 /// Human readable description
 pub const DESCRIPTION: &str = "compress'd data";
@@ -14,17 +16,16 @@ pub fn compressd_parser(
     offset: usize,
 ) -> Result<SignatureResult, SignatureError> {
     // Successful return value; confidence is medium since this only matches magic bytes at the beginning of a file
-    let result = SignatureResult {
+    let mut result = SignatureResult {
         offset,
         description: DESCRIPTION.to_string(),
-        confidence: CONFIDENCE_MEDIUM,
+        confidence: CONFIDENCE_LOW,
         ..Default::default()
     };
 
-    // This is enforced in magic.rs so this check is superfluous
     if offset == 0 {
-        return Ok(result);
+        result.confidence = CONFIDENCE_MEDIUM;
     }
 
-    Err(SignatureError)
+    Ok(result)
 }

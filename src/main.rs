@@ -95,6 +95,7 @@ fn main() {
         cliargs.include,
         cliargs.exclude,
         None,
+        cliargs.search_all,
     )
     .expect("Binwalk initialization failed");
 

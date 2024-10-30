@@ -23,6 +23,10 @@ pub struct CliArgs {
     #[arg(short = 'M', long)]
     pub matryoshka: bool,
 
+    /// Search for all signatures at all offsets
+    #[arg(short = 'a', long)]
+    pub search_all: bool,
+
     /// Plot the entropy of the specified file
     #[arg(short = 'E', long, conflicts_with = "extract")]
     pub entropy: bool,

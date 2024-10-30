@@ -1,6 +1,9 @@
 use crate::extractors::common::{ExtractionResult, Extractor, ExtractorType};
 use crate::extractors::inflate;
 
+/// Size of the checksum that follows the ZLIB deflate data stream
+pub const CHECKSUM_SIZE: usize = 4;
+
 /// Defines the internal extractor function for decompressing zlib data
 pub fn zlib_extractor() -> Extractor {
     Extractor {
@@ -17,8 +20,6 @@ pub fn zlib_decompress(
 ) -> ExtractionResult {
     // Size of the zlib header
     const HEADER_SIZE: usize = 2;
-    // Size of the checksum that follows the deflate data stream
-    const CHECKSUM_SIZE: usize = 4;
 
     // Do the decompression, ignoring the ZLIB header
     let mut result =
