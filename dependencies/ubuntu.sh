@@ -7,7 +7,6 @@ SCRIPT_DIRECTORY=$(dirname -- "$( readlink -f -- "$0"; )")
 DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install \
     p7zip-full \
     zstd \
-    unzip \
     tar \
     sleuthkit \
     cabextract \

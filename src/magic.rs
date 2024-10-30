@@ -212,7 +212,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             magic: signatures::zip::zip_magic(),
             parser: signatures::zip::zip_parser,
             description: signatures::zip::DESCRIPTION.to_string(),
-            extractor: Some(extractors::zip::zip_extractor()),
+            extractor: Some(extractors::sevenzip::sevenzip_extractor()),
         },
         // Intel PCH ROM
         signatures::common::Signature {
