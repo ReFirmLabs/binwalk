@@ -932,6 +932,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::btrfs::DESCRIPTION.to_string(),
             extractor: None,
         },
+        // WinCE
+        signatures::common::Signature {
+            name: "wince".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::wince::wince_magic(),
+            parser: signatures::wince::wince_parser,
+            description: signatures::wince::DESCRIPTION.to_string(),
+            extractor: Some(extractors::wince::wince_extractor()),
+        },
     ];
 
     binary_signatures
