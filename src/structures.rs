@@ -148,6 +148,7 @@ pub mod ubi;
 pub mod uefi;
 pub mod uimage;
 pub mod vxworks;
+pub mod wince;
 pub mod xz;
 pub mod yaffs;
 pub mod zip;

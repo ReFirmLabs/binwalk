@@ -178,6 +178,7 @@ pub mod ubi;
 pub mod uefi;
 pub mod uimage;
 pub mod vxworks;
+pub mod wince;
 pub mod yaffs2;
 pub mod zip;
 pub mod zlib;
