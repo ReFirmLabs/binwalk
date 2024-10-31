@@ -8,6 +8,7 @@ DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install \
     p7zip-full \
     zstd \
     tar \
+    unzip \
     sleuthkit \
     cabextract \
     curl \
