@@ -1,4 +1,4 @@
-## binwalk
+# binwalk
 
 A Rust implementation of the Binwalk firmware analysis tool.
 
