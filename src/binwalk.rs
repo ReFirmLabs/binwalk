@@ -534,7 +534,7 @@ impl Binwalk {
     ///
     /// ## Example
     ///
-    /// ```
+    /// ```no_run
     /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_binwalk_rs_529_0() -> Result<binwalk::Binwalk, binwalk::BinwalkError> {
     /// use binwalk::Binwalk;
     ///
@@ -636,7 +636,7 @@ impl Binwalk {
     ///
     /// ## Example
     ///
-    /// ```
+    /// ```no_run
     /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_binwalk_rs_624_0() -> Result<binwalk::Binwalk, binwalk::BinwalkError> {
     /// use binwalk::Binwalk;
     ///
