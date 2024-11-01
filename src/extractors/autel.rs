@@ -4,6 +4,27 @@ use crate::structures::autel::parse_autel_header;
 const BLOCK_SIZE: usize = 256;
 
 /// Defines the internal extractor function for deobfuscating Autel firmware
+///
+/// ```
+/// use std::io::ErrorKind;
+/// use std::process::Command;
+/// use binwalk::extractors::common::ExtractorType;
+/// use binwalk::extractors::autel::autel_extractor;
+///
+/// match autel_extractor().utility {
+///     ExtractorType::None => panic!("Invalid extractor type of None"),
+///     ExtractorType::Internal(func) => println!("Internal extractor OK: {:?}", func),
+///     ExtractorType::External(cmd) => {
+///         if let Err(e) = Command::new(&cmd).output() {
+///             if e.kind() == ErrorKind::NotFound {
+///                 panic!("External extractor '{}' not found", cmd);
+///             } else {
+///                 panic!("Failed to execute external extractor '{}': {}", cmd, e);
+///             }
+///         }
+///     }
+/// }
+/// ```
 pub fn autel_extractor() -> Extractor {
     Extractor {
         utility: ExtractorType::Internal(autel_deobfuscate),

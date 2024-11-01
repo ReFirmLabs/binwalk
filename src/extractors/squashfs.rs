@@ -1,6 +1,27 @@
 use crate::extractors;
 
 /// Describes how to run the sasquatch utility to extract SquashFS images
+///
+/// ```
+/// use std::io::ErrorKind;
+/// use std::process::Command;
+/// use binwalk::extractors::common::ExtractorType;
+/// use binwalk::extractors::squashfs::squashfs_extractor;
+///
+/// match squashfs_extractor().utility {
+///     ExtractorType::None => panic!("Invalid extractor type of None"),
+///     ExtractorType::Internal(func) => println!("Internal extractor OK: {:?}", func),
+///     ExtractorType::External(cmd) => {
+///         if let Err(e) = Command::new(&cmd).output() {
+///             if e.kind() == ErrorKind::NotFound {
+///                 panic!("External extractor '{}' not found", cmd);
+///             } else {
+///                 panic!("Failed to execute external extractor '{}': {}", cmd, e);
+///             }
+///         }
+///     }
+/// }
+/// ```
 pub fn squashfs_extractor() -> extractors::common::Extractor {
     extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("sasquatch".to_string()),
@@ -13,6 +34,27 @@ pub fn squashfs_extractor() -> extractors::common::Extractor {
 }
 
 /// Describes how to run the sasquatch-v4be utility to extract big endian SquashFSv4 images
+///
+/// ```
+/// use std::io::ErrorKind;
+/// use std::process::Command;
+/// use binwalk::extractors::common::ExtractorType;
+/// use binwalk::extractors::squashfs::squashfs_v4_be_extractor;
+///
+/// match squashfs_v4_be_extractor().utility {
+///     ExtractorType::None => panic!("Invalid extractor type of None"),
+///     ExtractorType::Internal(func) => println!("Internal extractor OK: {:?}", func),
+///     ExtractorType::External(cmd) => {
+///         if let Err(e) = Command::new(&cmd).output() {
+///             if e.kind() == ErrorKind::NotFound {
+///                 panic!("External extractor '{}' not found", cmd);
+///             } else {
+///                 panic!("Failed to execute external extractor '{}': {}", cmd, e);
+///             }
+///         }
+///     }
+/// }
+/// ```
 pub fn squashfs_v4_be_extractor() -> extractors::common::Extractor {
     extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("sasquatch-v4be".to_string()),
