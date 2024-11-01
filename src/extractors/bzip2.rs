@@ -2,6 +2,27 @@ use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorTy
 use bzip2::{Decompress, Status};
 
 /// Defines the internal extractor function for decompressing BZIP2 files
+///
+/// ```
+/// use std::io::ErrorKind;
+/// use std::process::Command;
+/// use binwalk::extractors::common::ExtractorType;
+/// use binwalk::extractors::bzip2::bzip2_extractor;
+///
+/// match bzip2_extractor().utility {
+///     ExtractorType::None => panic!("Invalid extractor type of None"),
+///     ExtractorType::Internal(func) => println!("Internal extractor OK: {:?}", func),
+///     ExtractorType::External(cmd) => {
+///         if let Err(e) = Command::new(&cmd).output() {
+///             if e.kind() == ErrorKind::NotFound {
+///                 panic!("External extractor '{}' not found", cmd);
+///             } else {
+///                 panic!("Failed to execute external extractor '{}': {}", cmd, e);
+///             }
+///         }
+///     }
+/// }
+/// ```
 pub fn bzip2_extractor() -> Extractor {
     Extractor {
         utility: ExtractorType::Internal(bzip2_decompressor),
