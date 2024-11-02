@@ -538,12 +538,20 @@ impl Binwalk {
     /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_binwalk_rs_529_0() -> Result<binwalk::Binwalk, binwalk::BinwalkError> {
     /// use binwalk::Binwalk;
     ///
-    /// # std::fs::remove_dir_all("/tmp/foobar");
-    /// let target_path = "/usr/share/man/man2/accept.2.gz".to_string();
-    /// let extraction_directory = "/tmp/foobar/extractions".to_string();
+    /// let target_path = std::path::Path::new("tests")
+    ///     .join("inputs")
+    ///     .join("gzip.bin")
+    ///     .display()
+    ///     .to_string();
     ///
+    /// let extraction_directory = std::path::Path::new("tests")
+    ///     .join("extractions")
+    ///     .display()
+    ///     .to_string();
+    ///
+    /// # std::fs::remove_dir_all(&extraction_directory);
     /// let binwalker = Binwalk::configure(Some(target_path),
-    ///                                    Some(extraction_directory),
+    ///                                    Some(extraction_directory.clone()),
     ///                                    None,
     ///                                    None,
     ///                                    None,
@@ -556,8 +564,12 @@ impl Binwalk {
     ///
     /// assert_eq!(scan_results.len(), 1);
     /// assert_eq!(extraction_results.len(),  1);
-    /// assert_eq!(std::path::Path::new("/tmp/foobar/extractions/accept.2.gz.extracted/0/decompressed.bin").exists(), true);
-    /// # std::fs::remove_dir_all("/tmp/foobar");
+    /// assert_eq!(std::path::Path::new(&extraction_directory)
+    ///     .join("gzip.bin.extracted")
+    ///     .join("0")
+    ///     .join("decompressed.bin")
+    ///     .exists(), true);
+    /// # std::fs::remove_dir_all(&extraction_directory);
     /// # Ok(binwalker)
     /// # } _doctest_main_src_binwalk_rs_529_0(); }
     /// ```
@@ -640,12 +652,20 @@ impl Binwalk {
     /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_binwalk_rs_624_0() -> Result<binwalk::Binwalk, binwalk::BinwalkError> {
     /// use binwalk::Binwalk;
     ///
-    /// # std::fs::remove_dir_all("/tmp/foobar");
-    /// let target_path = "/usr/share/man/man2/accept.2.gz".to_string();
-    /// let extraction_directory = "/tmp/foobar/extractions".to_string();
+    /// let target_path = std::path::Path::new("tests")
+    ///     .join("inputs")
+    ///     .join("gzip.bin")
+    ///     .display()
+    ///     .to_string();
     ///
+    /// let extraction_directory = std::path::Path::new("tests")
+    ///     .join("extractions")
+    ///     .display()
+    ///     .to_string();
+    ///
+    /// # std::fs::remove_dir_all(&extraction_directory);
     /// let binwalker = Binwalk::configure(Some(target_path),
-    ///                                    Some(extraction_directory),
+    ///                                    Some(extraction_directory.clone()),
     ///                                    None,
     ///                                    None,
     ///                                    None,
@@ -655,8 +675,12 @@ impl Binwalk {
     ///
     /// assert_eq!(analysis_results.file_map.len(), 1);
     /// assert_eq!(analysis_results.extractions.len(),  1);
-    /// assert_eq!(std::path::Path::new("/tmp/foobar/extractions/accept.2.gz.extracted/0/decompressed.bin").exists(), true);
-    /// # std::fs::remove_dir_all("/tmp/foobar");
+    /// assert_eq!(std::path::Path::new(&extraction_directory)
+    ///     .join("gzip.bin.extracted")
+    ///     .join("0")
+    ///     .join("decompressed.bin")
+    ///     .exists(), true);
+    /// # std::fs::remove_dir_all(&extraction_directory);
     /// # Ok(binwalker)
     /// # } _doctest_main_src_binwalk_rs_624_0(); }
     /// ```
