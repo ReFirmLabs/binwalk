@@ -172,7 +172,9 @@ fn romfs_crc_valid(crc_data: &[u8]) -> bool {
 
         // Sum each word
         while i < crc_data.len() {
-            sum += u32::from_be_bytes(crc_data[i..i + word_size].try_into().unwrap());
+            sum = sum.wrapping_add(u32::from_be_bytes(
+                crc_data[i..i + word_size].try_into().unwrap(),
+            ));
             i += word_size;
         }
 
