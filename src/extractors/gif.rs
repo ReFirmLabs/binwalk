@@ -3,7 +3,7 @@ use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorTy
 use crate::structures::common::StructureError;
 use crate::structures::gif::{parse_gif_extension, parse_gif_header, parse_gif_image_descriptor};
 
-/// Defines the internal extractor function for carving out JPEG images
+/// Defines the internal extractor function for carving out GIF images
 ///
 /// ```
 /// use std::io::ErrorKind;

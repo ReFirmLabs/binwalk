@@ -121,6 +121,7 @@ pub mod compressd;
 pub mod copyright;
 pub mod cpio;
 pub mod cramfs;
+pub mod dahua_zip;
 pub mod deb;
 pub mod dlob;
 pub mod dmg;

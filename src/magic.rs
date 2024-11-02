@@ -943,6 +943,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::wince::DESCRIPTION.to_string(),
             extractor: Some(extractors::wince::wince_extractor()),
         },
+        // Dahua ZIP
+        signatures::common::Signature {
+            name: "dahua_zip".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::dahua_zip::dahua_zip_magic(),
+            parser: signatures::dahua_zip::dahua_zip_parser,
+            description: signatures::dahua_zip::DESCRIPTION.to_string(),
+            extractor: Some(extractors::dahua_zip::dahua_zip_extractor()),
+        },
     ];
 
     binary_signatures
