@@ -146,6 +146,7 @@ pub mod autel;
 pub mod bzip2;
 pub mod cab;
 pub mod common;
+pub mod dahua_zip;
 pub mod dmg;
 pub mod dtb;
 pub mod dumpifs;
