@@ -39,3 +39,5 @@ features = [
     "macro-diagnostics", # Enable better diagnostics for compile-time UUIDs
 ]
 
+[profile.release]
+lto = true
