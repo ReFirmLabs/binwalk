@@ -5,7 +5,7 @@ SCRIPT_DIRECTORY=$(dirname -- "$( readlink -f -- "$0"; )")
 
 # Install dependencies from apt repository
 DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install \
-    p7zip-full \
+    7zip \
     zstd \
     tar \
     unzip \
