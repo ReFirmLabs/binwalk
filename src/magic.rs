@@ -673,7 +673,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             name: "openssl".to_string(),
             short: false,
             magic_offset: 0,
-            always_display: false,
+            always_display: true,
             magic: signatures::openssl::openssl_crypt_magic(),
             parser: signatures::openssl::openssl_crypt_parser,
             description: signatures::openssl::DESCRIPTION.to_string(),
