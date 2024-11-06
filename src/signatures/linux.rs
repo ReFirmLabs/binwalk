@@ -102,6 +102,7 @@ pub fn linux_kernel_version_parser(
     const AMPERSAND: &str = "@";
     const PERIOD_OFFSET_1: usize = 15;
     const PERIOD_OFFSET_2: usize = 17;
+    const PERIOD_OFFSET_3: usize = 18;
     const MIN_FILE_SIZE: usize = 100 * 1024;
     const MIN_VERSION_STRING_LENGTH: usize = 75;
     const GCC_VERSION_STRING: &str = "gcc ";
@@ -127,9 +128,12 @@ pub fn linux_kernel_version_parser(
                 if kernel_version_string.contains(AMPERSAND) {
                     // The kernel version string should end with a new line
                     if kernel_version_string.ends_with(NEW_LINE) {
+                        let kv_bytes = kernel_version_string.as_bytes();
+
                         // Make sure the linux kernel version has periods at the expected locations
-                        if kernel_version_string.as_bytes()[PERIOD_OFFSET_1] == PERIOD
-                            && kernel_version_string.as_bytes()[PERIOD_OFFSET_2] == PERIOD
+                        if kv_bytes[PERIOD_OFFSET_1] == PERIOD
+                            && (kv_bytes[PERIOD_OFFSET_2] == PERIOD
+                                || kv_bytes[PERIOD_OFFSET_3] == PERIOD)
                         {
                             // Try to locate a Linux kernel symbol table
                             let symtab_present = has_linux_symbol_table(file_data);
