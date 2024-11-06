@@ -954,6 +954,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::dahua_zip::DESCRIPTION.to_string(),
             extractor: Some(extractors::dahua_zip::dahua_zip_extractor()),
         },
+        // DLink MH01
+        signatures::common::Signature {
+            name: "mh01".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::mh01::mh01_magic(),
+            parser: signatures::mh01::mh01_parser,
+            description: signatures::mh01::DESCRIPTION.to_string(),
+            extractor: None,
+        },
     ];
 
     binary_signatures
