@@ -50,26 +50,33 @@ pub fn extract_uimage(
             let image_data_start = offset + uimage_header.header_size;
             let image_data_end = image_data_start + uimage_header.data_size;
 
-            // Get the raw image data after the uImage header and validate the data CRC
+            // Get the raw image data after the uImage header to validate the data CRC
             if let Some(image_data) = file_data.get(image_data_start..image_data_end) {
-                if crc32(image_data) == (uimage_header.data_checksum as u32) {
-                    result.success = true;
-                    result.size = Some(uimage_header.header_size + uimage_header.data_size);
+                result.success = true;
+                result.size = Some(uimage_header.header_size);
 
-                    // If extraction was requested, carve the uImage data out to a file
-                    if output_directory.is_some() {
-                        let chroot = Chroot::new(output_directory);
-                        let mut file_base_name: String = DEFAULT_OUTPUT_FILE_NAME.to_string();
+                // Check the data CRC
+                let data_crc_valid: bool =
+                    crc32(image_data) == (uimage_header.data_checksum as u32);
 
-                        // Use the name specified in the uImage header as the file name, if one was provided
-                        if !uimage_header.name.is_empty() {
-                            file_base_name = uimage_header.name.replace(" ", "_");
-                        }
+                // If the data CRC is valid, include the size of the data in the reported size
+                if data_crc_valid {
+                    result.size = Some(result.size.unwrap() + uimage_header.data_size);
+                }
 
-                        let output_file = format!("{}.{}", file_base_name, OUTPUT_FILE_EXT);
+                // If extraction was requested and the data CRC is valid, carve the uImage data out to a file
+                if data_crc_valid && output_directory.is_some() {
+                    let chroot = Chroot::new(output_directory);
+                    let mut file_base_name: String = DEFAULT_OUTPUT_FILE_NAME.to_string();
 
-                        result.success = chroot.create_file(&output_file, image_data);
+                    // Use the name specified in the uImage header as the file name, if one was provided
+                    if !uimage_header.name.is_empty() {
+                        file_base_name = uimage_header.name.replace(" ", "_");
                     }
+
+                    let output_file = format!("{}.{}", file_base_name, OUTPUT_FILE_EXT);
+
+                    result.success = chroot.create_file(&output_file, image_data);
                 }
             }
         }

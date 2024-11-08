@@ -16,6 +16,7 @@ pub struct UImageHeader {
     pub cpu_type: String,
     pub os_type: String,
     pub image_type: String,
+    pub header_crc_valid: bool,
 }
 
 /// Pase a uImage header
@@ -163,25 +164,24 @@ pub fn parse_uimage_header(uimage_data: &[u8]) -> Result<UImageHeader, Structure
             && valid_image_types.contains_key(&uimage_header["image_type"])
             && valid_compression_types.contains_key(&uimage_header["compression_type"])
         {
-            // Finally, validate the header CRC
+            // Get the header bytes to validate the CRC
             if let Some(crc_data) = uimage_data.get(0..UIMAGE_HEADER_SIZE) {
-                if calculate_uimage_header_checksum(crc_data) == uimage_header["header_crc"] {
-                    return Ok(UImageHeader {
-                        header_size: UIMAGE_HEADER_SIZE,
-                        name: get_cstring(&uimage_data[UIMAGE_NAME_OFFSET..]),
-                        data_size: uimage_header["data_size"],
-                        data_checksum: uimage_header["data_crc"],
-                        timestamp: uimage_header["creation_timestamp"],
-                        load_address: uimage_header["load_address"],
-                        entry_point_address: uimage_header["entry_point_address"],
-                        compression_type: valid_compression_types
-                            [&uimage_header["compression_type"]]
-                            .to_string(),
-                        cpu_type: valid_cpu_types[&uimage_header["cpu_type"]].to_string(),
-                        os_type: valid_os_types[&uimage_header["os_type"]].to_string(),
-                        image_type: valid_image_types[&uimage_header["image_type"]].to_string(),
-                    });
-                }
+                return Ok(UImageHeader {
+                    header_size: UIMAGE_HEADER_SIZE,
+                    name: get_cstring(&uimage_data[UIMAGE_NAME_OFFSET..]),
+                    data_size: uimage_header["data_size"],
+                    data_checksum: uimage_header["data_crc"],
+                    timestamp: uimage_header["creation_timestamp"],
+                    load_address: uimage_header["load_address"],
+                    entry_point_address: uimage_header["entry_point_address"],
+                    compression_type: valid_compression_types[&uimage_header["compression_type"]]
+                        .to_string(),
+                    cpu_type: valid_cpu_types[&uimage_header["cpu_type"]].to_string(),
+                    os_type: valid_os_types[&uimage_header["os_type"]].to_string(),
+                    image_type: valid_image_types[&uimage_header["image_type"]].to_string(),
+                    header_crc_valid: calculate_uimage_header_checksum(crc_data)
+                        == uimage_header["header_crc"],
+                });
             }
         }
     }
