@@ -1,5 +1,7 @@
 use crate::common::epoch_to_string;
-use crate::extractors::squashfs::{squashfs_be_extractor, squashfs_le_extractor, squashfs_v4_be_extractor};
+use crate::extractors::squashfs::{
+    squashfs_be_extractor, squashfs_le_extractor, squashfs_v4_be_extractor,
+};
 use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 use crate::structures::squashfs::{parse_squashfs_header, parse_squashfs_uid_entry};
 use std::collections::HashMap;
