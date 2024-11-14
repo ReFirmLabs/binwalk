@@ -1,5 +1,7 @@
 use crate::common::epoch_to_string;
-use crate::extractors::squashfs::squashfs_v4_be_extractor;
+use crate::extractors::squashfs::{
+    squashfs_be_extractor, squashfs_le_extractor, squashfs_v4_be_extractor,
+};
 use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 use crate::structures::squashfs::{parse_squashfs_header, parse_squashfs_uid_entry};
 use std::collections::HashMap;
@@ -90,11 +92,13 @@ pub fn squashfs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResul
                                     [&squashfs_header.compression]
                                     .to_string();
 
-                                // Standard SquashFSv4 is little endian only; devices that implement a custom big endian version must use a custom extractor
-                                if squashfs_header.major_version == SQUASHFSV4
-                                    && squashfs_header.endianness == "big"
-                                {
+                                // Select the appropriate extractor to use
+                                if squashfs_header.endianness == "little" {
+                                    result.preferred_extractor = Some(squashfs_le_extractor());
+                                } else if squashfs_header.major_version == SQUASHFSV4 {
                                     result.preferred_extractor = Some(squashfs_v4_be_extractor());
+                                } else {
+                                    result.preferred_extractor = Some(squashfs_be_extractor());
                                 }
 
                                 result.size = squashfs_header.image_size;
