@@ -965,6 +965,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::mh01::DESCRIPTION.to_string(),
             extractor: None,
         },
+        // CSman DAT
+        signatures::common::Signature {
+            name: "csman".to_string(),
+            short: true,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::csman::csman_magic(),
+            parser: signatures::csman::csman_parser,
+            description: signatures::csman::DESCRIPTION.to_string(),
+            extractor: Some(extractors::csman::csman_extractor()),
+        },
     ];
 
     binary_signatures

@@ -106,6 +106,7 @@ pub mod chk;
 pub mod common;
 pub mod cpio;
 pub mod cramfs;
+pub mod csman;
 pub mod deb;
 pub mod dlob;
 pub mod dmg;
