@@ -67,7 +67,7 @@ pub fn extract_csman_dat(
                     }
                     Some(next_entry_data) => {
                         // Parse the next entry
-                        match parse_csman_entry(next_entry_data) {
+                        match parse_csman_entry(next_entry_data, &csman_header.endianness) {
                             Err(_) => {
                                 break;
                             }
