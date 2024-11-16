@@ -1,6 +1,7 @@
 use crate::common::is_offset_safe;
 use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::csman::{parse_csman_entry, parse_csman_header, CSManEntry};
+use std::collections::HashMap;
 
 /// Defines the internal extractor function for CSMan DAT files
 ///
@@ -59,22 +60,30 @@ pub fn extract_csman_dat(
 
             // Loop while there is still data that can be safely parsed
             while is_offset_safe(available_data, next_offset, previous_offset) {
-                // Parse the next entry
-                match parse_csman_entry(&entry_data[next_offset..]) {
-                    Err(_) => {
+                // Get the next entry's data
+                match entry_data.get(next_offset..) {
+                    None => {
                         break;
                     }
-                    Ok(entry) => {
-                        if entry.eof {
-                            // Last entry should be an EOF marker; an EOF marker should always exist.
-                            // There should be at least one valid entry.
-                            result.success = !csman_entries.is_empty();
-                            break;
-                        } else {
-                            // Append this entry to the list of entries and update the offsets to process the next entry
-                            csman_entries.push(entry.clone());
-                            previous_offset = Some(next_offset);
-                            next_offset += entry.size;
+                    Some(next_entry_data) => {
+                        // Parse the next entry
+                        match parse_csman_entry(next_entry_data) {
+                            Err(_) => {
+                                break;
+                            }
+                            Ok(entry) => {
+                                if entry.eof {
+                                    // Last entry should be an EOF marker; an EOF marker should always exist.
+                                    // There should be at least one valid entry.
+                                    result.success = !csman_entries.is_empty();
+                                    break;
+                                } else {
+                                    // Append this entry to the list of entries and update the offsets to process the next entry
+                                    csman_entries.push(entry.clone());
+                                    previous_offset = Some(next_offset);
+                                    next_offset += entry.size;
+                                }
+                            }
                         }
                     }
                 }
@@ -87,10 +96,25 @@ pub fn extract_csman_dat(
 
                 // If extraction was requested, extract each entry using the entry key as the file name
                 if output_directory.is_some() {
+                    // All files will be written inside the provided output directory
                     let chroot = Chroot::new(output_directory);
 
+                    // There may be more than one entry with the same key; track the key and how many times it was encountered
+                    let mut processed_entries: HashMap<usize, usize> = HashMap::new();
+
+                    // Loop through all entries
                     for entry in csman_entries {
-                        let file_name = format!("{:X}.dat", entry.key);
+                        // File name is [key value, in ASCII hex].dat
+                        let mut file_name = format!("{:08X}.dat", entry.key);
+
+                        // If this key value has already been extracted, file name is [key value, in ASCII hex].dat_[count]
+                        if processed_entries.contains_key(&entry.key) {
+                            file_name = format!("{}_{}", file_name, processed_entries[&entry.key]);
+                            processed_entries.insert(entry.key, processed_entries[&entry.key] + 1);
+                        } else {
+                            processed_entries.insert(entry.key, 1);
+                        }
+
                         if !chroot.create_file(&file_name, &entry.value) {
                             result.success = false;
                             break;

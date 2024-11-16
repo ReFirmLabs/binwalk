@@ -44,8 +44,10 @@ pub struct CSManEntry {
 pub fn parse_csman_entry(entry_data: &[u8]) -> Result<CSManEntry, StructureError> {
     const EOF_TAG: usize = 0;
 
+    // The last entry is just a single 4-byte NULL value
     let csman_last_entry_structure = vec![("eof", "u32")];
 
+    // Entries consist of a 4-byte identifier, a 2-byte size, and a value
     let csman_entry_structure = vec![
         ("key", "u32"),
         ("size", "u16"),
