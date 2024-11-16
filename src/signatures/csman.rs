@@ -6,7 +6,8 @@ pub const DESCRIPTION: &str = "CSman DAT file";
 
 /// CSMAN DAT files always start with these bytes
 pub fn csman_magic() -> Vec<Vec<u8>> {
-    vec![b"SC".to_vec()]
+    // Big and little endian magic
+    vec![b"SC".to_vec(), b"CS".to_vec()]
 }
 
 /// Validates the CSMAN DAT file
