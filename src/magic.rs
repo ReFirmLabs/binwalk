@@ -963,7 +963,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             magic: signatures::mh01::mh01_magic(),
             parser: signatures::mh01::mh01_parser,
             description: signatures::mh01::DESCRIPTION.to_string(),
-            extractor: None,
+            extractor: Some(extractors::mh01::mh01_extractor()),
         },
         // CSman DAT
         signatures::common::Signature {
