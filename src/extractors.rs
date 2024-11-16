@@ -163,6 +163,7 @@ pub mod lzfse;
 pub mod lzma;
 pub mod lzop;
 pub mod mbr;
+pub mod mh01;
 pub mod pcap;
 pub mod pem;
 pub mod png;

@@ -27,7 +27,7 @@ pub fn mh01_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, S
             if let Ok(openssl_signature) = openssl_crypt_parser(crypt_data, 0) {
                 result.size = mh01_header.total_size;
                 result.description = format!(
-                    "{}, {}, IV: {}, total size: {} bytes",
+                    "{}, signed, encrypted with {}, IV: {}, total size: {} bytes",
                     result.description,
                     openssl_signature.description,
                     mh01_header.iv,
