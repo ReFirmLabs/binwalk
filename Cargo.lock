@@ -115,6 +115,7 @@ dependencies = [
  "env_logger",
  "flate2",
  "log",
+ "miniz_oxide 0.8.0",
  "plotters",
  "serde",
  "serde_json",

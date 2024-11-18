@@ -1,6 +1,7 @@
 use crate::common::is_offset_safe;
 use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::csman::{parse_csman_entry, parse_csman_header, CSManEntry};
+use miniz_oxide::inflate;
 use std::collections::HashMap;
 
 /// Defines the internal extractor function for CSMan DAT files
@@ -38,6 +39,8 @@ pub fn extract_csman_dat(
     offset: usize,
     output_directory: Option<&String>,
 ) -> ExtractionResult {
+    const COMPRESSED_HEADER_SIZE: usize = 2;
+
     // Return value
     let mut result = ExtractionResult {
         ..Default::default()
@@ -47,12 +50,29 @@ pub fn extract_csman_dat(
 
     // Parse the CSMAN header
     if let Ok(csman_header) = parse_csman_header(&file_data[offset..]) {
+        println!("{:?}", csman_header);
         // Calulate the start and end offsets of the CSMAN entries
         let entries_start: usize = offset + csman_header.header_size;
         let entries_end: usize = entries_start + csman_header.data_size;
 
         // Get the CSMAN entry data
-        if let Some(entry_data) = file_data.get(entries_start..entries_end) {
+        if let Some(raw_entry_data) = file_data.get(entries_start..entries_end) {
+            let mut entry_data = raw_entry_data.to_vec();
+
+            // If the entries are compressed, decompress it (zlib compression)
+            if csman_header.compressed {
+                if let Some(compressed_data) = raw_entry_data.get(COMPRESSED_HEADER_SIZE..) {
+                    match inflate::decompress_to_vec(compressed_data) {
+                        Err(_) => {
+                            return result;
+                        }
+                        Ok(decompressed_data) => {
+                            entry_data = decompressed_data.clone();
+                        }
+                    }
+                }
+            }
+
             // Offsets for processing CSMAN entries in entry_data
             let mut next_offset: usize = 0;
             let mut previous_offset = None;
