@@ -3,6 +3,7 @@ use crate::structures::common::{self, StructureError};
 /// Struct to store CSMAN header info
 #[derive(Debug, Default, Clone)]
 pub struct CSManHeader {
+    pub compressed: bool,
     pub data_size: usize,
     pub endianness: String,
     pub header_size: usize,
@@ -10,14 +11,15 @@ pub struct CSManHeader {
 
 /// Parses a CSMAN header
 pub fn parse_csman_header(csman_data: &[u8]) -> Result<CSManHeader, StructureError> {
+    const COMPRESSED_MAGIC: &[u8] = b"\x78";
     const LITTLE_ENDIAN_MAGIC: usize = 0x4353;
 
     let csman_header_structure = vec![
         ("magic", "u16"),
         ("unknown1", "u16"),
-        ("data_size_1", "u32"),
+        ("compressed_size", "u32"),
         ("unknown2", "u32"),
-        ("data_size_2", "u32"),
+        ("decompressed_size", "u32"),
     ];
 
     let mut result = CSManHeader {
@@ -39,12 +41,24 @@ pub fn parse_csman_header(csman_data: &[u8]) -> Result<CSManHeader, StructureErr
             result.endianness = "big".to_string();
         }
 
-        // Data size is repeated in both these fields
-        if !result.endianness.is_empty()
-            && csman_header["data_size_1"] == csman_header["data_size_2"]
-        {
-            result.data_size = csman_header["data_size_1"];
+        // Should have been able to determine the endianness
+        if !result.endianness.is_empty() {
+            result.data_size = csman_header["compressed_size"];
             result.header_size = common::size(&csman_header_structure);
+            result.compressed =
+                csman_header["compressed_size"] != csman_header["decompressed_size"];
+
+            // If compressed, check the expected compressed magic bytes
+            if result.compressed {
+                if let Some(compressed_magic) =
+                    csman_data.get(result.header_size..result.header_size + COMPRESSED_MAGIC.len())
+                {
+                    if compressed_magic != COMPRESSED_MAGIC {
+                        return Err(StructureError);
+                    }
+                }
+            }
+
             return Ok(result);
         }
     }
