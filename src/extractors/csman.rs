@@ -50,7 +50,6 @@ pub fn extract_csman_dat(
 
     // Parse the CSMAN header
     if let Ok(csman_header) = parse_csman_header(&file_data[offset..]) {
-        println!("{:?}", csman_header);
         // Calulate the start and end offsets of the CSMAN entries
         let entries_start: usize = offset + csman_header.header_size;
         let entries_end: usize = entries_start + csman_header.data_size;
