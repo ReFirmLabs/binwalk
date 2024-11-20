@@ -1,5 +1,4 @@
 use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
-use aho_corasick::AhoCorasick;
 
 /// Defines the internal extractor function for carving out JPEG images
 ///
@@ -58,22 +57,97 @@ pub fn extract_jpeg_image(
     result
 }
 
+/// Parses JPEG markers until the EOF marker is found
 fn get_jpeg_data_size(jpeg_data: &[u8]) -> Option<usize> {
-    const EOF_SIZE: usize = 2;
-    const JPEG_DELIM: u8 = 0xFF;
+    const SIZE_FIELD_LENGTH: usize = 2;
+    const SOS_SCAN_AHEAD_LENGTH: usize = 2;
+    const MARKER_MAGIC: u8 = 0xFF;
+    const SOS_MARKER: u8 = 0xDA;
+    const EOF_MARKER: u8 = 0xD9;
 
-    // This is a short EOF marker to search for, but in a valid JPEG it *should* only occur at EOF
-    let grep = AhoCorasick::new(vec![b"\xFF\xD9"]).unwrap();
+    let mut next_marker_offset: usize = 0;
 
-    for eof_match in grep.find_overlapping_iter(jpeg_data) {
-        let eof_candidate: usize = eof_match.start() + EOF_SIZE;
+    // Most JPEG markers include a size field; these do not
+    let no_length_markers: Vec<u8> = vec![
+        0x00, 0x01, 0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7, 0xD8, EOF_MARKER,
+    ];
 
-        // Make sure the expected EOF marker is not immediately followed by 0xFF (which would indicate the JPEG continues...)
-        if eof_candidate < jpeg_data.len() && jpeg_data[eof_candidate] == JPEG_DELIM {
-            continue;
+    // In a Start Of Scan block, ignore 0xFF marker magics that are followed by one of these bytes
+    let sos_skip_markers: Vec<u8> = vec![0x00, 0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7];
+
+    loop {
+        // Read the marker magic byte
+        match jpeg_data.get(next_marker_offset) {
+            None => {
+                break;
+            }
+            Some(marker_magic) => {
+                // Make sure this is the correct marker magic
+                if *marker_magic != MARKER_MAGIC {
+                    break;
+                }
+
+                // Include marker magic byte in side of the marker
+                next_marker_offset += 1;
+
+                // Read the marker ID byte
+                match jpeg_data.get(next_marker_offset) {
+                    None => {
+                        break;
+                    }
+                    Some(marker_id) => {
+                        // Include marker ID byte in the size of the marker
+                        next_marker_offset += 1;
+
+                        // Most markers have a 2-byte length field after the marker, stored in big-endian
+                        if !no_length_markers.contains(marker_id) {
+                            match jpeg_data
+                                .get(next_marker_offset..next_marker_offset + SIZE_FIELD_LENGTH)
+                            {
+                                None => {
+                                    break;
+                                }
+                                Some(size_bytes) => {
+                                    next_marker_offset +=
+                                        u16::from_be_bytes(size_bytes.try_into().unwrap()) as usize;
+                                }
+                            }
+                        }
+
+                        // Start Of Scan markers have a size field, but are immediately followed by data not included int
+                        // the size field. Need to scan all the bytes until the next valid JPEG marker is found.
+                        if *marker_id == SOS_MARKER {
+                            loop {
+                                // Get the next two bytes
+                                match jpeg_data.get(
+                                    next_marker_offset..next_marker_offset + SOS_SCAN_AHEAD_LENGTH,
+                                ) {
+                                    None => {
+                                        break;
+                                    }
+                                    Some(next_bytes) => {
+                                        // Check if the next byte is a marker magic byte, *and* that it is not followed by a marker escape byte
+                                        if next_bytes[0] == MARKER_MAGIC
+                                            && !sos_skip_markers.contains(&next_bytes[1])
+                                        {
+                                            break;
+                                        } else {
+                                            // Go to the next byte
+                                            next_marker_offset += 1;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // EOF marker indicates the end of the JPEG image
+                        if *marker_id == EOF_MARKER {
+                            return Some(next_marker_offset);
+                        }
+                    }
+                }
+            }
         }
-
-        return Some(eof_match.start() + EOF_SIZE);
     }
 
     None
