@@ -151,6 +151,7 @@ pub mod dahua_zip;
 pub mod dmg;
 pub mod dtb;
 pub mod dumpifs;
+pub mod dxbc;
 pub mod gif;
 pub mod gzip;
 pub mod inflate;

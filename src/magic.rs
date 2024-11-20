@@ -976,6 +976,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::csman::DESCRIPTION.to_string(),
             extractor: Some(extractors::csman::csman_extractor()),
         },
+        // DirectX ByteCode
+        signatures::common::Signature {
+            name: "dxbc".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::dxbc::dxbc_magic(),
+            parser: signatures::dxbc::dxbc_parser,
+            description: signatures::dxbc::DESCRIPTION.to_string(),
+            extractor: Some(extractors::dxbc::dxbc_extractor()),
+        },
     ];
 
     binary_signatures

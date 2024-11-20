@@ -111,6 +111,7 @@ pub mod deb;
 pub mod dlob;
 pub mod dmg;
 pub mod dtb;
+pub mod dxbc;
 pub mod efigpt;
 pub mod elf;
 pub mod ext;
