@@ -83,8 +83,8 @@ fn main() {
         return;
     }
 
-    // If extraction was requested, we need to initialize the output directory
-    if cliargs.extract {
+    // If extraction or data carving was requested, we need to initialize the output directory
+    if cliargs.extract || cliargs.carve {
         output_directory = Some(cliargs.directory);
     }
 
@@ -220,7 +220,7 @@ fn main() {
     }
 
     // If BINWALK_RM_SYMLINK env var was set, delete the base_target_file symlink
-    if cliargs.extract && std::env::var(BINWALK_RM_SYMLINK).is_ok() {
+    if (cliargs.carve || cliargs.extract) && std::env::var(BINWALK_RM_SYMLINK).is_ok() {
         if let Err(e) = std::fs::remove_file(&binwalker.base_target_file) {
             error!(
                 "Request to remove extraction symlink file {} failed: {}",
@@ -276,8 +276,12 @@ fn spawn_worker(
         let results = bw.analyze(&target_file, do_extraction);
 
         // If data carving was requested as part of extraction, carve analysis results to disk
-        if do_extraction && do_carve {
-            let _ = bw.carve(&results);
+        if do_carve {
+            let carve_count = carve_file_map(&results);
+            info!(
+                "Carved {} data blocks to disk from {}",
+                carve_count, target_file
+            );
         }
 
         // Report file results back to main thread
@@ -287,4 +291,84 @@ fn spawn_worker(
             );
         }
     });
+}
+
+/// Carve signatures identified during analysis to separate files on disk.
+/// Returns the number of carved files created.
+/// Note that unknown blocks of file data are also carved to disk, so the number of files
+/// created may be larger than the number of results defined in results.file_map.
+fn carve_file_map(results: &binwalk::AnalysisResults) -> usize {
+    let mut carve_count: usize = 0;
+    let mut last_known_offset: usize = 0;
+    let mut unknown_bytes: Vec<(usize, usize)> = Vec::new();
+
+    // No results, don't do anything
+    if !results.file_map.is_empty() {
+        // Read in the source file
+        if let Ok(file_data) = common::read_file(&results.file_path) {
+            // Loop through all identified signatures in the file
+            for signature_result in &results.file_map {
+                // If there is data between the last signature and this signature, it is some chunk of unknown data
+                if signature_result.offset > last_known_offset {
+                    unknown_bytes.push((
+                        last_known_offset,
+                        signature_result.offset - last_known_offset,
+                    ));
+                }
+
+                // Carve this signature's data to disk
+                if carve_file_data_to_disk(
+                    &results.file_path,
+                    &file_data,
+                    &signature_result.name,
+                    signature_result.offset,
+                    signature_result.size,
+                ) {
+                    carve_count += 1;
+                }
+
+                // Update the last known offset to the end of this signature's data
+                last_known_offset = signature_result.offset + signature_result.size;
+            }
+
+            // All known signature data has been carved to disk, now carve any unknown blocks of data to disk
+            for (offset, size) in unknown_bytes {
+                if carve_file_data_to_disk(&results.file_path, &file_data, "unknown", offset, size)
+                {
+                    carve_count += 1;
+                }
+            }
+        }
+    }
+
+    carve_count
+}
+
+/// Carves a block of file data to a new file on disk
+fn carve_file_data_to_disk(
+    source_file_path: &str,
+    file_data: &[u8],
+    name: &str,
+    offset: usize,
+    size: usize,
+) -> bool {
+    let chroot = extractors::common::Chroot::new(None);
+
+    // Carved file path will be: <source file path>_<offset>_<name>.raw
+    let carved_file_path = format!("{}_{}_{}.raw", source_file_path, offset, name,);
+
+    debug!("Carving {}", carved_file_path);
+
+    // Carve the data to disk
+    if !chroot.carve_file(&carved_file_path, file_data, offset, size) {
+        error!(
+            "Failed to carve {} [{:#X}..{:#X}] to disk",
+            carved_file_path,
+            offset,
+            offset + size,
+        );
+        return false;
+    }
+
+    true
 }
