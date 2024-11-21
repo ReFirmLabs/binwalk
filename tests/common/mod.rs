@@ -1,18 +1,31 @@
 use binwalk::{AnalysisResults, Binwalk};
 
-/// Run an integration test against the specified file, with the provided signature filter
+/// Convenience function for running an integration test against the specified file, with the provided signature filter.
+/// Assumes that there will be one signature result and one extraction result at file offset 0.
+#[allow(dead_code)]
 pub fn integration_test(signature_filter: &str, file_name: &str) {
+    let expected_signature_offsets: Vec<usize> = vec![0];
+    let expected_extraction_offsets: Vec<usize> = vec![0];
+
     // Run binwalk, get analysis/extraction results
     let results = run_binwalk(signature_filter, file_name);
 
-    // Each test is expected to have a single result at offset 0 in the file
-    assert!(results.file_map.len() == 1);
-    assert!(results.file_map[0].offset == 0);
+    // Assert that there was a valid signature and successful result at, and only at, file offset 0
+    assert_results_ok(results, expected_signature_offsets, expected_extraction_offsets);
+}
 
-    // Tests which support extraction are expected to have a single successful extraction
-    if !results.extractions.is_empty() {
-        assert!(results.extractions.len() == 1);
-        assert!(results.extractions[&results.file_map[0].id].success);
+/// Assert that there was a valid signature match and corresponding extraction at, and only at, the specified file offsets
+pub fn assert_results_ok(results: AnalysisResults, signature_offsets: Vec<usize>, extraction_offsets: Vec<usize>) {
+    // Assert that the number of signature results and extractions match the expected results
+    assert!(results.file_map.len() == signature_offsets.len());
+    assert!(results.extractions.len() == extraction_offsets.len());
+
+    // Assert that each signature match was at an expected offset and that extraction, if expected, was successful
+    for signature_result in results.file_map {
+        assert!(signature_offsets.contains(&signature_result.offset));
+        if extraction_offsets.contains(&signature_result.offset) {
+            assert!(results.extractions[&signature_result.id].success);
+        }
     }
 }
 
