@@ -19,7 +19,7 @@ pub struct CliArgs {
     #[arg(short, long)]
     pub extract: bool,
 
-    /// Carve raw file data to disk during extraction
+    /// Carve both known and unknown file contents to disk
     #[arg(short, long)]
     pub carve: bool,
 
