@@ -162,6 +162,7 @@ fn main() {
                 binwalker.clone(),
                 target_file,
                 cliargs.extract,
+                cliargs.carve,
                 worker_tx.clone(),
             );
         }
@@ -267,11 +268,18 @@ fn spawn_worker(
     bw: binwalk::Binwalk,
     target_file: String,
     do_extraction: bool,
+    do_carve: bool,
     worker_tx: mpsc::Sender<AnalysisResults>,
 ) {
     pool.execute(move || {
         // Analyze target file, with extraction, if specified
         let results = bw.analyze(&target_file, do_extraction);
+
+        // If data carving was requested as part of extraction, carve analysis results to disk
+        if do_extraction && do_carve {
+            let _ = bw.carve(&results);
+        }
+
         // Report file results back to main thread
         if let Err(e) = worker_tx.send(results) {
             panic!(

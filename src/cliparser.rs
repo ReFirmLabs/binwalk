@@ -19,6 +19,10 @@ pub struct CliArgs {
     #[arg(short, long)]
     pub extract: bool,
 
+    /// Carve raw file data to disk during extraction
+    #[arg(short, long)]
+    pub carve: bool,
+
     /// Recursively scan extracted files
     #[arg(short = 'M', long)]
     pub matryoshka: bool,
