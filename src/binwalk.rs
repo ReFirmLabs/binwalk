@@ -714,6 +714,37 @@ impl Binwalk {
 
         results
     }
+
+    /// Carve signatures identified during analysis to separate files on disk
+    pub fn carve(&self, results: &AnalysisResults) -> bool {
+        if !results.file_map.is_empty() {
+            if let Ok(file_data) = read_file(&results.file_path) {
+                let chroot = extractors::common::Chroot::new(None);
+
+                for signature_result in &results.file_map {
+                    let carved_file_path = format!(
+                        "{}_{:X}-{:X}.carved",
+                        results.file_path,
+                        signature_result.offset,
+                        signature_result.offset + signature_result.size
+                    );
+                    debug!("Carving {}", carved_file_path);
+                    if !chroot.carve_file(
+                        &carved_file_path,
+                        &file_data,
+                        signature_result.offset,
+                        signature_result.size,
+                    ) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        false
+    }
 }
 
 /// Initializes the extraction output directory
