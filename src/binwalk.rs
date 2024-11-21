@@ -715,36 +715,90 @@ impl Binwalk {
         results
     }
 
-    /// Carve signatures identified during analysis to separate files on disk
-    pub fn carve(&self, results: &AnalysisResults) -> bool {
-        if !results.file_map.is_empty() {
-            if let Ok(file_data) = read_file(&results.file_path) {
-                let chroot = extractors::common::Chroot::new(None);
+    /// Carve signatures identified during analysis to separate files on disk.
+    /// Returns the number of carved files created.
+    /// Note that unknown blocks of file data are also carved to disk, so the number of files
+    /// created may be larger than the number of results defined in results.file_map.
+    pub fn carve(&self, results: &AnalysisResults) -> usize {
+        let mut carve_count: usize = 0;
+        let mut last_known_offset: usize = 0;
+        let mut unknown_bytes: Vec<(usize, usize)> = Vec::new();
 
+        // No results, don't do anything
+        if !results.file_map.is_empty() {
+            // Read in the source file
+            if let Ok(file_data) = read_file(&results.file_path) {
+                // Loop through all identified signatures in the file
                 for signature_result in &results.file_map {
-                    let carved_file_path = format!(
-                        "{}_{:X}-{:X}.carved",
-                        results.file_path,
-                        signature_result.offset,
-                        signature_result.offset + signature_result.size
-                    );
-                    debug!("Carving {}", carved_file_path);
-                    if !chroot.carve_file(
-                        &carved_file_path,
+                    // If there is data between the last signature and this signature, it is some chunk of unknown data
+                    if signature_result.offset > last_known_offset {
+                        unknown_bytes.push((
+                            last_known_offset,
+                            signature_result.offset - last_known_offset,
+                        ));
+                    }
+
+                    // Carve this signature's data to disk
+                    if carve_file_data_to_disk(
+                        &results.file_path,
                         &file_data,
+                        &signature_result.name,
                         signature_result.offset,
                         signature_result.size,
                     ) {
-                        return false;
+                        carve_count += 1;
                     }
+
+                    // Update the last known offset to the end of this signature's data
+                    last_known_offset = signature_result.offset + signature_result.size;
                 }
 
-                return true;
+                // All known signature data has been carved to disk, now carve any unknown blocks of data to disk
+                for (offset, size) in unknown_bytes {
+                    if carve_file_data_to_disk(
+                        &results.file_path,
+                        &file_data,
+                        "unknown",
+                        offset,
+                        size,
+                    ) {
+                        carve_count += 1;
+                    }
+                }
             }
         }
 
-        false
+        carve_count
     }
+}
+
+/// Carves a block of file data to a new file on disk
+fn carve_file_data_to_disk(
+    source_file_path: &str,
+    file_data: &[u8],
+    name: &str,
+    offset: usize,
+    size: usize,
+) -> bool {
+    let chroot = extractors::common::Chroot::new(None);
+
+    // Carved file path will be: <source file path>_<offset>_<name>.raw
+    let carved_file_path = format!("{}_{}_{}.raw", source_file_path, offset, name,);
+
+    debug!("Carving {}", carved_file_path);
+
+    // Carve the data to disk
+    if !chroot.carve_file(&carved_file_path, file_data, offset, size) {
+        error!(
+            "Failed to carve {} [{:#X}..{:#X}] to disk",
+            carved_file_path,
+            offset,
+            offset + size,
+        );
+        return false;
+    }
+
+    true
 }
 
 /// Initializes the extraction output directory

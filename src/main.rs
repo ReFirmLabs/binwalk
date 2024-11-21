@@ -276,8 +276,8 @@ fn spawn_worker(
         let results = bw.analyze(&target_file, do_extraction);
 
         // If data carving was requested as part of extraction, carve analysis results to disk
-        if do_extraction && do_carve && !bw.carve(&results) {
-            error!("Failed to carve raw data to disk");
+        if do_extraction && do_carve {
+            let _ = bw.carve(&results);
         }
 
         // Report file results back to main thread
