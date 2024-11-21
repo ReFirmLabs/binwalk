@@ -11,11 +11,19 @@ pub fn integration_test(signature_filter: &str, file_name: &str) {
     let results = run_binwalk(signature_filter, file_name);
 
     // Assert that there was a valid signature and successful result at, and only at, file offset 0
-    assert_results_ok(results, expected_signature_offsets, expected_extraction_offsets);
+    assert_results_ok(
+        results,
+        expected_signature_offsets,
+        expected_extraction_offsets,
+    );
 }
 
 /// Assert that there was a valid signature match and corresponding extraction at, and only at, the specified file offsets
-pub fn assert_results_ok(results: AnalysisResults, signature_offsets: Vec<usize>, extraction_offsets: Vec<usize>) {
+pub fn assert_results_ok(
+    results: AnalysisResults,
+    signature_offsets: Vec<usize>,
+    extraction_offsets: Vec<usize>,
+) {
     // Assert that the number of signature results and extractions match the expected results
     assert!(results.file_map.len() == signature_offsets.len());
     assert!(results.extractions.len() == extraction_offsets.len());

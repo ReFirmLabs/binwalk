@@ -9,5 +9,9 @@ fn integration_test() {
     let expected_extraction_offsets: Vec<usize> = vec![];
 
     let results = common::run_binwalk(SIGNATURE_TYPE, INPUT_FILE_NAME);
-    common::assert_results_ok(results, expected_signature_offsets, expected_extraction_offsets);
+    common::assert_results_ok(
+        results,
+        expected_signature_offsets,
+        expected_extraction_offsets,
+    );
 }
