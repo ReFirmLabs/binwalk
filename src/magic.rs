@@ -987,6 +987,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::dxbc::DESCRIPTION.to_string(),
             extractor: Some(extractors::dxbc::dxbc_extractor()),
         },
+        // D-Link TLV firmware
+        signatures::common::Signature {
+            name: "dlink_tlv".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::dlink_tlv::dlink_tlv_magic(),
+            parser: signatures::dlink_tlv::dlink_tlv_parser,
+            description: signatures::dlink_tlv::DESCRIPTION.to_string(),
+            extractor: None,
+        },
     ];
 
     binary_signatures

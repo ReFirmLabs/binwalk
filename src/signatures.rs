@@ -124,6 +124,7 @@ pub mod cramfs;
 pub mod csman;
 pub mod dahua_zip;
 pub mod deb;
+pub mod dlink_tlv;
 pub mod dlob;
 pub mod dmg;
 pub mod dtb;
