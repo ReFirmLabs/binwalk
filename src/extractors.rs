@@ -149,6 +149,7 @@ pub mod common;
 pub mod csman;
 pub mod dahua_zip;
 pub mod dlink_tlv;
+pub mod dlke;
 pub mod dmg;
 pub mod dtb;
 pub mod dumpifs;

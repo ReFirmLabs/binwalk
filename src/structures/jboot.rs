@@ -22,12 +22,12 @@ pub fn parse_jboot_arm_header(jboot_data: &[u8]) -> Result<JBOOTArmHeader, Struc
     const LPVS_VALUE: usize = 1;
     const MBZ_VALUE: usize = 0;
     const HEADER_ID_VALUE: usize = 0x4842;
-    const HEADER_VERSION_VALUE: usize = 2;
+    const HEADER_MAX_VERSION_VALUE: usize = 4;
 
     let arm_structure = vec![
         ("drange", "u16"),
         ("image_checksum", "u16"),
-        ("reserved1", "u32"),
+        ("block_size", "u32"),
         ("reserved2", "u32"),
         ("reserved3", "u16"),
         ("lpvs", "u8"),
@@ -57,9 +57,9 @@ pub fn parse_jboot_arm_header(jboot_data: &[u8]) -> Result<JBOOTArmHeader, Struc
     if let Some(header_data) = jboot_data.get(STRUCTURE_OFFSET..) {
         // Parse the header structure
         if let Ok(arm_header) = common::parse(header_data, &arm_structure, "little") {
+            println!("{:#?}", arm_header);
             // Make sure the reserved fields are NULL
-            if arm_header["reserved1"] == 0
-                && arm_header["reserved2"] == 0
+            if arm_header["reserved2"] == 0
                 && arm_header["reserved3"] == 0
                 && arm_header["reserved4"] == 0
                 && arm_header["reserved5"] == 0
@@ -71,7 +71,7 @@ pub fn parse_jboot_arm_header(jboot_data: &[u8]) -> Result<JBOOTArmHeader, Struc
                 if arm_header["lpvs"] == LPVS_VALUE
                     && arm_header["mbz"] == MBZ_VALUE
                     && arm_header["header_id"] == HEADER_ID_VALUE
-                    && arm_header["header_version"] == HEADER_VERSION_VALUE
+                    && arm_header["header_version"] <= HEADER_MAX_VERSION_VALUE
                 {
                     return Ok(JBOOTArmHeader {
                         header_size,
