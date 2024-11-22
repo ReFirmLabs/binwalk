@@ -13,10 +13,7 @@ pub const JBOOT_SCH2_DESCRIPTION: &str = "JBOOT SCH2 header";
 
 /// JBOOT firmware header magic bytes
 pub fn jboot_arm_magic() -> Vec<Vec<u8>> {
-    vec![
-        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x42\x48"
-            .to_vec(),
-    ]
+    vec![b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x42\x48".to_vec()]
 }
 
 /// JBOOT STAG header magic bytes
