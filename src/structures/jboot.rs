@@ -57,7 +57,6 @@ pub fn parse_jboot_arm_header(jboot_data: &[u8]) -> Result<JBOOTArmHeader, Struc
     if let Some(header_data) = jboot_data.get(STRUCTURE_OFFSET..) {
         // Parse the header structure
         if let Ok(arm_header) = common::parse(header_data, &arm_structure, "little") {
-            println!("{:#?}", arm_header);
             // Make sure the reserved fields are NULL
             if arm_header["reserved2"] == 0
                 && arm_header["reserved3"] == 0
