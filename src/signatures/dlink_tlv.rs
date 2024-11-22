@@ -1,4 +1,5 @@
 use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
+use crate::signatures::openssl::openssl_crypt_parser;
 use crate::structures::dlink_tlv::parse_dlink_tlv_header;
 
 /// Human readable description
@@ -37,7 +38,7 @@ pub fn dlink_tlv_parser(
 
             // Make sure the MD5 hashes match
             if payload_md5 == tlv_header.data_checksum {
-                result.size = tlv_header.header_size;
+                result.size = tlv_header.header_size + tlv_header.data_size;
                 result.description = format!(
                     "{}, model name: {}, board ID: {}, header size: {} bytes, data size: {} bytes",
                     result.description,
@@ -46,6 +47,15 @@ pub fn dlink_tlv_parser(
                     tlv_header.header_size,
                     tlv_header.data_size,
                 );
+
+                // Check if the firmware data is OpenSSL encrypted
+                if let Some(crypt_data) = file_data.get(offset + tlv_header.header_size..) {
+                    if let Ok(openssl_signature) = openssl_crypt_parser(crypt_data, 0) {
+                        result.description =
+                            format!("{}, {}", result.description, openssl_signature.description);
+                    }
+                }
+
                 return Ok(result);
             }
         }

@@ -996,7 +996,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             magic: signatures::dlink_tlv::dlink_tlv_magic(),
             parser: signatures::dlink_tlv::dlink_tlv_parser,
             description: signatures::dlink_tlv::DESCRIPTION.to_string(),
-            extractor: None,
+            extractor: Some(extractors::dlink_tlv::dlink_tlv_extractor()),
         },
     ];
 
