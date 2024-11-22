@@ -57,6 +57,8 @@ pub struct AnalysisResults {
 pub struct Binwalk {
     /// Count of all signatures (short and regular)
     pub signature_count: usize,
+    /// Count of all magic patterns (short and regular)
+    pub pattern_count: usize,
     /// The base file requested for analysis
     pub base_target_file: String,
     /// The base output directory for extracted files
@@ -188,6 +190,9 @@ impl Binwalk {
             // Keep a count of total unique signatures that are supported
             new_instance.signature_count += 1;
 
+            // Keep a count of the total number of magic patterns
+            new_instance.pattern_count += signature.magic.len();
+
             // Create a lookup table which associates each signature to its respective extractor
             new_instance
                 .extractor_lookup_table
@@ -198,6 +203,7 @@ impl Binwalk {
                 if signature.short && !full_search {
                     // These are short patterns, and should only be searched for at the very beginning of a file
                     new_instance.short_signatures.push(signature.clone());
+                    break;
                 } else {
                     /*
                      * Need to keep a mapping of the pattern index and its associated signature

@@ -235,7 +235,7 @@ fn main() {
         run_time,
         file_count,
         binwalker.signature_count,
-        binwalker.patterns.len(),
+        binwalker.pattern_count,
     );
 }
 
