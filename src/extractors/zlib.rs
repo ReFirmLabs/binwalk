@@ -42,15 +42,31 @@ pub fn zlib_decompress(
     // Size of the zlib header
     const HEADER_SIZE: usize = 2;
 
+    let mut exresult = ExtractionResult {
+        ..Default::default()
+    };
+
     // Do the decompression, ignoring the ZLIB header
-    let mut result =
+    let inflate_result =
         inflate::inflate_decompressor(file_data, offset + HEADER_SIZE, output_directory);
 
-    // If the decompression reported the size of the deflate data, update the reported size
-    // to include the ZLIB header and checksum fields
-    if let Some(deflate_size) = result.size {
-        result.size = Some(HEADER_SIZE + deflate_size + CHECKSUM_SIZE);
+    // Check that the data decompressed OK
+    if inflate_result.success {
+        // Calculate the ZLIB checksum offsets
+        let checksum_start = offset + HEADER_SIZE + inflate_result.size;
+        let checksum_end = checksum_start + CHECKSUM_SIZE;
+
+        // Get the ZLIB checksum
+        if let Some(adler32_checksum_bytes) = file_data.get(checksum_start..checksum_end) {
+            let reported_checksum = u32::from_be_bytes(adler32_checksum_bytes.try_into().unwrap());
+
+            // Make sure the checksum matches
+            if reported_checksum == inflate_result.adler32 {
+                exresult.success = true;
+                exresult.size = Some(HEADER_SIZE + inflate_result.size + CHECKSUM_SIZE);
+            }
+        }
     }
 
-    result
+    exresult
 }

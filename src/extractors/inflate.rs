@@ -1,33 +1,32 @@
-use crate::extractors::common::{Chroot, ExtractionResult};
+use crate::extractors::common::Chroot;
+use adler32::RollingAdler32;
 use flate2::bufread::DeflateDecoder;
 use std::io::Read;
 
-/*
- * The inflate_decompressor extractor is currently not directly used by any signature definitions.
- *
-use crate::extractors::common::{ Extractor, ExtractorType };
-
-// Defines the internal extractor function for decompressing raw deflate data
-pub fn inflate_extractor() -> Extractor {
-    return Extractor { utility: ExtractorType::Internal(inflate_decompressor), ..Default::default() };
+#[derive(Debug, Default, Clone)]
+pub struct DeflateResult {
+    pub size: usize,
+    pub adler32: u32,
+    pub success: bool,
 }
-*/
 
-/// Internal extractor for inflating deflated data.
+/// Decompressor for inflating deflated data.
+/// For internal use, does not conform to the standard extractor format.
 pub fn inflate_decompressor(
     file_data: &[u8],
     offset: usize,
     output_directory: Option<&String>,
-) -> ExtractionResult {
+) -> DeflateResult {
     // Size of decompression buffer
     const BLOCK_SIZE: usize = 8192;
     // Output file for decompressed data
     const OUTPUT_FILE_NAME: &str = "decompressed.bin";
 
-    let mut result = ExtractionResult {
+    let mut result = DeflateResult {
         ..Default::default()
     };
 
+    let mut adler32_checksum = RollingAdler32::new();
     let mut decompressed_buffer = [0; BLOCK_SIZE];
     let mut decompressor = DeflateDecoder::new(&file_data[offset..]);
 
@@ -49,12 +48,16 @@ pub fn inflate_decompressor(
                 break;
             }
             Ok(n) => {
-                // Decompressed a block of data, if extraction was requested write the decompressed block to the output file
-                if n > 0 && output_directory.is_some() {
-                    let chroot = Chroot::new(output_directory);
-                    if !chroot.append_to_file(OUTPUT_FILE_NAME, &decompressed_buffer[0..n]) {
-                        // If writing data to file fails, break
-                        break;
+                // Decompressed a block of data, update checksum and if extraction was requested write the decompressed block to the output file
+                if n > 0 {
+                    adler32_checksum.update_buffer(&decompressed_buffer[0..n]);
+
+                    if output_directory.is_some() {
+                        let chroot = Chroot::new(output_directory);
+                        if !chroot.append_to_file(OUTPUT_FILE_NAME, &decompressed_buffer[0..n]) {
+                            // If writing data to file fails, break
+                            break;
+                        }
                     }
                 }
 
@@ -63,7 +66,8 @@ pub fn inflate_decompressor(
                     // If some data was actually decompressed, report success and the number of input bytes consumed
                     if decompressor.total_out() > 0 {
                         result.success = true;
-                        result.size = Some(decompressor.total_in() as usize);
+                        result.adler32 = adler32_checksum.hash();
+                        result.size = decompressor.total_in() as usize;
                     }
 
                     // Nothing else to do, break
