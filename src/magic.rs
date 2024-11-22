@@ -998,6 +998,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::dlink_tlv::DESCRIPTION.to_string(),
             extractor: Some(extractors::dlink_tlv::dlink_tlv_extractor()),
         },
+        // DLKE encrypted firmware
+        signatures::common::Signature {
+            name: "dlke".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::dlke::dlke_magic(),
+            parser: signatures::dlke::dlke_parser,
+            description: signatures::dlke::DESCRIPTION.to_string(),
+            extractor: Some(extractors::dlke::dlke_extractor()),
+        },
     ];
 
     binary_signatures
