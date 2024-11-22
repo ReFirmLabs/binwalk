@@ -10,7 +10,12 @@ pub const DESCRIPTION: &str = "uImage firmware image";
 
 /// uImage magic bytes
 pub fn uimage_magic() -> Vec<Vec<u8>> {
-    vec![b"\x27\x05\x19\x56".to_vec()]
+    vec![
+        // Standard uImage magic
+        b"\x27\x05\x19\x56".to_vec(),
+        // Alternate uImage magic (https://git.openwrt.org/?p=openwrt/openwrt.git;a=commitdiff;h=01a1e21863aa30c7a2c252ff06b9aef0cf957970)
+        b"OKLI".to_vec(),
+    ]
 }
 
 /// Validates uImage signatures
