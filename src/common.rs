@@ -1,6 +1,7 @@
 //! Common Functions
 use chrono::prelude::DateTime;
 use log::{debug, error};
+use memmap2::Mmap;
 use std::fs::File;
 use std::io::Read;
 
@@ -35,6 +36,36 @@ pub fn read_file(file: impl Into<String>) -> Result<Vec<u8>, std::io::Error> {
                 debug!("Loaded {} bytes from {}", file_size, file_path);
                 Ok(file_data)
             }
+        },
+    }
+}
+
+/// Map the file into memory and return a [Mmap] instance
+/// that provides access into the file's contents.
+/// 
+/// ## Example
+/// 
+/// ```
+/// use binwalk::common::mmap_file;
+///
+/// let file_data = mmap_file("/etc/passwd")?;
+/// assert!(file_data.len() > 0);
+/// # Ok::<(), std::io::Error>(())
+/// ```
+pub fn mmap_file(file: impl Into<String>) -> Result<Mmap, std::io::Error> {
+    let file_path = file.into();
+
+    match File::open(&file_path) {
+        Err(e) => {
+            error!("Failed to open file {}: {}", file_path, e);
+            Err(e)
+        }
+        Ok(fp) => match unsafe { Mmap::map(&fp) } {
+            Err(e) => {
+                error!("Failed to map file {} into memory: {}", file_path, e);
+                Err(e)
+            }
+            Ok(mmap) => Ok(mmap),
         },
     }
 }
