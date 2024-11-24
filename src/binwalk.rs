@@ -14,7 +14,7 @@ use std::os::windows;
 #[cfg(unix)]
 use std::os::unix;
 
-use crate::common::{is_offset_safe, read_file};
+use crate::common::{is_offset_safe, mmap_file};
 use crate::extractors;
 use crate::magic;
 use crate::signatures;
@@ -699,11 +699,10 @@ impl Binwalk {
 
         debug!("Analysis start: {}", target_file);
 
-        // Read file into memory
-        if let Ok(file_data) = read_file(target_file) {
+        if let Ok(file_mmap) = mmap_file(target_file) {
             // Scan file data for signatures
             info!("Scanning {}", target_file);
-            results.file_map = self.scan(&file_data);
+            results.file_map = self.scan(&file_mmap);
 
             // Only extract if told to, and if there were some signatures found in this file
             if do_extraction && !results.file_map.is_empty() {
@@ -712,7 +711,7 @@ impl Binwalk {
                     "Submitting {} signature results to extractor",
                     results.file_map.len()
                 );
-                results.extractions = self.extract(&file_data, target_file, &results.file_map);
+                results.extractions = self.extract(&file_mmap, target_file, &results.file_map);
             }
         }
 
