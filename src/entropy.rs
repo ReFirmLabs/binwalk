@@ -1,4 +1,4 @@
-use crate::common::read_file;
+use crate::common::mmap_file;
 use entropy::shannon_entropy;
 use log::error;
 use plotters::prelude::*;
@@ -87,7 +87,7 @@ pub fn plot(file_path: impl Into<String>) -> Result<FileEntropy, EntropyError> {
     }
 
     // Read in the target file data
-    if let Ok(file_data) = read_file(&target_file) {
+    if let Ok(file_data) = mmap_file(&target_file) {
         let mut points: Vec<(i32, i32)> = vec![];
 
         // Calculate the entropy for each file block

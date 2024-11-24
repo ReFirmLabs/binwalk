@@ -305,7 +305,7 @@ fn carve_file_map(results: &binwalk::AnalysisResults) -> usize {
     // No results, don't do anything
     if !results.file_map.is_empty() {
         // Read in the source file
-        if let Ok(file_data) = common::read_file(&results.file_path) {
+        if let Ok(file_data) = common::mmap_file(&results.file_path) {
             // Loop through all identified signatures in the file
             for signature_result in &results.file_map {
                 // If there is data between the last signature and this signature, it is some chunk of unknown data
