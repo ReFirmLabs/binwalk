@@ -1,3 +1,4 @@
+use crate::common::is_offset_safe;
 use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 use crate::structures::xz::{parse_xz_footer, parse_xz_header};
 use aho_corasick::AhoCorasick;
@@ -20,19 +21,40 @@ pub fn xz_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, Sig
         ..Default::default()
     };
 
-    // Parse the XZ header to get the header's size
-    if let Ok(header_size) = parse_xz_header(&file_data[offset..]) {
-        if let Some(xz_stream_data) = file_data.get(offset + header_size..) {
-            // Get the size of the XZ stream data
-            if let Ok(stream_size) = xz_stream_size(xz_stream_data) {
-                // Total size is the header size plus the data stream size
-                result.size = header_size + stream_size;
-                result.description =
-                    format!("{}, total size: {} bytes", result.description, result.size);
-                return Ok(result);
+    let mut next_offset = offset;
+    let mut previous_offset = None;
+    let available_data = file_data.len() - offset;
+
+    // XZ streams can be concatenated together, need to process them all to determine the size of an XZ file
+    while is_offset_safe(available_data, next_offset, previous_offset) {
+        // Parse the next XZ header to get the header's size
+        match parse_xz_header(&file_data[next_offset..]) {
+            Err(_) => break,
+            Ok(header_size) => {
+                match file_data.get(next_offset + header_size..) {
+                    None => break,
+                    Some(xz_stream_data) => {
+                        // Determine the size of the XZ stream data
+                        match xz_stream_size(xz_stream_data) {
+                            Err(_) => break,
+                            Ok(stream_size) => {
+                                previous_offset = Some(next_offset);
+                                next_offset += header_size + stream_size;
+                            }
+                        }
+                    }
+                }
             }
         }
-    };
+    }
+
+    // If at least one valid header and one valid stream were identified,
+    // next_offset will be greater than the starting offset.
+    if next_offset > offset {
+        result.size = next_offset - offset;
+        result.description = format!("{}, total size: {} bytes", result.description, result.size);
+        return Ok(result);
+    }
 
     Err(SignatureError)
 }
