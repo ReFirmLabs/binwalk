@@ -30,16 +30,6 @@ make install
 cd /tmp
 rm -rf /tmp/dmg2img
 
-# Install srec2bin
-mkdir /tmp/srec
-cd /tmp/srec
-wget https://www.goffart.co.uk/s-record/download/srec_151_src.zip
-unzip srec_151_src.zip
-make
-cp srec2bin /usr/local/bin/
-cd /tmp
-rm -rf /tmp/srec
-
 # Install latest version of 7z (static) for APFS support
 mkdir /tmp/7z
 cd /tmp/7z
