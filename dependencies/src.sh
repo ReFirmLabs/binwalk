@@ -33,7 +33,7 @@ rm -rf /tmp/dmg2img
 # Install srec2bin
 mkdir /tmp/srec
 cd /tmp/srec
-wget http://www.goffart.co.uk/s-record/download/srec_151_src.zip
+wget https://www.goffart.co.uk/s-record/download/srec_151_src.zip
 unzip srec_151_src.zip
 make
 cp srec2bin /usr/local/bin/
