@@ -1,24 +1,22 @@
 //! Common Functions
 use chrono::prelude::DateTime;
-use log::{debug, error};
+use log::error;
+use memmap2::Mmap;
 use std::fs::File;
-use std::io::Read;
 
-/// Read a file into memory and return its contents.
+/// Map the file into memory and return a [Mmap] instance
+/// that provides access into the file's contents.
 ///
 /// ## Example
 ///
 /// ```
-/// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_common_rs_11_0() -> Result<(), Box<dyn std::error::Error>> {
-/// use binwalk::common::read_file;
+/// use binwalk::common::mmap_file;
 ///
-/// let file_data = read_file("/etc/passwd")?;
+/// let file_data = mmap_file("/etc/passwd")?;
 /// assert!(file_data.len() > 0);
-/// # Ok(())
-/// # } _doctest_main_src_common_rs_11_0(); }
+/// # Ok::<(), std::io::Error>(())
 /// ```
-pub fn read_file(file: impl Into<String>) -> Result<Vec<u8>, std::io::Error> {
-    let mut file_data = Vec::new();
+pub fn mmap_file(file: impl Into<String>) -> Result<Mmap, std::io::Error> {
     let file_path = file.into();
 
     match File::open(&file_path) {
@@ -26,15 +24,12 @@ pub fn read_file(file: impl Into<String>) -> Result<Vec<u8>, std::io::Error> {
             error!("Failed to open file {}: {}", file_path, e);
             Err(e)
         }
-        Ok(mut fp) => match fp.read_to_end(&mut file_data) {
+        Ok(fp) => match unsafe { Mmap::map(&fp) } {
             Err(e) => {
-                error!("Failed to read file {} into memory: {}", file_path, e);
+                error!("Failed to map file {} into memory: {}", file_path, e);
                 Err(e)
             }
-            Ok(file_size) => {
-                debug!("Loaded {} bytes from {}", file_size, file_path);
-                Ok(file_data)
-            }
+            Ok(mmap) => Ok(mmap),
         },
     }
 }
