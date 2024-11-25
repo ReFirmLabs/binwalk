@@ -24,15 +24,22 @@ pub fn openssl_crypt_parser(
         ..Default::default()
     };
 
+    // This "salt" value are the bytes commonly found in the openssl binary itself
+    let known_false_positive_salts: Vec<usize> = vec![0x2D252D32];
+
     // Parse the header
     if let Ok(openssl_header) = parse_openssl_crypt_header(&file_data[offset..]) {
-        // If the magic starts at the beginning of a file, our confidence is a bit higher
-        if offset == 0 {
-            result.confidence = CONFIDENCE_MEDIUM;
-        }
+        // Check common false positive salt values
+        if !known_false_positive_salts.contains(&openssl_header.salt) {
+            // If the magic starts at the beginning of a file, our confidence is a bit higher
+            if offset == 0 {
+                result.confidence = CONFIDENCE_MEDIUM;
+            }
 
-        result.description = format!("{}, salt: {:#X}", result.description, openssl_header.salt);
-        return Ok(result);
+            result.description =
+                format!("{}, salt: {:#X}", result.description, openssl_header.salt);
+            return Ok(result);
+        }
     }
 
     Err(SignatureError)
