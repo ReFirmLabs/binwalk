@@ -7,6 +7,7 @@ SCRIPT_DIRECTORY=$(dirname -- "$( readlink -f -- "$0"; )")
 DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install \
     7zip \
     zstd \
+    srecord \
     tar \
     unzip \
     sleuthkit \

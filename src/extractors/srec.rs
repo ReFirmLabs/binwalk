@@ -1,6 +1,6 @@
 use crate::extractors;
 
-/// Describes how to run the srec2bin utility to convert Motorola S-records to binary
+/// Describes how to run the srec_cat utility to convert Motorola S-records to binary
 ///
 /// ```
 /// use std::io::ErrorKind;
@@ -24,11 +24,13 @@ use crate::extractors;
 /// ```
 pub fn srec_extractor() -> extractors::common::Extractor {
     extractors::common::Extractor {
-        utility: extractors::common::ExtractorType::External("srec2bin".to_string()),
+        utility: extractors::common::ExtractorType::External("srec_cat".to_string()),
         extension: "hex".to_string(),
         arguments: vec![
-            extractors::common::SOURCE_FILE_PLACEHOLDER.to_string(),
+            "-output".to_string(),
             "s-record.bin".to_string(),
+            "-binary".to_string(),
+            extractors::common::SOURCE_FILE_PLACEHOLDER.to_string(),
         ],
         exit_codes: vec![0],
         ..Default::default()
