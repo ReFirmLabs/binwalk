@@ -1009,6 +1009,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::dlke::DESCRIPTION.to_string(),
             extractor: Some(extractors::dlke::dlke_extractor()),
         },
+        // SHRS encrypted firmware
+        signatures::common::Signature {
+            name: "shrs".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::shrs::shrs_magic(),
+            parser: signatures::shrs::shrs_parser,
+            description: signatures::shrs::DESCRIPTION.to_string(),
+            extractor: Some(extractors::shrs::shrs_extractor()),
+        },
     ];
 
     binary_signatures

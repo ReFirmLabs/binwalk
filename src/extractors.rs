@@ -174,6 +174,7 @@ pub mod rar;
 pub mod riff;
 pub mod romfs;
 pub mod sevenzip;
+pub mod shrs;
 pub mod squashfs;
 pub mod srec;
 pub mod svg;
