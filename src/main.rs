@@ -63,16 +63,18 @@ fn main() {
         panic!("No target file name specified! Try --help.");
     }
 
+    let mut json_logger = json::JsonLogger::new(cliargs.log);
+
     // If entropy analysis was requested, generate the entropy graph and return
     if cliargs.entropy {
         display::print_plain(cliargs.quiet, "Calculating file entropy...");
 
         if let Ok(entropy_results) = entropy::plot(cliargs.file_name.unwrap()) {
             // Log entropy results to JSON file, if requested
-            json::log(
-                &cliargs.log,
+            json_logger.log(
                 json::JSONType::Entropy(entropy_results.clone()),
             );
+            json_logger.close();
 
             display::print_plain(cliargs.quiet, "entropy graph saved to: ");
             display::println_plain(cliargs.quiet, &entropy_results.file);
@@ -190,7 +192,7 @@ fn main() {
             file_count += 1;
 
             // Log analysis results to JSON file
-            json::log(&cliargs.log, json::JSONType::Analysis(results.clone()));
+            json_logger.log(json::JSONType::Analysis(results.clone()));
 
             // Nothing found? Nothing else to do for this file.
             if results.file_map.is_empty() {
@@ -218,6 +220,8 @@ fn main() {
             }
         }
     }
+
+    json_logger.close();
 
     // If BINWALK_RM_SYMLINK env var was set, delete the base_target_file symlink
     if (cliargs.carve || cliargs.extract) && std::env::var(BINWALK_RM_SYMLINK).is_ok() {

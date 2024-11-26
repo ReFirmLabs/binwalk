@@ -8,66 +8,80 @@ use std::io::Write;
 use crate::binwalk::AnalysisResults;
 use crate::entropy::FileEntropy;
 
+const STDOUT: &str = "-";
+const JSON_LIST_START: &str = "[\n";
+const JSON_LIST_END: &str = "{\"EOF\": true}\n]\n";
+const JSON_LIST_SEP: &str = ",\n";
+
 #[derive(Debug, Serialize, Deserialize)]
 pub enum JSONType {
     Entropy(FileEntropy),
     Analysis(AnalysisResults),
 }
 
-/// If file does not exist, write "[\n<json_data>\n]".
-/// Else, seek to EOF -1 and write ",\n<json_data>\n]".
-pub fn log(json_file: &Option<String>, results: JSONType) {
-    const JSON_LIST_START: &str = "[\n";
-    const JSON_LIST_END: &str = "\n]";
-    const JSON_COMMA_SEPERATOR: &str = ",\n";
+#[derive(Debug, Default, Clone)]
+pub struct JsonLogger {
+    pub json_file: Option<String>,
+    pub json_file_initialized: bool,
+}
 
-    match json_file {
-        None => (),
-        Some(file_name) => {
-            // Convert analysis results to JSON
-            match serde_json::to_string_pretty(&results) {
-                Err(e) => panic!("Failed to convert analysis results to JSON: {}", e),
-                Ok(json) => {
+impl JsonLogger {
+    pub fn new(log_file: Option<String>) -> JsonLogger {
+        let mut new_instance = JsonLogger { ..Default::default() };
+
+        if log_file.is_some() {
+            new_instance.json_file = Some(log_file.unwrap().clone());
+        }
+
+        new_instance
+    }
+    
+    pub fn close(&self) {
+        self.write_json(JSON_LIST_END.to_string());
+    }
+
+    pub fn log(&mut self, results: JSONType) {
+        // Convert analysis results to JSON
+        match serde_json::to_string_pretty(&results) {
+            Err(e) => error!("Failed to convert analysis results to JSON: {}", e),
+            Ok(json) => {
+                if !self.json_file_initialized {
+                    self.write_json(JSON_LIST_START.to_string());
+                    self.json_file_initialized = true;
+                }
+                self.write_json(json);
+                self.write_json(JSON_LIST_SEP.to_string());
+            }
+        }
+    }
+
+    fn write_json(&self, data: String) {
+        match &self.json_file {
+            None => return,
+            Some(log_file) => {
+                if log_file == STDOUT {
+                    print!("{data}");
+                } else {
                     // Open file for reading and writing, create if does not already exist
                     match fs::OpenOptions::new()
                         .create(true)
                         .append(true)
                         .read(true)
-                        .open(file_name)
+                        .open(log_file)
                     {
                         Err(e) => {
-                            error!("Failed to open JSON log file '{}': {}", file_name, e);
+                            error!("Failed to open JSON log file '{}': {}", log_file, e);
                         }
                         Ok(mut fp) => {
                             // Seek to the end of the file and get the cursor position
                             match fp.seek(io::SeekFrom::End(0)) {
                                 Err(e) => {
-                                    error!("Failed to see to end of JSON file: {}", e);
+                                    error!("Failed to seek to end of JSON file: {}", e);
                                 }
-                                Ok(pos) => {
-                                    if pos == 0 {
-                                        // If EOF is at offset 0, this file is empty and needs an opening JSON list character
-                                        write_to_json_file(&fp, JSON_LIST_START.to_string());
-                                    } else {
-                                        // If there is already data in the file we want to overwrite the last byte, which should be a closing JSON list character, with a comma
-                                        if let Err(e) = fp.seek(io::SeekFrom::Start(
-                                            pos - (JSON_LIST_END.len() as u64),
-                                        )) {
-                                            error!("Failed to seek to EOF-1 in JSON file: {}", e);
-                                            return;
-                                        } else {
-                                            write_to_json_file(
-                                                &fp,
-                                                JSON_COMMA_SEPERATOR.to_string(),
-                                            );
-                                        }
+                                Ok(_) => {
+                                    if let Err(e) = fp.write_all(data.as_bytes()) {
+                                        error!("Failed to write to JSON log file: {}", e);
                                     }
-
-                                    // Write the JSON data to file
-                                    write_to_json_file(&fp, json);
-
-                                    // Write a closing JSON list character to file
-                                    write_to_json_file(&fp, JSON_LIST_END.to_string());
                                 }
                             }
                         }
@@ -75,11 +89,5 @@ pub fn log(json_file: &Option<String>, results: JSONType) {
                 }
             }
         }
-    }
-}
-
-fn write_to_json_file(mut fp: &fs::File, data: String) {
-    if let Err(e) = fp.write_all(data.as_bytes()) {
-        error!("Failed to write to JSON log file: {}", e);
     }
 }
