@@ -169,6 +169,7 @@ pub mod rsa;
 pub mod rtk;
 pub mod seama;
 pub mod sevenzip;
+pub mod shrs;
 pub mod squashfs;
 pub mod srec;
 pub mod svg;
