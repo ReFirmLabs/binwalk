@@ -71,9 +71,7 @@ fn main() {
 
         if let Ok(entropy_results) = entropy::plot(cliargs.file_name.unwrap()) {
             // Log entropy results to JSON file, if requested
-            json_logger.log(
-                json::JSONType::Entropy(entropy_results.clone()),
-            );
+            json_logger.log(json::JSONType::Entropy(entropy_results.clone()));
             json_logger.close();
 
             display::print_plain(cliargs.quiet, "entropy graph saved to: ");

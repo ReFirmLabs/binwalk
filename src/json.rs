@@ -10,7 +10,7 @@ use crate::entropy::FileEntropy;
 
 const STDOUT: &str = "-";
 const JSON_LIST_START: &str = "[\n";
-const JSON_LIST_END: &str = "{\"EOF\": true}\n]\n";
+const JSON_LIST_END: &str = "\n]\n";
 const JSON_LIST_SEP: &str = ",\n";
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -27,7 +27,9 @@ pub struct JsonLogger {
 
 impl JsonLogger {
     pub fn new(log_file: Option<String>) -> JsonLogger {
-        let mut new_instance = JsonLogger { ..Default::default() };
+        let mut new_instance = JsonLogger {
+            ..Default::default()
+        };
 
         if log_file.is_some() {
             new_instance.json_file = Some(log_file.unwrap().clone());
@@ -35,7 +37,7 @@ impl JsonLogger {
 
         new_instance
     }
-    
+
     pub fn close(&self) {
         self.write_json(JSON_LIST_END.to_string());
     }
@@ -48,40 +50,38 @@ impl JsonLogger {
                 if !self.json_file_initialized {
                     self.write_json(JSON_LIST_START.to_string());
                     self.json_file_initialized = true;
+                } else {
+                    self.write_json(JSON_LIST_SEP.to_string());
                 }
                 self.write_json(json);
-                self.write_json(JSON_LIST_SEP.to_string());
             }
         }
     }
 
     fn write_json(&self, data: String) {
-        match &self.json_file {
-            None => return,
-            Some(log_file) => {
-                if log_file == STDOUT {
-                    print!("{data}");
-                } else {
-                    // Open file for reading and writing, create if does not already exist
-                    match fs::OpenOptions::new()
-                        .create(true)
-                        .append(true)
-                        .read(true)
-                        .open(log_file)
-                    {
-                        Err(e) => {
-                            error!("Failed to open JSON log file '{}': {}", log_file, e);
-                        }
-                        Ok(mut fp) => {
-                            // Seek to the end of the file and get the cursor position
-                            match fp.seek(io::SeekFrom::End(0)) {
-                                Err(e) => {
-                                    error!("Failed to seek to end of JSON file: {}", e);
-                                }
-                                Ok(_) => {
-                                    if let Err(e) = fp.write_all(data.as_bytes()) {
-                                        error!("Failed to write to JSON log file: {}", e);
-                                    }
+        if let Some(log_file) = &self.json_file {
+            if log_file == STDOUT {
+                print!("{data}");
+            } else {
+                // Open file for reading and writing, create if does not already exist
+                match fs::OpenOptions::new()
+                    .create(true)
+                    .append(true)
+                    .read(true)
+                    .open(log_file)
+                {
+                    Err(e) => {
+                        error!("Failed to open JSON log file '{}': {}", log_file, e);
+                    }
+                    Ok(mut fp) => {
+                        // Seek to the end of the file and get the cursor position
+                        match fp.seek(io::SeekFrom::End(0)) {
+                            Err(e) => {
+                                error!("Failed to seek to end of JSON file: {}", e);
+                            }
+                            Ok(_) => {
+                                if let Err(e) = fp.write_all(data.as_bytes()) {
+                                    error!("Failed to write to JSON log file: {}", e);
                                 }
                             }
                         }

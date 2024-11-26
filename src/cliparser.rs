@@ -35,7 +35,7 @@ pub struct CliArgs {
     #[arg(short = 'E', long, conflicts_with = "extract")]
     pub entropy: bool,
 
-    /// Log JSON results to a file
+    /// Log JSON results to a file ('-' for stdout)
     #[arg(short, long)]
     pub log: Option<String>,
 
