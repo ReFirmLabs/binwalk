@@ -6,6 +6,7 @@ use std::io::Seek;
 use std::io::Write;
 
 use crate::binwalk::AnalysisResults;
+use crate::display;
 use crate::entropy::FileEntropy;
 
 const STDOUT: &str = "-";
@@ -39,7 +40,7 @@ impl JsonLogger {
     }
 
     pub fn close(&self) {
-        self.write_json(JSON_LIST_END.to_string());
+        self.write_json(JSON_LIST_END);
     }
 
     pub fn log(&mut self, results: JSONType) {
@@ -48,20 +49,20 @@ impl JsonLogger {
             Err(e) => error!("Failed to convert analysis results to JSON: {}", e),
             Ok(json) => {
                 if !self.json_file_initialized {
-                    self.write_json(JSON_LIST_START.to_string());
+                    self.write_json(JSON_LIST_START);
                     self.json_file_initialized = true;
                 } else {
-                    self.write_json(JSON_LIST_SEP.to_string());
+                    self.write_json(JSON_LIST_SEP);
                 }
-                self.write_json(json);
+                self.write_json(&json);
             }
         }
     }
 
-    fn write_json(&self, data: String) {
+    fn write_json(&self, data: &str) {
         if let Some(log_file) = &self.json_file {
             if log_file == STDOUT {
-                print!("{data}");
+                display::print_plain(false, data);
             } else {
                 // Open file for reading and writing, create if does not already exist
                 match fs::OpenOptions::new()
