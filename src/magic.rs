@@ -1020,6 +1020,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::shrs::DESCRIPTION.to_string(),
             extractor: Some(extractors::shrs::shrs_extractor()),
         },
+        // PKCS DER hashes
+        signatures::common::Signature {
+            name: "pkcs_der_hash".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::pkcs_der::der_hash_magic(),
+            parser: signatures::pkcs_der::der_hash_parser,
+            description: signatures::pkcs_der::DESCRIPTION.to_string(),
+            extractor: None,
+        },
     ];
 
     binary_signatures
