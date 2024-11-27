@@ -7,11 +7,9 @@ pub const DESCRIPTION: &str = "JPEG image";
 /// JPEG magic bytes
 pub fn jpeg_magic() -> Vec<Vec<u8>> {
     vec![
-        /*
-         * Works for normal jpegs but not exif.
-         * See: https://github.com/corkami/formats/blob/master/image/jpeg.md
-         */
         b"\xFF\xD8\xFF\xE0\x00\x10JFIF\x00".to_vec(),
+        b"\xFF\xD8\xFF\xE1".to_vec(),
+        b"\xFF\xD8\xFF\xDB".to_vec(),
     ]
 }
 
