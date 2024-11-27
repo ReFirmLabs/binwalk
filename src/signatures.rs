@@ -144,6 +144,7 @@ pub mod jboot;
 pub mod jffs2;
 pub mod jpeg;
 pub mod linux;
+pub mod logfs;
 pub mod luks;
 pub mod lz4;
 pub mod lzfse;

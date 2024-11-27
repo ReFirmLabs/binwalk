@@ -1031,6 +1031,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::pkcs_der::DESCRIPTION.to_string(),
             extractor: None,
         },
+        // LogFS
+        signatures::common::Signature {
+            name: "logfs".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::logfs::logfs_magic(),
+            parser: signatures::logfs::logfs_parser,
+            description: signatures::logfs::DESCRIPTION.to_string(),
+            extractor: None,
+        },
     ];
 
     binary_signatures
