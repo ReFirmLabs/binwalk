@@ -27,9 +27,10 @@ pub fn sevenzip_extractor() -> extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("7zz".to_string()),
         extension: "bin".to_string(),
         arguments: vec![
-            "x".to_string(),   // Perform extraction
-            "-y".to_string(),  // Assume Yes to all questions
-            "-o.".to_string(), // Output to current working directory
+            "x".to_string(),    // Perform extraction
+            "-y".to_string(),   // Assume Yes to all questions
+            "-o.".to_string(),  // Output to current working directory
+            "-p''".to_string(), // Blank password to prevent hangs if archives are password protected
             extractors::common::SOURCE_FILE_PLACEHOLDER.to_string(),
         ],
         // If there is trailing data after the compressed data, extraction will happen but exit code will be 2
