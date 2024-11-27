@@ -916,7 +916,10 @@ pub fn execute(
                 // Decide how to execute the extractor depending on the extractor type
                 match &extractor_definition.utility {
                     ExtractorType::None => {
-                        panic!("An extractor of type None is invalid!");
+                        error!(
+                            "Signature {}: an extractor of type None is invalid!",
+                            signature.name
+                        );
                     }
 
                     ExtractorType::Internal(func) => {
@@ -994,17 +997,26 @@ fn spawn(
     signature: &SignatureResult,
     mut extractor: Extractor,
 ) -> Result<ProcInfo, std::io::Error> {
-    let command: String;
     let chroot = Chroot::new(None);
 
     // This function *only* handles execution of external extraction utilities; internal extractors must be invoked directly
-    match &extractor.utility {
-        ExtractorType::External(cmd) => command = cmd.clone(),
+    let command = match &extractor.utility {
+        ExtractorType::External(cmd) => cmd.clone(),
         ExtractorType::Internal(_ext) => {
-            panic!("Tried to run an internal extractor as an external command!")
+            error!("Tried to run an internal extractor as an external command!");
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "attempt to execute an internal extractor as an external command",
+            ));
         }
-        ExtractorType::None => panic!("An extractor command was defined, but is set to None!"),
-    }
+        ExtractorType::None => {
+            error!("An extractor command was defined, but is set to None!");
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "invalid external command of type None",
+            ));
+        }
+    };
 
     // Carved file path will be <output directory>/<signature.name>_<hex offset>.<extractor.extension>
     let carved_file = format!(

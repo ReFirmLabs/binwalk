@@ -3,6 +3,7 @@ use crate::extractors;
 use crate::signatures;
 use colored::ColoredString;
 use colored::Colorize;
+use log::error;
 use std::collections::HashMap;
 use std::io;
 use std::io::Write;
@@ -291,7 +292,7 @@ pub fn print_signature_list(quiet: bool, signatures: &Vec<signatures::common::Si
                     extractors::common::ExtractorType::Internal(_) => {
                         signature_info.extractor = "Built-in".to_string();
                     }
-                    extractors::common::ExtractorType::None => panic!(
+                    extractors::common::ExtractorType::None => error!(
                         "An invalid extractor type exists for the '{}' signature",
                         signature.description
                     ),
