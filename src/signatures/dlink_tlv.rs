@@ -36,8 +36,8 @@ pub fn dlink_tlv_parser(
         if let Some(payload_data) = file_data.get(data_start..data_end) {
             let payload_md5 = format!("{:x}", md5::compute(payload_data));
 
-            // Make sure the MD5 hashes match
-            if payload_md5 == tlv_header.data_checksum {
+            // If the MD5 checksum exists, make sure it matches
+            if tlv_header.data_checksum.is_empty() || payload_md5 == tlv_header.data_checksum {
                 result.size = tlv_header.header_size + tlv_header.data_size;
                 result.description = format!(
                     "{}, model name: {}, board ID: {}, header size: {} bytes, data size: {} bytes",
