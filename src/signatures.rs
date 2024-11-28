@@ -133,6 +133,7 @@ pub mod dxbc;
 pub mod ecos;
 pub mod efigpt;
 pub mod elf;
+pub mod encrpted_img;
 pub mod ext;
 pub mod fat;
 pub mod gif;
