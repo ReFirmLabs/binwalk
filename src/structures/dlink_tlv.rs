@@ -43,11 +43,8 @@ pub fn parse_dlink_tlv_header(tlv_data: &[u8]) -> Result<DlinkTLVHeader, Structu
         header.data_checksum =
             get_cstring(&header_data[MD5_HASH_OFFSET..MD5_HASH_OFFSET + MAX_STRING_LENGTH]);
 
-        // Make sure we got the expected strings OK
-        if !header.model_name.is_empty()
-            && !header.board_id.is_empty()
-            && !header.data_checksum.is_empty()
-        {
+        // Make sure we got the expected strings OK (checksum is not always included)
+        if !header.model_name.is_empty() && !header.board_id.is_empty() {
             // Parse the type and length values that describe the data the follows the header
             if let Ok(data_tlv) =
                 common::parse(&header_data[DATA_TLV_OFFSET..], &tlv_structure, "little")
