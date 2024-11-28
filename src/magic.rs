@@ -1042,6 +1042,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::logfs::DESCRIPTION.to_string(),
             extractor: None,
         },
+        // encrpted_img
+        signatures::common::Signature {
+            name: "encrpted_img".to_string(),
+            short: true,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::encrpted_img::encrpted_img_magic(),
+            parser: signatures::encrpted_img::encrpted_img_parser,
+            description: signatures::encrpted_img::DESCRIPTION.to_string(),
+            extractor: None,
+        },
     ];
 
     binary_signatures
