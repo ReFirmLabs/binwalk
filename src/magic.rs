@@ -1053,6 +1053,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::encrpted_img::DESCRIPTION.to_string(),
             extractor: None,
         },
+        // Android boot image
+        signatures::common::Signature {
+            name: "android_bootimg".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::android_bootimg::android_bootimg_magic(),
+            parser: signatures::android_bootimg::android_bootimg_parser,
+            description: signatures::android_bootimg::DESCRIPTION.to_string(),
+            extractor: None,
+        },
     ];
 
     binary_signatures
