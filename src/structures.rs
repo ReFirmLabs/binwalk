@@ -96,6 +96,7 @@
 //! }
 //! ```
 
+pub mod android_bootimg;
 pub mod androidsparse;
 pub mod apfs;
 pub mod autel;
