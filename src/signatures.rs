@@ -181,6 +181,7 @@ pub mod tarball;
 pub mod tplink;
 pub mod trx;
 pub mod ubi;
+pub mod uboot;
 pub mod uefi;
 pub mod uimage;
 pub mod vxworks;
