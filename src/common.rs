@@ -119,6 +119,40 @@ pub fn get_cstring(raw_data: &[u8]) -> String {
     string
 }
 
+/// Returns true if the provided byte is an ASCII number
+///
+/// ## Example
+///
+/// ```
+/// use binwalk::common::is_ascii_number;
+///
+/// assert!(is_ascii_number(0x31));
+/// assert!(!is_ascii_number(0xFE));
+/// ```
+pub fn is_ascii_number(b: u8) -> bool {
+    const ZERO: u8 = 48;
+    const NINE: u8 = 57;
+
+    (ZERO..=NINE).contains(&b)
+}
+
+/// Returns true if the provided byte is a printable ASCII character
+///
+/// ## Example
+///
+/// ```
+/// use binwalk::common::is_printable_ascii;
+///
+/// assert!(is_printable_ascii(0x41));
+/// assert!(!is_printable_ascii(0xFE));
+/// ```
+pub fn is_printable_ascii(b: u8) -> bool {
+    const ASCII_MIN: u8 = 0x0A;
+    const ASCII_MAX: u8 = 0x7E;
+
+    (ASCII_MIN..=ASCII_MAX).contains(&b)
+}
+
 /// Validates data offsets to prevent out-of-bounds access and infinite loops while parsing file formats.
 ///
 /// ## Notes

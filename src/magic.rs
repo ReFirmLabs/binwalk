@@ -1075,6 +1075,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::android_bootimg::DESCRIPTION.to_string(),
             extractor: None,
         },
+        // uboot
+        signatures::common::Signature {
+            name: "uboot".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: true,
+            magic: signatures::uboot::uboot_magic(),
+            parser: signatures::uboot::uboot_parser,
+            description: signatures::uboot::DESCRIPTION.to_string(),
+            extractor: None,
+        },
     ];
 
     binary_signatures
