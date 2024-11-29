@@ -192,6 +192,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::linux::LINUX_BOOT_IMAGE_DESCRIPTION.to_string(),
             extractor: None,
         },
+        // linux arm zimage
+        signatures::common::Signature {
+            name: "linux_arm_zimage".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::linux::linux_arm_zimage_magic(),
+            parser: signatures::linux::linux_arm_zimage_parser,
+            description: signatures::linux::LINUX_ARM_ZIMAGE_DESCRIPTION.to_string(),
+            extractor: None,
+        },
         // zstd
         signatures::common::Signature {
             name: "zstd".to_string(),

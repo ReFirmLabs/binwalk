@@ -2,10 +2,13 @@ use crate::common::get_cstring;
 use crate::signatures::common::{
     SignatureError, SignatureResult, CONFIDENCE_LOW, CONFIDENCE_MEDIUM,
 };
-use crate::structures::linux::parse_linux_arm64_boot_image_header;
+use crate::structures::linux::{
+    parse_linux_arm64_boot_image_header, parse_linux_arm_zimage_header,
+};
 use aho_corasick::AhoCorasick;
 
 /// Human readable descriptions
+pub const LINUX_ARM_ZIMAGE_DESCRIPTION: &str = "Linux ARM boot executable zImage";
 pub const LINUX_BOOT_IMAGE_DESCRIPTION: &str = "Linux kernel boot image";
 pub const LINUX_KERNEL_VERSION_DESCRIPTION: &str = "Linux kernel version";
 pub const LINUX_ARM64_BOOT_IMAGE_DESCRIPTION: &str = "Linux kernel ARM64 boot image";
@@ -23,6 +26,41 @@ pub fn linux_kernel_version_magic() -> Vec<Vec<u8>> {
 /// Magic bytes for a linux ARM64 boot image
 pub fn linux_arm64_boot_image_magic() -> Vec<Vec<u8>> {
     vec![b"\x00\x00\x00\x00\x00\x00\x00\x00ARMd".to_vec()]
+}
+
+/// Magic bytes for Linux ARM zImage
+pub fn linux_arm_zimage_magic() -> Vec<Vec<u8>> {
+    vec![b"\x18\x28\x6F\x01".to_vec(), b"\x01\x6F\x28\x18".to_vec()]
+}
+
+/// Validate a Linux ARM zImage
+pub fn linux_arm_zimage_parser(
+    file_data: &[u8],
+    offset: usize,
+) -> Result<SignatureResult, SignatureError> {
+    const MAGIC_OFFSET: usize = 36;
+
+    let mut result = SignatureResult {
+        confidence: CONFIDENCE_MEDIUM,
+        description: LINUX_ARM_ZIMAGE_DESCRIPTION.to_string(),
+        ..Default::default()
+    };
+
+    if offset >= MAGIC_OFFSET {
+        result.offset = offset - MAGIC_OFFSET;
+
+        if let Some(zimage_data) = file_data.get(result.offset..) {
+            if let Ok(zimage_header) = parse_linux_arm_zimage_header(zimage_data) {
+                result.description = format!(
+                    "{}, {} endian",
+                    result.description, zimage_header.endianness
+                );
+                return Ok(result);
+            }
+        }
+    }
+
+    Err(SignatureError)
 }
 
 /// Validate a linux ARM64 boot image signature

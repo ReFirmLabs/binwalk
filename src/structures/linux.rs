@@ -8,6 +8,56 @@ pub struct LinuxARM64BootHeader {
     pub endianness: String,
 }
 
+/// Struct to store Linux ARM zImage info
+#[derive(Debug, Default, Clone)]
+pub struct LinuxARMzImageHeader {
+    pub endianness: String,
+}
+
+/// Parses a Linux ARM zImage header
+pub fn parse_linux_arm_zimage_header(
+    zimage_data: &[u8],
+) -> Result<LinuxARMzImageHeader, StructureError> {
+    const NOP_LE: usize = 0xE1A00000;
+    const NOP_BE: usize = 0x0000A0E1;
+
+    let zimage_structure = vec![
+        ("nop1", "u32"),
+        ("nop2", "u32"),
+        ("nop3", "u32"),
+        ("nop4", "u32"),
+        ("nop5", "u32"),
+        ("nop6", "u32"),
+        ("nop7", "u32"),
+        ("nop8", "u32"),
+    ];
+
+    if let Ok(zimage_nops) = common::parse(zimage_data, &zimage_structure, "little") {
+        if zimage_nops["nop1"] == zimage_nops["nop2"]
+            && zimage_nops["nop1"] == zimage_nops["nop3"]
+            && zimage_nops["nop1"] == zimage_nops["nop4"]
+            && zimage_nops["nop1"] == zimage_nops["nop5"]
+            && zimage_nops["nop1"] == zimage_nops["nop6"]
+            && zimage_nops["nop1"] == zimage_nops["nop7"]
+            && zimage_nops["nop1"] == zimage_nops["nop8"]
+        {
+            if zimage_nops["nop1"] == NOP_LE {
+                return Ok(LinuxARMzImageHeader {
+                    endianness: "little".to_string(),
+                });
+            }
+
+            if zimage_nops["nop1"] == NOP_BE {
+                return Ok(LinuxARMzImageHeader {
+                    endianness: "big".to_string(),
+                });
+            }
+        }
+    }
+
+    Err(StructureError)
+}
+
 /// Parses a linux ARM64 boot header
 pub fn parse_linux_arm64_boot_image_header(
     img_data: &[u8],
