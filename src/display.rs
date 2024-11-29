@@ -34,7 +34,7 @@ fn line_delimiter() -> String {
     delim
 }
 
-fn center_text(text: &String) -> String {
+fn center_text(text: &str) -> String {
     let mut padding_width: i32;
     let mut centered_string: String = "".to_string();
 
@@ -95,7 +95,7 @@ fn line_wrap(text: &str, prefix_size: usize) -> String {
 
     formatted_string = formatted_string + &this_line;
 
-    return formatted_string.trim().to_string();
+    formatted_string.trim().to_string()
 }
 
 fn print_column_headers(col1: &str, col2: &str, col3: &str) {
@@ -113,7 +113,7 @@ fn print_delimiter() {
     println!("{}", line_delimiter().bold().bright_blue());
 }
 
-fn print_header(title_text: &String) {
+fn print_header(title_text: &str) {
     println!();
     println!("{}", center_text(title_text).bold().magenta());
     print_delimiter();
