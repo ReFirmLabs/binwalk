@@ -12,7 +12,7 @@ use std::io::Read;
 /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_common_rs_11_0() -> Result<(), Box<dyn std::error::Error>> {
 /// use binwalk::common::read_file;
 ///
-/// let file_data = read_file("/etc/passwd")?;
+/// let file_data = read_file("/etc/passwd", false)?;
 /// assert!(file_data.len() > 0);
 /// # Ok(())
 /// # } _doctest_main_src_common_rs_11_0(); }

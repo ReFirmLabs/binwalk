@@ -675,7 +675,7 @@ impl Binwalk {
     ///
     /// ```
     /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_binwalk_rs_624_0() -> Result<binwalk::Binwalk, binwalk::BinwalkError> {
-    /// use binwalk::Binwalk;
+    /// use binwalk::{Binwalk, common};
     ///
     /// let target_path = std::path::Path::new("tests")
     ///     .join("inputs")
@@ -688,6 +688,8 @@ impl Binwalk {
     ///     .display()
     ///     .to_string();
     ///
+    /// let file_data = common::read_file(&target_path, false).expect("Failed to read file data");
+    ///
     /// # std::fs::remove_dir_all(&extraction_directory);
     /// let binwalker = Binwalk::configure(Some(target_path),
     ///                                    Some(extraction_directory.clone()),
@@ -696,7 +698,7 @@ impl Binwalk {
     ///                                    None,
     ///                                    false)?;
     ///
-    /// let analysis_results = binwalker.analyze(&binwalker.base_target_file, true);
+    /// let analysis_results = binwalker.analyze(&file_data, &binwalker.base_target_file, true);
     ///
     /// assert_eq!(analysis_results.file_map.len(), 1);
     /// assert_eq!(analysis_results.extractions.len(),  1);
