@@ -1086,6 +1086,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::uboot::DESCRIPTION.to_string(),
             extractor: None,
         },
+        // dms firmware
+        signatures::common::Signature {
+            name: "dms".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::dms::dms_magic(),
+            parser: signatures::dms::dms_parser,
+            description: signatures::dms::DESCRIPTION.to_string(),
+            extractor: Some(extractors::swapped::swapped_extractor_u16()),
+        },
     ];
 
     binary_signatures
