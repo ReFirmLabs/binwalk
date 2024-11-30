@@ -21,7 +21,18 @@ use crate::signatures;
 
 /// Returned on initialization error
 #[derive(Debug, Default, Clone)]
-pub struct BinwalkError;
+pub struct BinwalkError {
+    pub message: String,
+}
+
+impl BinwalkError {
+    pub fn new(message: &str) -> Self {
+        BinwalkError {
+            message: message.to_string(),
+        }
+    }
+}
+
 
 /// Analysis results returned by Binwalk::analyze
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
@@ -134,8 +145,11 @@ impl Binwalk {
         if let Some(target_file) = target_file_name {
             // Set the target file path, make it an absolute path
             match path::absolute(&target_file) {
-                Err(_) => {
-                    return Err(BinwalkError);
+                Err(e) => {
+                    return Err(BinwalkError::new(&format!(
+                        "Failed to get absolute path for '{}'",
+                        target_file
+                    )));
                 }
                 Ok(abspath) => {
                     new_instance.base_target_file = abspath.display().to_string();
@@ -146,8 +160,11 @@ impl Binwalk {
             if let Some(extraction_directory) = output_directory {
                 // Make the extraction directory an absolute path
                 match path::absolute(&extraction_directory) {
-                    Err(_) => {
-                        return Err(BinwalkError);
+                    Err(e) => {
+                        return Err(BinwalkError::new(&format!(
+                            "Failed to get absolute path for '{}'",
+                            extraction_directory
+                        )));
                     }
                     Ok(abspath) => {
                         new_instance.base_output_directory = abspath.display().to_string();
@@ -161,8 +178,11 @@ impl Binwalk {
                     &new_instance.base_target_file,
                     &new_instance.base_output_directory,
                 ) {
-                    Err(_) => {
-                        return Err(BinwalkError);
+                    Err(e) => {
+                        return Err(BinwalkError::new( &format!(
+                            "Failed to initialize extraction directory: {}",
+                            e
+                        )));
                     }
                     Ok(new_target_file_path) => {
                         // This is the new base target path (a symlink inside the extraction directory)

@@ -96,8 +96,9 @@ fn main() {
         cliargs.exclude,
         None,
         cliargs.search_all,
-    )
-    .expect("Binwalk initialization failed");
+    ).unwrap_or_else(|e| {
+        panic!("Binwalk initialization failed: {}", e.message);
+    });
 
     // If the user specified --threads, honor that request; else, auto-detect available parallelism
     let available_workers = cliargs.threads.unwrap_or_else(|| {
