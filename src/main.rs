@@ -20,6 +20,9 @@ mod signatures;
 mod structures;
 
 fn main() {
+    // File name used when reading from stdin
+    const STDIN: &str = "stdin";
+
     // Only use one thread if unable to auto-detect available core info
     const DEFAULT_WORKER_COUNT: usize = 1;
 
@@ -50,12 +53,17 @@ fn main() {
     env_logger::init();
 
     // Process command line aguments
-    let cliargs = cliparser::parse();
+    let mut cliargs = cliparser::parse();
 
     // If --list was specified, just display a list of signatures and return
     if cliargs.list {
         display::print_signature_list(cliargs.quiet, &magic::patterns());
         return;
+    }
+
+    // Set a dummy file name when reading from stdin
+    if cliargs.stdin {
+        cliargs.file_name = Some(STDIN.to_string());
     }
 
     // If --list was not specified, a target file must be provided
@@ -69,7 +77,7 @@ fn main() {
     if cliargs.entropy {
         display::print_plain(cliargs.quiet, "Calculating file entropy...");
 
-        if let Ok(entropy_results) = entropy::plot(cliargs.file_name.unwrap()) {
+        if let Ok(entropy_results) = entropy::plot(cliargs.file_name.unwrap(), cliargs.stdin) {
             // Log entropy results to JSON file, if requested
             json_logger.log(json::JSONType::Entropy(entropy_results.clone()));
             json_logger.close();
@@ -165,6 +173,7 @@ fn main() {
                 &workers,
                 binwalker.clone(),
                 target_file,
+                cliargs.stdin && file_count == 0,
                 cliargs.extract,
                 cliargs.carve,
                 worker_tx.clone(),
@@ -273,17 +282,27 @@ fn spawn_worker(
     pool: &ThreadPool,
     bw: binwalk::Binwalk,
     target_file: String,
+    stdin: bool,
     do_extraction: bool,
     do_carve: bool,
     worker_tx: mpsc::Sender<AnalysisResults>,
 ) {
     pool.execute(move || {
+        // Read in file data
+        let file_data = match common::read_input(&target_file, stdin) {
+            Err(_) => {
+                error!("Failed to read {} data", target_file);
+                b"".to_vec()
+            }
+            Ok(data) => data,
+        };
+
         // Analyze target file, with extraction, if specified
-        let results = bw.analyze(&target_file, do_extraction);
+        let results = bw.analyze_buf(&file_data, &target_file, do_extraction);
 
         // If data carving was requested as part of extraction, carve analysis results to disk
         if do_carve {
-            let carve_count = carve_file_map(&results);
+            let carve_count = carve_file_map(&file_data, &results);
             info!(
                 "Carved {} data blocks to disk from {}",
                 carve_count, target_file
@@ -303,46 +322,42 @@ fn spawn_worker(
 /// Returns the number of carved files created.
 /// Note that unknown blocks of file data are also carved to disk, so the number of files
 /// created may be larger than the number of results defined in results.file_map.
-fn carve_file_map(results: &binwalk::AnalysisResults) -> usize {
+fn carve_file_map(file_data: &[u8], results: &binwalk::AnalysisResults) -> usize {
     let mut carve_count: usize = 0;
     let mut last_known_offset: usize = 0;
     let mut unknown_bytes: Vec<(usize, usize)> = Vec::new();
 
     // No results, don't do anything
     if !results.file_map.is_empty() {
-        // Read in the source file
-        if let Ok(file_data) = common::read_file(&results.file_path) {
-            // Loop through all identified signatures in the file
-            for signature_result in &results.file_map {
-                // If there is data between the last signature and this signature, it is some chunk of unknown data
-                if signature_result.offset > last_known_offset {
-                    unknown_bytes.push((
-                        last_known_offset,
-                        signature_result.offset - last_known_offset,
-                    ));
-                }
-
-                // Carve this signature's data to disk
-                if carve_file_data_to_disk(
-                    &results.file_path,
-                    &file_data,
-                    &signature_result.name,
-                    signature_result.offset,
-                    signature_result.size,
-                ) {
-                    carve_count += 1;
-                }
-
-                // Update the last known offset to the end of this signature's data
-                last_known_offset = signature_result.offset + signature_result.size;
+        // Loop through all identified signatures in the file
+        for signature_result in &results.file_map {
+            // If there is data between the last signature and this signature, it is some chunk of unknown data
+            if signature_result.offset > last_known_offset {
+                unknown_bytes.push((
+                    last_known_offset,
+                    signature_result.offset - last_known_offset,
+                ));
             }
 
-            // All known signature data has been carved to disk, now carve any unknown blocks of data to disk
-            for (offset, size) in unknown_bytes {
-                if carve_file_data_to_disk(&results.file_path, &file_data, "unknown", offset, size)
-                {
-                    carve_count += 1;
-                }
+            // Carve this signature's data to disk
+            if carve_file_data_to_disk(
+                &results.file_path,
+                file_data,
+                &signature_result.name,
+                signature_result.offset,
+                signature_result.size,
+            ) {
+                carve_count += 1;
+            }
+
+            // Update the last known offset to the end of this signature's data
+            last_known_offset = signature_result.offset + signature_result.size;
+        }
+
+        // All known signature data has been carved to disk, now carve any unknown blocks of data to disk
+        for (offset, size) in unknown_bytes {
+            if carve_file_data_to_disk(&results.file_path, file_data, "unknown", offset, size) {
+                carve_count += 1;
             }
         }
     }

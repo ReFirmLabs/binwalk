@@ -4,18 +4,55 @@ use log::{debug, error};
 use std::fs::File;
 use std::io::Read;
 
-/// Read a file into memory and return its contents.
+/// Read a data into memory, either from disk or from stdin, and return its contents.
 ///
 /// ## Example
 ///
 /// ```
 /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_common_rs_11_0() -> Result<(), Box<dyn std::error::Error>> {
+/// use binwalk::common::read_input;
+///
+/// let file_data = read_input("/etc/passwd", false)?;
+/// assert!(file_data.len() > 0);
+/// # Ok(())
+/// # } _doctest_main_src_common_rs_11_0(); }
+/// ```
+pub fn read_input(file: impl Into<String>, stdin: bool) -> Result<Vec<u8>, std::io::Error> {
+    if stdin {
+        read_stdin()
+    } else {
+        read_file(file)
+    }
+}
+
+/// Read data from standard input and return its contents.
+pub fn read_stdin() -> Result<Vec<u8>, std::io::Error> {
+    let mut stdin_data = Vec::new();
+
+    match std::io::stdin().read_to_end(&mut stdin_data) {
+        Err(e) => {
+            error!("Failed to read data from stdin: {}", e);
+            Err(e)
+        }
+        Ok(nbytes) => {
+            debug!("Loaded {} bytes from stdin", nbytes);
+            Ok(stdin_data)
+        }
+    }
+}
+
+/// Read a file data into memory and return its contents.
+///
+/// ## Example
+///
+/// ```
+/// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_common_rs_48_0() -> Result<(), Box<dyn std::error::Error>> {
 /// use binwalk::common::read_file;
 ///
 /// let file_data = read_file("/etc/passwd")?;
 /// assert!(file_data.len() > 0);
 /// # Ok(())
-/// # } _doctest_main_src_common_rs_11_0(); }
+/// # } _doctest_main_src_common_rs_48_0(); }
 /// ```
 pub fn read_file(file: impl Into<String>) -> Result<Vec<u8>, std::io::Error> {
     let mut file_data = Vec::new();

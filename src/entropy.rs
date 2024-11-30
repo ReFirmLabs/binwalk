@@ -1,4 +1,4 @@
-use crate::common::read_file;
+use crate::common::read_input;
 use entropy::shannon_entropy;
 use log::error;
 use plotters::prelude::*;
@@ -58,7 +58,7 @@ fn blocks(data: &[u8]) -> Vec<BlockEntropy> {
 
 /// Generate a plot of a file's entropy.
 /// Will output a file to the current working directory with the name `<file_name>.png`.
-pub fn plot(file_path: impl Into<String>) -> Result<FileEntropy, EntropyError> {
+pub fn plot(file_path: impl Into<String>, stdin: bool) -> Result<FileEntropy, EntropyError> {
     const FILE_EXTENSION: &str = "png";
     const SHANNON_MAX_VALUE: i32 = 8;
     const IMAGE_PIXEL_WIDTH: u32 = 2048;
@@ -87,7 +87,7 @@ pub fn plot(file_path: impl Into<String>) -> Result<FileEntropy, EntropyError> {
     }
 
     // Read in the target file data
-    if let Ok(file_data) = read_file(&target_file) {
+    if let Ok(file_data) = read_input(&target_file, stdin) {
         let mut points: Vec<(i32, i32)> = vec![];
 
         // Calculate the entropy for each file block

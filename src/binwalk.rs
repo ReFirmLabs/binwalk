@@ -601,9 +601,10 @@ impl Binwalk {
     pub fn extract(
         &self,
         file_data: &[u8],
-        file_path: &String,
+        file_name: impl Into<String>,
         file_map: &Vec<signatures::common::SignatureResult>,
     ) -> HashMap<String, extractors::common::ExtractionResult> {
+        let file_path = file_name.into();
         let mut extraction_results: HashMap<String, extractors::common::ExtractionResult> =
             HashMap::new();
 
@@ -622,7 +623,7 @@ impl Binwalk {
                 Some(_) => {
                     // Run an extraction for this signature
                     let mut extraction_result =
-                        extractors::common::execute(file_data, file_path, signature, &extractor);
+                        extractors::common::execute(file_data, &file_path, signature, &extractor);
 
                     if !extraction_result.success {
                         debug!(
@@ -653,7 +654,7 @@ impl Binwalk {
                             // Re-run the extraction
                             extraction_result = extractors::common::execute(
                                 file_data,
-                                file_path,
+                                &file_path,
                                 &new_signature,
                                 &extractor,
                             );
@@ -669,12 +670,87 @@ impl Binwalk {
         extraction_results
     }
 
-    /// Analyze a file and optionally extract the file contents.
+    /// Analyze a data buffer and optionally extract the file contents.
     ///
     /// ## Example
     ///
     /// ```
-    /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_binwalk_rs_624_0() -> Result<binwalk::Binwalk, binwalk::BinwalkError> {
+    /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_binwalk_rs_672_0() -> Result<binwalk::Binwalk, binwalk::BinwalkError> {
+    /// use binwalk::{Binwalk, common};
+    ///
+    /// let target_path = std::path::Path::new("tests")
+    ///     .join("inputs")
+    ///     .join("gzip.bin")
+    ///     .display()
+    ///     .to_string();
+    ///
+    /// let extraction_directory = std::path::Path::new("tests")
+    ///     .join("extractions")
+    ///     .display()
+    ///     .to_string();
+    ///
+    /// let file_data = common::read_file(&target_path).expect("Failed to read file data");
+    ///
+    /// # std::fs::remove_dir_all(&extraction_directory);
+    /// let binwalker = Binwalk::configure(Some(target_path),
+    ///                                    Some(extraction_directory.clone()),
+    ///                                    None,
+    ///                                    None,
+    ///                                    None,
+    ///                                    false)?;
+    ///
+    /// let analysis_results = binwalker.analyze_buf(&file_data, &binwalker.base_target_file, true);
+    ///
+    /// assert_eq!(analysis_results.file_map.len(), 1);
+    /// assert_eq!(analysis_results.extractions.len(),  1);
+    /// assert_eq!(std::path::Path::new(&extraction_directory)
+    ///     .join("gzip.bin.extracted")
+    ///     .join("0")
+    ///     .join("decompressed.bin")
+    ///     .exists(), true);
+    /// # std::fs::remove_dir_all(&extraction_directory);
+    /// # Ok(binwalker)
+    /// # } _doctest_main_src_binwalk_rs_672_0(); }
+    /// ```
+    pub fn analyze_buf(
+        &self,
+        file_data: &[u8],
+        target_file: impl Into<String>,
+        do_extraction: bool,
+    ) -> AnalysisResults {
+        let file_path = target_file.into();
+
+        // Return value
+        let mut results: AnalysisResults = AnalysisResults {
+            file_path: file_path.clone(),
+            ..Default::default()
+        };
+
+        // Scan file data for signatures
+        debug!("Analysis start: {}", file_path);
+        results.file_map = self.scan(file_data);
+
+        // Only extract if told to, and if there were some signatures found in this file
+        if do_extraction && !results.file_map.is_empty() {
+            // Extract everything we can
+            debug!(
+                "Submitting {} signature results to extractor",
+                results.file_map.len()
+            );
+            results.extractions = self.extract(file_data, &file_path, &results.file_map);
+        }
+
+        debug!("Analysis end: {}", file_path);
+
+        results
+    }
+
+    /// Analyze a file on disk and optionally extract its contents.
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_binwalk_rs_745_0() -> Result<binwalk::Binwalk, binwalk::BinwalkError> {
     /// use binwalk::Binwalk;
     ///
     /// let target_path = std::path::Path::new("tests")
@@ -707,44 +783,28 @@ impl Binwalk {
     ///     .exists(), true);
     /// # std::fs::remove_dir_all(&extraction_directory);
     /// # Ok(binwalker)
-    /// # } _doctest_main_src_binwalk_rs_624_0(); }
+    /// # } _doctest_main_src_binwalk_rs_745_0(); }
     /// ```
-    pub fn analyze(&self, target_file: &String, do_extraction: bool) -> AnalysisResults {
-        // Return value
-        let mut results: AnalysisResults = AnalysisResults {
-            file_path: target_file.clone(),
-            ..Default::default()
+    #[allow(dead_code)]
+    pub fn analyze(&self, target_file: impl Into<String>, do_extraction: bool) -> AnalysisResults {
+        let file_path = target_file.into();
+
+        let file_data = match read_file(&file_path) {
+            Err(_) => {
+                error!("Failed to read data from {}", file_path);
+                b"".to_vec()
+            }
+            Ok(data) => data,
         };
 
-        debug!("Analysis start: {}", target_file);
-
-        // Read file into memory
-        if let Ok(file_data) = read_file(target_file) {
-            // Scan file data for signatures
-            info!("Scanning {}", target_file);
-            results.file_map = self.scan(&file_data);
-
-            // Only extract if told to, and if there were some signatures found in this file
-            if do_extraction && !results.file_map.is_empty() {
-                // Extract everything we can
-                debug!(
-                    "Submitting {} signature results to extractor",
-                    results.file_map.len()
-                );
-                results.extractions = self.extract(&file_data, target_file, &results.file_map);
-            }
-        }
-
-        debug!("Analysis end: {}", target_file);
-
-        results
+        self.analyze_buf(&file_data, &file_path, do_extraction)
     }
 }
 
 /// Initializes the extraction output directory
 fn init_extraction_directory(
-    target_file: &String,
-    extraction_directory: &String,
+    target_file: &str,
+    extraction_directory: &str,
 ) -> Result<String, std::io::Error> {
     // Create the output directory, equivalent of mkdir -p
     match fs::create_dir_all(extraction_directory) {
