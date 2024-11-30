@@ -17,25 +17,38 @@ use std::io::Read;
 /// # Ok(())
 /// # } _doctest_main_src_common_rs_11_0(); }
 /// ```
-pub fn read_file(file: impl Into<String>) -> Result<Vec<u8>, std::io::Error> {
+pub fn read_file(file: impl Into<String>, stdin: bool) -> Result<Vec<u8>, std::io::Error> {
     let mut file_data = Vec::new();
     let file_path = file.into();
 
-    match File::open(&file_path) {
-        Err(e) => {
-            error!("Failed to open file {}: {}", file_path, e);
-            Err(e)
-        }
-        Ok(mut fp) => match fp.read_to_end(&mut file_data) {
+    if stdin {
+        match std::io::stdin().read_to_end(&mut file_data) {
             Err(e) => {
-                error!("Failed to read file {} into memory: {}", file_path, e);
+                error!("Failed to read data from stdin: {}", e);
                 Err(e)
             }
-            Ok(file_size) => {
-                debug!("Loaded {} bytes from {}", file_size, file_path);
+            Ok(nbytes) => {
+                debug!("Loaded {} bytes from stdin", nbytes);
                 Ok(file_data)
             }
-        },
+        }
+    } else {
+        match File::open(&file_path) {
+            Err(e) => {
+                error!("Failed to open file {}: {}", file_path, e);
+                Err(e)
+            }
+            Ok(mut fp) => match fp.read_to_end(&mut file_data) {
+                Err(e) => {
+                    error!("Failed to read file {} into memory: {}", file_path, e);
+                    Err(e)
+                }
+                Ok(file_size) => {
+                    debug!("Loaded {} bytes from {}", file_size, file_path);
+                    Ok(file_data)
+                }
+            },
+        }
     }
 }
 

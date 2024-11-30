@@ -7,6 +7,10 @@ pub struct CliArgs {
     #[arg(short = 'L', long)]
     pub list: bool,
 
+    /// Read data from standard input
+    #[arg(short, long)]
+    pub stdin: bool,
+
     /// Supress output to stdout
     #[arg(short, long)]
     pub quiet: bool,

@@ -14,7 +14,7 @@ use std::os::windows;
 #[cfg(unix)]
 use std::os::unix;
 
-use crate::common::{is_offset_safe, read_file};
+use crate::common::is_offset_safe;
 use crate::extractors;
 use crate::magic;
 use crate::signatures;
@@ -709,30 +709,30 @@ impl Binwalk {
     /// # Ok(binwalker)
     /// # } _doctest_main_src_binwalk_rs_624_0(); }
     /// ```
-    pub fn analyze(&self, target_file: &String, do_extraction: bool) -> AnalysisResults {
+    pub fn analyze(
+        &self,
+        file_data: &[u8],
+        target_file: &String,
+        do_extraction: bool,
+    ) -> AnalysisResults {
         // Return value
         let mut results: AnalysisResults = AnalysisResults {
             file_path: target_file.clone(),
             ..Default::default()
         };
 
+        // Scan file data for signatures
         debug!("Analysis start: {}", target_file);
+        results.file_map = self.scan(file_data);
 
-        // Read file into memory
-        if let Ok(file_data) = read_file(target_file) {
-            // Scan file data for signatures
-            info!("Scanning {}", target_file);
-            results.file_map = self.scan(&file_data);
-
-            // Only extract if told to, and if there were some signatures found in this file
-            if do_extraction && !results.file_map.is_empty() {
-                // Extract everything we can
-                debug!(
-                    "Submitting {} signature results to extractor",
-                    results.file_map.len()
-                );
-                results.extractions = self.extract(&file_data, target_file, &results.file_map);
-            }
+        // Only extract if told to, and if there were some signatures found in this file
+        if do_extraction && !results.file_map.is_empty() {
+            // Extract everything we can
+            debug!(
+                "Submitting {} signature results to extractor",
+                results.file_map.len()
+            );
+            results.extractions = self.extract(file_data, target_file, &results.file_map);
         }
 
         debug!("Analysis end: {}", target_file);
