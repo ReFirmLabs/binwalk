@@ -178,6 +178,7 @@ pub mod shrs;
 pub mod squashfs;
 pub mod srec;
 pub mod svg;
+pub mod swapped;
 pub mod tarball;
 pub mod trx;
 pub mod tsk;
