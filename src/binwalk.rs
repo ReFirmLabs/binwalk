@@ -33,7 +33,6 @@ impl BinwalkError {
     }
 }
 
-
 /// Analysis results returned by Binwalk::analyze
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct AnalysisResults {
@@ -145,7 +144,7 @@ impl Binwalk {
         if let Some(target_file) = target_file_name {
             // Set the target file path, make it an absolute path
             match path::absolute(&target_file) {
-                Err(e) => {
+                Err(_) => {
                     return Err(BinwalkError::new(&format!(
                         "Failed to get absolute path for '{}'",
                         target_file
@@ -160,7 +159,7 @@ impl Binwalk {
             if let Some(extraction_directory) = output_directory {
                 // Make the extraction directory an absolute path
                 match path::absolute(&extraction_directory) {
-                    Err(e) => {
+                    Err(_) => {
                         return Err(BinwalkError::new(&format!(
                             "Failed to get absolute path for '{}'",
                             extraction_directory
@@ -179,7 +178,7 @@ impl Binwalk {
                     &new_instance.base_output_directory,
                 ) {
                     Err(e) => {
-                        return Err(BinwalkError::new( &format!(
+                        return Err(BinwalkError::new(&format!(
                             "Failed to initialize extraction directory: {}",
                             e
                         )));

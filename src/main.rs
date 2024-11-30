@@ -89,14 +89,19 @@ fn main() {
     }
 
     // Initialize binwalk
-    let binwalker = binwalk::Binwalk::configure(
+    let binwalker = match binwalk::Binwalk::configure(
         cliargs.file_name,
         output_directory,
         cliargs.include,
         cliargs.exclude,
         None,
         cliargs.search_all,
-    ).expect("Binwalk initialization failed");
+    ) {
+        Err(e) => {
+            panic!("Binwalk initialization failed: {}", e.message);
+        }
+        Ok(bw) => bw,
+    };
 
     // If the user specified --threads, honor that request; else, auto-detect available parallelism
     let available_workers = cliargs.threads.unwrap_or_else(|| {
