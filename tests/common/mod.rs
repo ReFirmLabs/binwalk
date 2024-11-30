@@ -1,4 +1,4 @@
-use binwalk::{common, AnalysisResults, Binwalk};
+use binwalk::{AnalysisResults, Binwalk};
 
 /// Convenience function for running an integration test against the specified file, with the provided signature filter.
 /// Assumes that there will be one signature result and one extraction result at file offset 0.
@@ -55,9 +55,6 @@ pub fn run_binwalk(signature_filter: &str, file_name: &str) -> AnalysisResults {
     // Delete the output directory, if it exists
     let _ = std::fs::remove_dir_all(&output_directory);
 
-    // Read in file data
-    let file_data = common::read_file(&file_path, false).expect("Failed to read test file");
-
     // Configure binwalk
     let binwalker = Binwalk::configure(
         Some(file_path),
@@ -70,7 +67,7 @@ pub fn run_binwalk(signature_filter: &str, file_name: &str) -> AnalysisResults {
     .expect("Binwalk initialization failed");
 
     // Run analysis
-    let results = binwalker.analyze(&file_data, &binwalker.base_target_file, true);
+    let results = binwalker.analyze(&binwalker.base_target_file, true);
 
     // Clean up the output directory
     let _ = std::fs::remove_dir_all(output_directory);

@@ -234,10 +234,8 @@ fn main() {
 
     json_logger.close();
 
-    // If BINWALK_RM_SYMLINK env var was set, or if data was read from stdin, delete the base_target_file symlink
-    if (cliargs.carve || cliargs.extract)
-        && (cliargs.stdin || std::env::var(BINWALK_RM_SYMLINK).is_ok())
-    {
+    // If BINWALK_RM_SYMLINK env var was set, delete the base_target_file symlink
+    if (cliargs.carve || cliargs.extract) && std::env::var(BINWALK_RM_SYMLINK).is_ok() {
         if let Err(e) = std::fs::remove_file(&binwalker.base_target_file) {
             error!(
                 "Request to remove extraction symlink file {} failed: {}",
@@ -291,7 +289,7 @@ fn spawn_worker(
 ) {
     pool.execute(move || {
         // Read in file data
-        let file_data = match common::read_file(&target_file, stdin) {
+        let file_data = match common::read_input(&target_file, stdin) {
             Err(_) => {
                 error!("Failed to read {} data", target_file);
                 b"".to_vec()
@@ -300,7 +298,7 @@ fn spawn_worker(
         };
 
         // Analyze target file, with extraction, if specified
-        let results = bw.analyze(&file_data, &target_file, do_extraction);
+        let results = bw.analyze_buf(&file_data, &target_file, do_extraction);
 
         // If data carving was requested as part of extraction, carve analysis results to disk
         if do_carve {

@@ -1,4 +1,4 @@
-use crate::common::read_file;
+use crate::common::read_input;
 use entropy::shannon_entropy;
 use log::error;
 use plotters::prelude::*;
@@ -87,7 +87,7 @@ pub fn plot(file_path: impl Into<String>, stdin: bool) -> Result<FileEntropy, En
     }
 
     // Read in the target file data
-    if let Ok(file_data) = read_file(&target_file, stdin) {
+    if let Ok(file_data) = read_input(&target_file, stdin) {
         let mut points: Vec<(i32, i32)> = vec![];
 
         // Calculate the entropy for each file block
