@@ -17,7 +17,6 @@ DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install \
     git \
     lz4 \
     lzop \
-    device-tree-compiler \
     unrar \
     unyaffs \
     python3-pip \
