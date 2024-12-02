@@ -9,6 +9,7 @@ pub struct DKBSHeader {
     pub board_id: String,
     pub version: String,
     pub boot_device: String,
+    pub endianness: String,
 }
 
 /// Parses a DKBS header
@@ -45,14 +46,21 @@ pub fn parse_dkbs_header(dkbs_data: &[u8]) -> Result<DKBSHeader, StructureError>
             && !header.board_id.is_empty()
             && !header.boot_device.is_empty()
         {
-            // Parse the payload size field
-            if let Ok(data_size) = common::parse(
-                &dkbs_data[DATA_SIZE_START..DATA_SIZE_END],
-                &data_size_field,
-                "big",
-            ) {
-                header.data_size = data_size["size"];
-                return Ok(header);
+            if let Some(data_size_bytes) = dkbs_data.get(DATA_SIZE_START..DATA_SIZE_END) {
+                // Parse the payload size field
+                if let Ok(data_size) = common::parse(data_size_bytes, &data_size_field, "big") {
+                    if data_size["size"] & 0xFF000000 == 0 {
+                        header.data_size = data_size["size"];
+                        header.endianness = "big".to_string();
+                    } else if let Ok(data_size) = common::parse(data_size_bytes, &data_size_field, "little") {
+                        header.data_size = data_size["size"];
+                        header.endianness = "little".to_string();
+                    }
+                }
+
+                if header.data_size != 0 {
+                    return Ok(header);
+                }
             }
         }
     }
