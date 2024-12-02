@@ -42,8 +42,8 @@ pub fn dkbs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, S
                 // Report header size and description
                 result.size = dkbs_header.header_size;
                 result.description = format!(
-                    "{}, board ID: {}, firmware version: {}, boot device: {}, header size: {} bytes, data size: {}",
-                    result.description, dkbs_header.board_id, dkbs_header.version, dkbs_header.boot_device, dkbs_header.header_size, dkbs_header.data_size
+                    "{}, board ID: {}, firmware version: {}, boot device: {}, endianness: {}, header size: {} bytes, data size: {}",
+                    result.description, dkbs_header.board_id, dkbs_header.version, dkbs_header.boot_device, dkbs_header.endianness, dkbs_header.header_size, dkbs_header.data_size
                 );
 
                 // Return OK
