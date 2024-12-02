@@ -52,7 +52,9 @@ pub fn parse_dkbs_header(dkbs_data: &[u8]) -> Result<DKBSHeader, StructureError>
                     if data_size["size"] & 0xFF000000 == 0 {
                         header.data_size = data_size["size"];
                         header.endianness = "big".to_string();
-                    } else if let Ok(data_size) = common::parse(data_size_bytes, &data_size_field, "little") {
+                    } else if let Ok(data_size) =
+                        common::parse(data_size_bytes, &data_size_field, "little")
+                    {
                         header.data_size = data_size["size"];
                         header.endianness = "little".to_string();
                     }
