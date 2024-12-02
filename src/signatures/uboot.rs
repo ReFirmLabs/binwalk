@@ -27,7 +27,8 @@ pub fn uboot_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, 
 
             if !uboot_version_string.is_empty() {
                 result.size = uboot_version_string.len();
-                result.description = format!("{}: {}", result.description, uboot_version_string);
+                result.description =
+                    format!("{}: {:.100}", result.description, uboot_version_string);
                 return Ok(result);
             }
         }
