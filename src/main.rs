@@ -354,6 +354,14 @@ fn carve_file_map(file_data: &[u8], results: &binwalk::AnalysisResults) -> usize
             last_known_offset = signature_result.offset + signature_result.size;
         }
 
+        // Calculate the size of any remaining data from the end of the last signature to EOF
+        let remaining_data = file_data.len() - last_known_offset;
+
+        // Add any remaining unknown data to the unknown_bytes list
+        if remaining_data > 0 {
+            unknown_bytes.push((last_known_offset, remaining_data));
+        }
+
         // All known signature data has been carved to disk, now carve any unknown blocks of data to disk
         for (offset, size) in unknown_bytes {
             if carve_file_data_to_disk(&results.file_path, file_data, "unknown", offset, size) {
