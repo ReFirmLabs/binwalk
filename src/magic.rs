@@ -1108,6 +1108,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::dkbs::DESCRIPTION.to_string(),
             extractor: None,
         },
+        // known encrypted firmware
+        signatures::common::Signature {
+            name: "encfw".to_string(),
+            short: true,
+            magic_offset: 0,
+            always_display: true,
+            magic: signatures::encfw::encfw_magic(),
+            parser: signatures::encfw::encfw_parser,
+            description: signatures::encfw::DESCRIPTION.to_string(),
+            extractor: None,
+        },
     ];
 
     binary_signatures
