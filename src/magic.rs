@@ -413,7 +413,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             magic: signatures::gpg::gpg_signed_magic(),
             parser: signatures::gpg::gpg_signed_parser,
             description: signatures::gpg::GPG_SIGNED_DESCRIPTION.to_string(),
-            extractor: Some(extractors::zlib::zlib_extractor()),
+            extractor: Some(extractors::gpg::gpg_extractor()),
         },
         // pem certificates
         signatures::common::Signature {

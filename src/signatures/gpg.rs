@@ -1,4 +1,4 @@
-use crate::extractors::zlib::{zlib_decompress, CHECKSUM_SIZE};
+use crate::extractors::gpg::gpg_decompress;
 use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 
 /// Human readable description
@@ -26,13 +26,12 @@ pub fn gpg_signed_parser(
      * GPG signed files are just zlib compressed files with the zlib magic bytes replaced with the GPG magic bytes.
      * Decompress the signed file; no output directory specified, dry run only.
      */
-    let decompression_dry_run = zlib_decompress(file_data, offset, None);
+    let decompression_dry_run = gpg_decompress(file_data, offset, None);
 
     // If the decompression dry run was a success, this signature is almost certianly valid
     if decompression_dry_run.success {
         if let Some(total_size) = decompression_dry_run.size {
-            // GPG doesn't include the trailing checksum
-            result.size = total_size - CHECKSUM_SIZE;
+            result.size = total_size;
             result.description =
                 format!("{}, total size: {} bytes", result.description, result.size);
             return Ok(result);
