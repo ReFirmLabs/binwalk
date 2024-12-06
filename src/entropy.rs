@@ -58,13 +58,23 @@ fn blocks(data: &[u8]) -> Vec<BlockEntropy> {
 
 /// Generate a plot of a file's entropy.
 /// Will output a file to the current working directory with the name `<file_name>.png`.
-pub fn plot(file_path: impl Into<String>, stdin: bool) -> Result<FileEntropy, EntropyError> {
-    const FILE_EXTENSION: &str = "png";
+pub fn plot(
+    png_file_path: impl Into<String>,
+    file_path: impl Into<String>,
+    stdin: bool,
+) -> Result<FileEntropy, EntropyError> {
+    const FILE_EXTENSION: &str = ".png";
     const SHANNON_MAX_VALUE: i32 = 8;
     const IMAGE_PIXEL_WIDTH: u32 = 2048;
     const IMAGE_PIXEL_HEIGHT: u32 = ((IMAGE_PIXEL_WIDTH as f64) * 0.6) as u32;
 
     let target_file: String = file_path.into();
+    let mut png_path: String = png_file_path.into();
+
+    // Make sure the output file extension is .png
+    if !png_path.ends_with(FILE_EXTENSION) {
+        png_path = format!("{}{}", png_path, FILE_EXTENSION);
+    }
 
     // Get the base name of the target file
     let target_file_name = path::Path::new(&target_file)
@@ -74,11 +84,9 @@ pub fn plot(file_path: impl Into<String>, stdin: bool) -> Result<FileEntropy, En
         .unwrap();
 
     let mut file_entropy = FileEntropy {
-        file: format!("{}.{}", target_file_name, FILE_EXTENSION),
+        file: png_path.clone(),
         ..Default::default()
     };
-
-    let png_path = file_entropy.file.clone();
 
     // Make sure the output file doesn't already exist
     if path::Path::new(&png_path).exists() {
