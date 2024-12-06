@@ -190,3 +190,4 @@ pub mod wince;
 pub mod yaffs2;
 pub mod zlib;
 pub mod zstd;
+pub mod gpg;
