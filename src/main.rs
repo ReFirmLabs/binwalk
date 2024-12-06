@@ -74,10 +74,14 @@ fn main() {
     let mut json_logger = json::JsonLogger::new(cliargs.log);
 
     // If entropy analysis was requested, generate the entropy graph and return
-    if cliargs.entropy {
+    if let Some(entropy_output_file) = cliargs.entropy {
         display::print_plain(cliargs.quiet, "Calculating file entropy...");
 
-        if let Ok(entropy_results) = entropy::plot(cliargs.file_name.unwrap(), cliargs.stdin) {
+        if let Ok(entropy_results) = entropy::plot(
+            &entropy_output_file,
+            cliargs.file_name.unwrap(),
+            cliargs.stdin,
+        ) {
             // Log entropy results to JSON file, if requested
             json_logger.log(json::JSONType::Entropy(entropy_results.clone()));
             json_logger.close();

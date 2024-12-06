@@ -35,9 +35,9 @@ pub struct CliArgs {
     #[arg(short = 'a', long)]
     pub search_all: bool,
 
-    /// Plot the entropy of the specified file
+    /// Write entropy plot image to the ENTROPY file
     #[arg(short = 'E', long, conflicts_with = "extract")]
-    pub entropy: bool,
+    pub entropy: Option<String>,
 
     /// Log JSON results to a file ('-' for stdout)
     #[arg(short, long)]
