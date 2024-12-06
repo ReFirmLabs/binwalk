@@ -11,7 +11,7 @@ pub struct CliArgs {
     #[arg(short, long)]
     pub stdin: bool,
 
-    /// Supress output to stdout
+    /// Supress normal stdout output
     #[arg(short, long)]
     pub quiet: bool,
 
@@ -35,9 +35,13 @@ pub struct CliArgs {
     #[arg(short = 'a', long)]
     pub search_all: bool,
 
-    /// Write entropy plot image to the ENTROPY file
+    /// Generate a PNG entropy graph
     #[arg(short = 'E', long, conflicts_with = "extract")]
-    pub entropy: Option<String>,
+    pub entropy: bool,
+
+    /// Specify an alternate file name for the PNG entropy graph
+    #[arg(short, long, requires = "entropy")]
+    pub png: Option<String>,
 
     /// Log JSON results to a file ('-' for stdout)
     #[arg(short, long)]
