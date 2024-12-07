@@ -60,7 +60,7 @@ pub struct CliArgs {
     pub include: Option<Vec<String>>,
 
     /// Extract files/folders to a custom directory
-    #[arg(short = 'C', long, default_value = "extractions")]
+    #[arg(short, long, default_value = "extractions")]
     pub directory: String,
 
     /// Path to the file to analyze
