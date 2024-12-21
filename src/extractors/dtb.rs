@@ -36,7 +36,7 @@ pub fn dtb_extractor() -> Extractor {
 pub fn extract_dtb(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     let mut heirerarchy: Vec<String> = Vec::new();
 

@@ -34,7 +34,7 @@ pub fn dlink_tlv_extractor() -> Extractor {
 pub fn extract_dlink_tlv_image(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     const OUTPUT_FILE_NAME: &str = "image.bin";
 

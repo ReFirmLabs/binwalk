@@ -35,7 +35,7 @@ pub fn riff_extractor() -> Extractor {
 pub fn extract_riff_image(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     const OUTFILE_NAME: &str = "image.riff";
     const WAV_OUTFILE_NAME: &str = "video.wav";

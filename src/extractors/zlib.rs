@@ -37,7 +37,7 @@ pub fn zlib_extractor() -> Extractor {
 pub fn zlib_decompress(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     // Size of the zlib header
     const HEADER_SIZE: usize = 2;

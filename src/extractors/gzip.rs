@@ -35,7 +35,7 @@ pub fn gzip_extractor() -> Extractor {
 pub fn gzip_decompress(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     let mut exresult = ExtractionResult {
         ..Default::default()

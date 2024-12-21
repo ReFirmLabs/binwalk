@@ -34,7 +34,7 @@ pub fn lzma_extractor() -> Extractor {
 pub fn lzma_decompress(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     // Output file name
     const OUTPUT_FILE_NAME: &str = "decompressed.bin";

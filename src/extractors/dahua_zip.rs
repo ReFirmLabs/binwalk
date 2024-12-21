@@ -34,7 +34,7 @@ pub fn dahua_zip_extractor() -> Extractor {
 pub fn extract_dahua_zip(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     const OUTFILE_NAME: &str = "dahua.zip";
     const ZIP_HEADER: &[u8] = b"PK";

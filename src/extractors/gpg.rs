@@ -34,7 +34,7 @@ pub fn gpg_extractor() -> Extractor {
 pub fn gpg_decompress(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     // Size of the GPG header
     const HEADER_SIZE: usize = 2;
