@@ -34,7 +34,7 @@ pub fn mbr_extractor() -> Extractor {
 pub fn extract_mbr_partitions(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     // Return value
     let mut result = ExtractionResult {

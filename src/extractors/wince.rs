@@ -35,7 +35,7 @@ pub fn wince_extractor() -> Extractor {
 pub fn wince_dump(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     let mut result = ExtractionResult {
         ..Default::default()

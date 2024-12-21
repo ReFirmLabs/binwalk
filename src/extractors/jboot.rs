@@ -35,7 +35,7 @@ pub fn sch2_extractor() -> Extractor {
 pub fn extract_jboot_sch2_kernel(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     // Output file name
     const OUTFILE_NAME: &str = "kernel.bin";

@@ -35,7 +35,7 @@ pub fn trx_extractor() -> Extractor {
 pub fn extract_trx_partitions(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     const CRC_DATA_START_OFFSET: usize = 12;
 

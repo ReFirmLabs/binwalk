@@ -24,7 +24,7 @@ pub struct ExtractionError;
 
 /// Built-in internal extractors must provide a function conforming to this definition.
 /// Arguments: file_data, offset, output_directory.
-pub type InternalExtractor = fn(&[u8], usize, Option<&String>) -> ExtractionResult;
+pub type InternalExtractor = fn(&[u8], usize, Option<&str>) -> ExtractionResult;
 
 /// Enum to define either an Internal or External extractor type
 #[derive(Debug, Default, Clone, Eq, PartialEq, Ord, PartialOrd)]
@@ -104,7 +104,7 @@ impl Chroot {
     /// assert_eq!(std::path::Path::new(&chroot_dir).exists(), true);
     /// # std::fs::remove_dir_all(&chroot_dir);
     /// ```
-    pub fn new(chroot_directory: Option<&String>) -> Chroot {
+    pub fn new(chroot_directory: Option<&str>) -> Chroot {
         let mut chroot_instance = Chroot {
             ..Default::default()
         };
@@ -121,7 +121,7 @@ impl Chroot {
                         chroot_instance.chroot_directory = pathbuf.display().to_string();
                     }
                     Err(_) => {
-                        chroot_instance.chroot_directory = chroot_dir.clone();
+                        chroot_instance.chroot_directory = chroot_dir.to_string();
                     }
                 }
             }
@@ -781,7 +781,7 @@ impl Chroot {
     }
 
     /// Returns true if the file path is a symlink.
-    fn is_symlink(&self, file_path: &String) -> bool {
+    fn is_symlink(&self, file_path: &str) -> bool {
         if let Ok(metadata) = fs::symlink_metadata(file_path) {
             return metadata.file_type().is_symlink();
         }
@@ -856,7 +856,7 @@ impl Chroot {
 
 /// Recursively walks a given directory and returns a list of regular non-zero size files in the given directory path.
 #[allow(dead_code)]
-pub fn get_extracted_files(directory: &String) -> Vec<String> {
+pub fn get_extracted_files(directory: &str) -> Vec<String> {
     let mut regular_files: Vec<String> = vec![];
 
     for entry in WalkDir::new(directory).into_iter() {
@@ -884,7 +884,7 @@ pub fn get_extracted_files(directory: &String) -> Vec<String> {
 /// Executes an extractor for the provided SignatureResult.
 pub fn execute(
     file_data: &[u8],
-    file_path: &String,
+    file_path: &str,
     signature: &SignatureResult,
     extractor: &Option<Extractor>,
 ) -> ExtractionResult {
@@ -992,8 +992,8 @@ pub fn execute(
 /// Spawn an external extractor process.
 fn spawn(
     file_data: &[u8],
-    file_path: &String,
-    output_directory: &String,
+    file_path: &str,
+    output_directory: &str,
     signature: &SignatureResult,
     mut extractor: Extractor,
 ) -> Result<ProcInfo, std::io::Error> {
@@ -1143,7 +1143,7 @@ fn proc_wait(mut worker_info: ProcInfo) -> Result<ExtractionResult, ExtractionEr
 }
 
 // Create an output directory in which to place extraction results
-fn create_output_directory(file_path: &String, offset: usize) -> Result<String, std::io::Error> {
+fn create_output_directory(file_path: &str, offset: usize) -> Result<String, std::io::Error> {
     let chroot = Chroot::new(None);
 
     // Output directory will be: <file_path.extracted/<hex offset>
@@ -1167,7 +1167,7 @@ fn create_output_directory(file_path: &String, offset: usize) -> Result<String, 
 
 /// Returns true if the size of the provided extractor output directory is greater than zero.
 /// Note that any intermediate/carved files must be deleted *before* calling this function.
-fn was_something_extracted(output_directory: &String) -> bool {
+fn was_something_extracted(output_directory: &str) -> bool {
     let output_directory_path = path::Path::new(output_directory);
     debug!("Checking output directory {} for results", output_directory);
 

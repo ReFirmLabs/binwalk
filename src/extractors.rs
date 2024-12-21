@@ -96,7 +96,7 @@
 //! }
 //!
 //! /// This function extracts the contents of a FooBar file
-//! pub fn extract_foobar_file(file_data: Vec<u8>, offset: usize, output_directory: Option<&String>) -> ExtractionResult {
+//! pub fn extract_foobar_file(file_data: Vec<u8>, offset: usize, output_directory: Option<&str>) -> ExtractionResult {
 //!
 //!     // This will be the return value
 //!     let mut result = ExtractionResult{..Default::default()};

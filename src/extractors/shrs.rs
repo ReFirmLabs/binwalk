@@ -34,7 +34,7 @@ pub fn shrs_extractor() -> Extractor {
 pub fn extract_shrs_image(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     const IV_FILE_NAME: &str = "iv.bin";
     const ENCRYPTED_FILE_NAME: &str = "encrypted.bin";

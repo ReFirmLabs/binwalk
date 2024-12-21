@@ -34,7 +34,7 @@ pub fn dlke_extractor() -> Extractor {
 pub fn extract_dlke_image(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     const ENCRYPTED_FILE_NAME: &str = "encrypted.bin";
     const SIGNATURE_FILE_NAME: &str = "signature.bin";
