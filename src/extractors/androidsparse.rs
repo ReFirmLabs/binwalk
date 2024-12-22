@@ -70,7 +70,7 @@ pub fn extract_android_sparse(
                                 &sparse_header,
                                 &chunk_header,
                                 chunk_data,
-                                &OUTFILE_NAME.to_string(),
+                                OUTFILE_NAME,
                                 &chroot,
                             ) {
                                 break;
