@@ -60,8 +60,9 @@ pub fn extract_mh01_image(
                 match delink::mh01::decrypt(mh01_data) {
                     Ok(decrypted_data) => {
                         // Write decrypted data to disk
-                        result.success = chroot.create_file(DECRYPTED_DATA_FILE_NAME, &decrypted_data);
-                    },
+                        result.success =
+                            chroot.create_file(DECRYPTED_DATA_FILE_NAME, &decrypted_data);
+                    }
                     Err(_) => {
                         // Decryption failture; extract each part of the firmware image, ensuring that each one extracts without error
                         result.success = chroot.carve_file(

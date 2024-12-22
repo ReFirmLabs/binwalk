@@ -1007,7 +1007,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             magic: signatures::dlink_tlv::dlink_tlv_magic(),
             parser: signatures::dlink_tlv::dlink_tlv_parser,
             description: signatures::dlink_tlv::DESCRIPTION.to_string(),
-            extractor: Some(extractors::dlink_tlv::dlink_tlv_extractor()),
+            extractor: Some(extractors::encfw::encfw_extractor()),
         },
         // DLKE encrypted firmware
         signatures::common::Signature {
@@ -1018,7 +1018,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             magic: signatures::dlke::dlke_magic(),
             parser: signatures::dlke::dlke_parser,
             description: signatures::dlke::DESCRIPTION.to_string(),
-            extractor: Some(extractors::dlke::dlke_extractor()),
+            extractor: Some(extractors::encfw::encfw_extractor()),
         },
         // SHRS encrypted firmware
         signatures::common::Signature {
@@ -1029,7 +1029,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             magic: signatures::shrs::shrs_magic(),
             parser: signatures::shrs::shrs_parser,
             description: signatures::shrs::DESCRIPTION.to_string(),
-            extractor: Some(extractors::shrs::shrs_extractor()),
+            extractor: Some(extractors::encfw::encfw_extractor()),
         },
         // PKCS DER hashes
         signatures::common::Signature {
@@ -1062,7 +1062,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             magic: signatures::encrpted_img::encrpted_img_magic(),
             parser: signatures::encrpted_img::encrpted_img_parser,
             description: signatures::encrpted_img::DESCRIPTION.to_string(),
-            extractor: None,
+            extractor: Some(extractors::encfw::encfw_extractor()),
         },
         // Android boot image
         signatures::common::Signature {
