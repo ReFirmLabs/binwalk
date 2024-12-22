@@ -688,7 +688,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             magic: signatures::openssl::openssl_crypt_magic(),
             parser: signatures::openssl::openssl_crypt_parser,
             description: signatures::openssl::DESCRIPTION.to_string(),
-            extractor: None,
+            extractor: Some(extractors::encfw::encfw_extractor()),
         },
         // lzfse
         signatures::common::Signature {
