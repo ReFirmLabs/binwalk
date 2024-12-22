@@ -1106,7 +1106,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             magic: signatures::dkbs::dkbs_magic(),
             parser: signatures::dkbs::dkbs_parser,
             description: signatures::dkbs::DESCRIPTION.to_string(),
-            extractor: None,
+            extractor: Some(extractors::encfw::encfw_extractor()),
         },
         // known encrypted firmware
         signatures::common::Signature {
