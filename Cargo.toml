@@ -34,8 +34,7 @@ serde = { version = "1.0", features = ["derive"]}
 clap = { version = "4.5.16", features = ["derive"] }
 xxhash-rust = { version = "0.8.12", features = ["xxh32"] }
 hex = "0.4.3"
-#delink = { git = "https://github.com/devttys0/delink" }
-delink = { path = "../delink" }
+delink = { git = "https://github.com/devttys0/delink" }
 
 [dependencies.uuid]
 version = "1.10.0"

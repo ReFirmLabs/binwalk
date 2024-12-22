@@ -427,6 +427,7 @@ dependencies = [
 [[package]]
 name = "delink"
 version = "0.1.0"
+source = "git+https://github.com/devttys0/delink#3e799997d568297326b970839da15fd6ba0b1dad"
 dependencies = [
  "env_logger",
  "hex",
