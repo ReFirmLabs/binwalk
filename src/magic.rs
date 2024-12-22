@@ -168,7 +168,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             magic: signatures::iso9660::iso_magic(),
             parser: signatures::iso9660::iso_parser,
             description: signatures::iso9660::DESCRIPTION.to_string(),
-            extractor: Some(extractors::tsk::tsk_extractor()),
+            extractor: Some(extractors::iso9660::iso9660_extractor()),
         },
         // linux kernel
         signatures::common::Signature {

@@ -158,6 +158,7 @@ pub mod gif;
 pub mod gpg;
 pub mod gzip;
 pub mod inflate;
+pub mod iso9660;
 pub mod jboot;
 pub mod jffs2;
 pub mod jpeg;
