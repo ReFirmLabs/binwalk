@@ -34,7 +34,7 @@ pub fn dxbc_extractor() -> Extractor {
 pub fn extract_dxbc_file(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     const OUTFILE_NAME: &str = "shader.dxbc";
 

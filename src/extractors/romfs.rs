@@ -59,7 +59,7 @@ pub fn romfs_extractor() -> Extractor {
 pub fn extract_romfs(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     let mut result = ExtractionResult {
         ..Default::default()
@@ -228,8 +228,8 @@ fn process_romfs_entries(
 fn extract_romfs_entries(
     romfs_data: &[u8],
     romfs_files: &Vec<RomFSEntry>,
-    parent_directory: &String,
-    chroot_directory: &String,
+    parent_directory: &str,
+    chroot_directory: &str,
 ) -> usize {
     let mut file_count: usize = 0;
 

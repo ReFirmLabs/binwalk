@@ -33,7 +33,7 @@ pub fn swapped_extractor_u16() -> Extractor {
 pub fn extract_swapped_u16(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     const SWAP_BYTE_COUNT: usize = 2;
     extract_swapped(file_data, offset, output_directory, SWAP_BYTE_COUNT)
@@ -43,7 +43,7 @@ pub fn extract_swapped_u16(
 fn extract_swapped(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
     n: usize,
 ) -> ExtractionResult {
     const OUTPUT_FILE_NAME: &str = "swapped.bin";

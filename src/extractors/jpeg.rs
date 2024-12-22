@@ -34,7 +34,7 @@ pub fn jpeg_extractor() -> Extractor {
 pub fn extract_jpeg_image(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     const OUTFILE_NAME: &str = "image.jpg";
 

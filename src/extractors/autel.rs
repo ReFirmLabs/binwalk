@@ -37,7 +37,7 @@ pub fn autel_extractor() -> Extractor {
 pub fn autel_deobfuscate(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     const OUTPUT_FILE_NAME: &str = "autel.decoded";
 

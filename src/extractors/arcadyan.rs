@@ -34,7 +34,7 @@ pub fn obfuscated_lzma_extractor() -> Extractor {
 pub fn extract_obfuscated_lzma(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     const LZMA_DATA_OFFSET: usize = 4;
     const MIN_DATA_SIZE: usize = 0x100;

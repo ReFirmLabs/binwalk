@@ -35,7 +35,7 @@ pub fn android_sparse_extractor() -> Extractor {
 pub fn extract_android_sparse(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     const OUTFILE_NAME: &str = "unsparsed.img";
 
@@ -102,7 +102,7 @@ fn extract_chunk(
     sparse_header: &androidsparse::AndroidSparseHeader,
     chunk_header: &androidsparse::AndroidSparseChunkHeader,
     chunk_data: &[u8],
-    outfile: &String,
+    outfile: &str,
     chroot: &Chroot,
 ) -> bool {
     if chunk_header.is_raw {

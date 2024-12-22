@@ -34,7 +34,7 @@ pub fn uimage_extractor() -> Extractor {
 pub fn extract_uimage(
     file_data: &[u8],
     offset: usize,
-    output_directory: Option<&String>,
+    output_directory: Option<&str>,
 ) -> ExtractionResult {
     // If no name is povided in the uImage header, use this as the output file name
     const DEFAULT_OUTPUT_FILE_NAME: &str = "uimage_data";
