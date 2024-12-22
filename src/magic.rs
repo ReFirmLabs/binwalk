@@ -1117,7 +1117,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             magic: signatures::encfw::encfw_magic(),
             parser: signatures::encfw::encfw_parser,
             description: signatures::encfw::DESCRIPTION.to_string(),
-            extractor: None,
+            extractor: Some(extractors::encfw::encfw_extractor()),
         },
     ];
 

@@ -157,6 +157,7 @@ pub mod dxbc;
 pub mod gif;
 pub mod gpg;
 pub mod gzip;
+pub mod encfw;
 pub mod inflate;
 pub mod iso9660;
 pub mod jboot;
