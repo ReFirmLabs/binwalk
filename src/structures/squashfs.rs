@@ -102,7 +102,7 @@ pub fn parse_squashfs_header(sqsh_data: &[u8]) -> Result<SquashFSHeader, Structu
         // Sanity check the version number
         if squashfs_version <= MAX_SQUASHFS_VERSION && squashfs_version > 0 {
             let squashfs_header_size: usize;
-            let squashfs_header: HashMap<String, usize>;
+            let mut squashfs_header: HashMap<String, usize>;
 
             // Parse the SquashFS header, using the appropriate version header.
             if squashfs_version == 4 {
@@ -123,6 +123,24 @@ pub fn parse_squashfs_header(sqsh_data: &[u8]) -> Result<SquashFSHeader, Structu
                     }
                     Ok(squash3_header) => {
                         squashfs_header = squash3_header.clone();
+
+                        // Adjust the reported header values for v1 and v2 images
+                        if squashfs_version < 3 {
+                            squashfs_header
+                                .insert("uid_start".to_string(), squashfs_header["uid_start_2"]);
+                            squashfs_header
+                                .insert("guid_start".to_string(), squashfs_header["guid_start_2"]);
+                            squashfs_header
+                                .insert("image_size".to_string(), squashfs_header["bytes_used_2"]);
+                            squashfs_header.insert(
+                                "inode_table_start".to_string(),
+                                squashfs_header["inode_table_start_2"],
+                            );
+                            squashfs_header.insert(
+                                "directory_table_start".to_string(),
+                                squashfs_header["directory_table_start_2"],
+                            );
+                        }
                     }
                 }
             }
