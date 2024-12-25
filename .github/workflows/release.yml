@@ -1,0 +1,214 @@
+name: Release
+
+# Only do the release on vX.Y.Z tags.
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+# We need this to be able to create releases.
+permissions:
+  contents: write
+
+jobs:
+  # The create-release job runs purely to initialize the GitHub release itself,
+  # and names the release after the `X.Y.Z` tag that was pushed. It's separate
+  # from building the release so that we only create the release once.
+  create-release:
+    name: create-release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get the release version from the tag
+        if: env.VERSION == ''
+        run: echo "VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
+      - name: Show the version
+        run: |
+          echo "version is: $VERSION"
+      - name: Create GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create $VERSION --draft --verify-tag --title $VERSION
+    outputs:
+      version: ${{ env.VERSION }}
+
+  build-release:
+    name: build-release
+    needs: ["create-release"]
+    runs-on: ${{ matrix.os }}
+    env:
+      BINARY: binwalk
+      # For some builds, we use cross to test on 32-bit and big-endian
+      # systems.
+      CARGO: cargo
+      # When CARGO is set to CROSS, this is set to `--target matrix.target`.
+      # Note that we only use cross on Linux, so setting a target on a
+      # different OS will just use normal cargo.
+      TARGET_FLAGS:
+      # When CARGO is set to CROSS, TARGET_DIR includes matrix.target.
+      TARGET_DIR: ./target
+      # Emit backtraces on panics.
+      RUST_BACKTRACE: 1
+      # Disable BuildKit for cross builds
+      CROSS_CONTAINER_ENGINE_NO_BUILDKIT: 1
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux builds
+          - build: linux-x86_64
+            os: ubuntu-latest
+            rust: nightly
+            target: x86_64-unknown-linux-gnu
+            strip: x86_64-linux-gnu-strip
+          - build: linux-aarch64
+            os: ubuntu-latest
+            rust: stable
+            target: aarch64-unknown-linux-gnu
+            strip: aarch64-linux-gnu-strip
+          - build: linux-powerpc64le
+            os: ubuntu-latest
+            rust: stable
+            target: powerpc64le-unknown-linux-gnu
+            strip: powerpc64le-linux-gnu-strip
+          - build: linux-s390x
+            os: ubuntu-latest
+            rust: stable
+            target: s390x-unknown-linux-gnu
+            strip: s390x-linux-gnu-strip
+          - build: linux-riscv64
+            os: ubuntu-latest
+            rust: stable
+            target: riscv64gc-unknown-linux-gnu
+            strip: riscv64-linux-gnu-strip
+
+          # Android builds
+          - build: android-x86_64
+            os: ubuntu-latest
+            rust: stable
+            target: x86_64-linux-android
+            strip: x86_64-linux-android-strip
+          - build: android-aarch64
+            os: ubuntu-latest
+            rust: stable
+            target: aarch64-linux-android
+            strip: aarch64-linux-android-strip
+
+          # macOS builds
+          - build: macos-x86_64
+            os: macos-latest
+            rust: nightly
+            target: x86_64-apple-darwin
+          - build: macos-aarch64
+            os: macos-latest
+            rust: nightly
+            target: aarch64-apple-darwin
+
+          # Windows builds
+          - build: windows-x86_64
+            os: windows-latest
+            rust: nightly
+            target: x86_64-pc-windows-msvc
+          - build: windows-aarch64
+            os: windows-latest
+            rust: nightly
+            target: aarch64-pc-windows-msvc
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install CI packages (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: |
+          ./dependencies/ci-packages.sh
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+          target: ${{ matrix.target }}
+
+      - name: Use Cross (git)
+        if: matrix.os == 'ubuntu-latest' && matrix.target != ''
+        shell: bash
+        run: |
+          cargo install cross --git https://github.com/cross-rs/cross --rev 4090beca3cfffa44371a5bba524de3a578aa46c3
+          echo "CARGO=cross" >> $GITHUB_ENV
+
+      - name: Set target variables
+        shell: bash
+        run: |
+          echo "TARGET_FLAGS=--target ${{ matrix.target }}" >> $GITHUB_ENV
+          echo "TARGET_DIR=./target/${{ matrix.target }}" >> $GITHUB_ENV
+
+      - name: Show command used for Cargo
+        run: |
+          echo "cargo command is: ${{ env.CARGO }}"
+          echo "target flag is: ${{ env.TARGET_FLAGS }}"
+          echo "target dir is: ${{ env.TARGET_DIR }}"
+
+      - name: Build release binary
+        shell: bash
+        run: |
+          ${{ env.CARGO }} build --verbose --release ${{ env.TARGET_FLAGS }}
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            bin="target/${{ matrix.target }}/release/${{ env.BINARY }}.exe"
+          else
+            bin="target/${{ matrix.target }}/release/${{ env.BINARY }}"
+          fi
+          echo "BIN=$bin" >> $GITHUB_ENV
+
+      - name: Strip release binary (macos)
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        run: strip "$BIN"
+
+      - name: Strip release binary (cross)
+        if: env.CARGO == 'cross'
+        shell: bash
+        run: |
+          docker run --rm -v \
+            "$PWD/target:/target:Z" \
+            "ghcr.io/cross-rs/${{ matrix.target }}:main" \
+            "${{ matrix.strip }}" \
+            "/$BIN"
+
+      - name: Determine archive name
+        shell: bash
+        run: |
+          version="${{ needs.create-release.outputs.version }}"
+          echo "ARCHIVE=${{ env.BINARY }}-$version-${{ matrix.build }}" >> $GITHUB_ENV
+
+      - name: Creating directory for archive
+        shell: bash
+        run: |
+          mkdir -p "$ARCHIVE"/
+          cp "$BIN" "$ARCHIVE"/
+          cp {README.md,LICENSE} "$ARCHIVE"/
+
+      - name: Build archive (Windows)
+        shell: bash
+        if: matrix.os == 'windows-latest'
+        run: |
+          7z a "$ARCHIVE.zip" "$ARCHIVE"
+          certutil -hashfile "$ARCHIVE.zip" SHA256 > "$ARCHIVE.zip.sha256"
+          echo "ASSET=$ARCHIVE.zip" >> $GITHUB_ENV
+          echo "ASSET_SUM=$ARCHIVE.zip.sha256" >> $GITHUB_ENV
+
+      - name: Build archive (Unix)
+        shell: bash
+        if: matrix.os != 'windows-latest'
+        run: |
+          tar czf "$ARCHIVE.tar.gz" "$ARCHIVE"
+          shasum -a 256 "$ARCHIVE.tar.gz" > "$ARCHIVE.tar.gz.sha256"
+          echo "ASSET=$ARCHIVE.tar.gz" >> $GITHUB_ENV
+          echo "ASSET_SUM=$ARCHIVE.tar.gz.sha256" >> $GITHUB_ENV
+
+      - name: Upload release archive
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          version="${{ needs.create-release.outputs.version }}"
+          gh release upload "$version" ${{ env.ASSET }} ${{ env.ASSET_SUM }}
