@@ -52,7 +52,7 @@ fn main() {
     // Initialize logging
     env_logger::init();
 
-    // Process command line aguments
+    // Process command line arguments
     let mut cliargs = cliparser::parse();
 
     // If --list was specified, just display a list of signatures and return
@@ -64,11 +64,6 @@ fn main() {
     // Set a dummy file name when reading from stdin
     if cliargs.stdin {
         cliargs.file_name = Some(STDIN.to_string());
-    }
-
-    // If --list was not specified, a target file must be provided
-    if cliargs.file_name.is_none() {
-        panic!("No target file name specified! Try --help.");
     }
 
     let mut json_logger = json::JsonLogger::new(cliargs.log);
