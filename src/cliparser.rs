@@ -1,4 +1,4 @@
-use clap::Parser;
+use clap::{CommandFactory, Parser};
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
@@ -68,5 +68,14 @@ pub struct CliArgs {
 }
 
 pub fn parse() -> CliArgs {
-    CliArgs::parse()
+    let args = CliArgs::parse();
+
+    if std::env::args().len() == 1 {
+        CliArgs::command()
+            .print_help()
+            .expect("Failed to print help output");
+        std::process::exit(1);
+    }
+
+    args
 }
