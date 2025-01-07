@@ -1119,6 +1119,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::encfw::DESCRIPTION.to_string(),
             extractor: Some(extractors::encfw::encfw_extractor()),
         },
+        // matter ota firmware
+        signatures::common::Signature {
+            name: "matter_ota".to_string(),
+            short: true,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::matter_ota::matter_ota_magic(),
+            parser: signatures::matter_ota::matter_ota_parser,
+            description: signatures::matter_ota::DESCRIPTION.to_string(),
+            extractor: Some(extractors::matter_ota::matter_ota_extractor()),
+        },
     ];
 
     binary_signatures
