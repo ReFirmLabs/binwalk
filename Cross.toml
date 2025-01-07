@@ -1,0 +1,35 @@
+[target.aarch64-unknown-linux-gnu]
+pre-build = [
+    "dpkg --add-architecture arm64",
+    "apt update -y",
+    "apt install -y build-essential:arm64",
+    "apt install -y libfontconfig1-dev:arm64",
+    "apt install -y liblzma-dev:arm64",
+]
+
+[target.powerpc64le-unknown-linux-gnu]
+pre-build = [
+    "dpkg --add-architecture ppc64el",
+    "apt update -y",
+    "apt install -y build-essential:ppc64el",
+    "apt install -y libfontconfig1-dev:ppc64el",
+    "apt install -y liblzma-dev:ppc64el",
+]
+
+[target.s390x-unknown-linux-gnu]
+pre-build = [
+    "dpkg --add-architecture s390x",
+    "apt update -y",
+    "apt install -y build-essential:s390x",
+    "apt install -y libfontconfig1-dev:s390x",
+    "apt install -y liblzma-dev:s390x",
+]
+
+[target.riscv64gc-unknown-linux-gnu]
+pre-build = [
+    "dpkg --add-architecture riscv64",
+    "apt update -y",
+    "apt install -y build-essential:riscv64",
+    "apt install -y libfontconfig1-dev:riscv64",
+    "apt install -y liblzma-dev:riscv64",
+]
