@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::common::get_cstring;
+use crate::common::{get_cstring, is_offset_safe};
 use crate::structures::common::{self, StructureError};
 
 /// Struct to store Matter OTA header info
@@ -46,7 +46,9 @@ pub fn parse_matter_ota_header(ota_data: &[u8]) -> Result<MatterOTAHeader, Struc
         // Header starts after the magic, total size and header size fields
         let header_start = common::size(&ota_structure);
         let header_end = header_start + header_size;
-        let header_data = &ota_data[header_start..header_end];
+        let header_data = ota_data
+            .get(header_start..header_end)
+            .ok_or(StructureError)?;
 
         let header = parse_tlv_header(header_data)?;
 
@@ -111,7 +113,7 @@ fn parse_tlv_element(data: &[u8]) -> Result<(Element, usize), StructureError> {
         _ => return Err(StructureError),
     };
 
-    let field_data = &data[field_offset..];
+    let field_data = data.get(field_offset..).ok_or(StructureError)?;
 
     match element_type {
         0b1_0101 => Ok((
@@ -147,8 +149,14 @@ fn parse_tlv_element(data: &[u8]) -> Result<(Element, usize), StructureError> {
             let structure = &vec![("string_length", field_width_type)];
             let result = common::parse(field_data, structure, "little")?;
             let string_length = result["string_length"] as usize;
-            let string_data = &field_data[common::size(structure)..];
-            let string = get_cstring(&string_data[..string_length]);
+            let string_data = field_data
+                .get(common::size(structure)..)
+                .ok_or(StructureError)?;
+            // The string buffer isn't null-terminated, so use the explicit length
+            let string = string_data
+                .get(..string_length)
+                .map(get_cstring)
+                .ok_or(StructureError)?;
             Ok((
                 Element {
                     tag,
@@ -162,11 +170,18 @@ fn parse_tlv_element(data: &[u8]) -> Result<(Element, usize), StructureError> {
             let structure = &vec![("octet_string_length", field_width_type)];
             let result = common::parse(field_data, structure, "little")?;
             let octet_string_length = result["octet_string_length"] as usize;
-            let octet_string_data = &field_data[common::size(structure)..];
+            let octet_string_data = field_data
+                .get(common::size(structure)..)
+                .ok_or(StructureError)?;
             Ok((
                 Element {
                     tag,
-                    value: Value::OctetString(octet_string_data[..octet_string_length].to_vec()),
+                    value: Value::OctetString(
+                        octet_string_data
+                            .get(..octet_string_length)
+                            .ok_or(StructureError)?
+                            .to_vec(),
+                    ),
                 },
                 field_offset + common::size(structure) + octet_string_length,
             ))
@@ -189,11 +204,17 @@ fn parse_tlv_header(data: &[u8]) -> Result<HashMap<String, Value>, StructureErro
         "ImageDigestType",
         "ImageDigest",
     ];
-    let mut offset = 0;
     let mut header = HashMap::new();
-    while offset < data.len() {
-        let (element, new_offset) = parse_tlv_element(&data[offset..])?;
-        offset += new_offset;
+
+    let available_data: usize = data.len();
+
+    let mut last_tlv_offset: Option<usize> = None;
+    let mut next_tlv_offset: usize = 0;
+
+    while is_offset_safe(available_data, next_tlv_offset, last_tlv_offset) {
+        let (element, new_offset) = parse_tlv_element(&data[next_tlv_offset..])?;
+        last_tlv_offset = Some(next_tlv_offset);
+        next_tlv_offset += new_offset;
         if let Some(tag) = element.tag {
             let field_name = *fields.get(tag).ok_or(StructureError)?;
             header.insert(field_name.to_string(), element.value);

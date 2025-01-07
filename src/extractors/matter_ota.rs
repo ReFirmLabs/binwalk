@@ -50,6 +50,7 @@ pub fn extract_matter_ota(
         let total_header_size =
             MAGIC_SIZE + TOTAL_SIZE_SIZE + HEADER_SIZE_SIZE + ota_header.header_size;
 
+        result.success = true;
         result.size = Some(ota_header.total_size);
 
         let payload_start = offset + total_header_size;
