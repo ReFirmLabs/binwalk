@@ -1130,6 +1130,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::matter_ota::DESCRIPTION.to_string(),
             extractor: Some(extractors::matter_ota::matter_ota_extractor()),
         },
+        // DPAPI blob data
+        signatures::common::Signature {
+            name: "dpapi".to_string(),
+            short: true,
+            magic_offset: 0,
+            always_display: true,
+            magic: signatures::dpapi::dpapi_magic(),
+            parser: signatures::dpapi::dpapi_parser,
+            description: signatures::dpapi::DESCRIPTION.to_string(),
+            extractor: None,
+        },
     ];
 
     binary_signatures
