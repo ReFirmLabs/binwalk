@@ -143,6 +143,7 @@ pub mod androidsparse;
 pub mod apfs;
 pub mod arcadyan;
 pub mod autel;
+pub mod bmp;
 pub mod bzip2;
 pub mod cab;
 pub mod common;
