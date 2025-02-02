@@ -94,7 +94,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             extractor: Some(extractors::lzma::lzma_extractor()),
         },
         // bmp
-        signatures::common::Signature{
+        signatures::common::Signature {
             name: "bmp".to_string(),
             short: false,
             magic_offset: 0,
@@ -102,7 +102,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             magic: signatures::bmp::bmp_magic(),
             parser: signatures::bmp::bmp_parser,
             description: signatures::bmp::DESCRIPTION.to_string(),
-            extractor: Some(extractors::bmp::bmp_extractor())
+            extractor: Some(extractors::bmp::bmp_extractor()),
         },
         // bzip2
         signatures::common::Signature {
