@@ -52,10 +52,12 @@ pub fn parse_bmp_file_header(bmp_data: &[u8]) -> Result<BMPFileHeader, Structure
 // https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapv5header
 // "The number of bytes required by the structure. Applications should use this member to determine which bitmap information header structure is being used."
 pub fn get_dib_header_size(bmp_data: &[u8]) -> Result<usize, StructureError> {
-    let valid_header_sizes = [12,  // BITMAPCOREHEADER
+    let valid_header_sizes = [
+        12,  // BITMAPCOREHEADER
         40,  // BITMAPINFOHEADER
         108, // BITMAPV4HEADER
-        124];
+        124,
+    ];
 
     let header_size = u32::from_le_bytes(bmp_data[..4].try_into().unwrap());
 
