@@ -132,6 +132,7 @@ pub mod dlke;
 pub mod dlob;
 pub mod dmg;
 pub mod dms;
+pub mod dpapi;
 pub mod dtb;
 pub mod dxbc;
 pub mod ecos;
