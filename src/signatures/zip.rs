@@ -1,3 +1,4 @@
+use crate::common::is_offset_safe;
 use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
 use crate::structures::zip::{parse_eocd_header, parse_zip_header};
 use aho_corasick::AhoCorasick;
@@ -23,16 +24,52 @@ pub fn zip_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, Si
     // Parse the ZIP file header
     if let Ok(zip_file_header) = parse_zip_header(&file_data[offset..]) {
         // Locate the end-of-central-directory header, which must come after the zip local file entries
-        if let Ok(zip_info) = find_zip_eof(file_data, offset) {
-            result.size = zip_info.eof - offset;
-            result.description = format!(
-                "{}, version: {}.{}, file count: {}, total size: {} bytes",
-                result.description,
-                zip_file_header.version_major,
-                zip_file_header.version_minor,
-                zip_info.file_count,
-                result.size
-            );
+        match find_zip_eof(file_data, offset) {
+            Ok(zip_info) => {
+                result.size = zip_info.eof - offset;
+                result.description = format!(
+                    "{}, version: {}.{}, file count: {}, total size: {} bytes",
+                    result.description,
+                    zip_file_header.version_major,
+                    zip_file_header.version_minor,
+                    zip_info.file_count,
+                    result.size
+                );
+            }
+            // If the ZIP file is corrupted and no EOCD header exists, attempt to parse all the individual ZIP file headers
+            Err(_) => {
+                let available_data = file_data.len() - offset;
+                let mut previous_file_header_offset = None;
+                let mut next_file_header_offset = offset + zip_file_header.total_size;
+
+                while is_offset_safe(
+                    available_data,
+                    next_file_header_offset,
+                    previous_file_header_offset,
+                ) {
+                    match parse_zip_header(&file_data[next_file_header_offset..]) {
+                        Ok(zip_header) => {
+                            previous_file_header_offset = Some(next_file_header_offset);
+                            next_file_header_offset += zip_header.total_size;
+                        }
+                        Err(_) => {
+                            result.size = next_file_header_offset - offset;
+                            result.description = format!(
+                                "{}, version: {}.{}, missing end-of-central-directory header, total size: {} bytes",
+                                result.description,
+                                zip_file_header.version_major,
+                                zip_file_header.version_minor,
+                                result.size
+                            );
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Only return success if the identified ZIP file is larger than the first ZIP file entry
+        if result.size > zip_file_header.total_size {
             return Ok(result);
         }
     }
