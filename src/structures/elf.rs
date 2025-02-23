@@ -58,6 +58,7 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, StructureError> {
     ]);
 
     let elf_types = HashMap::from([
+        (0, "no file type"),
         (1, "relocatable"),
         (2, "executable"),
         (3, "shared object"),
