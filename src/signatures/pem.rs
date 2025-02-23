@@ -10,7 +10,12 @@ pub const PEM_CERTIFICATE_DESCRIPTION: &str = "PEM certificate";
 
 /// Public key magic
 pub fn pem_public_key_magic() -> Vec<Vec<u8>> {
-    vec![b"-----BEGIN PUBLIC KEY-----".to_vec()]
+    vec![
+        b"-----BEGIN PUBLIC KEY-----".to_vec(),
+        b"-----BEGIN RSA PUBLIC KEY-----".to_vec(),
+        b"-----BEGIN DSA PUBLIC KEY-----".to_vec(),
+        b"-----BEGIN ECDSA PUBLIC KEY-----".to_vec(),
+    ]
 }
 
 /// Private key magics
@@ -21,6 +26,9 @@ pub fn pem_private_key_magic() -> Vec<Vec<u8>> {
         b"-----BEGIN RSA PRIVATE KEY-----".to_vec(),
         b"-----BEGIN DSA PRIVATE KEY-----".to_vec(),
         b"-----BEGIN OPENSSH PRIVATE KEY-----".to_vec(),
+        b"-----BEGIN ANY PRIVATE KEY-----".to_vec(),
+        b"-----BEGIN ENCRYPTED PRIVATE KEY-----".to_vec(),
+        b"-----BEGIN TSS2 PRIVATE KEY-----".to_vec(),
     ]
 }
 
