@@ -31,6 +31,7 @@ pub fn arj_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, Si
                 offset,
                 size: arj_header.header_size,
                 confidence: CONFIDENCE_MEDIUM,
+                extraction_declined: arj_header.file_type != *"comment header",
                 ..Default::default()
             });
         }
