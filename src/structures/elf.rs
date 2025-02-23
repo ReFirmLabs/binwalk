@@ -241,7 +241,10 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, StructureError> {
         (219, "CSR Kalimba architecture family"),
         (220, "Zilog Z80"),
         (221, "Controls and Data Services VISIUMcore processor"),
-        (222, "FTDI Chip FT32 high performance 32-bit RISC architecture"),
+        (
+            222,
+            "FTDI Chip FT32 high performance 32-bit RISC architecture",
+        ),
         (223, "Moxie processor family"),
         (224, "AMD GPU architecture"),
         (243, "RISC-V"),
@@ -296,11 +299,14 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, StructureError> {
                     // Sanity check the remaining ELF header fields
                     if elf_info["version"] == EXPECTED_VERSION
                         && elf_types.contains_key(&elf_info["type"])
-                        && elf_machines.contains_key(&elf_info["machine"])
                     {
                         // Set the ELF info fields
                         elf_hdr_info.exe_type = elf_types[&elf_info["type"]].to_string();
-                        elf_hdr_info.machine = elf_machines[&elf_info["machine"]].to_string();
+                        elf_hdr_info.machine = elf_machines
+                            .get(&elf_info["machine"])
+                            // Use 'Unknown' as a fallback for the machine type
+                            .unwrap_or(&"Unknown")
+                            .to_string();
 
                         return Ok(elf_hdr_info);
                     }
