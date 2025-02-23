@@ -42,6 +42,7 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, StructureError> {
         (2, "NetBSD"),
         (3, "Linux"),
         (4, "GNU Hurd"),
+        (5, "86Open"),
         (6, "Solaris"),
         (7, "AIX"),
         (8, "IRIX"),
@@ -55,6 +56,10 @@ pub fn parse_elf_header(elf_data: &[u8]) -> Result<ELFHeader, StructureError> {
         (16, "FenixOS"),
         (17, "Nuxi CloudABI"),
         (18, "OpenVOS"),
+        (97, "ARM ABI"),
+        (102, "Cell LV2"),
+        (202, "Cafe OS"),
+        (255, "embedded"),
     ]);
 
     let elf_types = HashMap::from([
