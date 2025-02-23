@@ -1152,6 +1152,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::dpapi::DESCRIPTION.to_string(),
             extractor: None,
         },
+        // QEMU QCOW image
+        signatures::common::Signature {
+            name: "qcow".to_string(),
+            short: true,
+            magic_offset: 0,
+            always_display: true,
+            magic: signatures::qcow::qcow_magic(),
+            parser: signatures::qcow::qcow_parser,
+            description: signatures::qcow::DESCRIPTION.to_string(),
+            extractor: None,
+        },
     ];
 
     binary_signatures
