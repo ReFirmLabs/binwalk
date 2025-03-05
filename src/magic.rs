@@ -1162,6 +1162,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             parser: signatures::qcow::qcow_parser,
             description: signatures::qcow::DESCRIPTION.to_string(),
             extractor: None,
+      },
+        // ARJ archive
+        signatures::common::Signature {
+            name: "arj".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::arj::arj_magic(),
+            parser: signatures::arj::arj_parser,
+            description: signatures::arj::DESCRIPTION.to_string(),
+            extractor: Some(extractors::sevenzip::sevenzip_extractor()),
         },
     ];
 

@@ -99,6 +99,7 @@
 pub mod android_bootimg;
 pub mod androidsparse;
 pub mod apfs;
+pub mod arj;
 pub mod autel;
 pub mod binhdr;
 pub mod bmp;
