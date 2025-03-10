@@ -1,9 +1,8 @@
 use crate::common::read_input;
 use entropy::shannon_entropy;
-use log::error;
-use plotters::prelude::*;
+use plotly::{Plot, Scatter};
+use plotly::layout::{Axis, Layout};
 use serde::{Deserialize, Serialize};
-use std::path;
 
 #[derive(Debug, Clone)]
 pub struct EntropyError;
@@ -23,10 +22,17 @@ pub struct FileEntropy {
 
 /// Splits the supplied data up into blocks and calculates the entropy of each block.
 fn blocks(data: &[u8]) -> Vec<BlockEntropy> {
-    const BLOCK_SIZE: usize = 1024 * 4;
+    const BLOCK_COUNT: usize = 2048;
 
     let mut offset: usize = 0;
-    let mut chunker = data.chunks(BLOCK_SIZE);
+
+    let block_size = if data.len() < BLOCK_COUNT {
+        data.len()
+    } else {
+        data.len() / BLOCK_COUNT
+    };
+
+    let mut chunker = data.chunks(block_size);
     let mut entropy_blocks: Vec<BlockEntropy> = vec![];
 
     loop {
@@ -50,101 +56,40 @@ fn blocks(data: &[u8]) -> Vec<BlockEntropy> {
     entropy_blocks
 }
 
-/// Generate a plot of a file's entropy.
-/// Will output a file to the current working directory with the name `<file_name>.png`.
 pub fn plot(
     file_path: impl Into<String>,
     stdin: bool,
-    png_file_path: Option<String>,
 ) -> Result<FileEntropy, EntropyError> {
-    const FILE_EXTENSION: &str = "png";
-    const SHANNON_MAX_VALUE: i32 = 8;
-    const IMAGE_PIXEL_WIDTH: u32 = 2048;
-    const IMAGE_PIXEL_HEIGHT: u32 = ((IMAGE_PIXEL_WIDTH as f64) * 0.6) as u32;
-
+    let mut x: Vec<usize> = Vec::new();
+    let mut y: Vec<f32> = Vec::new();
     let target_file: String = file_path.into();
-
-    // Use the specified output file path, else generate a default output file name
-    let png_path: String = match png_file_path {
-        Some(fpath) => fpath,
-        None => format!("{}.{}", target_file, FILE_EXTENSION),
-    };
-
-    // Get the base name of the target file
-    let target_file_name = path::Path::new(&target_file)
-        .file_name()
-        .unwrap()
-        .to_str()
-        .unwrap();
-
-    let mut file_entropy = FileEntropy {
-        file: png_path.clone(),
-        ..Default::default()
-    };
-
-    // Make sure the output file doesn't already exist
-    if path::Path::new(&png_path).exists() {
-        error!("Cannot create entropy graph {}: File exists", png_path);
-        return Err(EntropyError);
-    }
+    let mut file_entropy = FileEntropy { file: target_file.clone(), ..Default::default() };
 
     // Read in the target file data
     if let Ok(file_data) = read_input(&target_file, stdin) {
-        let mut points: Vec<(i32, i32)> = vec![];
-
-        // Calculate the entropy for each file block
+        // Calculate the entropy of each file block
         file_entropy.blocks = blocks(&file_data);
 
-        // Convert x, y coordinates into i32's
         for block in &file_entropy.blocks {
-            let x = block.start as i32;
-            let y = block.entropy.round() as i32;
-            points.push((x, y));
+            x.push(block.start);
+            x.push(block.end);
+            y.push(block.entropy);
+            y.push(block.entropy);
         }
 
-        // Use the BitMapBackend to create a PNG, make the background black
-        let root_area = BitMapBackend::new(&png_path, (IMAGE_PIXEL_WIDTH, IMAGE_PIXEL_HEIGHT))
-            .into_drawing_area();
-        root_area.fill(&BLACK).unwrap();
-
-        // Build a 2D chart to plot the file entropy
-        let mut ctx = ChartBuilder::on(&root_area)
-            .margin(50)
-            .set_label_area_size(LabelAreaPosition::Left, 40)
-            .set_label_area_size(LabelAreaPosition::Bottom, 40)
-            .caption(
-                target_file_name,
-                TextStyle::from(("sans-serif", 30).into_font()).color(&GREEN),
-            )
-            .build_cartesian_2d(0..file_data.len() as i32, 0..SHANNON_MAX_VALUE)
-            .unwrap();
-
-        // Set the axis colors
-        ctx.configure_mesh()
-            .axis_style(GREEN)
-            .x_label_style(&GREEN)
-            .draw()
-            .unwrap();
-
-        // Line plot of the entropy points
-        ctx.draw_series(LineSeries::new(
-            points, //.into_iter().map(|(x, y)| (x, y)),
-            &YELLOW,
-        ))
-        .unwrap();
+        let mut plot = Plot::new();
+        let trace = Scatter::new(x, y);
+        let layout = Layout::new()
+            .title("Entropy Graph")
+            .x_axis(Axis::new().title("File Offset"))
+            .y_axis(Axis::new().title("Entropy").range(vec![0, 8]));
+        
+        plot.add_trace(trace);
+        plot.set_layout(layout);
+        plot.show();
+        
+        return Ok(file_entropy);
     }
 
-    /*
-     * Plotter code doesn't throw any errors if graph file creation fails.
-     * Make sure the output file was created.
-     */
-    if !path::Path::new(&png_path).exists() {
-        error!(
-            "Failed to create entropy graph {}: possible permissions error?",
-            png_path
-        );
-        return Err(EntropyError);
-    }
-
-    Ok(file_entropy)
+    Err(EntropyError)
 }
