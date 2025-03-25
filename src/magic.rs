@@ -874,7 +874,51 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             always_display: false,
             magic: signatures::aes::aes_sbox_magic(),
             parser: signatures::aes::aes_sbox_parser,
-            description: signatures::aes::DESCRIPTION.to_string(),
+            description: signatures::aes::DESCRIPTION_AES_SBOX.to_string(),
+            extractor: None,
+        },
+        // AES Forward table
+        signatures::common::Signature {
+            name: "aes_forward_table".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::aes::aes_forward_table_magic(),
+            parser: signatures::aes::aes_forward_table_parser,
+            description: signatures::aes::DESCRIPTION_AES_FT.to_string(),
+            extractor: None,
+        },
+        // AES Reverse table
+        signatures::common::Signature {
+            name: "aes_reverse_table".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::aes::aes_reverse_table_magic(),
+            parser: signatures::aes::aes_reverse_table_parser,
+            description: signatures::aes::DESCRIPTION_AES_RT.to_string(),
+            extractor: None,
+        },
+        // AES RCON
+        signatures::common::Signature {
+            name: "aes_rcon".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::aes::aes_rcon_magic(),
+            parser: signatures::aes::aes_rcon_parser,
+            description: signatures::aes::DESCRIPTION_AES_RCON.to_string(),
+            extractor: None,
+        },
+        // Accelerated AES
+        signatures::common::Signature {
+            name: "aes_acceleration_table".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::aes::aes_acceleration_table_magic(),
+            parser: signatures::aes::aes_acceleration_table_parser,
+            description: signatures::aes::DESCRIPTION_AES_ACC.to_string(),
             extractor: None,
         },
         // LUKS
