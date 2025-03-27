@@ -29,7 +29,9 @@ DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y install \
     zlib1g-dev \
     libfontconfig1-dev \
     liblzma-dev \
-    libssl-dev
+    libssl-dev \
+    7zip-standalone \
+    cpio
 
 # Install sasquatch Debian package
 curl -L -o sasquatch_1.0.deb "https://github.com/onekey-sec/sasquatch/releases/download/sasquatch-v4.5.1-4/sasquatch_1.0_$(dpkg --print-architecture).deb"
