@@ -10,21 +10,17 @@ pub const DESCRIPTION_AES_ACC: &str = "AES Acceleration Table";
 /// AES S-box magic bytes
 pub fn aes_sbox_magic() -> Vec<Vec<u8>> {
     vec![
-        b"\x63\x7C\x77\x7B\xF2\x6B\x6F\xC5".to_vec(),   // Forward S-Box
-        b"\x52\x09\x6A\xD5\x30\x36\xA5\x38".to_vec(),   // Reverse S-Box
+        b"\x63\x7C\x77\x7B\xF2\x6B\x6F\xC5".to_vec(), // Forward S-Box
+        b"\x52\x09\x6A\xD5\x30\x36\xA5\x38".to_vec(), // Reverse S-Box
     ]
 }
 
 pub fn aes_forward_table_magic() -> Vec<Vec<u8>> {
-    vec![
-        b"\xC6\x63\x63\xA5\xF8\x7C\x7C\x84\xEE\x77\x77\x99\xF6\x7B\x7B\x8D".to_vec(),
-    ]
+    vec![b"\xC6\x63\x63\xA5\xF8\x7C\x7C\x84\xEE\x77\x77\x99\xF6\x7B\x7B\x8D".to_vec()]
 }
 
 pub fn aes_reverse_table_magic() -> Vec<Vec<u8>> {
-    vec![
-        b"\x51\xF4\xA7\x50\x7E\x41\x65\x53\x1A\x17\xA4\xC3\x3A\x27\x5E\x96".to_vec(),
-    ]
+    vec![b"\x51\xF4\xA7\x50\x7E\x41\x65\x53\x1A\x17\xA4\xC3\x3A\x27\x5E\x96".to_vec()]
 }
 
 pub fn aes_rcon_magic() -> Vec<Vec<u8>> {
@@ -34,7 +30,7 @@ pub fn aes_rcon_magic() -> Vec<Vec<u8>> {
     ]
 }
 
-pub fn aes_acceleration_table_magic()  -> Vec<Vec<u8>> {
+pub fn aes_acceleration_table_magic() -> Vec<Vec<u8>> {
     vec![
         b"\xA5\x84\x99\x8D\x0D\xBD\xB1\x54\x50\x03\xA9\x7D\x19\x62\xE6\x9A".to_vec(), // combined sbox x2
         b"\xC6\xF8\xEE\xF6\xFF\xD6\xDE\x91\x60\x02\xCE\x56\xE7\xB5\x4D\xEC".to_vec(), // combined sbox x3
