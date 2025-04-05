@@ -34,7 +34,7 @@ clap = { version = "4.5.16", features = ["derive"] }
 xxhash-rust = { version = "0.8.12", features = ["xxh32"] }
 hex = "0.4.3"
 delink = { git = "https://github.com/devttys0/delink" }
-plotly = "0.12"
+plotly = { version = "0.12.1", features = ["kaleido", "kaleido_download"] }
 
 [dependencies.uuid]
 version = "1.10.0"
