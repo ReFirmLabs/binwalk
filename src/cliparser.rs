@@ -39,6 +39,10 @@ pub struct CliArgs {
     #[arg(short = 'E', long, conflicts_with = "extract")]
     pub entropy: bool,
 
+    /// Save entropy graph as a PNG file
+    #[arg(short, long)]
+    pub png: Option<String>,
+
     /// Log JSON results to a file ('-' for stdout)
     #[arg(short, long)]
     pub log: Option<String>,
