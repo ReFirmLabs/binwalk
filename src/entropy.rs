@@ -1,7 +1,7 @@
 use crate::common::read_input;
 use entropy::shannon_entropy;
-use plotly::{Plot, Scatter};
 use plotly::layout::{Axis, Layout};
+use plotly::{ImageFormat, Plot, Scatter};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone)]
@@ -59,11 +59,15 @@ fn blocks(data: &[u8]) -> Vec<BlockEntropy> {
 pub fn plot(
     file_path: impl Into<String>,
     stdin: bool,
+    out_file: Option<String>,
 ) -> Result<FileEntropy, EntropyError> {
     let mut x: Vec<usize> = Vec::new();
     let mut y: Vec<f32> = Vec::new();
     let target_file: String = file_path.into();
-    let mut file_entropy = FileEntropy { file: target_file.clone(), ..Default::default() };
+    let mut file_entropy = FileEntropy {
+        file: target_file.clone(),
+        ..Default::default()
+    };
 
     // Read in the target file data
     if let Ok(file_data) = read_input(&target_file, stdin) {
@@ -83,11 +87,17 @@ pub fn plot(
             .title("Entropy Graph")
             .x_axis(Axis::new().title("File Offset"))
             .y_axis(Axis::new().title("Entropy").range(vec![0, 8]));
-        
+
         plot.add_trace(trace);
         plot.set_layout(layout);
-        plot.show();
-        
+
+        match out_file {
+            None => plot.show(),
+            Some(out_file_name) => {
+                plot.write_image(&out_file_name, ImageFormat::PNG, 2048, 1024, 1.0);
+            }
+        }
+
         return Ok(file_entropy);
     }
 

@@ -73,7 +73,7 @@ fn main() {
         display::print_plain(cliargs.quiet, "Calculating file entropy...");
 
         if let Ok(entropy_results) =
-            entropy::plot(cliargs.file_name.unwrap(), cliargs.stdin)
+            entropy::plot(cliargs.file_name.unwrap(), cliargs.stdin, cliargs.png)
         {
             // Log entropy results to JSON file, if requested
             json_logger.log(json::JSONType::Entropy(entropy_results.clone()));
