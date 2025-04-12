@@ -1,3 +1,4 @@
+use crate::common::is_offset_safe;
 use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use bzip2::{Decompress, Status};
 
@@ -50,6 +51,8 @@ pub fn bzip2_decompressor(
     let bzip2_data = &file_data[offset..];
     let mut decompressed_buffer = [0; BLOCK_SIZE];
     let mut decompressor = Decompress::new(false);
+    let available_data = bzip2_data.len();
+    let mut previous_offset = None;
 
     /*
      * Loop through all compressed data and decompress it.
@@ -61,7 +64,9 @@ pub fn bzip2_decompressor(
      * The advantage is that not only are we 100% sure that this data is valid BZIP2 data, but we
      * can also determine the exact size of the BZIP2 data.
      */
-    loop {
+    while is_offset_safe(available_data, stream_offset, previous_offset) {
+        previous_offset = Some(stream_offset);
+
         // Decompress a block of data
         match decompressor.decompress(&bzip2_data[stream_offset..], &mut decompressed_buffer) {
             Err(_) => {
