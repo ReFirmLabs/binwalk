@@ -10,8 +10,8 @@ pub struct UEFIVolumeHeader {
 
 /// Parse a UEFI volume header
 pub fn parse_uefi_volume_header(uefi_data: &[u8]) -> Result<UEFIVolumeHeader, StructureError> {
-    // The revision field must be 2
-    const EXPECTED_REVISION: usize = 2;
+    // The revision field must be 1 or 2
+    let valid_revisions: Vec<usize> = vec![1, 2];
 
     let uefi_pi_header_structure = vec![
         ("volume_size", "u64"),
@@ -30,8 +30,8 @@ pub fn parse_uefi_volume_header(uefi_data: &[u8]) -> Result<UEFIVolumeHeader, St
         if uefi_volume_header["header_size"] < uefi_volume_header["volume_size"] {
             // The reserved field *must* be 0
             if uefi_volume_header["reserved"] == 0 {
-                // The revision number must be 2
-                if uefi_volume_header["revision"] == EXPECTED_REVISION {
+                // The revision number must be 1 or 2
+                if valid_revisions.contains(&uefi_volume_header["revision"]) {
                     return Ok(UEFIVolumeHeader {
                         // TODO: Validate UEFI header CRC
                         header_crc: uefi_volume_header["header_crc"],
