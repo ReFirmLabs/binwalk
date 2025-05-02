@@ -985,7 +985,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             magic: signatures::apfs::apfs_magic(),
             parser: signatures::apfs::apfs_parser,
             description: signatures::apfs::DESCRIPTION.to_string(),
-            extractor: Some(extractors::apfs::apfs_extractor()),
+            extractor: Some(extractors::sevenzip::sevenzip_extractor()),
         },
         // BTRFS
         signatures::common::Signature {

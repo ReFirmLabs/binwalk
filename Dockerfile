@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:25.04
 
 ARG BINWALK_INSTALL_DIR="/tmp/binwalk"
 ARG DEFAULT_WORKING_DIR="/analysis"
@@ -12,8 +12,9 @@ RUN apt-get update && apt-get upgrade -y
 RUN mkdir -p ${BINWALK_INSTALL_DIR}
 COPY . ${BINWALK_INSTALL_DIR}
 
-# Allow pip to install packages system-wide
-RUN mkdir -p $HOME/.config/pip && echo "[global]" > $HOME/.config/pip/pip.conf && echo "break-system-packages = true" >> $HOME/.config/pip/pip.conf
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+ENV UV_SYSTEM_PYTHON=1 UV_BREAK_SYSTEM_PACKAGES=1
 
 # Install all system dependencies
 RUN ${BINWALK_INSTALL_DIR}/dependencies/ubuntu.sh
