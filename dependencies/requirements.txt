@@ -1,0 +1,6 @@
+uefi_firmware
+jefferson
+ubi-reader
+lz4
+zstandard
+git+https://github.com/marin-m/vmlinux-to-elf
