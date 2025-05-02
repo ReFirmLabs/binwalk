@@ -1,4 +1,5 @@
 FROM ubuntu:25.04
+
 ARG BINWALK_INSTALL_DIR="/tmp/binwalk"
 ARG DEFAULT_WORKING_DIR="/analysis"
 
