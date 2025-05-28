@@ -61,9 +61,9 @@ jobs:
           release-tag-prefix: v
           action-gh-release-parameters: |
             {
-              "draft": false
-              "prerelease": false
-              "overwrite": true
+              "draft": false,
+              "prerelease": false,
+              "overwrite": true,
               "files": [
                 "ubi-${{ matrix.platform.os-name }}.tar.gz",
                 "ubi-${{ matrix.platform.os-name }}.zip"
