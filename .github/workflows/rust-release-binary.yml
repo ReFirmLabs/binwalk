@@ -1,10 +1,6 @@
 name: Release Build
 
-on:
-  push:
-    tags:
-      - 'v*'
-
+on: push
 jobs:
   release:
     name: Release - ${{ matrix.platform.os-name }}
@@ -39,6 +35,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      
+      - name: Update CHANGELOG
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+
       - name: Build binary
         uses: houseabsolute/actions-rust-cross@v1
         with:
@@ -54,3 +58,20 @@ jobs:
           executable-name: binwalk
           target: ${{ matrix.platform.target }}
           release-tag-prefix: v
+          changes-file: "CHANGELOG.md"          
+          action-gh-release-parameters: |
+            {
+              "draft": false,
+              "prerelease": false,
+              "overwrite": true,
+              "body": "Release for ${{ github.ref_name }}\n\n" +
+                    "## Changes\n${{ steps.changelog.outputs.changes }}\n\n",
+              "token": "${{ secrets.GITHUB_TOKEN }}"
+            }
+      - name: Commit CHANGELOG.md
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: master
+          commit_message: 'docs: update CHANGELOG.md for ${{ github.ref_name }} [skip ci]'
+          file_pattern: CHANGELOG.md
+        
