@@ -4,100 +4,66 @@ on:
   push:
     tags:
       - 'v*'
+    branches:
+      - 'dev'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  release:
+    name: Release - ${{ matrix.platform.os-name }}
     strategy:
       matrix:
-        target: [
-          'aarch64-apple-darwin',
-          'x86_64-apple-darwin',
-          'aarch64-pc-windows-msvc',
-          'x86_64-pc-windows-msvc',
-          'aarch64-unknown-linux-gnu',
-          'x86_64-unknown-linux-gnu',
-          'x86_64-unknown-freebsd'
-        ]
+        platform: 
+          - os-name: FreeBSD-x86_64
+            runs-on: ubuntu-24.04
+            target: x86_64-unknown-freebsd
+
+          - os-name: Linux-x86_64
+            runs-on: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+
+          - os-name: Linux-aarch64
+            runs-on: ubuntu-24.04
+            target: aarch64-unknown-linux-gnu
+
+          - os-name: macOS-x86_64
+            runs-on: macOS-latest
+            target: x86_64-apple-darwin
+
+          - os-name: macOS-aarch64
+            runs-on: macOS-latest
+            target: aarch64-apple-darwin
+
+          - os-name: Windows-x86_64
+            runs-on: windows-latest
+            target: x86_64-pc-windows-msvc
+
+          - os-name: Windows-aarch64
+            runs-on: windows-latest
+            target: aarch64-pc-windows-msvc
     
+    runs-on: ${{ matrix.platform.runs-on }}
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          profile: minimal
-          override: true
-          target: ${{ matrix.target }}
-      
-      - name: Get binary name
-        id: get-bin-name
-        run: |
-          echo "BIN_NAME=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].name')" >> $GITHUB_ENV
-
-      - name: Add cross-compilation dependencies
-        run: |
-          sudo apt-get update
-          # Common build dependencies
-          sudo apt-get install -y build-essential libfontconfig1-dev liblzma-dev
-          # Linux aarch64
-          if [[ "${{ matrix.target }}" == "aarch64-unknown-linux-gnu" ]]; then
-            sudo apt-get install -y gcc-aarch64-linux-gnu
-          fi
-          # Windows (x86_64 & aarch64)
-          if [[ "${{ matrix.target }}" == *"windows-msvc"* ]]; then
-            sudo apt-get install -y mingw-w64
-          fi
-          # MacOS (cross-compiling to Darwin)
-          if [[ "${{ matrix.target }}" == *"apple-darwin"* ]]; then
-            echo "Cross-compiling to MacOS requires osxcross and SDKs, which may not be available in GitHub Actions by default."
-            # sudo apt-get install -y osxcross # Uncomment if you have a setup for osxcross
-          fi
-          # FreeBSD (cross-compiling)
-          if [[ "${{ matrix.target }}" == *"freebsd"* ]]; then
-            sudo apt-get install -y gcc binutils
-          fi
-        shell: bash
-
-      - name: Build release
-        uses: actions-rs/cargo@v1
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build binary
+        uses: houseabsolute/actions-rust-cross@v1
         with:
           command: build
-          args: --release --target ${{ matrix.target }}
+          target: ${{ matrix.platform.target }}
+          args: "--locked --release"
+          strip: true
 
-      - name: Prepare binaries
-        run: |
-          mkdir -p release
-          EXT=""
-          if [[ "${{ matrix.target }}" == *"windows"* ]]; then
-            EXT=".exe"
-          fi
-          cp target/${{ matrix.target }}/release/${BIN_NAME}${EXT} release/${BIN_NAME}-${{ matrix.target }}${EXT}
-          tar -czvf release/${BIN_NAME}-${{ matrix.target }}.tar.gz -C release ${BIN_NAME}-${{ matrix.target }}${EXT}
-      
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4.6.2
+      - name: Publish artifacts and release
+        uses: houseabsolute/actions-rust-release@v0
         with:
-          name: binaries
-          path: release/
-          if-no-files-found: error
-  
-  create-release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4.3.0
-        with:
-          name: binaries
-          path: release/
-      
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            release/*.tar.gz
-            release/*.exe
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          executable-name: ubi
+          target: ${{ matrix.platform.target }}
+          release-tag-prefix: v
+          action-gh-release-parameters: |
+            draft: false
+            prerelease: false
+            overwrite: true
+            files: |
+              ubi-${{ matrix.platform.os-name }}.tar.gz
+              ubi-${{ matrix.platform.os-name }}.zip
+            token: ${{ secrets.GITHUB_TOKEN }}
