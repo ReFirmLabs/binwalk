@@ -47,6 +47,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
           writeToFile: true
+          changelogFilePath: "${{ github.workspace }}/CHANGELOG.md"
 
       - name: Build binary
         uses: houseabsolute/actions-rust-cross@v1
@@ -63,7 +64,7 @@ jobs:
           executable-name: binwalk
           target: ${{ matrix.platform.target }}
           release-tag-prefix: v
-          changes-file: "CHANGELOG.md"          
+          changes-file: "${{ github.workspace }}/CHANGELOG.md"          
           action-gh-release-parameters: |
             {
               "draft": false,
@@ -71,9 +72,13 @@ jobs:
               "overwrite": true,
               "generate_release_notes": true,
               "make_latest": true,
-              "body_path": "CHANGELOG.md",
+              "body_path": "${{ github.workspace }}/CHANGELOG.md",
               "token": "${{ secrets.GITHUB_TOKEN }}"
             }
+  commit:
+    name: Commit changelog
+    runs-on: ubuntu-latest
+    steps:
       - name: Commit CHANGELOG.md
         if: startsWith(github.ref, 'refs/tags/')
         uses: stefanzweifel/git-auto-commit-action@v4
