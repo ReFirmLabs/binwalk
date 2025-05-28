@@ -46,6 +46,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
+          writeToFile: true
 
       - name: Build binary
         uses: houseabsolute/actions-rust-cross@v1
@@ -68,7 +69,9 @@ jobs:
               "draft": false,
               "prerelease": false,
               "overwrite": true,
-              "body": "Release for ${{ github.ref_name }}\n\n## Changes\n${{ steps.changelog.outputs.changes }}\n\n",
+              "generate_release_notes": true,
+              "make_latest": true,
+              "body_path": "CHANGELOG.md",
               "token": "${{ secrets.GITHUB_TOKEN }}"
             }
       - name: Commit CHANGELOG.md
