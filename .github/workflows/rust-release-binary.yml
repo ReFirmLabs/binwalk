@@ -11,20 +11,13 @@ jobs:
     strategy:
       matrix:
         target: [
-          'x86_64-unknown-linux-gnu',
-          'aarch64-unknown-linux-gnu',
-          'x86_64-apple-darwin',
           'aarch64-apple-darwin',
-          'x86_64-pc-windows-msvc',
+          'x86_64-apple-darwin',
           'aarch64-pc-windows-msvc',
-          'x86_64-unknown-freebsd',
-          'aarch64-unknown-freebsd',
-          'x86_64-unknown-netbsd',
-          'aarch64-unknown-netbsd',
-          'x86_64-unknown-openbsd',
-          'aarch64-unknown-openbsd',
-          'x86_64-unknown-dragonfly',
-          'aarch64-unknown-dragonfly'
+          'x86_64-pc-windows-msvc',
+          'aarch64-unknown-linux-gnu',
+          'x86_64-unknown-linux-gnu',
+          'x86_64-unknown-freebsd'
         ]
     
     steps:
@@ -60,8 +53,8 @@ jobs:
             echo "Cross-compiling to MacOS requires osxcross and SDKs, which may not be available in GitHub Actions by default."
             # sudo apt-get install -y osxcross # Uncomment if you have a setup for osxcross
           fi
-          # FreeBSD, NetBSD, OpenBSD, DragonFly (cross-compiling)
-          if [[ "${{ matrix.target }}" == *"freebsd"* ]] || [[ "${{ matrix.target }}" == *"netbsd"* ]] || [[ "${{ matrix.target }}" == *"openbsd"* ]] || [[ "${{ matrix.target }}" == *"dragonfly"* ]]; then
+          # FreeBSD (cross-compiling)
+          if [[ "${{ matrix.target }}" == *"freebsd"* ]]; then
             sudo apt-get install -y gcc binutils
           fi
         shell: bash
