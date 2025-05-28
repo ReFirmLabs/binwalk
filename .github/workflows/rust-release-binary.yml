@@ -1,6 +1,9 @@
 name: Release Build
 
-on: push
+on:
+  push:
+    tags:
+      - 'v*'
 jobs:
   release:
     name: Release - ${{ matrix.platform.os-name }}
@@ -37,6 +40,7 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Update CHANGELOG
+        if: startsWith(github.ref, 'refs/tags/')
         id: changelog
         uses: requarks/changelog-action@v1
         with:
@@ -69,6 +73,7 @@ jobs:
               "token": "${{ secrets.GITHUB_TOKEN }}"
             }
       - name: Commit CHANGELOG.md
+        if: startsWith(github.ref, 'refs/tags/')
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           branch: master
