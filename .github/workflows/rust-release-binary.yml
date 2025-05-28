@@ -68,8 +68,7 @@ jobs:
               "draft": false,
               "prerelease": false,
               "overwrite": true,
-              "body": "Release for ${{ github.ref_name }}\n\n" +
-                    "## Changes\n${{ steps.changelog.outputs.changes }}\n\n",
+              "body": "Release for ${{ github.ref_name }}\n\n## Changes\n${{ steps.changelog.outputs.changes }}\n\n",
               "token": "${{ secrets.GITHUB_TOKEN }}"
             }
       - name: Commit CHANGELOG.md
