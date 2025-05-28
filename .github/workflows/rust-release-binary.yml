@@ -56,7 +56,7 @@ jobs:
       - name: Publish artifacts and release
         uses: houseabsolute/actions-rust-release@v0
         with:
-          executable-name: ubi
+          executable-name: binwalk
           target: ${{ matrix.platform.target }}
           release-tag-prefix: v
           action-gh-release-parameters: |
