@@ -1,0 +1,110 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [
+          'x86_64-unknown-linux-gnu',
+          'aarch64-unknown-linux-gnu',
+          'x86_64-apple-darwin',
+          'aarch64-apple-darwin',
+          'x86_64-pc-windows-msvc',
+          'aarch64-pc-windows-msvc',
+          'x86_64-unknown-freebsd',
+          'aarch64-unknown-freebsd',
+          'x86_64-unknown-netbsd',
+          'aarch64-unknown-netbsd',
+          'x86_64-unknown-openbsd',
+          'aarch64-unknown-openbsd',
+          'x86_64-unknown-dragonfly',
+          'aarch64-unknown-dragonfly'
+        ]
+    
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+          target: ${{ matrix.target }}
+      
+      - name: Get binary name
+        id: get-bin-name
+        run: |
+          echo "BIN_NAME=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].name')" >> $GITHUB_ENV
+
+      - name: Add cross-compilation dependencies
+        run: |
+          sudo apt-get update
+          # Common build dependencies
+          sudo apt-get install -y build-essential libfontconfig1-dev liblzma-dev
+          # Linux aarch64
+          if [[ "${{ matrix.target }}" == "aarch64-unknown-linux-gnu" ]]; then
+            sudo apt-get install -y gcc-aarch64-linux-gnu
+          fi
+          # Windows (x86_64 & aarch64)
+          if [[ "${{ matrix.target }}" == *"windows-msvc"* ]]; then
+            sudo apt-get install -y mingw-w64
+          fi
+          # MacOS (cross-compiling to Darwin)
+          if [[ "${{ matrix.target }}" == *"apple-darwin"* ]]; then
+            echo "Cross-compiling to MacOS requires osxcross and SDKs, which may not be available in GitHub Actions by default."
+            # sudo apt-get install -y osxcross # Uncomment if you have a setup for osxcross
+          fi
+          # FreeBSD, NetBSD, OpenBSD, DragonFly (cross-compiling)
+          if [[ "${{ matrix.target }}" == *"freebsd"* ]] || [[ "${{ matrix.target }}" == *"netbsd"* ]] || [[ "${{ matrix.target }}" == *"openbsd"* ]] || [[ "${{ matrix.target }}" == *"dragonfly"* ]]; then
+            sudo apt-get install -y gcc binutils
+          fi
+        shell: bash
+
+      - name: Build release
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --target ${{ matrix.target }}
+
+      - name: Prepare binaries
+        run: |
+          mkdir -p release
+          EXT=""
+          if [[ "${{ matrix.target }}" == *"windows"* ]]; then
+            EXT=".exe"
+          fi
+          cp target/${{ matrix.target }}/release/${BIN_NAME}${EXT} release/${BIN_NAME}-${{ matrix.target }}${EXT}
+          tar -czvf release/${BIN_NAME}-${{ matrix.target }}.tar.gz -C release ${BIN_NAME}-${{ matrix.target }}${EXT}
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: binaries
+          path: release/
+          if-no-files-found: error
+  
+  create-release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: binaries
+          path: release/
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            release/*.tar.gz
+            release/*.exe
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
