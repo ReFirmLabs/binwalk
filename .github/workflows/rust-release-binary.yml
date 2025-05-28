@@ -60,10 +60,13 @@ jobs:
           target: ${{ matrix.platform.target }}
           release-tag-prefix: v
           action-gh-release-parameters: |
-            draft: false
-            prerelease: false
-            overwrite: true
-            files: |
-              ubi-${{ matrix.platform.os-name }}.tar.gz
-              ubi-${{ matrix.platform.os-name }}.zip
-            token: ${{ secrets.GITHUB_TOKEN }}
+            {
+              "draft": false
+              "prerelease": false
+              "overwrite": true
+              "files": [
+                "ubi-${{ matrix.platform.os-name }}.tar.gz",
+                "ubi-${{ matrix.platform.os-name }}.zip"
+              ],
+              "token": "${{ secrets.GITHUB_TOKEN }}"
+            }
