@@ -12,17 +12,13 @@ jobs:
     name: Release - ${{ matrix.platform.os-name }}
     strategy:
       matrix:
-        platform: 
-          - os-name: FreeBSD-x86_64
-            runs-on: ubuntu-24.04
-            target: x86_64-unknown-freebsd
-
+        platform:
           - os-name: Linux-x86_64
             runs-on: ubuntu-24.04
             target: x86_64-unknown-linux-gnu
 
           - os-name: Linux-aarch64
-            runs-on: ubuntu-24.04
+            runs-on: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
 
           - os-name: macOS-x86_64
@@ -38,7 +34,7 @@ jobs:
             target: x86_64-pc-windows-msvc
 
           - os-name: Windows-aarch64
-            runs-on: windows-latest
+            runs-on: windows-11-arm
             target: aarch64-pc-windows-msvc
     
     runs-on: ${{ matrix.platform.runs-on }}
