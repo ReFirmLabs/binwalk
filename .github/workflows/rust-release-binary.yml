@@ -4,8 +4,6 @@ on:
   push:
     tags:
       - 'v*'
-    branches:
-      - 'dev'
 
 jobs:
   release:
@@ -50,19 +48,9 @@ jobs:
           strip: true
 
       - name: Publish artifacts and release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: houseabsolute/actions-rust-release@v0
         with:
           executable-name: binwalk
           target: ${{ matrix.platform.target }}
           release-tag-prefix: v
-          # action-gh-release-parameters: |
-          #   {
-          #     "draft": false,
-          #     "prerelease": false,
-          #     "overwrite": true,
-          #     "files": [
-          #       "binwalk-${{ matrix.platform.os-name }}.tar.gz",
-          #       "binwalk-${{ matrix.platform.os-name }}.zip"
-          #     ],
-          #     "token": "${{ secrets.GITHUB_TOKEN }}"
-          #   }
