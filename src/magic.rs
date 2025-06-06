@@ -24,7 +24,7 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             magic: signatures::deb::deb_magic(),
             parser: signatures::deb::deb_parser,
             description: signatures::deb::DESCRIPTION.to_string(),
-            extractor: None,
+            extractor: Some(extractors::ar::ar_extractor()),
         },
         // 7-zip
         signatures::common::Signature {
