@@ -68,8 +68,8 @@ pub fn zip_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, Si
             }
         }
 
-        // Only return success if the identified ZIP file is larger than the first ZIP file entry
-        if result.size > zip_file_header.total_size {
+        // Only return success if the ZIP file size was identified
+        if result.size > 0 {
             return Ok(result);
         }
     }
