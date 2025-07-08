@@ -1,7 +1,6 @@
 use crate::common::is_offset_safe;
 use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::png::parse_png_chunk_header;
-use log::debug;
 
 /// Defines the internal extractor function for carving out PNG images
 ///
@@ -71,7 +70,6 @@ fn get_png_data_size(png_chunk_data: &[u8]) -> Option<usize> {
 
     // Loop until we run out of data
     while is_offset_safe(available_data, png_chunk_offset, previous_png_chunk_offset) {
-        debug!("Parsing chunk at offset {:?}", png_chunk_offset);
 
         // Parse this PNG chunk header
         match parse_png_chunk_header(&png_chunk_data[png_chunk_offset..]) {
