@@ -74,7 +74,7 @@ pub fn parse() -> CliArgs {
         CliArgs::command()
             .print_help()
             .expect("Failed to print help output");
-        std::process::exit(1);
+        std::process::exit(0);
     }
 
     args

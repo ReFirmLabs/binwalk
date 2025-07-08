@@ -599,6 +599,7 @@ impl Chroot {
     /// assert_eq!(chroot.make_executable(file_name), true);
     /// # std::fs::remove_dir_all(&chroot_dir);
     /// ```
+    #[allow(dead_code)]
     pub fn make_executable(&self, file_path: impl Into<String>) -> bool {
         // Make the file globally executable
         const UNIX_EXEC_FLAG: u32 = 1;
@@ -612,10 +613,10 @@ impl Chroot {
                     safe_file_path, e
                 );
             }
-            Ok(metadata) => {
+            Ok(_metadata) => {
                 #[cfg(unix)]
                 {
-                    let mut permissions = metadata.permissions();
+                    let mut permissions = _metadata.permissions();
                     let mode = permissions.mode() | UNIX_EXEC_FLAG;
                     permissions.set_mode(mode);
 
