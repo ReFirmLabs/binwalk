@@ -70,16 +70,20 @@ fn get_png_data_size(png_chunk_data: &[u8]) -> Option<usize> {
 
     // Loop until we run out of data
     while is_offset_safe(available_data, png_chunk_offset, previous_png_chunk_offset) {
-        // Parse this PNG chunk header
-        if let Ok(chunk_header) = parse_png_chunk_header(&png_chunk_data[png_chunk_offset..]) {
-            // The next chunk header will start immediately after this chunk
-            previous_png_chunk_offset = Some(png_chunk_offset);
-            png_chunk_offset += chunk_header.total_size;
 
-            // If this was the last chunk, then png_chunk_offset is the total size of the PNG data
-            if chunk_header.is_last_chunk {
-                return Some(png_chunk_offset);
-            }
+        // Parse this PNG chunk header
+        match parse_png_chunk_header(&png_chunk_data[png_chunk_offset..]) {
+            Ok(chunk_header) => {
+                // The next chunk header will start immediately after this chunk
+                previous_png_chunk_offset = Some(png_chunk_offset);
+                png_chunk_offset += chunk_header.total_size;
+
+                // If this was the last chunk, then png_chunk_offset is the total size of the PNG data
+                if chunk_header.is_last_chunk {
+                    return Some(png_chunk_offset);
+                }
+            },
+            Err(_) => break,
         }
     }
 

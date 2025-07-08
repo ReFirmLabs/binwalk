@@ -824,7 +824,7 @@ fn init_extraction_directory(
     let target_path = path::Path::new(&target_file);
 
     // Build a symlink path to the target file in the extraction directory
-    let symlink_target_path_str = format!(
+    let link_target_path_str = format!(
         "{}{}{}",
         extraction_directory,
         path::MAIN_SEPARATOR,
@@ -832,23 +832,27 @@ fn init_extraction_directory(
     );
 
     // Create a path for the symlink target path
-    let symlink_path = path::Path::new(&symlink_target_path_str);
+    let link_path = path::Path::new(&link_target_path_str);
+
+    if link_path.exists() {
+        return Ok(link_target_path_str);
+    }
 
     debug!(
         "Creating symlink from {} -> {}",
-        symlink_path.display(),
+        link_path.display(),
         target_path.display()
     );
 
     // Create a symlink from inside the extraction directory to the specified target file
     #[cfg(unix)]
     {
-        match unix::fs::symlink(target_path, symlink_path) {
-            Ok(_) => Ok(symlink_target_path_str),
+        match unix::fs::symlink(target_path, link_path) {
+            Ok(_) => Ok(link_target_path_str),
             Err(e) => {
                 error!(
                     "Failed to create symlink {} -> {}: {}",
-                    symlink_path.display(),
+                    link_path.display(),
                     target_path.display(),
                     e
                 );
@@ -858,14 +862,14 @@ fn init_extraction_directory(
     }
     #[cfg(windows)]
     {
-        match windows::fs::symlink_file(target_path, symlink_path) {
+        match std::fs::hard_link(target_path, link_path){
             Ok(_) => {
-                return Ok(symlink_target_path_str);
+                return Ok(link_target_path_str);
             }
             Err(e) => {
                 error!(
-                    "Failed to create symlink {} -> {}: {}",
-                    symlink_path.display(),
+                    "Failed to create hardlink {} -> {}: {}",
+                    link_path.display(),
                     target_path.display(),
                     e
                 );

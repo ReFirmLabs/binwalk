@@ -7,6 +7,7 @@ use std::sync::mpsc;
 use std::thread;
 use std::time;
 use threadpool::ThreadPool;
+use std::process::ExitCode;
 
 mod binwalk;
 mod cliparser;
@@ -19,7 +20,7 @@ mod magic;
 mod signatures;
 mod structures;
 
-fn main() {
+fn main() -> ExitCode {
     // File name used when reading from stdin
     const STDIN: &str = "stdin";
 
@@ -58,7 +59,7 @@ fn main() {
     // If --list was specified, just display a list of signatures and return
     if cliargs.list {
         display::print_signature_list(cliargs.quiet, &magic::patterns());
-        return;
+        return ExitCode::SUCCESS;
     }
 
     // Set a dummy file name when reading from stdin
@@ -84,7 +85,7 @@ fn main() {
             panic!("Entropy analysis failed!");
         }
 
-        return;
+        return ExitCode::SUCCESS;
     }
 
     // If extraction or data carving was requested, we need to initialize the output directory
@@ -102,7 +103,8 @@ fn main() {
         cliargs.search_all,
     ) {
         Err(e) => {
-            panic!("Binwalk initialization failed: {}", e.message);
+            error!("Binwalk initialization failed: {}", e.message);
+            return ExitCode::FAILURE;
         }
         Ok(bw) => bw,
     };
@@ -248,6 +250,8 @@ fn main() {
         binwalker.signature_count,
         binwalker.pattern_count,
     );
+
+    ExitCode::SUCCESS
 }
 
 /// Returns true if the specified results should be displayed to screen

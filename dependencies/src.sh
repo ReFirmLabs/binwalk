@@ -29,12 +29,3 @@ make dmg2img HAVE_LZFSE=1
 make install
 cd /tmp
 rm -rf /tmp/dmg2img
-
-# Install latest version of 7z (static) for APFS support
-mkdir /tmp/7z
-cd /tmp/7z
-wget https://www.7-zip.org/a/7z2408-linux-x64.tar.xz
-tar -xf 7z2408-linux-x64.tar.xz
-cp 7zzs /usr/local/bin/
-cd /tmp
-rm -rf /tmp/7z
