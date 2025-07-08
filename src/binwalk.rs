@@ -834,6 +834,10 @@ fn init_extraction_directory(
     // Create a path for the symlink target path
     let symlink_path = path::Path::new(&symlink_target_path_str);
 
+    if symlink_path.exists() {
+        return Ok(symlink_target_path_str);
+    }
+
     debug!(
         "Creating symlink from {} -> {}",
         symlink_path.display(),
