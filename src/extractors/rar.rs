@@ -29,6 +29,7 @@ pub fn rar_extractor() -> extractors::common::Extractor {
         arguments: vec![
             "x".to_string(),  // Perform extraction
             "-y".to_string(), // Answer yes to all questions
+            "-ppassword".to_string(), // Set the password to  'password' for password protected rar files
             extractors::common::SOURCE_FILE_PLACEHOLDER.to_string(),
         ],
         exit_codes: vec![0],
