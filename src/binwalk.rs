@@ -834,8 +834,8 @@ fn init_extraction_directory(
     // Create a path for the symlink target path
     let link_path = path::Path::new(&link_target_path_str);
 
-    if symlink_path.exists() {
-        return Ok(symlink_target_path_str);
+    if link_path.exists() {
+        return Ok(link_target_path_str);
     }
 
     debug!(
