@@ -16,6 +16,7 @@ WORKDIR ${BINWALK_BUILD_DIR}
 # Cleaning up our mess here doesn't matter, as anything generated in
 # this stage won't make it into the final image unless it's explicitly copied
 RUN apt-get update -y \
+    && apt-get upgrade -y \
     && apt-get -y --no-install-recommends install \
     ca-certificates \
     tzdata \
@@ -57,8 +58,10 @@ ARG DEFAULT_WORKING_DIR="/analysis"
 ARG SASQUATCH_FILENAME="sasquatch_1.0_amd64.deb"
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV PIP_OPTIONS='--break-system-packages'
 ENV TZ=Etc/UTC
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+ENV UV_SYSTEM_PYTHON=1 UV_BREAK_SYSTEM_PACKAGES=1
 
 WORKDIR ${BUILD_DIR}
 
@@ -77,6 +80,7 @@ RUN apt-get update -y \
     && apt-get -y install --no-install-recommends \
     ca-certificates \
     tzdata \
+    python3 \
     7zip \
     zstd \
     srecord \
@@ -91,7 +95,6 @@ RUN apt-get update -y \
     lzop \
     unrar \
     unyaffs \
-    python3-pip \
     zlib1g \
     zlib1g-dev \
     liblz4-1 \
@@ -110,16 +113,11 @@ RUN apt-get update -y \
     clang \
     && dpkg -i ${BUILD_DIR}/${SASQUATCH_FILENAME} \
     && rm ${BUILD_DIR}/${SASQUATCH_FILENAME} \
-    && mkdir -p $HOME/.config/pip \
-    && printf "[global]\nbreak-system-packages = true" > $HOME/.config/pip/pip.conf \
-    && pip3 install uefi_firmware $PIP_OPTIONS \
-    && pip3 install jefferson $PIP_OPTIONS \
-    && pip3 install ubi-reader $PIP_OPTIONS \
-    && CC=clang pip3 install --upgrade lz4 zstandard git+https://github.com/clubby789/python-lzo@b4e39df $PIP_OPTIONS \
-    && CC=clang pip3 install --upgrade git+https://github.com/marin-m/vmlinux-to-elf $PIP_OPTIONS \
+    && CC=clang uv pip install uefi_firmware jefferson jefferson ubi-reader git+https://github.com/marin-m/vmlinux-to-elf \
+    && uv cache clean \
     && apt-get purge clang -y \
     && apt autoremove -y \
-    && rm -rf /var/cache/apt/archives /var/lib/apt/lists/* \
+    && rm -rf /var/cache/apt/archives /var/lib/apt/lists/* /bin/uv /bin/uvx \
     && mkdir -p ${DEFAULT_WORKING_DIR} \
     && chmod 777 ${DEFAULT_WORKING_DIR}
 
