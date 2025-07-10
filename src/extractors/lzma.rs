@@ -1,5 +1,5 @@
 use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
-use xz2::stream::{Action, Status, Stream};
+use liblzma::stream::{Action, Status, Stream};
 
 /// Defines the internal extractor function for decompressing LZMA/XZ data
 ///
