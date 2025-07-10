@@ -1,12 +1,10 @@
 ## Scratch build stage
-FROM ubuntu:24.04 AS build
+FROM ubuntu:25.04 AS build
 
 ARG BUILD_DIR="/tmp"
 ARG BINWALK_BUILD_DIR="${BUILD_DIR}/binwalk}"
 ARG SASQUATCH_FILENAME="sasquatch_1.0_amd64.deb"
 ARG SASQUATCH_FILE_URL="https://github.com/onekey-sec/sasquatch/releases/download/sasquatch-v4.5.1-4/${SASQUATCH_FILENAME}"
-ARG ZIP_FILENAME="7z2409-linux-x64.tar.xz"
-ARG ZIP_FILE_URL="https://www.7-zip.org/a/${ZIP_FILENAME}"
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
@@ -19,26 +17,24 @@ WORKDIR ${BINWALK_BUILD_DIR}
 # this stage won't make it into the final image unless it's explicitly copied
 RUN apt-get update -y \
     && apt-get -y --no-install-recommends install \
-        ca-certificates \
-        tzdata \
-        curl \
-        git \
-        wget \
-        build-essential \
-        clang \
-        zlib1g \
-        zlib1g-dev \
-        liblz4-1 \
-        libsrecord-dev \
-        liblzma-dev \
-        liblzo2-dev \
-        libucl-dev \
-        liblz4-dev \
-        libbz2-dev \
-        libssl-dev \
-        pkg-config \
-    && curl -L -o "${ZIP_FILENAME}" "${ZIP_FILE_URL}" \
-    && tar -xf "${ZIP_FILENAME}" 7zzs \
+    ca-certificates \
+    tzdata \
+    curl \
+    git \
+    wget \
+    build-essential \
+    clang \
+    zlib1g \
+    zlib1g-dev \
+    liblz4-1 \
+    libsrecord-dev \
+    liblzma-dev \
+    liblzo2-dev \
+    libucl-dev \
+    liblz4-dev \
+    libbz2-dev \
+    libssl-dev \
+    pkg-config \
     && curl -L -o "${SASQUATCH_FILENAME}" "${SASQUATCH_FILE_URL}" \
     && git clone https://github.com/askac/dumpifs.git ${BUILD_DIR}/dumpifs \
     && git clone https://github.com/lzfse/lzfse.git ${BUILD_DIR}/lzfse \
@@ -53,14 +49,12 @@ RUN apt-get update -y \
 
 
 ## Prod image build stage
-FROM ubuntu:24.04
+FROM ubuntu:25.04
 
 ARG BUILD_DIR="/tmp"
 ARG BINWALK_BUILD_DIR="${BUILD_DIR}/binwalk}"
 ARG DEFAULT_WORKING_DIR="/analysis"
 ARG SASQUATCH_FILENAME="sasquatch_1.0_amd64.deb"
-ARG ZIP_FILENAME="7z2409-linux-x64.tar.xz"
-ARG ZIP_FILE_URL="https://www.7-zip.org/a/${ZIP_FILENAME}"
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PIP_OPTIONS='--break-system-packages'
@@ -69,7 +63,6 @@ ENV TZ=Etc/UTC
 WORKDIR ${BUILD_DIR}
 
 # Copy the build artifacts from the scratch build stage
-COPY --from=build ${BINWALK_BUILD_DIR}/7zzs /usr/local/bin/7zzs
 COPY --from=build ${BINWALK_BUILD_DIR}/${SASQUATCH_FILENAME} ${BUILD_DIR}/${SASQUATCH_FILENAME}
 COPY --from=build /usr/local/bin/lzfse ${BUILD_DIR}/dumpifs/dumpifs ${BUILD_DIR}/dmg2img/dmg2img ${BUILD_DIR}/dmg2img/vfdecrypt ${BINWALK_BUILD_DIR}/target/release/binwalk /usr/local/bin/
 
@@ -82,39 +75,39 @@ COPY --from=build /usr/local/bin/lzfse ${BUILD_DIR}/dumpifs/dumpifs ${BUILD_DIR}
 RUN apt-get update -y \
     && apt-get upgrade -y \
     && apt-get -y install --no-install-recommends \
-        ca-certificates \
-        tzdata \
-        7zip \
-        zstd \
-        srecord \
-        tar \
-        unzip \
-        sleuthkit \
-        cabextract \
-        curl \
-        wget \
-        git \
-        lz4 \
-        lzop \
-        unrar \
-        unyaffs \
-        python3-pip \
-        zlib1g \
-        zlib1g-dev \
-        liblz4-1 \
-        libsrecord-dev \
-        liblzma-dev \
-        liblzo2-dev \
-        libucl-dev \
-        liblz4-dev \
-        libbz2-dev \
-        libssl-dev \
-        libfontconfig1-dev \
-        libpython3-dev \
-        7zip-standalone \
-        cpio \
-        device-tree-compiler \
-        clang \
+    ca-certificates \
+    tzdata \
+    7zip \
+    zstd \
+    srecord \
+    tar \
+    unzip \
+    sleuthkit \
+    cabextract \
+    curl \
+    wget \
+    git \
+    lz4 \
+    lzop \
+    unrar \
+    unyaffs \
+    python3-pip \
+    zlib1g \
+    zlib1g-dev \
+    liblz4-1 \
+    libsrecord-dev \
+    liblzma-dev \
+    liblzo2-dev \
+    libucl-dev \
+    liblz4-dev \
+    libbz2-dev \
+    libssl-dev \
+    libfontconfig1-dev \
+    libpython3-dev \
+    7zip-standalone \
+    cpio \
+    device-tree-compiler \
+    clang \
     && dpkg -i ${BUILD_DIR}/${SASQUATCH_FILENAME} \
     && rm ${BUILD_DIR}/${SASQUATCH_FILENAME} \
     && mkdir -p $HOME/.config/pip \
