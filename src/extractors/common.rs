@@ -578,6 +578,53 @@ impl Chroot {
         false
     }
 
+    /// Delete a directory in the chroot directory.
+    ///
+    /// Equivalent to rm -rf.
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// use binwalk::extractors::common::Chroot;
+    ///
+    /// let chroot_dir = std::path::Path::new("tests")
+    ///     .join("binwalk_unit_tests")
+    ///     .display()
+    ///     .to_string();
+    ///
+    /// let dir_name = "my_directory";
+    ///
+    /// # std::fs::remove_dir_all(&chroot_dir);
+    /// let chroot = Chroot::new(Some(&chroot_dir));
+    ///
+    /// assert_eq!(chroot.create_directory(dir_name), true);
+    /// assert_eq!(chroot.remove_directory(dir_name), true);
+    /// assert_eq!(chroot.remove_directory("i_dont_exist"), true);
+    /// # std::fs::remove_dir_all(&chroot_dir);
+    /// ```
+    pub fn remove_directory(&self, dir_path: impl Into<String>) -> bool {
+        let safe_dir_path: String = self.chrooted_path(dir_path);
+
+        match fs::exists(safe_dir_path.clone()) {
+            Ok(dir_exists) => {
+                if !dir_exists {
+                    return true;
+                }
+            },
+            Err(e) => {
+                error!("Failed to check if directory {} exists: {:?}", safe_dir_path, e);
+                return false;
+            }
+        }
+
+        match fs::remove_dir_all(safe_dir_path.clone()) {
+            Ok(_) => return true,
+            Err(e) => error!("Failed to delete directory {}: {}", safe_dir_path, e),
+        }
+
+        false
+    }
+
     /// Set executable permissions on an existing file in the chroot directory.
     ///
     /// ## Example
@@ -1154,6 +1201,14 @@ fn create_output_directory(file_path: &str, offset: usize) -> Result<String, std
         path::MAIN_SEPARATOR,
         offset
     );
+
+    // First, remove the output directory if it exists from a previous run
+    if !chroot.remove_directory(&output_directory) {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            "Directory deletion failed",
+        ));
+    }
 
     // Create the output directory, equivalent of mkdir -p
     if !chroot.create_directory(&output_directory) {
