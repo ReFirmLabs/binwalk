@@ -122,8 +122,7 @@ pub fn parse(
                         }
                     } else {
                         error!(
-                            "Cannot parse structure element with unknown data type '{}'",
-                            data_type
+                            "Cannot parse structure element with unknown data type '{data_type}'"
                         );
                         return Err(StructureError);
                     }
@@ -180,7 +179,7 @@ fn type_to_size(ctype: &str) -> Option<usize> {
         HashMap::from([("u8", 1), ("u16", 2), ("u24", 3), ("u32", 4), ("u64", 8)]);
 
     if !size_lookup_table.contains_key(ctype) {
-        error!("Unknown size for structure type '{}'!", ctype);
+        error!("Unknown size for structure type '{ctype}'!");
         return None;
     }
 

@@ -129,8 +129,7 @@ fn main() -> ExitCode {
 
     // Initialize thread pool
     debug!(
-        "Initializing thread pool with {} workers",
-        available_workers
+        "Initializing thread pool with {available_workers} workers"
     );
     let workers = ThreadPool::new(available_workers);
     let (worker_tx, worker_rx) = mpsc::channel();
@@ -291,7 +290,7 @@ fn spawn_worker(
         // Read in file data
         let file_data = match common::read_input(&target_file, stdin) {
             Err(_) => {
-                error!("Failed to read {} data", target_file);
+                error!("Failed to read {target_file} data");
                 b"".to_vec()
             }
             Ok(data) => data,
@@ -304,8 +303,7 @@ fn spawn_worker(
         if do_carve {
             let carve_count = carve_file_map(&file_data, &results);
             info!(
-                "Carved {} data blocks to disk from {}",
-                carve_count, target_file
+                "Carved {carve_count} data blocks to disk from {target_file}"
             );
         }
 
@@ -384,9 +382,9 @@ fn carve_file_data_to_disk(
     let chroot = extractors::common::Chroot::new(None);
 
     // Carved file path will be: <source file path>_<offset>_<name>.raw
-    let carved_file_path = format!("{}_{}_{}.raw", source_file_path, offset, name,);
+    let carved_file_path = format!("{source_file_path}_{offset}_{name}.raw",);
 
-    debug!("Carving {}", carved_file_path);
+    debug!("Carving {carved_file_path}");
 
     // Carve the data to disk
     if !chroot.carve_file(&carved_file_path, file_data, offset, size) {

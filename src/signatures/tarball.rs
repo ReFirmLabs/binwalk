@@ -83,7 +83,7 @@ pub fn tarball_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult
         }
 
         return Ok(SignatureResult {
-            description: format!("{}, file count: {}", DESCRIPTION, valid_header_count),
+            description: format!("{DESCRIPTION}, file count: {valid_header_count}"),
             offset: tarball_start_offset,
             size: tarball_total_size,
             confidence,

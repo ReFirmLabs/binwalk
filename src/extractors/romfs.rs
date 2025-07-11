@@ -182,7 +182,7 @@ fn process_romfs_entries(
                     {
                         match String::from_utf8(symlink_bytes.to_vec()) {
                             Err(e) => {
-                                warn!("Failed to convert symlink target path to string: {}", e);
+                                warn!("Failed to convert symlink target path to string: {e}");
                                 return Err(ExtractionError);
                             }
                             Ok(path) => {
@@ -284,7 +284,7 @@ fn extract_romfs_entries(
                 chroot.make_executable(&file_path);
             }
         } else {
-            warn!("Failed to extract RomFS file {}", file_path);
+            warn!("Failed to extract RomFS file {file_path}");
         }
     }
 

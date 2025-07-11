@@ -71,7 +71,7 @@ pub fn extract_trx_partitions(
                                     - this_partition_relative_offset;
                             }
 
-                            let this_partition_file_name = format!("partition_{}.bin", i);
+                            let this_partition_file_name = format!("partition_{i}.bin");
                             result.success = chroot.carve_file(
                                 &this_partition_file_name,
                                 file_data,
