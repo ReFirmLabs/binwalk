@@ -113,7 +113,7 @@ RUN apt-get update -y \
     clang \
     && dpkg -i ${BUILD_DIR}/${SASQUATCH_FILENAME} \
     && rm ${BUILD_DIR}/${SASQUATCH_FILENAME} \
-    && CC=clang uv pip install uefi_firmware jefferson jefferson ubi-reader git+https://github.com/marin-m/vmlinux-to-elf \
+    && CC=clang uv pip install uefi_firmware jefferson ubi-reader git+https://github.com/marin-m/vmlinux-to-elf \
     && uv cache clean \
     && apt-get purge clang -y \
     && apt autoremove -y \
