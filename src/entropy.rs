@@ -94,6 +94,7 @@ pub fn plot(
         match out_file {
             None => plot.show(),
             Some(out_file_name) => {
+                #[allow(deprecated)]
                 plot.write_image(&out_file_name, ImageFormat::PNG, 2048, 1024, 1.0);
             }
         }
