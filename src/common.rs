@@ -27,11 +27,11 @@ pub fn read_stdin() -> Result<Vec<u8>, std::io::Error> {
 
     match std::io::stdin().read_to_end(&mut stdin_data) {
         Err(e) => {
-            error!("Failed to read data from stdin: {}", e);
+            error!("Failed to read data from stdin: {e}");
             Err(e)
         }
         Ok(nbytes) => {
-            debug!("Loaded {} bytes from stdin", nbytes);
+            debug!("Loaded {nbytes} bytes from stdin");
             Ok(stdin_data)
         }
     }
@@ -56,16 +56,16 @@ pub fn read_file(file: impl Into<String>) -> Result<Vec<u8>, std::io::Error> {
 
     match File::open(&file_path) {
         Err(e) => {
-            error!("Failed to open file {}: {}", file_path, e);
+            error!("Failed to open file {file_path}: {e}");
             Err(e)
         }
         Ok(mut fp) => match fp.read_to_end(&mut file_data) {
             Err(e) => {
-                error!("Failed to read file {} into memory: {}", file_path, e);
+                error!("Failed to read file {file_path} into memory: {e}");
                 Err(e)
             }
             Ok(file_size) => {
-                debug!("Loaded {} bytes from {}", file_size, file_path);
+                debug!("Loaded {file_size} bytes from {file_path}");
                 Ok(file_data)
             }
         },

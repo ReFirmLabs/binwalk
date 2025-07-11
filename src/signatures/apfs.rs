@@ -36,7 +36,7 @@ pub fn apfs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, S
                 // If the calculated size is 512 bytes short, adjust the reported APFS size accordingly
                 if truncated_size == MBR_BLOCK_SIZE {
                     result.size -= truncated_size;
-                    truncated_message = format!(" (truncated by {} bytes)", truncated_size);
+                    truncated_message = format!(" (truncated by {truncated_size} bytes)");
                 }
             }
 

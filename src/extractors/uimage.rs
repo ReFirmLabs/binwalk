@@ -74,7 +74,7 @@ pub fn extract_uimage(
                         file_base_name = uimage_header.name.replace(" ", "_");
                     }
 
-                    let output_file = format!("{}.{}", file_base_name, OUTPUT_FILE_EXT);
+                    let output_file = format!("{file_base_name}.{OUTPUT_FILE_EXT}");
 
                     result.success = chroot.create_file(&output_file, image_data);
                 }

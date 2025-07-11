@@ -46,7 +46,7 @@ impl JsonLogger {
     pub fn log(&mut self, results: JSONType) {
         // Convert analysis results to JSON
         match serde_json::to_string_pretty(&results) {
-            Err(e) => error!("Failed to convert analysis results to JSON: {}", e),
+            Err(e) => error!("Failed to convert analysis results to JSON: {e}"),
             Ok(json) => {
                 if !self.json_file_initialized {
                     self.write_json(JSON_LIST_START);
@@ -72,17 +72,17 @@ impl JsonLogger {
                     .open(log_file)
                 {
                     Err(e) => {
-                        error!("Failed to open JSON log file '{}': {}", log_file, e);
+                        error!("Failed to open JSON log file '{log_file}': {e}");
                     }
                     Ok(mut fp) => {
                         // Seek to the end of the file and get the cursor position
                         match fp.seek(io::SeekFrom::End(0)) {
                             Err(e) => {
-                                error!("Failed to seek to end of JSON file: {}", e);
+                                error!("Failed to seek to end of JSON file: {e}");
                             }
                             Ok(_) => {
                                 if let Err(e) = fp.write_all(data.as_bytes()) {
-                                    error!("Failed to write to JSON log file: {}", e);
+                                    error!("Failed to write to JSON log file: {e}");
                                 }
                             }
                         }

@@ -338,8 +338,8 @@ pub fn print_signature_list(quiet: bool, signatures: &Vec<signatures::common::Si
 
     print_delimiter();
     println!();
-    println!("Total signatures: {}", signature_count);
-    println!("Extractable signatures: {}", extractor_count);
+    println!("Total signatures: {signature_count}");
+    println!("Extractable signatures: {extractor_count}");
 }
 
 pub fn print_stats(
@@ -382,20 +382,19 @@ pub fn print_stats(
     }
 
     println!(
-        "Analyzed {} file{} for {} file signatures ({} magic patterns) in {:.1} {}",
-        file_count, file_plural, signature_count, pattern_count, display_time, units
+        "Analyzed {file_count} file{file_plural} for {signature_count} file signatures ({pattern_count} magic patterns) in {display_time:.1} {units}"
     );
 }
 
 pub fn print_plain(quiet: bool, msg: &str) {
     if !quiet {
-        print!("{}", msg);
+        print!("{msg}");
         let _ = io::stdout().flush();
     }
 }
 
 pub fn println_plain(quiet: bool, msg: &str) {
     if !quiet {
-        println!("{}", msg);
+        println!("{msg}");
     }
 }

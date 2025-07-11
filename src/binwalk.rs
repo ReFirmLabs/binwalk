@@ -146,8 +146,7 @@ impl Binwalk {
             match path::absolute(&target_file) {
                 Err(_) => {
                     return Err(BinwalkError::new(&format!(
-                        "Failed to get absolute path for '{}'",
-                        target_file
+                        "Failed to get absolute path for '{target_file}'"
                     )));
                 }
                 Ok(abspath) => {
@@ -161,8 +160,7 @@ impl Binwalk {
                 match path::absolute(&extraction_directory) {
                     Err(_) => {
                         return Err(BinwalkError::new(&format!(
-                            "Failed to get absolute path for '{}'",
-                            extraction_directory
+                            "Failed to get absolute path for '{extraction_directory}'"
                         )));
                     }
                     Ok(abspath) => {
@@ -179,8 +177,7 @@ impl Binwalk {
                 ) {
                     Err(e) => {
                         return Err(BinwalkError::new(&format!(
-                            "Failed to initialize extraction directory: {}",
-                            e
+                            "Failed to initialize extraction directory: {e}"
                         )));
                     }
                     Ok(new_target_file_path) => {
@@ -340,7 +337,7 @@ impl Binwalk {
             // Update the previous valid offset in praparation for the next loop iteration
             previous_valid_offset = Some(next_valid_offset);
 
-            debug!("Continuing scan from offset {:#X}", next_valid_offset);
+            debug!("Continuing scan from offset {next_valid_offset:#X}");
 
             /*
              * Run a new AhoCorasick scan starting at the next valid offset in the file data.
@@ -733,7 +730,7 @@ impl Binwalk {
         };
 
         // Scan file data for signatures
-        debug!("Analysis start: {}", file_path);
+        debug!("Analysis start: {file_path}");
         results.file_map = self.scan(file_data);
 
         // Only extract if told to, and if there were some signatures found in this file
@@ -746,7 +743,7 @@ impl Binwalk {
             results.extractions = self.extract(file_data, &file_path, &results.file_map);
         }
 
-        debug!("Analysis end: {}", file_path);
+        debug!("Analysis end: {file_path}");
 
         results
     }
@@ -797,7 +794,7 @@ impl Binwalk {
 
         let file_data = match read_file(&file_path) {
             Err(_) => {
-                error!("Failed to read data from {}", file_path);
+                error!("Failed to read data from {file_path}");
                 b"".to_vec()
             }
             Ok(data) => data,
@@ -815,12 +812,11 @@ fn init_extraction_directory(
     // Create the output directory, equivalent of mkdir -p
     match fs::create_dir_all(extraction_directory) {
         Ok(_) => {
-            debug!("Created base output directory: '{}'", extraction_directory);
+            debug!("Created base output directory: '{extraction_directory}'");
         }
         Err(e) => {
             error!(
-                "Failed to create base output directory '{}': {}",
-                extraction_directory, e
+                "Failed to create base output directory '{extraction_directory}': {e}"
             );
             return Err(e);
         }

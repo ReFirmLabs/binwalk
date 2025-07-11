@@ -29,7 +29,7 @@ pub fn bmp_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, Si
     if dry_run.success {
         // Retrieve total file size and report it to the user
         if let Some(total_size) = dry_run.size {
-            result.description = format!("BMP image, total size: {}", total_size);
+            result.description = format!("BMP image, total size: {total_size}");
             result.size = total_size;
             return Ok(result);
         }

@@ -49,14 +49,14 @@ pub fn parse_arj_header(arj_data: &[u8]) -> Result<ARJHeader, StructureError> {
             "no password".to_string()
         };
         if arj_header["internal_flags"] & 0x04 != 0 {
-            flags = format!("{}|multi-volume", flags);
+            flags = format!("{flags}|multi-volume");
         }
         // let file_start_pos_is_available =  arj_header["internal_flags"] & 0x08 != 0;
         if arj_header["internal_flags"] & 0x10 != 0 {
-            flags = format!("{}|slash-switched", flags);
+            flags = format!("{flags}|slash-switched");
         }
         if arj_header["internal_flags"] & 0x20 != 0 {
-            flags = format!("{}|backup", flags);
+            flags = format!("{flags}|backup");
         }
         let host_os = match &arj_header["host_os"] {
             0 => "MS-DOS".to_string(),
