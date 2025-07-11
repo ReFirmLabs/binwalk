@@ -1,5 +1,5 @@
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
-use crate::structures::logfs::{parse_logfs_super_block, LOGFS_MAGIC_OFFSET};
+use crate::signatures::common::{CONFIDENCE_MEDIUM, SignatureError, SignatureResult};
+use crate::structures::logfs::{LOGFS_MAGIC_OFFSET, parse_logfs_super_block};
 
 /// Human readable description
 pub const DESCRIPTION: &str = "LogFS file system";

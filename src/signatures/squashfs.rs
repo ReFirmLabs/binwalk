@@ -2,7 +2,7 @@ use crate::common::epoch_to_string;
 use crate::extractors::squashfs::{
     squashfs_be_extractor, squashfs_le_extractor, squashfs_v4_be_extractor,
 };
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
+use crate::signatures::common::{CONFIDENCE_HIGH, SignatureError, SignatureResult};
 use crate::structures::squashfs::{parse_squashfs_header, parse_squashfs_uid_entry};
 use std::collections::HashMap;
 
@@ -102,15 +102,18 @@ pub fn squashfs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResul
                                 }
 
                                 result.size = squashfs_header.image_size;
-                                result.description = format!("{}, {} endian, version: {}.{}, compression: {}, inode count: {}, block size: {}, image size: {} bytes, created: {}", result.description,
-                                                                                                                                                                                   squashfs_header.endianness,
-                                                                                                                                                                                   squashfs_header.major_version,
-                                                                                                                                                                                   squashfs_header.minor_version,
-                                                                                                                                                                                   compression_type_str,
-                                                                                                                                                                                   squashfs_header.inode_count,
-                                                                                                                                                                                   squashfs_header.block_size,
-                                                                                                                                                                                   squashfs_header.image_size,
-                                                                                                                                                                                   create_date);
+                                result.description = format!(
+                                    "{}, {} endian, version: {}.{}, compression: {}, inode count: {}, block size: {}, image size: {} bytes, created: {}",
+                                    result.description,
+                                    squashfs_header.endianness,
+                                    squashfs_header.major_version,
+                                    squashfs_header.minor_version,
+                                    compression_type_str,
+                                    squashfs_header.inode_count,
+                                    squashfs_header.block_size,
+                                    squashfs_header.image_size,
+                                    create_date
+                                );
 
                                 return Ok(result);
                             }

@@ -1,6 +1,6 @@
 use crate::common::is_offset_safe;
 use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
-use crate::structures::csman::{parse_csman_entry, parse_csman_header, CSManEntry};
+use crate::structures::csman::{CSManEntry, parse_csman_entry, parse_csman_header};
 use miniz_oxide::inflate;
 use std::collections::HashMap;
 

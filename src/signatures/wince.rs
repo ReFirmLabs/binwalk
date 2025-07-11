@@ -1,5 +1,5 @@
 use crate::extractors::wince::wince_dump;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
+use crate::signatures::common::{CONFIDENCE_HIGH, SignatureError, SignatureResult};
 use crate::structures::wince::parse_wince_header;
 
 /// Human readable description

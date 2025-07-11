@@ -1,5 +1,5 @@
 use crate::extractors::png::extract_png_image;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
+use crate::signatures::common::{CONFIDENCE_HIGH, SignatureError, SignatureResult};
 
 /// Human readable description
 pub const DESCRIPTION: &str = "PNG image";

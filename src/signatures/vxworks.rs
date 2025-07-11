@@ -1,6 +1,6 @@
 use crate::common::get_cstring;
 use crate::extractors::vxworks::extract_symbol_table;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH, CONFIDENCE_LOW};
+use crate::signatures::common::{CONFIDENCE_HIGH, CONFIDENCE_LOW, SignatureError, SignatureResult};
 
 /// Human readable descriptions
 pub const SYMTAB_DESCRIPTION: &str = "VxWorks symbol table";

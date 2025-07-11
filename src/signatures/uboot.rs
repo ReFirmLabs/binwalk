@@ -1,5 +1,5 @@
 use crate::common::{get_cstring, is_ascii_number};
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
+use crate::signatures::common::{CONFIDENCE_MEDIUM, SignatureError, SignatureResult};
 
 /// Human readable description
 pub const DESCRIPTION: &str = "U-Boot version string";

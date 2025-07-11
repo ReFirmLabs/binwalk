@@ -1,4 +1,4 @@
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_LOW};
+use crate::signatures::common::{CONFIDENCE_LOW, SignatureError, SignatureResult};
 
 /// Human readable description
 pub const EXCEPTION_HANDLER_DESCRIPTION: &str = "eCos kernel exception handler";

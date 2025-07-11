@@ -1,5 +1,5 @@
 use crate::extractors::bzip2::bzip2_decompressor;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
+use crate::signatures::common::{CONFIDENCE_HIGH, SignatureError, SignatureResult};
 
 /// Human readable description
 pub const DESCRIPTION: &str = "bzip2 compressed data";

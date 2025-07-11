@@ -1,5 +1,5 @@
 use crate::common::is_offset_safe;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
+use crate::signatures::common::{CONFIDENCE_MEDIUM, SignatureError, SignatureResult};
 use crate::structures::yaffs::{parse_yaffs_file_header, parse_yaffs_obj_header};
 
 /// Minimum number of expected YAFFS objects in a YAFFS image

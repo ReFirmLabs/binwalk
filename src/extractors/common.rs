@@ -610,9 +610,12 @@ impl Chroot {
                 if !dir_exists {
                     return true;
                 }
-            },
+            }
             Err(e) => {
-                error!("Failed to check if directory {} exists: {:?}", safe_dir_path, e);
+                error!(
+                    "Failed to check if directory {} exists: {:?}",
+                    safe_dir_path, e
+                );
                 return false;
             }
         }

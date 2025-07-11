@@ -450,7 +450,10 @@ impl Binwalk {
 
                 // If this file map entry and the conflicting entry do not have the same confidence level, default to the one with highest confidence
                 if this_signature.confidence != previous_signature.confidence {
-                    debug!("Conflicting signatures at offset {:#X}; defaulting to the signature with highest confidence", this_signature.offset);
+                    debug!(
+                        "Conflicting signatures at offset {:#X}; defaulting to the signature with highest confidence",
+                        this_signature.offset
+                    );
 
                     // If this signature is higher confidence, invalidate the previous signature
                     if this_signature.confidence > previous_signature.confidence {
@@ -466,7 +469,10 @@ impl Binwalk {
 
                 // Conflicting signatures have identical confidence levels; defer to the previously vetted signature
                 } else {
-                    debug!("Conflicting signatures at offset {:#X} with the same confidence; first come, first served", this_signature.offset);
+                    debug!(
+                        "Conflicting signatures at offset {:#X} with the same confidence; first come, first served",
+                        this_signature.offset
+                    );
                     file_map.remove(i);
                     index_adjustment += 1;
                     continue;
@@ -862,7 +868,7 @@ fn init_extraction_directory(
     }
     #[cfg(windows)]
     {
-        match std::fs::hard_link(target_path, link_path){
+        match std::fs::hard_link(target_path, link_path) {
             Ok(_) => {
                 return Ok(link_target_path_str);
             }

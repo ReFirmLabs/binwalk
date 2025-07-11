@@ -1,5 +1,5 @@
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
-use crate::structures::jffs2::{parse_jffs2_node_header, JFFS2_NODE_STRUCT_SIZE};
+use crate::signatures::common::{CONFIDENCE_HIGH, SignatureError, SignatureResult};
+use crate::structures::jffs2::{JFFS2_NODE_STRUCT_SIZE, parse_jffs2_node_header};
 use aho_corasick::AhoCorasick;
 
 /// Human readable description

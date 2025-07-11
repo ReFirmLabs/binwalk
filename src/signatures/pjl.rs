@@ -1,5 +1,5 @@
 use crate::common::get_cstring;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_LOW};
+use crate::signatures::common::{CONFIDENCE_LOW, SignatureError, SignatureResult};
 
 /// Human readable description
 pub const DESCRIPTION: &str = "HP Printer Job Language data";

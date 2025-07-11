@@ -1,6 +1,6 @@
 use crate::common::is_offset_safe;
 use crate::signatures::common::{
-    SignatureError, SignatureResult, CONFIDENCE_HIGH, CONFIDENCE_MEDIUM,
+    CONFIDENCE_HIGH, CONFIDENCE_MEDIUM, SignatureError, SignatureResult,
 };
 
 /// Some tarball constants

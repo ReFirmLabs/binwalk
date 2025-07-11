@@ -1,4 +1,4 @@
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
+use crate::signatures::common::{CONFIDENCE_MEDIUM, SignatureError, SignatureResult};
 use crate::structures::tplink::{parse_tplink_header, parse_tplink_rtos_header};
 
 /// Human readable description
@@ -58,7 +58,8 @@ pub fn tplink_rtos_parser(
     };
 
     if let Ok(fw_header) = parse_tplink_rtos_header(&file_data[offset..]) {
-        result.description = format!("{}, model number: {:X}, hardware version: {:X}.{:X}, header size: {} bytes, total size: {} bytes",
+        result.description = format!(
+            "{}, model number: {:X}, hardware version: {:X}.{:X}, header size: {} bytes, total size: {} bytes",
             result.description,
             fw_header.model_number,
             fw_header.hardware_rev_major,

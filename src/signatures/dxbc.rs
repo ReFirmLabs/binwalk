@@ -1,5 +1,5 @@
 use crate::signatures::common::{
-    SignatureError, SignatureResult, CONFIDENCE_HIGH, CONFIDENCE_MEDIUM,
+    CONFIDENCE_HIGH, CONFIDENCE_MEDIUM, SignatureError, SignatureResult,
 };
 use crate::structures::dxbc::parse_dxbc_header;
 

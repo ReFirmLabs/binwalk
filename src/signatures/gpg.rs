@@ -1,5 +1,5 @@
 use crate::extractors::gpg::gpg_decompress;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
+use crate::signatures::common::{CONFIDENCE_HIGH, SignatureError, SignatureResult};
 
 /// Human readable description
 pub const GPG_SIGNED_DESCRIPTION: &str = "GPG signed file";

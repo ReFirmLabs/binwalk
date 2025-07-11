@@ -1,7 +1,7 @@
 use crate::common::is_offset_safe;
 use crate::extractors::lzma::lzma_decompress;
 use crate::extractors::sevenzip::sevenzip_extractor;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
+use crate::signatures::common::{CONFIDENCE_HIGH, SignatureError, SignatureResult};
 use crate::structures::xz::parse_xz_header;
 
 /// Human readable description

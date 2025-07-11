@@ -1,6 +1,6 @@
 use crate::extractors::jboot::extract_jboot_sch2_kernel;
 use crate::signatures::common::{
-    SignatureError, SignatureResult, CONFIDENCE_HIGH, CONFIDENCE_LOW, CONFIDENCE_MEDIUM,
+    CONFIDENCE_HIGH, CONFIDENCE_LOW, CONFIDENCE_MEDIUM, SignatureError, SignatureResult,
 };
 use crate::structures::jboot::{
     parse_jboot_arm_header, parse_jboot_sch2_header, parse_jboot_stag_header,
@@ -53,7 +53,8 @@ pub fn jboot_arm_parser(
         if let Ok(arm_header) = parse_jboot_arm_header(jboot_data) {
             result.size = arm_header.header_size;
             result.offset = header_start;
-            result.description = format!("{}, header size: {} bytes, ROM ID: {}, erase offset: {:#X}, erase size: {:#X}, data flash offset: {:#X}, data size: {:#X}",
+            result.description = format!(
+                "{}, header size: {} bytes, ROM ID: {}, erase offset: {:#X}, erase size: {:#X}, data flash offset: {:#X}, data size: {:#X}",
                 result.description,
                 arm_header.header_size,
                 arm_header.rom_id,
@@ -126,7 +127,8 @@ pub fn jboot_sch2_parser(
         if let Some(total_size) = dry_run.size {
             if let Ok(sch2_header) = parse_jboot_sch2_header(&file_data[offset..]) {
                 result.size = total_size;
-                result.description = format!("{}, header size: {} bytes, kernel size: {} bytes, kernel compression: {}, kernel entry point: {:#X}",
+                result.description = format!(
+                    "{}, header size: {} bytes, kernel size: {} bytes, kernel compression: {}, kernel entry point: {:#X}",
                     result.description,
                     sch2_header.header_size,
                     sch2_header.kernel_size,

@@ -1,4 +1,4 @@
-use crate::structures::common::{parse, StructureError};
+use crate::structures::common::{StructureError, parse};
 
 /// Struct to store LZFSE block info
 #[derive(Debug, Default, Clone)]

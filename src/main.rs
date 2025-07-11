@@ -3,11 +3,11 @@ use log::{debug, error, info};
 use std::collections::VecDeque;
 use std::panic;
 use std::process;
+use std::process::ExitCode;
 use std::sync::mpsc;
 use std::thread;
 use std::time;
 use threadpool::ThreadPool;
-use std::process::ExitCode;
 
 mod binwalk;
 mod cliparser;

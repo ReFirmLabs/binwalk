@@ -1,5 +1,5 @@
 use crate::extractors::romfs::extract_romfs;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
+use crate::signatures::common::{CONFIDENCE_HIGH, SignatureError, SignatureResult};
 use crate::structures::romfs::parse_romfs_header;
 
 /// Human readable description

@@ -70,7 +70,6 @@ fn get_png_data_size(png_chunk_data: &[u8]) -> Option<usize> {
 
     // Loop until we run out of data
     while is_offset_safe(available_data, png_chunk_offset, previous_png_chunk_offset) {
-
         // Parse this PNG chunk header
         match parse_png_chunk_header(&png_chunk_data[png_chunk_offset..]) {
             Ok(chunk_header) => {
@@ -82,7 +81,7 @@ fn get_png_data_size(png_chunk_data: &[u8]) -> Option<usize> {
                 if chunk_header.is_last_chunk {
                     return Some(png_chunk_offset);
                 }
-            },
+            }
             Err(_) => break,
         }
     }

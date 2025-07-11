@@ -1,5 +1,5 @@
 use crate::signatures::common::{
-    SignatureError, SignatureResult, CONFIDENCE_HIGH, CONFIDENCE_MEDIUM,
+    CONFIDENCE_HIGH, CONFIDENCE_MEDIUM, SignatureError, SignatureResult,
 };
 use crate::structures::dkbs::parse_dkbs_header;
 
@@ -43,7 +43,13 @@ pub fn dkbs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, S
                 result.size = dkbs_header.header_size;
                 result.description = format!(
                     "{}, board ID: {}, firmware version: {}, boot device: {}, endianness: {}, header size: {} bytes, data size: {}",
-                    result.description, dkbs_header.board_id, dkbs_header.version, dkbs_header.boot_device, dkbs_header.endianness, dkbs_header.header_size, dkbs_header.data_size
+                    result.description,
+                    dkbs_header.board_id,
+                    dkbs_header.version,
+                    dkbs_header.boot_device,
+                    dkbs_header.endianness,
+                    dkbs_header.header_size,
+                    dkbs_header.data_size
                 );
 
                 // Return OK
