@@ -1,4 +1,4 @@
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
+use crate::signatures::common::{CONFIDENCE_MEDIUM, SignatureError, SignatureResult};
 use crate::structures::cab::parse_cab_header;
 
 /// Human readable description

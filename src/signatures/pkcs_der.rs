@@ -1,4 +1,4 @@
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
+use crate::signatures::common::{CONFIDENCE_MEDIUM, SignatureError, SignatureResult};
 use std::collections::HashMap;
 
 /// Human readable description

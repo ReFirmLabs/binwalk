@@ -1,5 +1,5 @@
 use crate::signatures::common::{
-    SignatureError, SignatureResult, CONFIDENCE_LOW, CONFIDENCE_MEDIUM,
+    CONFIDENCE_LOW, CONFIDENCE_MEDIUM, SignatureError, SignatureResult,
 };
 use crate::structures::shrs::parse_shrs_header;
 

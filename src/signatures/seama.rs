@@ -1,4 +1,4 @@
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_LOW};
+use crate::signatures::common::{CONFIDENCE_LOW, SignatureError, SignatureResult};
 use crate::structures::seama::parse_seama_header;
 
 /// Human readable description

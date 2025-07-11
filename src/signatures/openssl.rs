@@ -1,6 +1,6 @@
 use crate::common::is_printable_ascii;
 use crate::signatures::common::{
-    SignatureError, SignatureResult, CONFIDENCE_LOW, CONFIDENCE_MEDIUM,
+    CONFIDENCE_LOW, CONFIDENCE_MEDIUM, SignatureError, SignatureResult,
 };
 use crate::structures::openssl::parse_openssl_crypt_header;
 

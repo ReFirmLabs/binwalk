@@ -1,5 +1,5 @@
 use crate::common::is_offset_safe;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
+use crate::signatures::common::{CONFIDENCE_HIGH, SignatureError, SignatureResult};
 use crate::structures::zstd::{parse_block_header, parse_zstd_header};
 
 /// Human readable description

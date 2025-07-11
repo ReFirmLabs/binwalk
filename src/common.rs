@@ -18,11 +18,7 @@ use std::io::Read;
 /// # } _doctest_main_src_common_rs_11_0(); }
 /// ```
 pub fn read_input(file: impl Into<String>, stdin: bool) -> Result<Vec<u8>, std::io::Error> {
-    if stdin {
-        read_stdin()
-    } else {
-        read_file(file)
-    }
+    if stdin { read_stdin() } else { read_file(file) }
 }
 
 /// Read data from standard input and return its contents.

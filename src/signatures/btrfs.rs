@@ -1,4 +1,4 @@
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
+use crate::signatures::common::{CONFIDENCE_MEDIUM, SignatureError, SignatureResult};
 use crate::structures::btrfs::parse_btrfs_header;
 
 /// Human readable description
@@ -31,7 +31,13 @@ pub fn btrfs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, 
             result.size = btrfs_header.total_size;
             result.description = format!(
                 "{}, node size: {}, sector size: {}, leaf size: {}, stripe size: {}, bytes used: {}, total size: {} bytes",
-                result.description, btrfs_header.node_size, btrfs_header.sector_size, btrfs_header.leaf_size, btrfs_header.stripe_size, btrfs_header.bytes_used, result.size
+                result.description,
+                btrfs_header.node_size,
+                btrfs_header.sector_size,
+                btrfs_header.leaf_size,
+                btrfs_header.stripe_size,
+                btrfs_header.bytes_used,
+                result.size
             );
             return Ok(result);
         }

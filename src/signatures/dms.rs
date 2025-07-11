@@ -1,5 +1,5 @@
 use crate::extractors::swapped::byte_swap;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
+use crate::signatures::common::{CONFIDENCE_MEDIUM, SignatureError, SignatureResult};
 use crate::structures::dms::parse_dms_header;
 
 /// Human readable description

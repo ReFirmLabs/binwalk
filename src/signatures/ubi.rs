@@ -1,4 +1,4 @@
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
+use crate::signatures::common::{CONFIDENCE_HIGH, SignatureError, SignatureResult};
 use crate::structures::ubi::{
     parse_ubi_ec_header, parse_ubi_superblock_header, parse_ubi_volume_header,
 };

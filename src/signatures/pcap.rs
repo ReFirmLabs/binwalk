@@ -1,5 +1,5 @@
 use crate::extractors::pcap::pcapng_carver;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
+use crate::signatures::common::{CONFIDENCE_HIGH, SignatureError, SignatureResult};
 
 /// Human readable description
 pub const PCAPNG_DESCRIPTION: &str = "Pcap-NG capture file";

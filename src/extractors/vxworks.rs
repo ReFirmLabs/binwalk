@@ -1,7 +1,7 @@
 use crate::common::is_offset_safe;
 use crate::extractors::common::{Chroot, ExtractionResult, Extractor, ExtractorType};
 use crate::structures::vxworks::{
-    get_symtab_endianness, parse_symtab_entry, VxWorksSymbolTableEntry,
+    VxWorksSymbolTableEntry, get_symtab_endianness, parse_symtab_entry,
 };
 use log::error;
 use serde_json;

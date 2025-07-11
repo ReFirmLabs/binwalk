@@ -1,5 +1,5 @@
 use crate::extractors::androidsparse::extract_android_sparse;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
+use crate::signatures::common::{CONFIDENCE_HIGH, SignatureError, SignatureResult};
 use crate::structures::androidsparse::parse_android_sparse_header;
 
 /// Human readable description
@@ -32,13 +32,16 @@ pub fn android_sparse_parser(
             if let Ok(header) = parse_android_sparse_header(&file_data[offset..]) {
                 // Update reported size and description
                 result.size = total_size;
-                result.description = format!("{}, version {}.{}, header size: {}, block size: {}, chunk count: {}, total size: {} bytes", result.description,
-                                                                                                                                          header.major_version,
-                                                                                                                                          header.minor_version,
-                                                                                                                                          header.header_size,
-                                                                                                                                          header.block_size,
-                                                                                                                                          header.chunk_count,
-                                                                                                                                          total_size);
+                result.description = format!(
+                    "{}, version {}.{}, header size: {}, block size: {}, chunk count: {}, total size: {} bytes",
+                    result.description,
+                    header.major_version,
+                    header.minor_version,
+                    header.header_size,
+                    header.block_size,
+                    header.chunk_count,
+                    total_size
+                );
                 return Ok(result);
             }
         }

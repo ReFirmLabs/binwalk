@@ -1,5 +1,5 @@
 use crate::extractors::mbr::extract_mbr_partitions;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
+use crate::signatures::common::{CONFIDENCE_MEDIUM, SignatureError, SignatureResult};
 use crate::structures::mbr::parse_mbr_image;
 
 /// Human readable description

@@ -1,9 +1,9 @@
 use crate::common::get_cstring;
 use crate::signatures::common::{
-    SignatureError, SignatureResult, CONFIDENCE_LOW, CONFIDENCE_MEDIUM,
+    CONFIDENCE_LOW, CONFIDENCE_MEDIUM, SignatureError, SignatureResult,
 };
 use crate::structures::linux::{
-    parse_linux_arm64_boot_image_header, parse_linux_arm_zimage_header,
+    parse_linux_arm_zimage_header, parse_linux_arm64_boot_image_header,
 };
 use aho_corasick::AhoCorasick;
 

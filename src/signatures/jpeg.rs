@@ -1,5 +1,5 @@
 use crate::extractors::jpeg::extract_jpeg_image;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
+use crate::signatures::common::{CONFIDENCE_MEDIUM, SignatureError, SignatureResult};
 
 /// Human readable description
 pub const DESCRIPTION: &str = "JPEG image";

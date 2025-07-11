@@ -1,5 +1,5 @@
 use crate::common::crc32;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
+use crate::signatures::common::{CONFIDENCE_HIGH, SignatureError, SignatureResult};
 use crate::structures::sevenzip::parse_7z_header;
 
 /// Human readable description

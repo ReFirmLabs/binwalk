@@ -1,7 +1,7 @@
 use crate::extractors::pem;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
-use base64::prelude::BASE64_STANDARD;
+use crate::signatures::common::{CONFIDENCE_HIGH, SignatureError, SignatureResult};
 use base64::Engine;
+use base64::prelude::BASE64_STANDARD;
 
 /// Human readable descriptions
 pub const PEM_PUBLIC_KEY_DESCRIPTION: &str = "PEM public key";

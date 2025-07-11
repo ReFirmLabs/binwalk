@@ -1,5 +1,5 @@
 use crate::extractors::gif::extract_gif_image;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
+use crate::signatures::common::{CONFIDENCE_HIGH, SignatureError, SignatureResult};
 use crate::structures::gif::parse_gif_header;
 
 /// Human readable description

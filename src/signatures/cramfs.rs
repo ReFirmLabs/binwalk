@@ -1,6 +1,6 @@
 use crate::common;
 use crate::signatures::common::{
-    SignatureError, SignatureResult, CONFIDENCE_HIGH, CONFIDENCE_MEDIUM,
+    CONFIDENCE_HIGH, CONFIDENCE_MEDIUM, SignatureError, SignatureResult,
 };
 use crate::structures::cramfs::parse_cramfs_header;
 

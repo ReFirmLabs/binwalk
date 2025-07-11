@@ -1,5 +1,5 @@
 use crate::common::get_cstring;
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_HIGH};
+use crate::signatures::common::{CONFIDENCE_HIGH, SignatureError, SignatureResult};
 
 /// Human readable description
 pub const DESCRIPTION: &str = "Copyright text";

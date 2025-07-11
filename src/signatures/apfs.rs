@@ -1,5 +1,5 @@
-use crate::signatures::common::{SignatureError, SignatureResult, CONFIDENCE_MEDIUM};
-use crate::structures::apfs::{parse_apfs_header, MAGIC_OFFSET};
+use crate::signatures::common::{CONFIDENCE_MEDIUM, SignatureError, SignatureResult};
+use crate::structures::apfs::{MAGIC_OFFSET, parse_apfs_header};
 
 /// Human readable description
 pub const DESCRIPTION: &str = "APple File System";
