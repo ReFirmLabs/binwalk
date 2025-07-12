@@ -276,9 +276,7 @@ impl Chroot {
                 }
             }
         } else {
-            error!(
-                "Failed to create file {safe_file_path}: path already exists"
-            );
+            error!("Failed to create file {safe_file_path}: path already exists");
         }
 
         false
@@ -518,9 +516,7 @@ impl Chroot {
                 .open(safe_file_path.clone())
             {
                 Err(e) => {
-                    error!(
-                        "Failed to open file '{safe_file_path}' for appending: {e}"
-                    );
+                    error!("Failed to open file '{safe_file_path}' for appending: {e}");
                 }
                 Ok(mut fp) => match fp.write(data) {
                     Err(e) => {
@@ -610,9 +606,7 @@ impl Chroot {
                 }
             }
             Err(e) => {
-                error!(
-                    "Failed to check if directory {safe_dir_path} exists: {e:?}"
-                );
+                error!("Failed to check if directory {safe_dir_path} exists: {e:?}");
                 return false;
             }
         }
@@ -655,9 +649,7 @@ impl Chroot {
 
         match fs::metadata(safe_file_path.clone()) {
             Err(e) => {
-                error!(
-                    "Failed to get permissions for file {safe_file_path}: {e}"
-                );
+                error!("Failed to get permissions for file {safe_file_path}: {e}");
             }
             Ok(_metadata) => {
                 #[cfg(unix)]
@@ -668,9 +660,7 @@ impl Chroot {
 
                     match fs::set_permissions(&safe_file_path, permissions) {
                         Err(e) => {
-                            error!(
-                                "Failed to set permissions for file {safe_file_path}: {e}"
-                            );
+                            error!("Failed to set permissions for file {safe_file_path}: {e}");
                         }
                         Ok(_) => {
                             return true;
@@ -796,9 +786,7 @@ impl Chroot {
             match unix::fs::symlink(safe_target_path, safe_symlink_path) {
                 Ok(_) => true,
                 Err(e) => {
-                    error!(
-                        "Failed to create symlink from {symlink} -> {target}: {e}"
-                    );
+                    error!("Failed to create symlink from {symlink} -> {target}: {e}");
                     false
                 }
             }
@@ -1087,9 +1075,7 @@ fn spawn(
     } else {
         // Copy file data to carved file path
         if !chroot.carve_file(&carved_file, file_data, signature.offset, signature.size) {
-            return Err(std::io::Error::other(
-                "Failed to carve data to disk",
-            ));
+            return Err(std::io::Error::other("Failed to carve data to disk"));
         }
     }
 
@@ -1196,16 +1182,12 @@ fn create_output_directory(file_path: &str, offset: usize) -> Result<String, std
 
     // First, remove the output directory if it exists from a previous run
     if !chroot.remove_directory(&output_directory) {
-        return Err(std::io::Error::other(
-            "Directory deletion failed",
-        ));
+        return Err(std::io::Error::other("Directory deletion failed"));
     }
 
     // Create the output directory, equivalent of mkdir -p
     if !chroot.create_directory(&output_directory) {
-        return Err(std::io::Error::other(
-            "Directory creation failed",
-        ));
+        return Err(std::io::Error::other("Directory creation failed"));
     }
 
     Ok(output_directory)
