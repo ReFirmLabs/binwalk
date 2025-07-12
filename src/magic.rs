@@ -1218,6 +1218,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::arj::DESCRIPTION.to_string(),
             extractor: Some(extractors::sevenzip::sevenzip_extractor()),
         },
+        // MD5 hashes
+        signatures::common::Signature {
+            name: "md5".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::hashes::md5_magic(),
+            parser: signatures::hashes::md5_parser,
+            description: signatures::hashes::MD5_DESCRIPTION.to_string(),
+            extractor: None,
+        },
     ];
 
     binary_signatures
