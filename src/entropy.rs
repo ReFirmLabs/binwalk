@@ -94,6 +94,8 @@ pub fn plot(
         match out_file {
             None => plot.show(),
             Some(out_file_name) => {
+                // TODO: Switch to plotly_static, which is the recommended way to do this
+                #[allow(deprecated)]
                 plot.write_image(&out_file_name, ImageFormat::PNG, 2048, 1024, 1.0);
             }
         }
