@@ -3,8 +3,8 @@ FROM ubuntu:25.04 AS build
 
 ARG BUILD_DIR="/tmp"
 ARG BINWALK_BUILD_DIR="${BUILD_DIR}/binwalk"
-ARG SASQUATCH_FILENAME="sasquatch_1.0_amd64.deb"
-ARG SASQUATCH_FILE_URL="https://github.com/onekey-sec/sasquatch/releases/download/sasquatch-v4.5.1-5/${SASQUATCH_FILENAME}"
+ARG SASQUATCH_FILENAME="sasquatch_1.0.deb"
+ARG SASQUATCH_BASE_FILE_URL="https://github.com/onekey-sec/sasquatch/releases/download/sasquatch-v4.5.1-5/"
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
@@ -36,7 +36,7 @@ RUN apt-get update -y \
     libbz2-dev \
     libssl-dev \
     pkg-config \
-    && curl -L -o "${SASQUATCH_FILENAME}" "${SASQUATCH_FILE_URL}" \
+    && curl -L -o "${SASQUATCH_FILENAME}" "${SASQUATCH_BASE_FILE_URL}\sasquatch_1.0_$(dpkg --print-architecture).deb" \
     && git clone https://github.com/askac/dumpifs.git ${BUILD_DIR}/dumpifs \
     && git clone https://github.com/lzfse/lzfse.git ${BUILD_DIR}/lzfse \
     && git clone https://github.com/Lekensteyn/dmg2img.git ${BUILD_DIR}/dmg2img \
@@ -55,7 +55,7 @@ FROM ubuntu:25.04
 ARG BUILD_DIR="/tmp"
 ARG BINWALK_BUILD_DIR="${BUILD_DIR}/binwalk"
 ARG DEFAULT_WORKING_DIR="/analysis"
-ARG SASQUATCH_FILENAME="sasquatch_1.0_amd64.deb"
+ARG SASQUATCH_FILENAME="sasquatch_1.0.deb"
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
