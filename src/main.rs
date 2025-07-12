@@ -128,9 +128,7 @@ fn main() -> ExitCode {
     }
 
     // Initialize thread pool
-    debug!(
-        "Initializing thread pool with {available_workers} workers"
-    );
+    debug!("Initializing thread pool with {available_workers} workers");
     let workers = ThreadPool::new(available_workers);
     let (worker_tx, worker_rx) = mpsc::channel();
 
@@ -302,9 +300,7 @@ fn spawn_worker(
         // If data carving was requested as part of extraction, carve analysis results to disk
         if do_carve {
             let carve_count = carve_file_map(&file_data, &results);
-            info!(
-                "Carved {carve_count} data blocks to disk from {target_file}"
-            );
+            info!("Carved {carve_count} data blocks to disk from {target_file}");
         }
 
         // Report file results back to main thread

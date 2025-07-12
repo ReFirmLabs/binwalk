@@ -33,7 +33,7 @@ pub fn sha256_magic() -> Vec<Vec<u8>> {
 /// MD5 constants
 pub fn md5_magic() -> Vec<Vec<u8>> {
     vec![
-         // Big endian
+        // Big endian
         b"\xd7\x6a\xa4\x78\xe8\xc7\xb7\x56\x24\x20\x70\xdb\xc1\xbd\xce\xee".to_vec(),
         // Little endian
         b"\x78\xa4\x6a\xd7\x56\xb7\xc7\xe8\xdb\x70\x20\x24\xee\xce\xbd\xc1".to_vec(),

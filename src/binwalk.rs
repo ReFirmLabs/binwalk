@@ -815,9 +815,7 @@ fn init_extraction_directory(
             debug!("Created base output directory: '{extraction_directory}'");
         }
         Err(e) => {
-            error!(
-                "Failed to create base output directory '{extraction_directory}': {e}"
-            );
+            error!("Failed to create base output directory '{extraction_directory}': {e}");
             return Err(e);
         }
     }
