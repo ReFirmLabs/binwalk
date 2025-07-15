@@ -25,7 +25,7 @@ pub fn jffs2_magic() -> Vec<Vec<u8>> {
 /// Parse and validate a JFFS2 image
 pub fn jffs2_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, SignatureError> {
     // Useful contstants
-    const MAX_PAGE_SIZE: usize = 0x10000;
+    const MAX_PAGE_SIZE: usize = 0x20000;
     const MIN_VALID_NODE_COUNT: usize = 2;
     const JFFS2_BIG_ENDIAN_MAGIC: &[u8; 2] = b"\x19\x85";
     const JFFS2_LITTLE_ENDIAN_MAGIC: &[u8; 2] = b"\x85\x19";
