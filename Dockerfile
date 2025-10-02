@@ -1,5 +1,5 @@
 ## Scratch build stage
-FROM ubuntu:25.04 AS build
+FROM ubuntu:25.10 AS build
 
 ARG BUILD_DIR="/tmp"
 ARG BINWALK_BUILD_DIR="${BUILD_DIR}/binwalk"
@@ -50,7 +50,7 @@ RUN apt-get update -y \
 
 
 ## Prod image build stage
-FROM ubuntu:25.04
+FROM ubuntu:25.10
 
 ARG BUILD_DIR="/tmp"
 ARG BINWALK_BUILD_DIR="${BUILD_DIR}/binwalk"
