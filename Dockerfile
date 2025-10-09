@@ -85,11 +85,8 @@ RUN apt-get update -y \
     zstd \
     srecord \
     tar \
-    unzip \
     sleuthkit \
     cabextract \
-    curl \
-    wget \
     git \
     lz4 \
     lzop \
