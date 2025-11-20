@@ -1,7 +1,5 @@
 //! Common Functions
 use log::{debug, error};
-use std::fs::File;
-use std::io::Read;
 use std::path::Path;
 
 /// Read a file data into memory and return its contents.
@@ -18,28 +16,14 @@ use std::path::Path;
 /// # } _doctest_main_src_common_rs_48_0(); }
 /// ```
 pub fn read_file(file: impl AsRef<Path>) -> Result<Vec<u8>, std::io::Error> {
-    let mut file_data = Vec::new();
     let file_path = file.as_ref();
 
-    match File::open(file_path) {
-        Err(e) => {
-            error!("Failed to open file {}: {e}", file_path.display());
-            Err(e)
-        }
-        Ok(mut fp) => match fp.read_to_end(&mut file_data) {
-            Err(e) => {
-                error!(
-                    "Failed to read file {} into memory: {e}",
-                    file_path.display()
-                );
-                Err(e)
-            }
-            Ok(file_size) => {
-                debug!("Loaded {file_size} bytes from {}", file_path.display());
-                Ok(file_data)
-            }
-        },
-    }
+    let file_data = std::fs::read(&file_path)
+        .inspect_err(|e| error!("Failed to read file {} into memory: {e}", file_path.display()))?;
+
+    let file_size = file_data.len();
+    debug!("Loaded {file_size} bytes from {}", file_path.display());
+    Ok(file_data)
 }
 
 /// Calculates the CRC32 checksum of the given data.
@@ -81,22 +65,6 @@ pub fn epoch_to_string(epoch_timestamp: impl Into<i64>) -> String {
     }
 }
 
-/// Get a C-style NULL-terminated string from the provided list of u8 bytes.
-/// Return value does not include the terminating NULL byte.
-fn get_cstring_bytes(raw_data: &[u8]) -> Vec<u8> {
-    let mut cstring: Vec<u8> = vec![];
-
-    for raw_byte in raw_data {
-        if *raw_byte == 0 {
-            break;
-        } else {
-            cstring.push(*raw_byte);
-        }
-    }
-
-    cstring
-}
-
 /// Get a C-style NULL-terminated string from the provided array of u8 bytes.
 ///
 /// ## Example
@@ -111,14 +79,9 @@ fn get_cstring_bytes(raw_data: &[u8]) -> Vec<u8> {
 /// assert_eq!(string, "this_is_a_c_string");
 /// ```
 pub fn get_cstring(raw_data: &[u8]) -> String {
-    let raw_string = get_cstring_bytes(raw_data);
-
-    let string: String = match String::from_utf8(raw_string) {
-        Err(_) => "".to_string(),
-        Ok(s) => s.clone(),
-    };
-
-    string
+    let first_zero = raw_data.iter().position(|&r| r == 0).unwrap_or(raw_data.len());
+    let raw_bytes = &raw_data[..first_zero];
+    String::from_utf8_lossy(raw_bytes).into_owned()
 }
 
 /// Returns true if the provided byte is a printable ASCII character
@@ -165,9 +128,7 @@ pub fn is_offset_safe(
     last_offset: Option<usize>,
 ) -> bool {
     // If a previous file offset was specified, ensure that it is less than the next file offset
-    if let Some(previous_offset) = last_offset
-        && previous_offset >= next_offset
-    {
+    if last_offset.is_some_and(|b| b >= next_offset) {
         return false;
     }
 
