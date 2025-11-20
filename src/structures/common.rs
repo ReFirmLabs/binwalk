@@ -54,89 +54,70 @@ pub struct StructureError;
 /// ```
 pub fn parse(
     data: &[u8],
-    structure: &Vec<(&str, &str)>,
+    structure: &[(&str, &str)],
     endianness: &str,
 ) -> Result<HashMap<String, usize>, StructureError> {
+    const U8_SIZE: usize = std::mem::size_of::<u8>();
+    const U16_SIZE: usize = std::mem::size_of::<u16>();
+    const U32_SIZE: usize = std::mem::size_of::<u32>();
+    const U64_SIZE: usize = std::mem::size_of::<u64>();
     const U24_SIZE: usize = 3;
 
-    let mut value: usize;
-    let mut offset: usize = 0;
-    let mut parsed_structure = HashMap::new();
+    let mut parsed_structure = HashMap::with_capacity(structure.len());
 
-    // Get the size of the defined structure
-    let structure_size = size(structure);
-
-    if let Some(raw_data) = data.get(0..structure_size) {
-        for (name, ctype) in structure {
-            let data_type: String = ctype.to_string();
-
-            match type_to_size(ctype) {
-                None => return Err(StructureError),
-                Some(csize) => {
-                    if csize == std::mem::size_of::<u8>() {
-                        // u8, endianness doesn't matter
-                        value =
-                            u8::from_be_bytes(raw_data[offset..offset + csize].try_into().unwrap())
-                                as usize;
-                    } else if csize == std::mem::size_of::<u16>() {
-                        if endianness == "big" {
-                            value = u16::from_be_bytes(
-                                raw_data[offset..offset + csize].try_into().unwrap(),
-                            ) as usize;
-                        } else {
-                            value = u16::from_le_bytes(
-                                raw_data[offset..offset + csize].try_into().unwrap(),
-                            ) as usize;
-                        }
-
-                    // Yes Virginia, u24's are real
-                    } else if csize == U24_SIZE {
-                        if endianness == "big" {
-                            value = ((raw_data[offset] as usize) << 16)
-                                + ((raw_data[offset + 1] as usize) << 8)
-                                + (raw_data[offset + 2] as usize);
-                        } else {
-                            value = ((raw_data[offset + 2] as usize) << 16)
-                                + ((raw_data[offset + 1] as usize) << 8)
-                                + (raw_data[offset] as usize);
-                        }
-                    } else if csize == std::mem::size_of::<u32>() {
-                        if endianness == "big" {
-                            value = u32::from_be_bytes(
-                                raw_data[offset..offset + csize].try_into().unwrap(),
-                            ) as usize;
-                        } else {
-                            value = u32::from_le_bytes(
-                                raw_data[offset..offset + csize].try_into().unwrap(),
-                            ) as usize;
-                        }
-                    } else if csize == std::mem::size_of::<u64>() {
-                        if endianness == "big" {
-                            value = u64::from_be_bytes(
-                                raw_data[offset..offset + csize].try_into().unwrap(),
-                            ) as usize;
-                        } else {
-                            value = u64::from_le_bytes(
-                                raw_data[offset..offset + csize].try_into().unwrap(),
-                            ) as usize;
-                        }
-                    } else {
-                        error!(
-                            "Cannot parse structure element with unknown data type '{data_type}'"
-                        );
-                        return Err(StructureError);
-                    }
-
-                    offset += csize;
-                    parsed_structure.insert(name.to_string(), value);
+    let mut remaining_data = data;
+    for &(name, ctype) in structure {
+        let csize = type_to_size(ctype).ok_or(StructureError)?;
+        let raw_bytes = remaining_data.split_off(..csize).ok_or(StructureError)?;
+        let value = match csize {
+            // u8, endianness doesn't matter
+            U8_SIZE => usize::from(raw_bytes[0]),
+            U16_SIZE => {
+                let f = if endianness == "big" {
+                    u16::from_be_bytes
+                } else {
+                    u16::from_le_bytes
+                };
+                usize::from(f(raw_bytes.try_into().unwrap()))
+            }
+            U32_SIZE => {
+                let f = if endianness == "big" {
+                    u32::from_be_bytes
+                } else {
+                    u32::from_le_bytes
+                };
+                f(raw_bytes.try_into().unwrap()) as usize
+            }
+            U64_SIZE => {
+                let f = if endianness == "big" {
+                    u64::from_be_bytes
+                } else {
+                    u64::from_le_bytes
+                };
+                f(raw_bytes.try_into().unwrap()) as usize // TODO: this will truncate on 32 bit
+            }
+            // Yes Virginia, u24's are real
+            U24_SIZE => {
+                if endianness == "big" {
+                    usize::from(raw_bytes[0]) << 16
+                        | usize::from(raw_bytes[1]) << 8
+                        | usize::from(raw_bytes[2])
+                } else {
+                    usize::from(raw_bytes[2]) << 16
+                        | usize::from(raw_bytes[1]) << 8
+                        | usize::from(raw_bytes[0])
                 }
             }
-        }
+            _ => {
+                error!("Cannot parse structure element with unknown data type '{ctype}'");
+                return Err(StructureError);
+            }
+        };
 
-        return Ok(parsed_structure);
+        parsed_structure.insert(name.to_string(), value);
     }
 
-    Err(StructureError)
+    Ok(parsed_structure)
 }
 
 /// Returns the size of a given structure definition.
@@ -157,7 +138,7 @@ pub fn parse(
 ///
 /// assert_eq!(struct_size, 17);
 /// ```
-pub fn size(structure: &Vec<(&str, &str)>) -> usize {
+pub fn size(structure: &[(&str, &str)]) -> usize {
     let mut struct_size: usize = 0;
 
     for (_name, ctype) in structure {
