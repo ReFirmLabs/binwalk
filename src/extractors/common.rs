@@ -92,8 +92,10 @@ impl Chroot {
     /// ```
     /// use binwalk::extractors::common::Chroot;
     ///
-    /// let chroot_dir = std::path::Path::new(&std::env::temp_dir())
+    /// # let tempdir = tempfile::tempdir().unwrap();
+    /// let chroot_dir = std::path::Path::new("tests")
     ///     .join("binwalk_unit_tests")
+    /// #   .join(tempdir.path())
     ///     .display()
     ///     .to_string();
     ///
@@ -156,8 +158,10 @@ impl Chroot {
     /// use binwalk::extractors::common::Chroot;
     /// use std::path::MAIN_SEPARATOR;
     ///
-    /// let chroot_dir = std::path::Path::new(&std::env::temp_dir())
+    /// # let tempdir = tempfile::tempdir().unwrap();
+    /// let chroot_dir = std::path::Path::new("tests")
     ///     .join("binwalk_unit_tests")
+    /// #   .join(tempdir.path())
     ///     .display()
     ///     .to_string();
     ///
@@ -221,8 +225,10 @@ impl Chroot {
     /// ```
     /// use binwalk::extractors::common::Chroot;
     ///
-    /// let chroot_dir = std::path::Path::new(&std::env::temp_dir())
+    /// # let tempdir = tempfile::tempdir().unwrap();
+    /// let chroot_dir = std::path::Path::new("tests")
     ///     .join("binwalk_unit_tests")
+    /// #   .join(tempdir.path())
     ///     .display()
     ///     .to_string();
     ///
@@ -249,8 +255,10 @@ impl Chroot {
     ///
     /// let file_name = "created_file.txt";
     ///
+    /// # let tempdir = tempfile::tempdir().unwrap();
     /// let chroot_dir = std::path::Path::new("tests")
     ///     .join("binwalk_unit_tests")
+    /// #   .join(tempdir.path())
     ///     .display()
     ///     .to_string();
     ///
@@ -296,8 +304,10 @@ impl Chroot {
     ///
     /// let file_name = "carved_file.txt";
     ///
+    /// # let tempdir = tempfile::tempdir().unwrap();
     /// let chroot_dir = std::path::Path::new("tests")
     ///     .join("binwalk_unit_tests")
+    /// #   .join(tempdir.path())
     ///     .display()
     ///     .to_string();
     ///
@@ -355,8 +365,10 @@ impl Chroot {
     /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_extractors_common_rs_312_0() -> Result<(), Box<dyn std::error::Error>> {
     /// use binwalk::extractors::common::Chroot;
     ///
+    /// # let tempdir = tempfile::tempdir().unwrap();
     /// let chroot_dir = std::path::Path::new("tests")
     ///     .join("binwalk_unit_tests")
+    /// #   .join(tempdir.path())
     ///     .display()
     ///     .to_string();
     ///
@@ -392,8 +404,10 @@ impl Chroot {
     /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_extractors_common_rs_345_0() -> Result<(), Box<dyn std::error::Error>> {
     /// use binwalk::extractors::common::Chroot;
     ///
+    /// # let tempdir = tempfile::tempdir().unwrap();
     /// let chroot_dir = std::path::Path::new("tests")
     ///     .join("binwalk_unit_tests")
+    /// #   .join(tempdir.path())
     ///     .display()
     ///     .to_string();
     ///
@@ -429,8 +443,10 @@ impl Chroot {
     /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_extractors_common_rs_377_0() -> Result<(), Box<dyn std::error::Error>> {
     /// use binwalk::extractors::common::Chroot;
     ///
+    /// # let tempdir = tempfile::tempdir().unwrap();
     /// let chroot_dir = std::path::Path::new("tests")
     ///     .join("binwalk_unit_tests")
+    /// #   .join(tempdir.path())
     ///     .display()
     ///     .to_string();
     ///
@@ -459,8 +475,10 @@ impl Chroot {
     /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_extractors_common_rs_401_0() -> Result<(), Box<dyn std::error::Error>> {
     /// use binwalk::extractors::common::Chroot;
     ///
+    /// # let tempdir = tempfile::tempdir().unwrap();
     /// let chroot_dir = std::path::Path::new("tests")
     ///     .join("binwalk_unit_tests")
+    /// #   .join(tempdir.path())
     ///     .display()
     ///     .to_string();
     ///
@@ -489,8 +507,10 @@ impl Chroot {
     /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_extractors_common_rs_426_0() -> Result<(), Box<dyn std::error::Error>> {
     /// use binwalk::extractors::common::Chroot;
     ///
+    /// # let tempdir = tempfile::tempdir().unwrap();
     /// let chroot_dir = std::path::Path::new("tests")
     ///     .join("binwalk_unit_tests")
+    /// #   .join(tempdir.path())
     ///     .display()
     ///     .to_string();
     ///
@@ -543,8 +563,10 @@ impl Chroot {
     /// ```
     /// use binwalk::extractors::common::Chroot;
     ///
+    /// # let tempdir = tempfile::tempdir().unwrap();
     /// let chroot_dir = std::path::Path::new("tests")
     ///     .join("binwalk_unit_tests")
+    /// #   .join(tempdir.path())
     ///     .display()
     ///     .to_string();
     ///
@@ -581,8 +603,10 @@ impl Chroot {
     /// ```
     /// use binwalk::extractors::common::Chroot;
     ///
+    /// # let tempdir = tempfile::tempdir().unwrap();
     /// let chroot_dir = std::path::Path::new("tests")
     ///     .join("binwalk_unit_tests")
+    /// #   .join(tempdir.path())
     ///     .display()
     ///     .to_string();
     ///
@@ -626,8 +650,10 @@ impl Chroot {
     /// ```
     /// use binwalk::extractors::common::Chroot;
     ///
+    /// # let tempdir = tempfile::tempdir().unwrap();
     /// let chroot_dir = std::path::Path::new("tests")
     ///     .join("binwalk_unit_tests")
+    /// #   .join(tempdir.path())
     ///     .display()
     ///     .to_string();
     ///
@@ -688,8 +714,10 @@ impl Chroot {
     /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_extractors_common_rs_571_0() -> Result<(), Box<dyn std::error::Error>> {
     /// use binwalk::extractors::common::Chroot;
     ///
+    /// # let tempdir = tempfile::tempdir().unwrap();
     /// let chroot_dir = std::path::Path::new("tests")
     ///     .join("binwalk_unit_tests")
+    /// #   .join(tempdir.path())
     ///     .display()
     ///     .to_string();
     ///
