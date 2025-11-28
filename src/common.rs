@@ -1,5 +1,4 @@
 //! Common Functions
-use chrono::prelude::DateTime;
 use log::{debug, error};
 use std::fs::File;
 use std::io::Read;
@@ -104,11 +103,11 @@ pub fn crc32(data: &[u8]) -> u32 {
 ///
 /// assert_eq!(timestamp, "1970-01-01 00:00:00");
 /// ```
+// TODO: year 2106 problem
 pub fn epoch_to_string(epoch_timestamp: u32) -> String {
-    let date_time = DateTime::from_timestamp(epoch_timestamp.into(), 0);
-    match date_time {
-        Some(dt) => dt.format("%Y-%m-%d %H:%M:%S").to_string(),
-        None => "".to_string(),
+    match jiff::Timestamp::new(epoch_timestamp.into(), 0) {
+        Ok(timestamp) => timestamp.strftime("%Y-%m-%d %H:%M:%S").to_string(),
+        Err(_) => "".to_string(),
     }
 }
 

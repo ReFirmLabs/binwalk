@@ -12,7 +12,7 @@ keywords = ["binwalk", "firmware", "analysis"]
 [dependencies]
 log = "0.4.22"
 base64 = "0.22.1"
-chrono = "0.4.38"
+jiff = "0.2.10"
 walkdir = "2.5.0"
 entropy = "0.4.2"
 colored = "3.0.0"
