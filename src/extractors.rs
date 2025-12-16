@@ -181,6 +181,7 @@ pub mod srec;
 pub mod svg;
 pub mod swapped;
 pub mod tarball;
+pub mod tiff;
 pub mod trx;
 pub mod tsk;
 pub mod ubi;
