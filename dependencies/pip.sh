@@ -5,7 +5,7 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 if command -v uv >/dev/null 2>&1; then
-    uv pip install -r "$SCRIPT_DIR/requirements.txt" --system --break-system-packages
+    uv pip install -r "$SCRIPT_DIR/requirements.txt"
 else
-    pip install -r "$SCRIPT_DIR/requirements.txt" --break-system-packages
+    pip install -r "$SCRIPT_DIR/requirements.txt"
 fi
