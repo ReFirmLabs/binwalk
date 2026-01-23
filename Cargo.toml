@@ -9,12 +9,16 @@ repository = "https://github.com/ReFirmLabs/binwalk"
 description = "Analyzes data for embedded file types"
 keywords = ["binwalk", "firmware", "analysis"]
 
+[features]
+default = []
+entropy-plot = ["dep:plotly", "dep:entropy"]
+
 [dependencies]
 log = "0.4.22"
 base64 = "0.22.1"
 chrono = "0.4.38"
 walkdir = "2.5.0"
-entropy = "0.4.2"
+entropy = { version = "0.4.2", optional = true }
 colored = "3.0.0"
 termsize = "0.1"
 crc32-v2 = "0.0.5"
@@ -34,7 +38,10 @@ clap = { version = "4.5.16", features = ["derive"] }
 xxhash-rust = { version = "0.8.12", features = ["xxh32"] }
 hex = "0.4.3"
 delink = { git = "https://github.com/devttys0/delink" }
-plotly = { version = "0.13.1", features = ["kaleido", "kaleido_download"] }
+plotly = { version = "0.14", features = [
+    "kaleido",
+    "kaleido_download",
+], optional = true }
 
 [dependencies.uuid]
 version = "1.17.0"

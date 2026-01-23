@@ -7,6 +7,7 @@ use std::io::Write;
 
 use crate::binwalk::AnalysisResults;
 use crate::display;
+#[cfg(feature = "entropy-plot")]
 use crate::entropy::FileEntropy;
 
 const STDOUT: &str = "-";
@@ -16,6 +17,7 @@ const JSON_LIST_SEP: &str = ",\n";
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum JSONType {
+    #[cfg(feature = "entropy-plot")]
     Entropy(FileEntropy),
     Analysis(AnalysisResults),
 }

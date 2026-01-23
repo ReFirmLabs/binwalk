@@ -393,6 +393,7 @@ pub fn print_plain(quiet: bool, msg: &str) {
     }
 }
 
+#[cfg(feature = "entropy-plot")]
 pub fn println_plain(quiet: bool, msg: &str) {
     if !quiet {
         println!("{msg}");

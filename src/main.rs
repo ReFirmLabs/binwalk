@@ -13,6 +13,7 @@ mod binwalk;
 mod cliparser;
 mod common;
 mod display;
+#[cfg(feature = "entropy-plot")]
 mod entropy;
 mod extractors;
 mod json;
@@ -71,21 +72,30 @@ fn main() -> ExitCode {
 
     // If entropy analysis was requested, generate the entropy graph and return
     if cliargs.entropy {
-        display::print_plain(cliargs.quiet, "Calculating file entropy...");
-
-        if let Ok(entropy_results) =
-            entropy::plot(cliargs.file_name.unwrap(), cliargs.stdin, cliargs.png)
+        #[cfg(not(feature = "entropy-plot"))]
         {
-            // Log entropy results to JSON file, if requested
-            json_logger.log(json::JSONType::Entropy(entropy_results.clone()));
-            json_logger.close();
-
-            display::println_plain(cliargs.quiet, "done.");
-        } else {
-            panic!("Entropy analysis failed!");
+            panic!(
+                "binwalk was built without the \"entropy-plot\" feature, entropy analysis isn't available"
+            );
         }
+        #[cfg(feature = "entropy-plot")]
+        {
+            display::print_plain(cliargs.quiet, "Calculating file entropy...");
 
-        return ExitCode::SUCCESS;
+            if let Ok(entropy_results) =
+                entropy::plot(cliargs.file_name.unwrap(), cliargs.stdin, cliargs.png)
+            {
+                // Log entropy results to JSON file, if requested
+                json_logger.log(json::JSONType::Entropy(entropy_results.clone()));
+                json_logger.close();
+
+                display::println_plain(cliargs.quiet, "done.");
+            } else {
+                panic!("Entropy analysis failed!");
+            }
+
+            return ExitCode::SUCCESS;
+        }
     }
 
     // If extraction or data carving was requested, we need to initialize the output directory
