@@ -17,5 +17,6 @@ pub fn uefi_extractor() -> extractors::common::Extractor {
          * Recursing into this data would result in double extractions for no good reason.
          */
         do_not_recurse: true,
+        fallback: None,
     }
 }

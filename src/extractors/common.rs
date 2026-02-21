@@ -48,6 +48,8 @@ pub struct Extractor {
     pub exit_codes: Vec<i32>,
     /// Set to true to disable recursion into this extractor's extracted files
     pub do_not_recurse: bool,
+    /// Optional fallback extractor to try if the primary extractor fails
+    pub fallback: Option<Box<Extractor>>,
 }
 
 /// Stores information about a completed extraction
@@ -841,33 +843,31 @@ pub fn execute(
                         result.extractor = format!("{}_built_in", signature.name);
                     }
 
-                    ExtractorType::External(cmd) => {
-                        // Spawn the external extractor command
-                        match spawn(
-                            file_data,
-                            file_path,
-                            &output_directory,
-                            signature,
-                            extractor_definition.clone(),
-                        ) {
-                            Err(e) => {
-                                error!(
-                                    "Failed to spawn external extractor for '{}' signature: {}",
-                                    signature.name, e
-                                );
+                    ExtractorType::External(_) => {
+                        // Try the primary extractor, then any fallbacks if it fails
+                        let mut current_ext = Some(&extractor_definition);
+
+                        while let Some(ext) = current_ext {
+                            result = try_external_extract(
+                                file_data,
+                                file_path,
+                                &output_directory,
+                                signature,
+                                ext,
+                            );
+
+                            if result.success {
+                                break;
                             }
 
-                            Ok(proc_info) => {
-                                // Wait for the external process to exit
-                                match proc_wait(proc_info) {
-                                    Err(_) => {
-                                        warn!("External extractor failed!");
-                                    }
-                                    Ok(ext_result) => {
-                                        result = ext_result;
-                                        // Set the extractor name to the name of the extraction utility
-                                        result.extractor = cmd.to_string();
-                                    }
+                            // Try fallback extractor if available
+                            current_ext = ext.fallback.as_deref();
+                            if let Some(fallback) = current_ext {
+                                if let ExtractorType::External(fallback_cmd) = &fallback.utility {
+                                    info!(
+                                        "Trying fallback extractor '{}' for '{}' signature",
+                                        fallback_cmd, signature.name
+                                    );
                                 }
                             }
                         }
@@ -893,6 +893,50 @@ pub fn execute(
                     "Failed to clean up extraction directory {} after extraction failure: {}",
                     output_directory, e
                 );
+            }
+        }
+    }
+
+    result
+}
+
+/// Attempt to run an external extractor, returning the extraction result.
+fn try_external_extract(
+    file_data: &[u8],
+    file_path: &String,
+    output_directory: &String,
+    signature: &SignatureResult,
+    extractor: &Extractor,
+) -> ExtractionResult {
+    let mut result = ExtractionResult {
+        ..Default::default()
+    };
+
+    if let ExtractorType::External(cmd) = &extractor.utility {
+        match spawn(
+            file_data,
+            file_path,
+            output_directory,
+            signature,
+            extractor.clone(),
+        ) {
+            Err(e) => {
+                error!(
+                    "Failed to spawn external extractor '{}' for '{}' signature: {}",
+                    cmd, signature.name, e
+                );
+            }
+
+            Ok(proc_info) => {
+                match proc_wait(proc_info) {
+                    Err(_) => {
+                        warn!("External extractor '{}' failed!", cmd);
+                    }
+                    Ok(ext_result) => {
+                        result = ext_result;
+                        result.extractor = cmd.to_string();
+                    }
+                }
             }
         }
     }
@@ -971,6 +1015,13 @@ fn spawn(
         .spawn()
     {
         Err(e) => {
+            // Clean up the carved file since the process failed to start
+            if let Err(rm_err) = fs::remove_file(&carved_file) {
+                warn!(
+                    "Failed to clean up carved file '{}': {}",
+                    carved_file, rm_err
+                );
+            }
             error!(
                 "Failed to execute command {}{:?}: {}",
                 command, extractor.arguments, e
