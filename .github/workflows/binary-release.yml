@@ -1,0 +1,33 @@
+name: Binary Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger automatically on tags like v3.1.0
+  workflow_dispatch: # Allow manual triggers
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build Binary (Release Mode)
+        run: cargo build --release
+
+      - name: Create Release and Upload Asset
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          # Use a wildcard to capture both binwalk (Linux) and binwalk.exe (Windows)
+          files: target/release/binwalk*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
