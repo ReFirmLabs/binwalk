@@ -93,6 +93,53 @@ pub fn crc32(data: &[u8]) -> u32 {
     crc32_v2::crc32(0, data)
 }
 
+/// CRC-32 variant used by the Fritz!Box EVA kernel image file signature.
+///
+/// Differs from the standard [`crc32`] in three ways: bits are processed
+/// MSB-first (polynomial 0x04C11DB7, not the reflected form), the CRC starts
+/// at 0 instead of 0xFFFFFFFF, and the payload length is folded into the CRC
+/// byte-by-byte before the final one's-complement.
+///
+/// ## Example
+///
+/// ```
+/// use binwalk_ng::common::eva_file_signature_crc32;
+///
+/// assert_eq!(eva_file_signature_crc32(b""), 0xFFFFFFFF);
+/// ```
+pub fn eva_file_signature_crc32(data: &[u8]) -> u32 {
+    const POLY: u32 = 0x04C11DB7;
+    const TABLE: [u32; 256] = {
+        let mut table = [0u32; 256];
+        let mut i = 1;
+        while i < 256 {
+            let mut crc = table[i / 2];
+            let c = (crc >> 31) ^ ((i as u32) & 1);
+            crc <<= 1;
+            if c & 1 != 0 {
+                crc ^= POLY;
+            }
+            table[i] = crc;
+            i += 1;
+        }
+        table
+    };
+
+    let mut crc: u32 = 0;
+    for &byte in data {
+        crc = (crc << 8) ^ TABLE[((crc >> 24) as u8 ^ byte) as usize];
+    }
+
+    // Fold the payload length into the CRC
+    let mut length = data.len();
+    while length > 0 {
+        crc = (crc << 8) ^ TABLE[((crc >> 24) as u8 ^ (length & 0xFF) as u8) as usize];
+        length >>= 8;
+    }
+
+    !crc
+}
+
 /// Converts an epoch time to a formatted time string.
 ///
 /// ## Example
