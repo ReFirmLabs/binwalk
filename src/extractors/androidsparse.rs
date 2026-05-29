@@ -39,15 +39,32 @@ pub fn extract_android_sparse(
 ) -> ExtractionResult {
     const OUTFILE_NAME: &str = "unsparsed.img";
 
+    // Refuse to produce an unsparsed image larger than this. Real-world Android
+    // partitions are well under this cap; anything beyond is almost certainly a
+    // crafted header trying to exhaust disk space.
+    const MAX_UNSPARSED_SIZE: usize = 16 * 1024 * 1024 * 1024; // 16 GiB
+
     let mut result = ExtractionResult {
         ..Default::default()
     };
 
     // Parse the sparse file header
     if let Ok(sparse_header) = androidsparse::parse_android_sparse_header(&file_data[offset..]) {
+        // Sanity check the declared total output size. checked_mul guards against
+        // u32 * u32 overflowing usize, and the comparison guards against absurd
+        // but non-overflowing values (e.g., 256 TB).
+        match sparse_header
+            .block_count
+            .checked_mul(sparse_header.block_size)
+        {
+            Some(s) if s <= MAX_UNSPARSED_SIZE => {}
+            _ => return result,
+        };
+
         let available_data: usize = file_data.len();
         let mut last_chunk_offset: Option<usize> = None;
         let mut processed_chunk_count: usize = 0;
+        let mut blocks_written: usize = 0;
         let mut next_chunk_offset: usize = offset + sparse_header.header_size;
 
         while is_offset_safe(available_data, next_chunk_offset, last_chunk_offset) {
@@ -59,6 +76,27 @@ pub fn extract_android_sparse(
                 }
 
                 Ok(chunk_header) => {
+                    // A single chunk can never describe more blocks than the
+                    // total declared by the sparse header. This bounds the
+                    // cumulative output to max_output_size.
+                    blocks_written = match blocks_written.checked_add(chunk_header.block_count) {
+                        Some(n) if n <= sparse_header.block_count => n,
+                        _ => break,
+                    };
+
+                    // For RAW chunks the payload must exactly cover block_count
+                    // blocks; otherwise the extracted image would be silently
+                    // misaligned and an absurd block_count would still drive
+                    // unbounded reads via file_data.get().
+                    if chunk_header.is_raw {
+                        let expected = chunk_header
+                            .block_count
+                            .checked_mul(sparse_header.block_size);
+                        if expected != Some(chunk_header.data_size) {
+                            break;
+                        }
+                    }
+
                     // If not a dry run, extract the data from the next chunk
                     if output_directory.is_some() {
                         let chroot = Chroot::new(output_directory);
@@ -111,6 +149,12 @@ fn extract_chunk(
             return false;
         }
     } else if chunk_header.is_fill {
+        // The parser rejects FILL chunks whose payload isn't the spec-required
+        // 4 bytes, but guard here too: an empty fill value would make the inner
+        // loop below spin forever.
+        if chunk_data.is_empty() {
+            return false;
+        }
         // Fill chunks are block_count blocks that contain a repeated sequence of data (typically 4-bytes repeated over and over again)
         for _ in 0..chunk_header.block_count {
             let mut i = 0;

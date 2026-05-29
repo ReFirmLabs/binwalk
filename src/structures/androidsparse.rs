@@ -7,6 +7,8 @@ pub struct AndroidSparseHeader {
     pub minor_version: usize,
     pub header_size: usize,
     pub block_size: usize,
+    /// Total number of blocks in the unsparsed output image
+    pub block_count: usize,
     pub chunk_count: usize,
 }
 
@@ -53,6 +55,7 @@ pub fn parse_android_sparse_header(
                 minor_version: header["minor_version"],
                 header_size: header["header_size"],
                 block_size: header["block_size"],
+                block_count: header["block_count"],
                 chunk_count: header["total_chunks"],
             });
         }
@@ -95,23 +98,57 @@ pub fn parse_android_sparse_chunk_header(
         ..Default::default()
     };
 
+    // Expected payload sizes by chunk type (per the Android sparse spec):
+    //   FILL:      4 bytes (the repeated fill value)
+    //   DONT_CARE: 0 bytes
+    //   CRC:       4 bytes (CRC32)
+    //   RAW:       block_count * block_size bytes (validated by the extractor,
+    //              which has access to the sparse header)
+    const FILL_DATA_SIZE: usize = 4;
+    const DONT_CARE_DATA_SIZE: usize = 0;
+    const CRC_DATA_SIZE: usize = 4;
+
     // Parse the header
     if let Ok(chunk_header) = common::parse(chunk_data, &chunk_structure, "little") {
         // Make sure the reserved field is zero
-        if chunk_header["reserved"] == 0 {
-            // Populate the structure values
-            chonker.block_count = chunk_header["output_block_count"];
-            chonker.data_size = chunk_header["total_size"] - chonker.header_size;
-            chonker.is_crc = chunk_header["chunk_type"] == CHUNK_TYPE_CRC;
-            chonker.is_raw = chunk_header["chunk_type"] == CHUNK_TYPE_RAW;
-            chonker.is_fill = chunk_header["chunk_type"] == CHUNK_TYPE_FILL;
-            chonker.is_dont_care = chunk_header["chunk_type"] == CHUNK_TYPE_DONT_CARE;
-
-            // The chunk type must be one of the known chunk types
-            if chonker.is_crc || chonker.is_raw || chonker.is_fill || chonker.is_dont_care {
-                return Ok(chonker);
-            }
+        if chunk_header["reserved"] != 0 {
+            return Err(StructureError);
         }
+
+        // total_size must be at least the size of the chunk header itself; a
+        // smaller value would underflow when computing data_size, and is
+        // structurally invalid.
+        let data_size = match chunk_header["total_size"].checked_sub(chonker.header_size) {
+            Some(s) => s,
+            None => return Err(StructureError),
+        };
+
+        chonker.block_count = chunk_header["output_block_count"];
+        chonker.data_size = data_size;
+        chonker.is_crc = chunk_header["chunk_type"] == CHUNK_TYPE_CRC;
+        chonker.is_raw = chunk_header["chunk_type"] == CHUNK_TYPE_RAW;
+        chonker.is_fill = chunk_header["chunk_type"] == CHUNK_TYPE_FILL;
+        chonker.is_dont_care = chunk_header["chunk_type"] == CHUNK_TYPE_DONT_CARE;
+
+        // The chunk type must be one of the known chunk types
+        if !(chonker.is_crc || chonker.is_raw || chonker.is_fill || chonker.is_dont_care) {
+            return Err(StructureError);
+        }
+
+        // Reject chunks whose declared payload doesn't match the spec for their
+        // type. In particular, a FILL chunk with data_size == 0 would cause the
+        // extractor to loop forever trying to fill a block with no data.
+        if chonker.is_fill && data_size != FILL_DATA_SIZE {
+            return Err(StructureError);
+        }
+        if chonker.is_dont_care && data_size != DONT_CARE_DATA_SIZE {
+            return Err(StructureError);
+        }
+        if chonker.is_crc && data_size != CRC_DATA_SIZE {
+            return Err(StructureError);
+        }
+
+        return Ok(chonker);
     }
 
     Err(StructureError)
