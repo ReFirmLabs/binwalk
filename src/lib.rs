@@ -18,8 +18,13 @@
 //! ```
 mod binwalk;
 pub mod common;
+mod display;
+mod entropy;
 pub mod extractors;
+mod json;
 mod magic;
+pub mod orchestrator;
 pub mod signatures;
 pub mod structures;
 pub use binwalk::{AnalysisResults, Binwalk, BinwalkError};
+pub use orchestrator::{Orchestrator, OrchestratorArgs};
