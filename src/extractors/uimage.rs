@@ -56,16 +56,19 @@ pub fn extract_uimage(
                 result.size = Some(uimage_header.header_size);
 
                 // Check the data CRC
-                let data_crc_valid: bool =
-                    crc32(image_data) == (uimage_header.data_checksum as u32);
+                let data_crc = crc32(image_data);
+                let data_crc_valid = data_crc == (uimage_header.data_checksum as u32);
 
-                // If the data CRC is valid, include the size of the data in the reported size
-                if data_crc_valid {
-                    result.size = Some(result.size.unwrap() + uimage_header.data_size);
+                if !data_crc_valid {
+                    eprintln!("[!] Warning: uImage data CRC mismatch (expected 0x{:08x}, calculated 0x{:08x})",
+                        uimage_header.data_checksum, data_crc);
                 }
 
-                // If extraction was requested and the data CRC is valid, carve the uImage data out to a file
-                if data_crc_valid && output_directory.is_some() {
+                // Include the full data size so the region is marked as consumed
+                result.size = Some(result.size.unwrap() + uimage_header.data_size);
+
+                // If extraction was requested, carve the uImage data out to a file
+                if output_directory.is_some() {
                     let chroot = Chroot::new(output_directory);
                     let mut file_base_name: String = DEFAULT_OUTPUT_FILE_NAME.to_string();
 

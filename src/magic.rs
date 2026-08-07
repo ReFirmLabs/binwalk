@@ -358,6 +358,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::jffs2::DESCRIPTION.to_string(),
             extractor: Some(extractors::jffs2::jffs2_extractor()),
         },
+        // jzlzma
+        signatures::common::Signature {
+            name: "jzlzma".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::jzlzma::jzlzma_magic(),
+            parser: signatures::jzlzma::jzlzma_parser,
+            description: signatures::jzlzma::DESCRIPTION.to_string(),
+            extractor: Some(extractors::jzlzma::jzlzma_extractor()),
+        },
         // YAFFS
         signatures::common::Signature {
             name: "yaffs".to_string(),
@@ -379,6 +390,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             parser: signatures::lz4::lz4_parser,
             description: signatures::lz4::DESCRIPTION.to_string(),
             extractor: Some(extractors::lz4::lz4_extractor()),
+        },
+        // lz4l (UNISOC NV-storage wrapper around a raw LZ4 block)
+        signatures::common::Signature {
+            name: "lz4l".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::lz4l::lz4l_magic(),
+            parser: signatures::lz4l::lz4l_parser,
+            description: signatures::lz4l::DESCRIPTION.to_string(),
+            extractor: Some(extractors::lz4l::lz4l_extractor()),
         },
         // lzop
         signatures::common::Signature {
