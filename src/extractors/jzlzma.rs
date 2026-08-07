@@ -1,6 +1,7 @@
 use crate::extractors::common::{
     Chroot, Extractor, ExtractionResult, ExtractorType,
 };
+use crate::structures::jzlzma::parse_jzlzma_header;
 use std::process::Command;
 
 const JZLZMA_SCRIPT: &str = include_str!("../../scripts/jzlzma/jzlzma_decompress.py");
@@ -45,7 +46,21 @@ pub fn jzlzma_decompress(
     // mark_rootfs_lzma wrapper has magic at bytes 4-7, so include the 4-byte preamble
     let carved_name = "carved.jzlzma";
     let carve_start = if offset >= 4 { offset - 4 } else { offset };
-    if !chroot.carve_file(carved_name, file_data, carve_start, file_data.len() - carve_start) {
+
+    // Bound the carve to the wrapper's own declared length instead of the
+    // rest of the file. jzlzma_decompress.py's decode loop only stops via
+    // StopIteration when its input runs out -- if fed everything to EOF it
+    // keeps decoding past the real stream end into garbage (observed: a
+    // 212MB output for a true ~10MB payload, confirmed via the wrapped
+    // cpio's own TRAILER!!! record). Re-parse the header to get the
+    // authoritative wrapper length and clamp the carve to it.
+    let available = file_data.len() - carve_start;
+    let carve_len = match parse_jzlzma_header(&file_data[carve_start..]) {
+        Ok(header) => std::cmp::min(16 + header.payload_size, available),
+        Err(_) => available,
+    };
+
+    if !chroot.carve_file(carved_name, file_data, carve_start, carve_len) {
         return result;
     }
 
