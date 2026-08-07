@@ -156,6 +156,7 @@ pub mod linux;
 pub mod logfs;
 pub mod luks;
 pub mod lz4;
+pub mod lz4l;
 pub mod lzfse;
 pub mod lzma;
 pub mod lzop;

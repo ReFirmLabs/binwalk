@@ -391,6 +391,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::lz4::DESCRIPTION.to_string(),
             extractor: Some(extractors::lz4::lz4_extractor()),
         },
+        // lz4l (UNISOC NV-storage wrapper around a raw LZ4 block)
+        signatures::common::Signature {
+            name: "lz4l".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::lz4l::lz4l_magic(),
+            parser: signatures::lz4l::lz4l_parser,
+            description: signatures::lz4l::DESCRIPTION.to_string(),
+            extractor: Some(extractors::lz4l::lz4l_extractor()),
+        },
         // lzop
         signatures::common::Signature {
             name: "lzop".to_string(),
