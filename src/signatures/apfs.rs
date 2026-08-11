@@ -2,7 +2,7 @@ use crate::signatures::common::{CONFIDENCE_MEDIUM, SignatureError, SignatureResu
 use crate::structures::apfs::{MAGIC_OFFSET, parse_apfs_header};
 
 /// Human readable description
-pub const DESCRIPTION: &str = "APple File System";
+pub const DESCRIPTION: &str = "Apple File System";
 
 /// APFS magic bytes
 pub fn apfs_magic() -> Vec<Vec<u8>> {
