@@ -20,6 +20,8 @@ The easiest way to install Binwalk and all dependencies is to [build a Docker im
 
 Binwalk can also be [installed](https://github.com/ReFirmLabs/binwalk/wiki/Cargo-Installation) via the Rust package manager.
 
+Users of the [MacPorts](https://www.macports.org) package manager for macOS can run `sudo port install binwalk` to install Binwalk on macOS.
+
 Or, you can [compile from source](https://github.com/ReFirmLabs/binwalk/wiki/Compile-From-Source)!
 
 ## How do I use it?
