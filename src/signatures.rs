@@ -182,6 +182,7 @@ pub mod rtk;
 pub mod seama;
 pub mod sevenzip;
 pub mod shrs;
+pub mod sqlite;
 pub mod squashfs;
 pub mod srec;
 pub mod svg;

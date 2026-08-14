@@ -380,6 +380,28 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::lz4::DESCRIPTION.to_string(),
             extractor: Some(extractors::lz4::lz4_extractor()),
         },
+        // sqlite 3
+        signatures::common::Signature {
+            name: "sqlite3".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::sqlite::sqlite3_magic(),
+            parser: signatures::sqlite::sqlite3_parser,
+            description: signatures::sqlite::V3_DESCRIPTION.to_string(),
+            extractor: None,
+        },
+        // sqlite 2
+        signatures::common::Signature {
+            name: "sqlite2".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::sqlite::sqlite2_magic(),
+            parser: signatures::sqlite::sqlite2_parser,
+            description: signatures::sqlite::V2_DESCRIPTION.to_string(),
+            extractor: None,
+        },
         // lzop
         signatures::common::Signature {
             name: "lzop".to_string(),
