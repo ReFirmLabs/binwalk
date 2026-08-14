@@ -1,0 +1,34 @@
+[build-system]
+requires = ["maturin>=1.5,<2"]
+build-backend = "maturin"
+
+[project]
+name = "binwalk"
+description = "pip installable package for binwalk"
+readme = "README.md"
+authors = [{ name = "Craig Heffner", email = "heffnercj@gmail.com" }]
+license = { file = "../LICENSE" }
+requires-python = ">=3.8"
+keywords = ["binwalk", "firmware", "reverse-engineering", "rust"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: MacOS",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX :: Linux",
+]
+
+[project.urls]
+Homepage = "https://github.com/nightlark/binwalk"
+Issues = "https://github.com/nightlark/binwalk/issues"
+
+[tool.maturin]
+# Build the Rust binary as a Python CLI using maturin's `bindings = "bin"`.
+bindings = "bin"
+# Point maturin at the crate manifest in the repo root.
+manifest-path = "../Cargo.toml"
+# Name of the exposed module/CLI (sets the wheel name and console script).
+module-name = "binwalk"
+
+## No [project.scripts] needed; maturin will generate the console entrypoint in bin mode
