@@ -52,11 +52,11 @@ pub struct CliArgs {
     pub threads: Option<usize>,
 
     /// Do no scan for these signatures
-    #[arg(short = 'x', long, value_delimiter = ',', num_args = 1..)]
+    #[arg(short = 'x', long, value_delimiter = ',', num_args = 1)]
     pub exclude: Option<Vec<String>>,
 
     /// Only scan for these signatures
-    #[arg(short = 'y', long, value_delimiter = ',', num_args = 1.., conflicts_with = "exclude")]
+    #[arg(short = 'y', long, value_delimiter = ',', num_args = 1, conflicts_with = "exclude")]
     pub include: Option<Vec<String>>,
 
     /// Extract files/folders to a custom directory
