@@ -24,7 +24,7 @@ use crate::extractors;
 /// ```
 pub fn sevenzip_extractor() -> extractors::common::Extractor {
     extractors::common::Extractor {
-        utility: extractors::common::ExtractorType::External("7zz".to_string()),
+        utility: extractors::common::ExtractorType::External("7zzs".to_string()),
         extension: "bin".to_string(),
         arguments: vec![
             "x".to_string(),    // Perform extraction
