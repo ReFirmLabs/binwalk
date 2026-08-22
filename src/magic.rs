@@ -613,6 +613,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::jpeg::DESCRIPTION.to_string(),
             extractor: Some(extractors::jpeg::jpeg_extractor()),
         },
+        // TIFF image
+        signatures::common::Signature {
+            name: "tiff".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::tiff::tiff_magic(),
+            parser: signatures::tiff::tiff_parser,
+            description: signatures::tiff::DESCRIPTION.to_string(),
+            extractor: Some(extractors::tiff::tiff_extractor()),
+        },
         // arcadyan obfuscated lzma
         signatures::common::Signature {
             name: "arcadyan".to_string(),
