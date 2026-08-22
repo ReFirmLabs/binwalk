@@ -141,6 +141,7 @@ pub mod efigpt;
 pub mod elf;
 pub mod encfw;
 pub mod encrpted_img;
+pub mod eva;
 pub mod ext;
 pub mod fat;
 pub mod gif;

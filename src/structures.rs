@@ -121,6 +121,7 @@ pub mod dtb;
 pub mod dxbc;
 pub mod efigpt;
 pub mod elf;
+pub mod eva;
 pub mod ext;
 pub mod fat;
 pub mod gif;

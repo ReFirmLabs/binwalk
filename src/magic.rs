@@ -93,6 +93,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             //extractor: Some(extractors::sevenzip::sevenzip_extractor()),
             extractor: Some(extractors::lzma::lzma_extractor()),
         },
+        // Fritz!Box EVA kernel image (TI record format, LZMA-compressed)
+        signatures::common::Signature {
+            name: "eva".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::eva::eva_magic(),
+            parser: signatures::eva::eva_parser,
+            description: signatures::eva::DESCRIPTION.to_string(),
+            extractor: Some(extractors::eva::eva_extractor()),
+        },
         // bmp
         signatures::common::Signature {
             name: "bmp".to_string(),
