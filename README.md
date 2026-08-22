@@ -32,3 +32,18 @@ binwalk DIR-890L_AxFW110b07.bin
 ![example output](images/output.png)
 
 Use `--help`, or check out the [Wiki](https://github.com/ReFirmLabs/binwalk/wiki#usage) for more advanced options!
+
+## Hexdump / diff
+
+Binwalk can also perform a legacy-style hexdump/diff across one or more files:
+
+```sh
+# Hexdump a single file
+binwalk -W firmware.bin
+
+# Diff two files (show only fully-different bytes/lines)
+binwalk -W -i file1.bin file2.bin
+
+# Diff 3+ files (blue indicates partial differences among inputs)
+binwalk -W -U file1.bin file2.bin file3.bin
+```

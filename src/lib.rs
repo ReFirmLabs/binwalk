@@ -19,6 +19,7 @@
 mod binwalk;
 pub mod common;
 pub mod extractors;
+pub mod hexdiff;
 mod magic;
 pub mod signatures;
 pub mod structures;

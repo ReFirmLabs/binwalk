@@ -43,6 +43,34 @@ pub struct CliArgs {
     #[arg(short, long)]
     pub png: Option<String>,
 
+    /// Perform a hexdump / diff of a file or files
+    #[arg(short = 'W', long, conflicts_with = "list")]
+    pub hexdump: bool,
+
+    /// Only show lines containing bytes that are different among all files
+    #[arg(short = 'i', long)]
+    pub show_red: bool,
+
+    /// Only show lines containing bytes that are the same among all files
+    #[arg(short = 'G', long)]
+    pub show_green: bool,
+
+    /// Only show lines containing bytes that are different among some files
+    #[arg(short = 'U', long)]
+    pub show_blue: bool,
+
+    /// Collapse repeated output lines
+    #[arg(short = 'u', long)]
+    pub show_same: bool,
+
+    /// Diff all files, but only display a hex dump of the first file
+    #[arg(short = 'w', long)]
+    pub terse: bool,
+
+    /// Set file block size (hexdump line size)
+    #[arg(short = 'K', long, default_value_t = 16)]
+    pub block: usize,
+
     /// Log JSON results to a file ('-' for stdout)
     #[arg(short, long)]
     pub log: Option<String>,
@@ -63,8 +91,9 @@ pub struct CliArgs {
     #[arg(short, long, default_value = "extractions")]
     pub directory: String,
 
-    /// Path to the file to analyze
-    pub file_name: Option<String>,
+    /// Path(s) to the file(s) to analyze
+    #[arg(value_name = "FILE")]
+    pub files: Vec<String>,
 }
 
 pub fn parse() -> CliArgs {

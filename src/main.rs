@@ -13,6 +13,7 @@ mod binwalk;
 mod cliparser;
 mod common;
 mod display;
+mod hexdiff;
 mod entropy;
 mod extractors;
 mod json;
@@ -63,8 +64,60 @@ fn main() -> ExitCode {
     }
 
     // Set a dummy file name when reading from stdin
-    if cliargs.stdin {
-        cliargs.file_name = Some(STDIN.to_string());
+    if cliargs.stdin && cliargs.files.is_empty() {
+        cliargs.files.push(STDIN.to_string());
+    }
+
+    // If hexdump/diff mode was requested, run it and return
+    if cliargs.hexdump {
+        if cliargs.stdin {
+            error!("--stdin is not supported in --hexdump mode");
+            return ExitCode::FAILURE;
+        }
+
+        if cliargs.files.is_empty() {
+            error!("No input files specified");
+            return ExitCode::FAILURE;
+        }
+
+        let mut show_red = cliargs.show_red;
+        let mut show_green = cliargs.show_green;
+        let mut show_blue = cliargs.show_blue;
+
+        // Mimic legacy behavior: if no color filters were specified, show everything
+        if !show_red && !show_green && !show_blue {
+            show_red = true;
+            show_green = true;
+            show_blue = true;
+        }
+
+        // Read all file data up front
+        let mut inputs: Vec<(String, Vec<u8>)> = Vec::new();
+        for file_path in cliargs.files.iter() {
+            match common::read_input(file_path, false) {
+                Ok(data) => inputs.push((file_path.clone(), data)),
+                Err(e) => {
+                    error!("Failed to read {file_path}: {e}");
+                    return ExitCode::FAILURE;
+                }
+            }
+        }
+
+        let opts = hexdiff::HexdiffOptions {
+            block: cliargs.block,
+            show_red,
+            show_green,
+            show_blue,
+            terse: cliargs.terse,
+            collapse_repeats: cliargs.show_same,
+        };
+
+        if let Err(e) = hexdiff::run(cliargs.quiet, inputs, opts) {
+            error!("{e}");
+            return ExitCode::FAILURE;
+        }
+
+        return ExitCode::SUCCESS;
     }
 
     let mut json_logger = json::JsonLogger::new(cliargs.log);
@@ -73,8 +126,12 @@ fn main() -> ExitCode {
     if cliargs.entropy {
         display::print_plain(cliargs.quiet, "Calculating file entropy...");
 
-        if let Ok(entropy_results) =
-            entropy::plot(cliargs.file_name.unwrap(), cliargs.stdin, cliargs.png)
+        if cliargs.files.is_empty() {
+            error!("No input file specified");
+            return ExitCode::FAILURE;
+        }
+
+        if let Ok(entropy_results) = entropy::plot(cliargs.files[0].clone(), cliargs.stdin, cliargs.png)
         {
             // Log entropy results to JSON file, if requested
             json_logger.log(json::JSONType::Entropy(entropy_results.clone()));
@@ -93,9 +150,21 @@ fn main() -> ExitCode {
         output_directory = Some(cliargs.directory);
     }
 
+    // For normal scan/extract mode, accept exactly one file unless reading from stdin
+    if !cliargs.stdin && cliargs.files.len() != 1 {
+        error!("Expected exactly one input file (or use --stdin)");
+        return ExitCode::FAILURE;
+    }
+
+    let target_file = if cliargs.stdin {
+        cliargs.files[0].clone()
+    } else {
+        cliargs.files[0].clone()
+    };
+
     // Initialize binwalk
     let binwalker = match binwalk::Binwalk::configure(
-        cliargs.file_name,
+        Some(target_file),
         output_directory,
         cliargs.include,
         cliargs.exclude,
