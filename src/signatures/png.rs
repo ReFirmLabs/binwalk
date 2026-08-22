@@ -26,7 +26,7 @@ pub fn png_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, Si
     // Perform an extraction dry-run
     let dry_run = extract_png_image(file_data, offset, None);
 
-    // If the dry-run was a success, this is almost certianly a valid PNG
+    // If the dry-run was a success, this is almost certainly a valid PNG
     if dry_run.success {
         // Get the total size of the PNG
         if let Some(png_size) = dry_run.size {
