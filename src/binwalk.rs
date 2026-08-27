@@ -49,7 +49,7 @@ pub struct AnalysisResults {
 ///
 /// ## Example
 ///
-/// ```
+/// ```rust,no_run
 /// use binwalk::Binwalk;
 ///
 /// let target_file = "/bin/ls";
@@ -244,7 +244,7 @@ impl Binwalk {
     ///
     /// ## Example
     ///
-    /// ```
+    /// ```rust,no_run
     /// use binwalk::Binwalk;
     ///
     /// let target_file = "/bin/ls";
@@ -562,7 +562,7 @@ impl Binwalk {
     ///
     /// ## Example
     ///
-    /// ```
+    /// ```rust,no_run
     /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_binwalk_rs_529_0() -> Result<binwalk::Binwalk, binwalk::BinwalkError> {
     /// use binwalk::Binwalk;
     ///
@@ -677,7 +677,7 @@ impl Binwalk {
     ///
     /// ## Example
     ///
-    /// ```
+    /// ```rust,no_run
     /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_binwalk_rs_672_0() -> Result<binwalk::Binwalk, binwalk::BinwalkError> {
     /// use binwalk::{Binwalk, common};
     ///
@@ -752,7 +752,7 @@ impl Binwalk {
     ///
     /// ## Example
     ///
-    /// ```
+    /// ```rust,no_run
     /// # fn main() { #[allow(non_snake_case)] fn _doctest_main_src_binwalk_rs_745_0() -> Result<binwalk::Binwalk, binwalk::BinwalkError> {
     /// use binwalk::Binwalk;
     ///
