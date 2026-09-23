@@ -21,15 +21,13 @@ pub struct FileEntropy {
 }
 
 /// Splits the supplied data up into blocks and calculates the entropy of each block.
-fn blocks(data: &[u8]) -> Vec<BlockEntropy> {
-    const BLOCK_COUNT: usize = 2048;
-
+fn blocks(data: &[u8], block_count: usize) -> Vec<BlockEntropy> {
     let mut offset: usize = 0;
 
-    let block_size = if data.len() < BLOCK_COUNT {
+    let block_size = if data.len() < block_count {
         data.len()
     } else {
-        data.len() / BLOCK_COUNT
+        data.len() / block_count
     };
 
     let mut chunker = data.chunks(block_size);
@@ -59,6 +57,7 @@ fn blocks(data: &[u8]) -> Vec<BlockEntropy> {
 pub fn plot(
     file_path: impl Into<String>,
     stdin: bool,
+    block_count: usize,
     out_file: Option<String>,
 ) -> Result<FileEntropy, EntropyError> {
     let mut x: Vec<usize> = Vec::new();
@@ -72,7 +71,7 @@ pub fn plot(
     // Read in the target file data
     if let Ok(file_data) = read_input(&target_file, stdin) {
         // Calculate the entropy of each file block
-        file_entropy.blocks = blocks(&file_data);
+        file_entropy.blocks = blocks(&file_data, block_count);
 
         for block in &file_entropy.blocks {
             x.push(block.start);

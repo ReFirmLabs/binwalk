@@ -39,6 +39,10 @@ pub struct CliArgs {
     #[arg(short = 'E', long, conflicts_with = "extract")]
     pub entropy: bool,
 
+    /// Set entropy block count
+    #[arg(short = 'N', long, default_value_t = 2048, requires = "entropy")]
+    pub block_count: usize,
+
     /// Save entropy graph as a PNG file
     #[arg(short, long)]
     pub png: Option<String>,
