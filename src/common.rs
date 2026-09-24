@@ -226,3 +226,27 @@ pub fn is_offset_safe(
 
     true
 }
+
+/// Parses a hexadecimal string representation into a `u64`.
+///
+/// Strips optional `0x` or `0X` prefixes before parsing.
+///
+/// ## Example
+///
+/// ```
+/// use binwalk::common::parse_hex_u64;
+///
+/// assert_eq!(parse_hex_u64("0x1F4000"), Some(2_048_000));
+/// assert_eq!(parse_hex_u64("1F4000"), Some(2_048_000));
+/// assert_eq!(parse_hex_u64("0X0"), Some(0));
+/// assert_eq!(parse_hex_u64("invalid"), None);
+/// ```
+pub fn parse_hex_u64(hex_str: &str) -> Option<u64> {
+    let clean_str = hex_str.trim_start_matches("0x").trim_start_matches("0X");
+
+    if clean_str.is_empty() {
+        return None;
+    }
+
+    u64::from_str_radix(clean_str, 16).ok()
+}
