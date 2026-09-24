@@ -43,6 +43,18 @@ pub struct CliArgs {
     #[arg(short = 'N', long, default_value_t = 2048, requires = "entropy")]
     pub block_count: usize,
 
+    /// Set entropy start offset
+    #[arg(long, requires = "entropy")]
+    pub start: Option<String>,
+
+    /// Set entropy end offset
+    #[arg(long, requires = "entropy")]
+    pub end: Option<String>,
+
+    /// Set entropy offset length
+    #[arg(long, requires = "entropy", conflicts_with = "end")]
+    pub length: Option<String>,
+
     /// Save entropy graph as a PNG file
     #[arg(short, long)]
     pub png: Option<String>,
