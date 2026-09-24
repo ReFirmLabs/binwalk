@@ -1,4 +1,4 @@
-use crate::common::read_input;
+use crate::common::{parse_hex_u64, read_input};
 use entropy::shannon_entropy;
 use plotly::layout::{Axis, Layout};
 use plotly::{ImageFormat, Plot, Scatter};
@@ -21,16 +21,49 @@ pub struct FileEntropy {
 }
 
 /// Splits the supplied data up into blocks and calculates the entropy of each block.
-fn blocks(data: &[u8], block_count: usize) -> Vec<BlockEntropy> {
+fn blocks(data: &[u8], block_count: usize, start: Option<String>, end: Option<String>, length: Option<String>) -> Vec<BlockEntropy> {
+    const BLOCK_COUNT_MAX: usize = 1;
+
+    let block_count = block_count.max(BLOCK_COUNT_MAX);
+
     let mut offset: usize = 0;
 
-    let block_size = if data.len() < block_count {
-        data.len()
+    let start_off: usize = start
+        .as_deref()
+        .and_then(parse_hex_u64)
+        .map(|v| v as usize)
+        .unwrap_or(0);
+
+    let end_off: usize = if let Some(len_str) = length.as_deref() {
+        parse_hex_u64(len_str)
+            .map(|len| start_off.saturating_add(len as usize))
+            .unwrap_or(data.len())
+            .min(data.len())
+    } else if let Some(end_str) = end.as_deref() {
+        parse_hex_u64(end_str)
+            .map(|v| v as usize)
+            .unwrap_or(data.len())
+            .min(data.len())
     } else {
-        data.len() / block_count
+        data.len()
     };
 
-    let mut chunker = data.chunks(block_size);
+    let data_slice: &[u8] = if start_off <= end_off {
+        data.get(start_off..end_off).unwrap_or(data)
+    } else {
+        data
+    };
+
+    // block_size usize enforces alignment so block_count can be a non-base2 multiple
+    let mut block_size = if data_slice.len() < block_count {
+        data_slice.len()
+    } else {
+        data_slice.len() / block_count
+    };
+
+    block_size = block_size.max(1);
+
+    let mut chunker = data_slice.chunks(block_size);
     let mut entropy_blocks: Vec<BlockEntropy> = vec![];
 
     loop {
@@ -58,6 +91,9 @@ pub fn plot(
     file_path: impl Into<String>,
     stdin: bool,
     block_count: usize,
+    start: Option<String>,
+    end: Option<String>,
+    length: Option<String>,
     out_file: Option<String>,
 ) -> Result<FileEntropy, EntropyError> {
     let mut x: Vec<usize> = Vec::new();
@@ -71,7 +107,7 @@ pub fn plot(
     // Read in the target file data
     if let Ok(file_data) = read_input(&target_file, stdin) {
         // Calculate the entropy of each file block
-        file_entropy.blocks = blocks(&file_data, block_count);
+        file_entropy.blocks = blocks(&file_data, block_count, start, end, length);
 
         for block in &file_entropy.blocks {
             x.push(block.start);
