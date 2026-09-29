@@ -401,10 +401,19 @@ dependencies = [
 ]
 
 [[package]]
-name = "crc32-v2"
-version = "0.0.5"
+name = "crc32-codegen"
+version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f9e02424b355b87f4a99a47551bd8ee4c21df1e1c42df8c01ec313a88d1384e"
+checksum = "b3dd70e2a3ba14d3749bd3aa99a9798b5c8d7ab390d5cb34cf29c3080fd9e01e"
+
+[[package]]
+name = "crc32-v2"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "31e63b399961c30b87e556be26c98f6e720cd0be880344e1cc3e2d19575ee671"
+dependencies = [
+ "crc32-codegen",
+]
 
 [[package]]
 name = "crc32c"
