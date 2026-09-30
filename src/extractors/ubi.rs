@@ -28,7 +28,13 @@ pub fn ubi_extractor() -> extractors::common::Extractor {
             "ubireader_extract_images".to_string(),
         ),
         extension: "img".to_string(),
-        arguments: vec![extractors::common::SOURCE_FILE_PLACEHOLDER.to_string()],
+        arguments: vec![
+            // Include blocks whose EC/VID header checksums are bad or missing
+            "-i".to_string(),
+            // Warn, rather than bail, on bad block reads
+            "-w".to_string(),
+            extractors::common::SOURCE_FILE_PLACEHOLDER.to_string(),
+        ],
         exit_codes: vec![0],
         ..Default::default()
     }
@@ -39,7 +45,13 @@ pub fn ubifs_extractor() -> extractors::common::Extractor {
     extractors::common::Extractor {
         utility: extractors::common::ExtractorType::External("ubireader_extract_files".to_string()),
         extension: "ubifs".to_string(),
-        arguments: vec![extractors::common::SOURCE_FILE_PLACEHOLDER.to_string()],
+        arguments: vec![
+            // Include blocks whose EC/VID header checksums are bad or missing
+            "-i".to_string(),
+            // Warn, rather than bail, on bad node checksums and block reads
+            "-w".to_string(),
+            extractors::common::SOURCE_FILE_PLACEHOLDER.to_string(),
+        ],
         exit_codes: vec![0],
         ..Default::default()
     }
