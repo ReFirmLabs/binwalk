@@ -1,11 +1,19 @@
 use crate::common::crc32;
 use crate::structures::common::{self, StructureError};
 
+/// Sanity limits for UBI/UBIFS header fields; only enforced for headers whose checksum is invalid
+const MIN_LEB_SIZE: usize = 1024;
+const MAX_LEB_SIZE: usize = 16 * 1024 * 1024;
+const MAX_LEB_COUNT: usize = 1_048_576;
+const MAX_HEADER_OFFSET: usize = 1024 * 1024;
+
 /// Stores UBI superblock header info
 #[derive(Debug, Default, Clone)]
 pub struct UbiSuperBlockHeader {
     pub leb_size: usize,
     pub leb_count: usize,
+    /// False if the header checksum was invalid or could not be calculated
+    pub crc_valid: bool,
 }
 
 /// Partially parse a UBI superblock header
@@ -62,13 +70,25 @@ pub fn parse_ubi_superblock_header(ubi_data: &[u8]) -> Result<UbiSuperBlockHeade
             if sb_header["node_type"] == SUPERBLOCK_NODE_TYPE {
                 // Make sure the group type is valid
                 if sb_header["group_type"] <= MAX_GROUP_TYPE {
-                    // Validate the header CRC, which is calculated over the entire header except for the magic bytes and CRC field
-                    if let Some(crc_data) = ubi_data.get(CRC_START_OFFSET..sb_struct_size)
-                        && ubi_crc(crc_data) == sb_header["header_crc"]
+                    // Validate the header CRC, which is calculated over the entire header except for the magic bytes and CRC field.
+                    // A truncated image will not have enough data to calculate the CRC over.
+                    let crc_valid: bool = match ubi_data.get(CRC_START_OFFSET..sb_struct_size) {
+                        Some(crc_data) => ubi_crc(crc_data) == sb_header["header_crc"],
+                        None => false,
+                    };
+
+                    // Images with a corrupt or missing checksum are still accepted, but since the CRC can't
+                    // vouch for the rest of the header, the fields that are actually used must at least be sane
+                    if crc_valid
+                        || (sb_header["leb_size"] >= MIN_LEB_SIZE
+                            && sb_header["leb_size"] <= MAX_LEB_SIZE
+                            && sb_header["leb_count"] > 0
+                            && sb_header["leb_count"] <= MAX_LEB_COUNT)
                     {
                         return Ok(UbiSuperBlockHeader {
                             leb_size: sb_header["leb_size"],
                             leb_count: sb_header["leb_count"],
+                            crc_valid,
                         });
                     }
                 }
@@ -85,6 +105,8 @@ pub struct UbiECHeader {
     pub version: usize,
     pub data_offset: usize,
     pub volume_id_offset: usize,
+    /// False if the header checksum was invalid or could not be calculated
+    pub crc_valid: bool,
 }
 
 /// Parse a UBI erase count header
@@ -114,13 +136,30 @@ pub fn parse_ubi_ec_header(ubi_data: &[u8]) -> Result<UbiECHeader, StructureErro
             && ubi_ec_header["volume_id_header_offset"] >= ec_header_size
         {
             // Validate the header CRC
-            if let Some(crc_data) = ubi_data.get(0..crc_data_size)
-                && ubi_crc(crc_data) == ubi_ec_header["header_crc"]
+            let crc_valid: bool = match ubi_data.get(0..crc_data_size) {
+                Some(crc_data) => ubi_crc(crc_data) == ubi_ec_header["header_crc"],
+                None => false,
+            };
+
+            // All padding fields must be NULL; only checked if the checksum is bad or missing, in
+            // which case these are the only sanity checks left to weed out false positives
+            let padding_is_null: bool = ubi_ec_header["padding1"] == 0
+                && ubi_ec_header["padding2"] == 0
+                && ubi_ec_header["padding3"] == 0
+                && ubi_ec_header["padding4"] == 0
+                && ubi_ec_header["padding5"] == 0;
+
+            // Headers with a corrupt or missing checksum are still accepted, provided they otherwise look sane
+            if crc_valid
+                || (padding_is_null
+                    && ubi_ec_header["data_offset"] <= MAX_HEADER_OFFSET
+                    && ubi_ec_header["volume_id_header_offset"] <= MAX_HEADER_OFFSET)
             {
                 return Ok(UbiECHeader {
                     version: ubi_ec_header["version"],
                     data_offset: ubi_ec_header["data_offset"],
                     volume_id_offset: ubi_ec_header["volume_id_header_offset"],
+                    crc_valid,
                 });
             }
         }
@@ -129,12 +168,21 @@ pub fn parse_ubi_ec_header(ubi_data: &[u8]) -> Result<UbiECHeader, StructureErro
     Err(StructureError)
 }
 
-/// Dummy structure indicating a UBI volume header was parsed successfully
+/// Stores info about a UBI volume header
 #[derive(Debug, Default, Clone)]
-pub struct UbiVolumeHeader;
+pub struct UbiVolumeHeader {
+    /// False if the header checksum was invalid or could not be calculated
+    pub crc_valid: bool,
+}
 
 /// Parse a UBI volume header
 pub fn parse_ubi_volume_header(ubi_data: &[u8]) -> Result<UbiVolumeHeader, StructureError> {
+    // Valid volume types (dynamic and static respectively)
+    const VOLUME_TYPE_DYNAMIC: usize = 1;
+    const VOLUME_TYPE_STATIC: usize = 2;
+    // Largest defined compatibility type (UBI_COMPAT_REJECT)
+    const MAX_COMPAT_TYPE: usize = 5;
+
     let ubi_vol_structure = vec![
         ("magic", "u32"),
         ("version", "u8"),
@@ -167,10 +215,20 @@ pub fn parse_ubi_volume_header(ubi_data: &[u8]) -> Result<UbiVolumeHeader, Struc
             && ubi_vol_header["padding4"] == 0
         {
             // Validate the header CRC
-            if let Some(crc_data) = ubi_data.get(0..crc_data_size)
-                && ubi_crc(crc_data) == ubi_vol_header["header_crc"]
+            let crc_valid: bool = match ubi_data.get(0..crc_data_size) {
+                Some(crc_data) => ubi_crc(crc_data) == ubi_vol_header["header_crc"],
+                None => false,
+            };
+
+            // Headers with a corrupt or missing checksum are still accepted, but must contain
+            // sane volume, copy and compatibility types to reduce false positives
+            if crc_valid
+                || ((ubi_vol_header["volume_type"] == VOLUME_TYPE_DYNAMIC
+                    || ubi_vol_header["volume_type"] == VOLUME_TYPE_STATIC)
+                    && ubi_vol_header["copy_flag"] <= 1
+                    && ubi_vol_header["compat_type"] <= MAX_COMPAT_TYPE)
             {
-                return Ok(UbiVolumeHeader);
+                return Ok(UbiVolumeHeader { crc_valid });
             }
         }
     }

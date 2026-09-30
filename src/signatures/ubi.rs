@@ -1,4 +1,6 @@
-use crate::signatures::common::{CONFIDENCE_HIGH, SignatureError, SignatureResult};
+use crate::signatures::common::{
+    CONFIDENCE_HIGH, CONFIDENCE_MEDIUM, SignatureError, SignatureResult,
+};
 use crate::structures::ubi::{
     parse_ubi_ec_header, parse_ubi_superblock_header, parse_ubi_volume_header,
 };
@@ -32,8 +34,23 @@ pub fn ubifs_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, 
     // Parse the UBIFS superblock header
     if let Ok(sb_header) = parse_ubi_superblock_header(&file_data[offset..]) {
         // Image size is the number of logical erase blocks times the size of each logical erase block
-        result.size = sb_header.leb_count * sb_header.leb_size;
-        result.description = format!("{}, total size: {} bytes", result.description, result.size);
+        let image_size: usize = sb_header.leb_count.saturating_mul(sb_header.leb_size);
+        result.description = format!("{}, total size: {} bytes", result.description, image_size);
+
+        // A signature whose size runs past EOF is discarded as invalid; report a truncated image
+        // as an unknown size instead, so that what data there is can still be extracted
+        if image_size > (file_data.len() - offset) {
+            result.description = format!("{} (truncated)", result.description);
+        } else {
+            result.size = image_size;
+        }
+
+        // Images with a corrupt or missing header checksum are still reported, but with less confidence
+        if !sb_header.crc_valid {
+            result.confidence = CONFIDENCE_MEDIUM;
+            result.description = format!("{}, invalid header checksum", result.description);
+        }
+
         return Ok(result);
     }
 
@@ -58,12 +75,20 @@ pub fn ubi_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, Si
         // Sanity check the reported volume and data offsets
         if file_data.len() > data_offset && file_data.len() > volume_offset {
             // Get the size of the UBI image
-            if let Ok(image_size) = get_ubi_image_size(&file_data[offset..]) {
+            if let Ok((image_size, block_crcs_valid)) = get_ubi_image_size(&file_data[offset..]) {
                 result.size = image_size;
                 result.description = format!(
                     "{}, version: {}, image size: {} bytes",
                     result.description, ubi_header.version, result.size
                 );
+
+                // Images with corrupt or missing header checksums are still reported, but with less confidence
+                if !ubi_header.crc_valid || !block_crcs_valid {
+                    result.confidence = CONFIDENCE_MEDIUM;
+                    result.description =
+                        format!("{}, invalid header checksums", result.description);
+                }
+
                 return Ok(result);
             }
         }
@@ -72,10 +97,12 @@ pub fn ubi_parser(file_data: &[u8], offset: usize) -> Result<SignatureResult, Si
     Err(SignatureError)
 }
 
-/// Determines the LEB size and returns the size of the UBI image
-fn get_ubi_image_size(ubi_data: &[u8]) -> Result<usize, SignatureError> {
+/// Determines the LEB size and returns the size of the UBI image, along with false if any of the
+/// volume headers that make up the image had a corrupt or missing checksum
+fn get_ubi_image_size(ubi_data: &[u8]) -> Result<(usize, bool), SignatureError> {
     let mut leb_size: usize = 0;
     let mut block_count: usize = 0;
+    let mut crcs_valid: bool = true;
     let mut best_leb_match_count: usize = 0;
     let mut previous_volume_offset: usize = 0;
     let mut possible_leb_sizes: HashMap<usize, usize> = HashMap::new();
@@ -91,9 +118,10 @@ fn get_ubi_image_size(ubi_data: &[u8]) -> Result<usize, SignatureError> {
         let this_volume_offset: usize = magic_match.start();
 
         // Parse the volume header
-        if parse_ubi_volume_header(&ubi_data[this_volume_offset..]).is_ok() {
+        if let Ok(volume_header) = parse_ubi_volume_header(&ubi_data[this_volume_offset..]) {
             // Header looks valid, increment the block count
             block_count += 1;
+            crcs_valid &= volume_header.crc_valid;
 
             // If there was a previous UBI volume header identified, calculate the leb size as the distance between the two volume header
             if previous_volume_offset != 0 {
@@ -122,7 +150,7 @@ fn get_ubi_image_size(ubi_data: &[u8]) -> Result<usize, SignatureError> {
 
     // Image size is leb size times the number of blocks
     if leb_size != 0 && block_count != 0 {
-        return Ok(block_count * leb_size);
+        return Ok((block_count.saturating_mul(leb_size), crcs_valid));
     }
 
     Err(SignatureError)
