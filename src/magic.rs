@@ -1229,6 +1229,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::hashes::MD5_DESCRIPTION.to_string(),
             extractor: None,
         },
+        // DEX files
+        signatures::common::Signature {
+            name: "dex".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::dex::dex_magic(),
+            parser: signatures::dex::dex_parser,
+            description: signatures::dex::DESCRIPTION.to_string(),
+            extractor: Some(extractors::dex::dex_extractor()),
+        },
     ];
 
     binary_signatures
