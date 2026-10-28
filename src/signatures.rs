@@ -151,6 +151,7 @@ pub mod iso9660;
 pub mod jboot;
 pub mod jffs2;
 pub mod jpeg;
+pub mod libratone;
 pub mod linux;
 pub mod logfs;
 pub mod luks;

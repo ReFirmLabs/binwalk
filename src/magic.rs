@@ -1020,6 +1020,17 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::dahua_zip::DESCRIPTION.to_string(),
             extractor: Some(extractors::dahua_zip::dahua_zip_extractor()),
         },
+        // Libratone firmware update
+        signatures::common::Signature {
+            name: "libratone".to_string(),
+            short: true,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::libratone::libratone_magic(),
+            parser: signatures::libratone::libratone_parser,
+            description: signatures::libratone::DESCRIPTION.to_string(),
+            extractor: Some(extractors::libratone::libratone_extractor()),
+        },
         // DLink MH01
         signatures::common::Signature {
             name: "mh01".to_string(),
