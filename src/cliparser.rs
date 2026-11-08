@@ -52,11 +52,11 @@ pub struct CliArgs {
     pub threads: Option<usize>,
 
     /// Do no scan for these signatures
-    #[arg(short = 'x', long, value_delimiter = ',', num_args = 1..)]
+    #[arg(short = 'x', long, value_delimiter = ',')]
     pub exclude: Option<Vec<String>>,
 
     /// Only scan for these signatures
-    #[arg(short = 'y', long, value_delimiter = ',', num_args = 1.., conflicts_with = "exclude")]
+    #[arg(short = 'y', long, value_delimiter = ',', conflicts_with = "exclude")]
     pub include: Option<Vec<String>>,
 
     /// Extract files/folders to a custom directory
@@ -78,4 +78,40 @@ pub fn parse() -> CliArgs {
     }
 
     args
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn include_option_does_not_consume_target_file() {
+        let args = CliArgs::try_parse_from(["binwalk", "-y", "zip", "firmware.bin"]).unwrap();
+        assert_eq!(args.include, Some(vec!["zip".to_string()]));
+        assert_eq!(args.file_name.as_deref(), Some("firmware.bin"));
+    }
+
+    #[test]
+    fn include_option_accepts_comma_separated_values() {
+        let args = CliArgs::try_parse_from(["binwalk", "-y", "zip,png", "firmware.bin"]).unwrap();
+        assert_eq!(
+            args.include,
+            Some(vec!["zip".to_string(), "png".to_string()])
+        );
+        assert_eq!(args.file_name.as_deref(), Some("firmware.bin"));
+    }
+
+    #[test]
+    fn exclude_option_does_not_consume_target_file() {
+        let args = CliArgs::try_parse_from(["binwalk", "-x", "zip", "firmware.bin"]).unwrap();
+        assert_eq!(args.exclude, Some(vec!["zip".to_string()]));
+        assert_eq!(args.file_name.as_deref(), Some("firmware.bin"));
+    }
+
+    #[test]
+    fn include_option_still_accepts_equals_syntax() {
+        let args = CliArgs::try_parse_from(["binwalk", "--include=zip", "firmware.bin"]).unwrap();
+        assert_eq!(args.include, Some(vec!["zip".to_string()]));
+        assert_eq!(args.file_name.as_deref(), Some("firmware.bin"));
+    }
 }
