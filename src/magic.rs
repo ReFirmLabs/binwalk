@@ -104,6 +104,28 @@ pub fn patterns() -> Vec<signatures::common::Signature> {
             description: signatures::bmp::DESCRIPTION.to_string(),
             extractor: Some(extractors::bmp::bmp_extractor()),
         },
+        // Xilinx FPGA bitstream (.bit header or raw bus-width/sync sequence)
+        signatures::common::Signature {
+            name: "xilinx_bitstream".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::fpga::xilinx_magic(),
+            parser: signatures::fpga::xilinx_parser,
+            description: signatures::fpga::XILINX_DESCRIPTION.to_string(),
+            extractor: None,
+        },
+        // Lattice iCE40 FPGA bitstream
+        signatures::common::Signature {
+            name: "ice40_bitstream".to_string(),
+            short: false,
+            magic_offset: 0,
+            always_display: false,
+            magic: signatures::fpga::ice40_magic(),
+            parser: signatures::fpga::ice40_parser,
+            description: signatures::fpga::ICE40_DESCRIPTION.to_string(),
+            extractor: None,
+        },
         // bzip2
         signatures::common::Signature {
             name: "bzip2".to_string(),

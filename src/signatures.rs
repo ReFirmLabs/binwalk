@@ -143,6 +143,7 @@ pub mod encfw;
 pub mod encrpted_img;
 pub mod ext;
 pub mod fat;
+pub mod fpga;
 pub mod gif;
 pub mod gpg;
 pub mod gzip;
