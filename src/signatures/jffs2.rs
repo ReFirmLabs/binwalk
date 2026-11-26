@@ -19,6 +19,13 @@ pub fn jffs2_magic() -> Vec<Vec<u8>> {
         b"\x85\x19\x01\xe0".to_vec(),
         b"\x85\x19\x02\xe0".to_vec(),
         b"\x85\x19\x03\x20".to_vec(),
+        /* JFFS2_NODE_ACCURATE flag is cleared when a node is obsoleted, so the image may start with this. */
+        b"\x19\x85\xc0\x01".to_vec(),
+        b"\x19\x85\xc0\x02".to_vec(),
+        b"\x19\x85\x00\x03".to_vec(),
+        b"\x85\x19\x01\xc0".to_vec(),
+        b"\x85\x19\x02\xc0".to_vec(),
+        b"\x85\x19\x03\x00".to_vec(),
     ]
 }
 
