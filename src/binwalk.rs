@@ -795,12 +795,12 @@ impl Binwalk {
         let file_data = match read_file(&file_path) {
             Err(_) => {
                 error!("Failed to read data from {file_path}");
-                b"".to_vec()
+                b""
             }
             Ok(data) => data,
         };
 
-        self.analyze_buf(&file_data, &file_path, do_extraction)
+        self.analyze_buf(file_data, &file_path, do_extraction)
     }
 }
 
