@@ -290,7 +290,7 @@ fn spawn_worker(
         let file_data = match common::read_input(&target_file, stdin) {
             Err(_) => {
                 error!("Failed to read {target_file} data");
-                b"".to_vec()
+                b""
             }
             Ok(data) => data,
         };

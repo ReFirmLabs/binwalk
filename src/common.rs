@@ -1,6 +1,7 @@
 //! Common Functions
 use chrono::prelude::DateTime;
 use log::{debug, error};
+use memmap2::Mmap;
 use std::fs::File;
 use std::io::Read;
 
@@ -17,12 +18,12 @@ use std::io::Read;
 /// # Ok(())
 /// # } _doctest_main_src_common_rs_11_0(); }
 /// ```
-pub fn read_input(file: impl Into<String>, stdin: bool) -> Result<Vec<u8>, std::io::Error> {
+pub fn read_input(file: impl Into<String>, stdin: bool) -> Result<&'static [u8], std::io::Error> {
     if stdin { read_stdin() } else { read_file(file) }
 }
 
 /// Read data from standard input and return its contents.
-pub fn read_stdin() -> Result<Vec<u8>, std::io::Error> {
+pub fn read_stdin() -> Result<&'static [u8], std::io::Error> {
     let mut stdin_data = Vec::new();
 
     match std::io::stdin().read_to_end(&mut stdin_data) {
@@ -32,7 +33,7 @@ pub fn read_stdin() -> Result<Vec<u8>, std::io::Error> {
         }
         Ok(nbytes) => {
             debug!("Loaded {nbytes} bytes from stdin");
-            Ok(stdin_data)
+            Ok(stdin_data.leak())
         }
     }
 }
@@ -50,8 +51,7 @@ pub fn read_stdin() -> Result<Vec<u8>, std::io::Error> {
 /// # Ok(())
 /// # } _doctest_main_src_common_rs_48_0(); }
 /// ```
-pub fn read_file(file: impl Into<String>) -> Result<Vec<u8>, std::io::Error> {
-    let mut file_data = Vec::new();
+pub fn read_file(file: impl Into<String>) -> Result<&'static [u8], std::io::Error> {
     let file_path = file.into();
 
     match File::open(&file_path) {
@@ -59,14 +59,14 @@ pub fn read_file(file: impl Into<String>) -> Result<Vec<u8>, std::io::Error> {
             error!("Failed to open file {file_path}: {e}");
             Err(e)
         }
-        Ok(mut fp) => match fp.read_to_end(&mut file_data) {
+        Ok(fp) => match unsafe { Box::leak(Box::new(Mmap::map(&fp))) } {
             Err(e) => {
-                error!("Failed to read file {file_path} into memory: {e}");
-                Err(e)
+                error!("Failed to map file {file_path}: {e}");
+                Err(std::io::Error::new(e.kind(), e.to_string()))
             }
-            Ok(file_size) => {
-                debug!("Loaded {file_size} bytes from {file_path}");
-                Ok(file_data)
+            Ok(file_data) => {
+                debug!("Mapped {file_path}");
+                Ok(&*file_data)
             }
         },
     }

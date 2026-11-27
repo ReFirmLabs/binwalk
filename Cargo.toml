@@ -35,6 +35,7 @@ xxhash-rust = { version = "0.8.12", features = ["xxh32"] }
 hex = "0.4.3"
 delink = { git = "https://github.com/devttys0/delink" }
 plotly = { version = "0.13.1", features = ["kaleido", "kaleido_download"] }
+memmap2 = "0.9"
 
 [dependencies.uuid]
 version = "1.17.0"
