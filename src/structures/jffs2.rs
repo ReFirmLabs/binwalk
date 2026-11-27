@@ -19,6 +19,7 @@ pub fn parse_jffs2_node_header(node_data: &[u8]) -> Result<JFFS2Node, StructureE
 
     // Number of header bytes over which the header CRC is calculated
     const JFFS2_HEADER_CRC_SIZE: usize = 8;
+    const JFFS2_NODE_ACCURATE: u16 = 0x2000;
 
     let jffs2_node_structure = vec![
         ("magic", "u16"),
@@ -52,7 +53,20 @@ pub fn parse_jffs2_node_header(node_data: &[u8]) -> Result<JFFS2Node, StructureE
         // Node magic must be correct at this point, else this node is invalid
         if node_header["magic"] == JFFS2_CORRECT_MAGIC {
             // Calculate the node header CRC
-            let node_calculated_crc = jffs2_node_crc(&node_data[0..JFFS2_HEADER_CRC_SIZE]);
+            // JFFS2 marks a node obsolete by clearing JFFS2_NODE_ACCURATE flag.
+            // The stored header CRC was calculated before this bit was zeroed,
+            // so it must be restored before verification.
+            let mut crc_header = [0u8; JFFS2_HEADER_CRC_SIZE];
+            crc_header.copy_from_slice(&node_data[..JFFS2_HEADER_CRC_SIZE]);
+            let original_type = node_header["type"] as u16;
+            let crc_type = original_type | JFFS2_NODE_ACCURATE;
+            let type_bytes = if node.endianness == "big" {
+                crc_type.to_be_bytes()
+            } else {
+                crc_type.to_le_bytes()
+            };
+            crc_header[2..4].copy_from_slice(&type_bytes);
+            let node_calculated_crc = jffs2_node_crc(&crc_header);
 
             // Validate the node header CRC
             if node_calculated_crc == node_header["crc"] {
